@@ -3,19 +3,20 @@ title: RobotPal
 subtitle: 로봇 제어와 카메라 영상 전송을 잇는 C++ 시뮬레이터
 category: C++ 로봇 시뮬레이터와 실시간 영상 전송
 summary:
-- 실물 JETANK 이동 로봇의 주행을 가상으로 재현하는 C++ 시뮬레이터입니다.
-- 가상 카메라 영상을 Python 인공지능 모듈에 보내고, 이동 로봇과 로봇 팔 제어 명령을 연결했습니다.
+- 실물 JETANK의 주행을 재현한 C++ 시뮬레이터로, 가상 카메라 프레임을 압축해 Python 인공지능 모듈에 전달하고 로봇 제어 명령을 연결했습니다.
+- Tracy로 JPEG 압축 병목을 확인하고 4개 작업자로 분리했습니다. 보고된 1232×832 iGPU 측정에서 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS였습니다(각 5회 중앙값, 수신·디코딩 제외, 60 FPS 목표 미달).
 period: 2025.11 – 2025.12
 startDate: 2025-11
 endDate: 2025-12
 status: complete
 team: 팀 프로젝트 · 공개 자료의 팀 규모 기록 불일치
 role:
+- Tracy로 JPEG 압축이 주 실행 흐름의 병목임을 확인하고, 압축·송신을 4개 작업자로 분리
+- 1232×832 iGPU 보고 측정에서 스트리밍 중 시뮬레이션 66.70→96.01 FPS, 카메라 송신 26.95→40.05 FPS 기록(OFF·ON 각 5회 중앙값; 수신·디코딩 제외, 60 FPS 목표 미달)
 - Qt 화면에서 실물 JETANK 이동 로봇의 상태를 확인하고 조작 입력을 보내는 기능 구현
 - 좌우 모터 입력과 실측 주행값으로 가상 이동 로봇의 직진과 회전 속도 보정
 - Python 인공지능 명령을 이동 로봇, 로봇 팔, 집게, 카메라 기울기 제어에 연결
 - 가상 카메라 화면을 이미지로 압축해 Python 인공지능 모듈에 전달
-- 성능 측정 도구 Tracy로 병목을 찾고 별도 작업 스레드 네 개로 이미지 압축을 분리
 stack:
 - C++17
 - OpenGL 3D 화면 그리기
@@ -40,27 +41,27 @@ links:
   demo: null
 contributions:
 - id: robotpal-contribution-1
+  text: Tracy 계측에서 JPEG 압축이 주 실행 흐름의 병목임을 확인하고 압축·송신을 4개 작업자로 분리
+  evidenceIds:
+  - robotpal-benchmark
+  status: reported
+- id: robotpal-contribution-2
+  text: 1232×832 iGPU 보고 측정에서 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS였습니다(OFF·ON 각 5회 중앙값; 수신·디코딩 제외, 60 FPS 목표 미달)
+  evidenceIds:
+  - robotpal-benchmark
+  status: reported
+- id: robotpal-contribution-3
   text: Qt 화면에서 실물 JETANK 이동 로봇의 상태를 확인하고 조작 입력을 보내는 기능 구현
   evidenceIds:
   - robotpal-public
   status: reported
-- id: robotpal-contribution-2
+- id: robotpal-contribution-4
   text: 좌우 모터 입력과 실측 주행값으로 가상 이동 로봇의 직진과 회전 속도 보정
   evidenceIds:
   - robotpal-public
   status: reported
-- id: robotpal-contribution-3
-  text: Python 인공지능 명령을 이동 로봇, 로봇 팔, 집게, 카메라 기울기 제어에 연결
-  evidenceIds:
-  - robotpal-public
-  status: reported
-- id: robotpal-contribution-4
-  text: 가상 카메라 화면을 이미지로 압축해 Python 인공지능 모듈에 전달
-  evidenceIds:
-  - robotpal-public
-  status: reported
 - id: robotpal-contribution-5
-  text: 성능 측정 도구 Tracy로 병목을 찾고 별도 작업 스레드 네 개로 이미지 압축을 분리
+  text: Python 인공지능 명령과 카메라 프레임 전송을 이동 로봇·로봇 팔 제어에 연결
   evidenceIds:
   - robotpal-public
   status: reported
@@ -71,7 +72,7 @@ outcomes:
   - robotpal-benchmark
   status: reported
 - id: robotpal-target
-  text: 카메라 영상 전송은 26.95에서 40.05 FPS로 개선되었으며 목표 60 FPS에는 도달하지 못했습니다.
+  text: 1232×832 iGPU 보고 측정(OFF·ON 각 5회 중앙값, 수신·디코딩 제외)에서 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS였습니다. 카메라 송신 60 FPS 목표에는 도달하지 못했습니다.
   evidenceIds:
   - robotpal-benchmark
   status: reported
