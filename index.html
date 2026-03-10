@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>홍윤표 | Backend & System Engineer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Pretendard Font -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <style>
+        body {
+            font-family: 'Pretendard', system-ui, sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 100%;
+            height: 3px;
+            background-color: #3b82f6;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="antialiased leading-relaxed">
+
+    <!-- Header / Hero Section -->
+    <header class="bg-slate-900 text-white py-20 px-4">
+        <div class="max-w-5xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">홍윤표 <span class="text-2xl md:text-3xl font-normal text-slate-300">(Hong Yunpyo)</span></h1>
+            <p class="text-xl md:text-2xl text-blue-400 mb-8 font-light">System & Backend Software Engineer</p>
+            
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="mailto:cgantro@gmail.com" class="flex items-center gap-2 px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all">
+                    <i data-lucide="mail" class="w-5 h-5"></i> cgantro@gmail.com
+                </a>
+                <a href="https://github.com/cgantro" target="_blank" class="flex items-center gap-2 px-6 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-full transition-all">
+                    <i data-lucide="github" class="w-5 h-5"></i> github.com/cgantro
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-12 space-y-16">
+
+        <!-- Education & Skills -->
+        <section>
+            <h2 class="text-2xl section-title flex items-center gap-2">
+                <i data-lucide="user" class="text-blue-500"></i> 프로필 및 기술 스택
+            </h2>
+            <div class="grid grid-cols-1 gap-6">
+                <!-- Education/Cert -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800 border-b pb-2">학력 및 자격</h3>
+                    <ul class="space-y-3">
+                        <li class="flex justify-between items-start">
+                            <div>
+                                <span class="font-medium text-slate-800">광운대학교</span>
+                                <p class="text-sm text-slate-500">소프트웨어학부 학사</p>
+                            </div>
+                            <span class="text-sm text-slate-500 bg-slate-100 px-2 py-1 rounded">2019.03 - 2025.08</span>
+                        </li>
+                        <li class="flex justify-between items-start pt-2">
+                            <span class="font-medium text-slate-800">정보처리기사</span>
+                            <span class="text-sm text-slate-500">2024.12 취득</span>
+                        </li>
+                        <li class="flex justify-between items-start">
+                            <span class="font-medium text-slate-800">OPIc (IH)</span>
+                            <span class="text-sm text-slate-500">2025.02 취득</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Skills -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="font-bold text-lg mb-4 text-slate-800 border-b pb-2">기술 스택</h3>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1 font-medium">Core Languages</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm">C++17</span>
+                                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm">Java 17</span>
+                                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm">Python 3</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1 font-medium">Backend & Database</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-sm">Spring Boot</span>
+                                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm">PostgreSQL (TimescaleDB)</span>
+                                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm">MySQL</span>
+                                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm">Redis</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1 font-medium">System & Architecture</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-lg text-sm">MQTT</span>
+                                <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-lg text-sm">WebSocket (STOMP)</span>
+                                <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-lg text-sm">Flecs (ECS)</span>
+                                <span class="px-3 py-1 bg-purple-50 text-purple-700 rounded-lg text-sm">Qt</span>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-500 mb-1 font-medium">Infrastructure & DevOps</p>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-sm">Docker</span>
+                                <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-sm">GitLab CI/CD</span>
+                                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm">CMake</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project 1: AutowingCar -->
+        <section>
+            <h2 class="text-2xl section-title flex items-center gap-2">
+                <i data-lucide="server" class="text-blue-500"></i> AutowingCar: 통합 관제 시스템 개발
+            </h2>
+            
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">자율 주행 로봇의 실시간 관제 및 제어를 위한 백엔드 및 인프라 구축</h3>
+                        <div class="flex items-center gap-3 mt-2">
+                            <a href="https://github.com/cgantro/autowing_car" target="_blank" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                                <i data-lucide="external-link" class="w-4 h-4"></i> Repository
+                            </a>
+                            <span class="text-sm text-slate-500 bg-slate-100 px-2 py-1 rounded">2025.01 – 2025.02</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 text-slate-700 mb-6">
+                    <p><strong>프로젝트 개요:</strong> 공항 내 자율 주행 로봇(토잉카)의 고빈도 텔레메트리 데이터를 수집하고 다중 클라이언트에 실시간 동기화하는 관제 시스템 아키텍처 및 백엔드 인프라 전반 구축.</p>
+                    
+                    <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
+                        <h4 class="font-bold text-slate-800 mb-2">💡 주요 담당 역할 및 성과 (기여도: 35%)</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-2 text-sm leading-relaxed">
+                            <li><strong>메시징 브릿지 아키텍처 설계:</strong> Spring Boot, MQTT, WebSocket을 결합하여 로봇의 상태 데이터를 클라이언트로 실시간 중계하는 파이프라인 구축. k6 부하 테스트 결과, 차량 500대 동시 접속 환경에서도 E2E 지연 시간 평균 <strong>14ms ~ 28ms (0.03초 이내)</strong> 달성.</li>
+                            <li><strong>경로 추천 알고리즘 설계:</strong> 관제사가 다수의 로봇에게 이동 지시를 내릴 때, 맵 노드 간의 간선을 바탕으로 A* 탐색 알고리즘을 수행하여 최단 경로를 시각적으로 추천하는 기능 구현.</li>
+                            <li><strong>시계열 데이터 최적화:</strong> PostgreSQL(TimescaleDB)을 도입하여, 초 단위로 발생하는 대량의 차량 주행 로그(<code>DrivingLog</code>) 데이터를 효율적으로 파티셔닝하고 조회 성능을 최적화.</li>
+                            <li><strong>네트워크 최적화:</strong> <strong>RDP(Ramer-Douglas-Peucker) 알고리즘</strong>을 적용, 주행 경로 데이터 포인트를 압축하여 대역폭 사용량 80% 절감.</li>
+                            <li><strong>자동화 배포 환경:</strong> GitLab CI/CD와 Docker를 도입하여 백엔드(Spring Boot) API 서버 및 메시지 브로커, DB(Redis) 등 인프라의 자동 배포 환경 구축.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project 2: RobotPal -->
+        <section>
+            <h2 class="text-2xl section-title flex items-center gap-2">
+                <i data-lucide="cpu" class="text-blue-500"></i> RobotPal: 로봇 시뮬레이터 엔진 컴포넌트
+            </h2>
+            
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900">이기종 환경 지원을 위한 스트리밍 및 네트워크 파이프라인 구현</h3>
+                        <div class="flex items-center gap-3 mt-2">
+                            <a href="https://github.com/cgantro/robotpal" target="_blank" class="text-sm text-blue-600 hover:underline flex items-center gap-1">
+                                <i data-lucide="external-link" class="w-4 h-4"></i> Repository
+                            </a>
+                            <span class="text-sm text-slate-500 bg-slate-100 px-2 py-1 rounded">2025.11 – 2025.12</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4 text-slate-700 mb-6">
+                    <p><strong>프로젝트 시작 배경:</strong> 고가의 실물 JetTank 장비 사용 기간의 한계를 극복하고, 3D 모델링 지식 없이도 후배들이 로봇 제어 알고리즘 검증 및 웹 기반의 간단한 카메라 학습 데이터를 쉽게 수집할 수 있도록 자체 제작.</p>
+                    
+                    <div class="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
+                        <h4 class="font-bold text-slate-800 mb-2">💡 주요 담당 역할 및 성과 (기여도: 30%)</h4>
+                        <ul class="list-disc list-inside ml-4 space-y-2 text-sm leading-relaxed">
+                            <li><strong>스트리밍 성능 개선:</strong> 영상 캡처와 네트워크 전송을 분리하는 <strong>멀티스레드 기반 Producer-Consumer 패턴</strong>을 설계하여 시뮬레이터 메인 스레드의 연산 병목 현상 해소. 30~60fps 수준의 스트리밍을 달성했으나, TCP 환경의 한계가 존재하여 향후 UDP/WebRTC 도입 필요성 도출.</li>
+                            <li><strong>기구학 연산 모듈화:</strong> 대상 하드웨어인 Jetson Nano의 규격과 내장 코드의 움직임 속도에 맞춰, 시뮬레이터 내 로봇의 위치(Odometry) 변화를 추적하는 위치 계산 로직 구현 및 ECS 적용.</li>
+                            <li><strong>플랫폼 독립적 통신 레이어:</strong> Emscripten(WASM) 기반의 WebSocket과 데스크톱 Native 환경의 TCP 통신을 단일 인터페이스로 추상화한 네트워크 엔진 계층 설계.</li>
+                            <li><strong>제어 UI 구축:</strong> Qt 프레임워크를 활용하여 시뮬레이터 파라미터 튜닝뿐만 아니라, 실제 로봇의 모터를 조작하고 센서 상태를 확인할 수 있는 직관적인 데스크톱 UI 개발.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Extracurricular Activities -->
+        <section>
+            <h2 class="text-2xl section-title flex items-center gap-2">
+                <i data-lucide="users" class="text-blue-500"></i> 조직 관리 및 리더십
+            </h2>
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-900 flex items-center gap-3">
+                            교내 밴드 동아리 마스터 (합주 지도 및 교육)
+                            <span class="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">Leadership & Mentoring</span>
+                        </h3>
+                    </div>
+                    <span class="text-sm text-slate-500 bg-slate-100 px-3 py-1 rounded-full">2019 – 2025</span>
+                </div>
+                
+                <div class="space-y-4 text-slate-700">
+                    <p>단순한 취미 활동을 넘어, <strong>기술 조직에서 요구되는 '소통', '일정 관리', '갈등 해결' 역량을 배양</strong>한 경험입니다.</p>
+                    <ul class="list-disc list-inside ml-4 space-y-2 text-sm leading-relaxed">
+                        <li><strong>조직 운영 및 기획력:</strong> 15회 이상의 정기 공연 및 외부 행사를 기획하고 무대를 준비하는 과정을 총괄하며 마일스톤 관리 및 실행력을 키웠습니다.</li>
+                        <li><strong>자원 조율 및 최적화 (합주 디렉팅):</strong> 각기 다른 악기(기타, 베이스, 드럼, 키보드)의 특성을 파악하고 사운드 밸런스를 조율했습니다. 한정된 리소스(시간, 장비) 내에서 곡의 완성도를 도출하는 과정을 경험했습니다.</li>
+                        <li><strong>팀 빌딩 및 멘토링:</strong> 신입 부원들의 역량 강화를 위해 악기 연주법 및 합주 기초 교육을 주도적으로 진행했습니다. 팀 전체의 실력을 상향 평준화하는 온보딩 및 멘토링 경험을 쌓았습니다.</li>
+                        <li><strong>의견 조율 및 문제 해결:</strong> 다양한 성향의 부원들 사이에서 발생하는 음악적/개인적 의견 충돌을 중재하고, 공동의 목표를 향해 나아갈 수 있도록 팀워크를 다졌습니다.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center mt-12">
+        <p class="text-sm">© 2026 Hong Yunpyo. Built with C++17, Java 17, and Passion for Systems.</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
