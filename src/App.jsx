@@ -33,8 +33,26 @@ const TECH_GLYPH_MAP = {
   Coordination: "CO",
 };
 
+const TECH_ICON_MAP = {
+  "Java 17": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+  "Spring Boot": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg",
+  PostgreSQL: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+  TimescaleDB: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+  Redis: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
+  MQTT: "https://cdn.simpleicons.org/mqtt/8b5cf6",
+  WebSocket: "https://cdn.simpleicons.org/socketdotio/38bdf8",
+  "C++17": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+  OpenGL: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/opengl/opengl-original.svg",
+  Qt: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/qt/qt-original.svg",
+  CMake: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cmake/cmake-original.svg",
+};
+
 function getTechGlyph(label) {
   return TECH_GLYPH_MAP[label] ?? label.slice(0, 3).toUpperCase();
+}
+
+function getTechIcon(label) {
+  return TECH_ICON_MAP[label] ?? null;
 }
 
 function normalizeTabContent(fullText) {
@@ -198,12 +216,21 @@ export default function App() {
               <section className="meta-card">
                 <h5>Tech Stack</h5>
                 <div className="tech-chip-list">
-                  {techStack.map((tech) => (
-                    <span key={tech} className="tech-chip">
-                      <span className="tech-glyph">{getTechGlyph(tech)}</span>
-                      <span className="tech-label">{tech}</span>
-                    </span>
-                  ))}
+                  {techStack.map((tech) => {
+                    const iconUrl = getTechIcon(tech);
+                    return (
+                      <span key={tech} className="tech-chip">
+                        {iconUrl ? (
+                          <span className="tech-icon-wrap">
+                            <img src={iconUrl} alt={tech} className="tech-icon" loading="lazy" />
+                          </span>
+                        ) : (
+                          <span className="tech-glyph">{getTechGlyph(tech)}</span>
+                        )}
+                        <span className="tech-label">{tech}</span>
+                      </span>
+                    );
+                  })}
                 </div>
               </section>
             )}
