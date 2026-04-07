@@ -258,6 +258,24 @@ body {
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.38);
 }
 
+.tech-icon-wrap {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.78);
+  border: 1px solid rgba(148, 163, 184, 0.28);
+}
+
+.tech-icon {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(125, 211, 252, 0.25));
+}
+
 .tech-label {
   font-size: 12px;
   color: #e2e8f0;
