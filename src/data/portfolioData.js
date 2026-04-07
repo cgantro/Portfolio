@@ -13,7 +13,6 @@ export const portfolioData = {
       "MQTT",
       "WebSocket",
       "C++17",
-      "OpenGL",
     ],
     highlights: [
       "AutowingCar 최대 처리량 8,935 msg/s",
@@ -40,7 +39,7 @@ export const portfolioData = {
 - Spring Boot, PostgreSQL (TimescaleDB), MySQL, Redis
 
 [System & Architecture]
-- MQTT, WebSocket(STOMP), Flecs(ECS), Qt
+- MQTT, WebSocket(STOMP), Qt
 
 [DevOps & Tools]
 - Docker, GitLab CI/CD, CMake, Git
@@ -160,15 +159,12 @@ export const portfolioData = {
       id: "robotpal",
       label: "RobotPal",
       title: "크로스플랫폼 로봇 시뮬레이터",
-      subtitle: "C++17, OpenGL, Flecs(ECS), WebSockets, Qt, CMake",
+      subtitle: "C++17, WebSockets, Qt, CMake",
       techStack: [
         "C++17",
-        "OpenGL",
-        "Flecs ECS",
         "WebSocket",
         "Qt",
         "CMake",
-        "PBO",
         "Multithreading",
       ],
       highlights: [
@@ -190,7 +186,7 @@ export const portfolioData = {
 - 접근 방식: 체감 품질이 아니라 프레임 드랍률과 처리 지연을 기준으로 병목을 계측하고 개선`,
 
         architecture: `[End-to-End Pipeline]
-- Render(GPU) -> PBO Readback(VRAM->RAM) -> Network Queue -> JPEG Encode(CPU) -> WebSocket/TCP 송신
+- Render(GPU) -> Async Readback(VRAM->RAM) -> Network Queue -> JPEG Encode(CPU) -> WebSocket/TCP 송신
 
 [Component]
 - Main Thread: 물리 연산 및 렌더링
@@ -198,7 +194,7 @@ export const portfolioData = {
 - Network Queue: Producer-Consumer 패턴 기반 스레드 세이프 버퍼
 
 [Design Choice]
-- glReadPixels의 동기 블로킹을 줄이기 위해 PBO 더블 버퍼링(Ping-Pong) 적용
+- GPU readback의 동기 블로킹을 줄이기 위해 비동기 버퍼링 구조 적용
 - 플랫폼 종속성을 줄이기 위해 NetworkTransport 인터페이스로 TCP/WebSocket 구현 분리
 
 [Observability & Test]
@@ -226,7 +222,7 @@ export const portfolioData = {
 [해결 과정]
 - 메인 스레드와 스트리밍 워커를 분리해 블로킹 작업 비동기화
 - Queue 기반 파이프라인으로 단계 간 결합도 축소
-- PBO 비동기 Readback으로 CPU 대기 시간 감소
+- 비동기 Readback으로 CPU 대기 시간 감소
 
 [개선 결과]
 - 프레임 드랍률 17.56% -> 0.78% (약 95.6% 개선)
