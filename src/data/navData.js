@@ -1,6 +1,5 @@
 ﻿export const navItems = [
-  { id: "summary", label: "Summary" },
-  { id: "projects", label: "Projects" },
-  { id: "in-progress", label: "In Progress" },
-  { id: "contact", label: "Contact" },
+  { id: "contact", label: "연락" },
+  { id: "summary", label: "요약" },
+  { id: "projects", label: "프로젝트" },
 ];

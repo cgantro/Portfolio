@@ -1,6 +1,6 @@
 export default function SlideTabs({ slides, activeIndex, onSelect }) {
   return (
-    <div className="slide-tabs" role="tablist" aria-label="Project slide tabs">
+    <div className="slide-tabs" role="tablist" aria-label="프로젝트 슬라이드 탭">
       {slides.map((slide, index) => (
         <button
           key={slide.key}

@@ -14,9 +14,13 @@
   git: "https://cdn.simpleicons.org/git/F05032",
   notion: "https://cdn.simpleicons.org/notion/111111",
   unreal: "https://cdn.simpleicons.org/unrealengine/0E1128",
-  aop: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/gear.svg",
-  logging: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/file-earmark-text.svg",
-  scrum: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/kanban.svg",
+  opengl: "https://cdn.simpleicons.org/opengl/5586A4",
+  image: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/image.svg",
+  network: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/hdd-network.svg",
+  chart: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/graph-up-arrow.svg",
+  server: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/server.svg",
+  buffer: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/soundwave.svg",
+  clock: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/clock-history.svg",
   udp: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/icons/diagram-3.svg",
 };
 
@@ -29,7 +33,11 @@ export default function TechIcon({ iconKey, label }) {
   const src = ICON_URL_MAP[iconKey];
 
   if (!src) {
-    return <span className="stack-icon stack-icon-fallback">{getFallbackText(label)}</span>;
+    return (
+      <span className="stack-icon stack-icon-fallback" aria-label={label} title={label}>
+        {getFallbackText(label || iconKey)}
+      </span>
+    );
   }
 
   return (
@@ -38,15 +46,17 @@ export default function TechIcon({ iconKey, label }) {
         className="stack-icon-img"
         src={src}
         alt=""
-        loading="lazy"
+        loading="eager"
+        decoding="sync"
         referrerPolicy="no-referrer"
         onError={(event) => {
-          const target = event.currentTarget;
-          target.style.display = "none";
-          const parent = target.parentElement;
-          if (parent) {
-            parent.classList.add("stack-icon-fallback");
-            parent.textContent = getFallbackText(label);
+          const image = event.currentTarget;
+          const wrapper = image.parentElement;
+
+          image.remove();
+          if (wrapper) {
+            wrapper.classList.add("stack-icon-fallback");
+            wrapper.textContent = getFallbackText(label || iconKey);
           }
         }}
       />

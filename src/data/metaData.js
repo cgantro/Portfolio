@@ -1,13 +1,15 @@
-﻿export const metaData = {
+﻿import profileImage from "../../asset/증사.jpg";
+
+export const metaData = {
   owner: "홍윤표",
-  focus: "Backend / Realtime System Engineer",
+  focus: "백엔드 / 실시간 시스템 엔지니어",
   mainTitle: "운영 안정성과 상태 정합성을 설계로 보장하는 실시간 백엔드 엔지니어",
   subtitle:
     "비동기 실시간 환경에서 병목을 계측하고, 구조 재설계로 지연·정합성·운영 안정성을 함께 개선합니다.",
   targetRoles: [
-    "Spring Boot Backend Engineer",
-    "Realtime Data Processing Engineer",
-    "System Reliability Engineer",
+    "Spring Boot 백엔드 엔지니어",
+    "실시간 데이터 처리 엔지니어",
+    "시스템 신뢰성 엔지니어",
   ],
   personalInfo: {
     birthYear: "2000년생",
@@ -16,10 +18,10 @@
     language: "OPIc IH",
   },
   portrait: {
-    src: "/asset/증사.jpg",
+    src: profileImage,
     alt: "홍윤표 프로필 사진",
-    title: "Profile",
-    caption: "홍윤표 · Backend / Realtime System Engineer",
+    title: "프로필",
+    caption: "홍윤표 · 백엔드 / 실시간 시스템 엔지니어",
     placeholder: "프로필 사진 준비중",
   },
   links: {
@@ -49,3 +51,4 @@
     ],
   },
 };
+

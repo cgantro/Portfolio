@@ -1,4 +1,4 @@
-import TechIcon from "../common/TechIcon";
+﻿import TechIcon from "../common/TechIcon";
 
 function CoreTechRow({ item }) {
   return (
@@ -45,12 +45,12 @@ export default function SummarySection({ summary, techStacks }) {
   return (
     <section className="page-section summary-editorial" id="summary">
       <div className="section-header summary-section-header">
-        <h2>Selected Overview</h2>
+        <h2>핵심 요약</h2>
       </div>
 
       <div className="summary-editorial-layout">
         <div className="summary-editorial-intro">
-          <SummaryGroup eyebrow="Profile" title="A concise introduction" className="summary-profile-group">
+          <SummaryGroup eyebrow="프로필" title="간단한 소개" className="summary-profile-group">
             <ul className="summary-statement-list">
               {summary.profileStatements.map((line) => (
                 <li key={line} className="summary-statement-item">
@@ -60,7 +60,7 @@ export default function SummarySection({ summary, techStacks }) {
             </ul>
           </SummaryGroup>
 
-          <SummaryGroup eyebrow="Strengths" title="What I tend to bring into a team" className="summary-strength-group">
+          <SummaryGroup eyebrow="강점" title="팀에 기여할 수 있는 부분" className="summary-strength-group">
             <div className="summary-strength-list">
               {summary.coreStrengths.map((item) => (
                 <div className="summary-strength-item" key={item.title}>
@@ -72,9 +72,9 @@ export default function SummarySection({ summary, techStacks }) {
           </SummaryGroup>
         </div>
 
-        <SummaryGroup eyebrow="Stack" title="Core technologies and working tools" className="summary-stack-group">
+        <SummaryGroup eyebrow="기술 스택" title="핵심 기술과 협업 도구" className="summary-stack-group">
           <div className="summary-stack-block">
-            <p className="summary-stack-label">Core technologies</p>
+            <p className="summary-stack-label">핵심 기술</p>
             <ul className="summary-tech-list">
               {techStacks.core.map((item) => (
                 <CoreTechRow key={item.name} item={item} />
@@ -84,7 +84,7 @@ export default function SummarySection({ summary, techStacks }) {
 
           <div className="summary-stack-grid">
             <div className="summary-stack-block">
-              <p className="summary-stack-label">Messaging / Infra</p>
+              <p className="summary-stack-label">메시징 / 인프라</p>
               <ul className="summary-support-list">
                 {techStacks.infraMessaging.map((item) => (
                   <SupportingChip key={item.name} item={item} />
@@ -93,7 +93,7 @@ export default function SummarySection({ summary, techStacks }) {
             </div>
 
             <div className="summary-stack-block">
-              <p className="summary-stack-label">Collaboration & Tooling</p>
+              <p className="summary-stack-label">협업 / 도구</p>
               <ul className="summary-support-list">
                 {techStacks.tooling.map((item) => (
                   <SupportingChip key={item.name} item={item} />
