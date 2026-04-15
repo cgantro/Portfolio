@@ -1,0 +1,63 @@
+
+> cosmic-portfolio@0.1.0 dev
+> vite --host 127.0.0.1 --port 5173
+
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m201[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[2m오전 12:16:43[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[2m오전 12:19:14[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/common/TechIcon.jsx[22m
+[2m오전 12:26:03[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/common/TechIcon.jsx[22m
+[2m오전 12:26:08[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[2m오전 12:28:24[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/ProjectDeck.jsx[22m
+[2m오전 12:28:37[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/ProjectDeck.jsx[22m
+[2m오전 12:29:49[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:30:00[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[2m오전 12:30:05[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[2m오전 12:33:11[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/ProjectDeck.jsx[22m
+[2m오전 12:33:21[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/common/TechIcon.jsx[22m
+[2m오전 12:33:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[2m오전 12:33:47[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:35:45[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/ProjectDeck.jsx[22m
+[2m오전 12:36:53[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/common/TechIcon.jsx[22m
+[2m오전 12:37:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:37:39[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/common/TechIcon.jsx[22m
+[2m오전 12:38:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:39:02[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/PortfolioPage.jsx[22m
+[2m오전 12:39:12[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/PortfolioPage.jsx[22m
+[2m오전 12:40:07[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:41:45[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:41:45[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:41:45[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/PortfolioPage.jsx[22m
+[2m오전 12:41:45[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:51:24[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/PortfolioPage.jsx[22m
+[2m오전 12:51:38[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/HeroSection.jsx[22m
+[2m오전 12:51:43[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:51:50[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:53:07[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[2m오전 12:53:11[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m
+[2m오전 12:53:40[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/ContactSection.jsx[22m
+[2m오전 12:55:52[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:57:07[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:57:12[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:57:24[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/HeroSection.jsx[22m
+[2m오전 12:57:28[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/PortfolioPage.jsx[22m
+[2m오전 12:57:31[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/ProjectDeck.jsx[22m
+[2m오전 12:57:59[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:58:43[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/SummarySection.jsx[22m
+[2m오전 12:58:43[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/SlideTabs.jsx[22m
+[2m오전 12:58:43[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/HeroSection.jsx[22m
+[2m오전 12:59:00[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 12:59:00[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/ProjectDeck.jsx[22m
+[2m오전 1:00:14[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 1:01:20[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/HeroSection.jsx[22m
+[2m오전 1:01:20[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/SummarySection.jsx[22m
+[2m오전 1:02:31[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 1:02:31[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 1:03:52[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/page/HeroSection.jsx[22m
+[2m오전 1:10:11[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/App.jsx[22m
+[2m오전 1:10:42[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/ProjectDeck.jsx[22m
+[2m오전 1:10:42[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/projects/ProjectSlide.jsx[22m
+[2m오전 1:11:02[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/styles.css[22m

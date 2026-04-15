@@ -35,9 +35,6 @@
   tooling: [
     { name: "Git", icon: "git" },
     { name: "Jira", icon: "jira" },
-    { name: "Scrum", icon: "scrum" },
     { name: "Notion", icon: "notion" },
-    { name: "Logging", icon: "logging" },
-    { name: "AOP", icon: "aop" },
   ],
 };

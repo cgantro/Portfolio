@@ -1,174 +1,139 @@
-﻿export const featuredProjectDecks = [
+﻿import autowingArchitectureImage from "../../asset/오토잉카_아키텍처.png";
+
+export const featuredProjectDecks = [
   {
     id: "autowing",
     name: "Autowing_car",
-    oneLine: "상태 정합성과 메시징 분리를 중심으로 실시간 관제 서버와 배포 운영을 담당한 프로젝트",
-    roleLabel: "서버 + 서버 배포",
-    stackTags: ["Spring Boot", "MQTT", "WebSocket/STOMP", "Redis", "PostgreSQL/TimescaleDB", "Docker", "Nginx", "GitLab CI"],
+    oneLine: "자율주행 토잉카 관제 서버에서 MQTT 텔레메트리와 명령 신뢰성을 설계한 프로젝트",
+    stackTags: ["Spring Boot", "MQTT", "STOMP", "Redis", "PostgreSQL", "Docker", "GitLab CI"],
     repo: "https://github.com/cgantro/Autowing_car",
+    links: [{ label: "깃허브", href: "https://github.com/cgantro/Autowing_car" }],
     slides: [
       {
         key: "overview",
         label: "Overview",
-        title: "실시간 관제 백엔드와 배포 운영을 함께 맡은 프로젝트",
-        summary:
-          "상태 정합성, 메시징 경계, 저장소 분리, 배포 경로를 하나의 시스템으로 설계하고 운영한 경험입니다.",
+        title: "실시간 토잉카 관제 백엔드",
         leftBlocks: [
           {
-            title: "문제 상황",
+            title: "프로젝트 소개",
             bullets: [
-              "고빈도 텔레메트리 입력에서 DB 경합과 지연 누적이 발생했습니다.",
-              "명령 재전송/네트워크 흔들림 상황에서 상태 불일치 리스크가 있었습니다.",
-              "실시간 반영과 이력 저장이 같은 경로에 묶여 책임이 불명확했습니다.",
+              "공항 내 항공기 견인 작업을 자율주행 토잉카, 관제 UI, MQTT 통신, AI/임베디드 제어로 연결한 실시간 관제 플랫폼입니다.",
+              "자율주행 토잉카 관제 서버에서 MQTT 텔레메트리와 명령 신뢰성을 설계한 프로젝트입니다.",
+              "6인 팀 프로젝트에서 백엔드, 메시징, 배포를 담당했고 담당 모듈 설계와 구현을 주도했습니다.",
             ],
           },
           {
-            title: "내 역할",
+            title: "핵심 기여",
             bullets: [
-              "Spring Boot 서버 설계/구현과 ACK 기반 상태 제어를 담당했습니다.",
-              "Redis-RDB 분리, MQTT-STOMP 경계 설계, 운영 로그 체계를 구성했습니다.",
-              "GitLab CI + Docker + Nginx 기반 배포 경로를 구축했습니다.",
+              "MQTT 수신, ACK 매칭, 차량 상태 전이 로직을 설계했습니다.",
+              "Redis 최신 상태 캐시와 PostgreSQL 이력 저장 경로를 분리했습니다.",
+              "Docker와 GitLab CI 기반 배포 흐름을 구성했습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
             type: "figure",
-            title: "핵심 메시지",
-            caption: "실시간 상태 제어와 배포 운영을 분리된 책임으로 설계",
-            bullets: ["정합성 제어", "저지연 전파", "운영 재현성"],
+            title: "Autowing_car 아키텍처",
+            caption: "사용자 영역, AWS EC2 Docker 네트워크, 로봇 엣지 영역으로 분리한 관제 통신 구조",
+            image: {
+              src: autowingArchitectureImage,
+              alt: "Autowing_car 시스템 아키텍처 구조도",
+            },
+            bullets: ["HTTPS/WSS 관제 UI", "MQTT 명령·텔레메트리", "WebRTC 영상 스트림"],
+          },
+        ],
+      },
+      {
+        key: "tech",
+        label: "Tech Stack",
+        title: "기술 스택",
+        leftBlocks: [
+          {
+            title: "주요 기술 스택",
+            bullets: [
+              "Spring Boot: 명령 처리, 트랜잭션, WebSocket 브로드캐스트를 한 서비스 경계 안에서 관리했습니다.",
+              "MQTT: 차량 텔레메트리와 서버 명령을 토픽 단위로 분리해 실시간 메시징 경로를 구성했습니다.",
+              "Redis + PostgreSQL: 최신 상태 조회와 관제 이력 저장 책임을 분리했습니다.",
+            ],
+          },
+          {
+            title: "부 기술 스택",
+            bullets: [
+              "STOMP/WebSocket으로 관제 화면에 상태 변화를 실시간 반영했습니다.",
+              "Docker와 GitLab CI로 서버 배포 절차를 자동화했습니다.",
+              "JWT와 WebSocket 핸드셰이크 토큰으로 HTTP/WS 인증 경로를 분리했습니다.",
+            ],
+          },
+        ],
+        rightBlocks: [
+          {
+            type: "stack",
+            title: "기술 스택",
+            items: ["Spring Boot", "MQTT", "STOMP", "Redis", "PostgreSQL", "Docker", "GitLab CI"],
           },
           {
             type: "metrics",
-            title: "핵심 기술 스택",
+            title: "선정 이유",
             items: [
-              "Spring Boot + MQTT/STOMP",
-              "Redis + PostgreSQL/TimescaleDB",
-              "GitLab CI + Docker + Nginx",
+              "실시간 명령과 상태 변경을 안정적으로 처리할 수 있는 서버 프레임워크가 필요했습니다.",
+              "차량의 짧고 빈번한 메시지는 HTTP 폴링보다 MQTT 토픽 기반 통신이 적합했습니다.",
+              "관제 화면의 최신 상태 조회는 Redis로, 감사 가능한 이력은 PostgreSQL로 분리했습니다.",
             ],
           },
         ],
       },
       {
-        key: "architecture",
-        label: "Architecture",
-        title: "수집-처리-전파-저장 경계를 분리한 구조",
-        summary: "운영 안정성과 상태 정합성을 위해 책임 단위를 명확하게 쪼갠 아키텍처입니다.",
+        key: "problem-solving",
+        label: "Problem Solving",
+        title: "문제 상황 / 해결 / 결과",
         leftBlocks: [
           {
-            title: "설계 의도",
+            title: "문제 상황 + 해결 + 결과",
             bullets: [
-              "실시간 반영 경로와 이력 저장 경로를 분리해 병목 전파를 줄였습니다.",
-              "ACK/FSM 기반 상태 전이로 명령 처리 순서를 강제했습니다.",
-              "배포/운영 단계에서도 동일한 구조를 재현할 수 있도록 환경을 표준화했습니다.",
-            ],
-          },
-          {
-            title: "책임 분리 방식",
-            bullets: [
-              "Ingress: MQTT 수신/파싱",
-              "Domain: 미션/차량 상태 전이",
-              "State Cache: Redis",
-              "History Store: PostgreSQL/TimescaleDB",
-              "Realtime Fan-out: WebSocket(STOMP)",
-            ],
-          },
-        ],
-        rightBlocks: [
-          {
-            type: "figure",
-            title: "구조도 배치",
-            caption: "전체 시스템 구조도 삽입 영역",
-            bullets: ["Component boundary", "State transition path", "Realtime broadcast path"],
-          },
-          {
-            type: "figure",
-            title: "데이터 흐름",
-            caption: "MQTT -> Domain -> Cache/DB -> STOMP 흐름도 삽입 영역",
-            bullets: ["입력 검증", "상태 전이", "커밋 후 이벤트 발행"],
-          },
-        ],
-      },
-      {
-        key: "implementation",
-        label: "Implementation",
-        title: "구현 디테일과 배포 경로를 함께 설계",
-        summary: "기능 구현과 운영 배포를 분리하지 않고 하나의 전달 흐름으로 정리했습니다.",
-        leftBlocks: [
-          {
-            title: "실제 구현 내용",
-            bullets: [
-              "ACK 매칭 키(vehicleId/commandType/sequence/commandId) 기반 상태 추적 구현",
-              "Mission/TowingCar 상태 기계로 허용 전이만 통과",
-              "트랜잭션 커밋 이후 이벤트 발행으로 순서 보장",
-              "부하 시나리오와 로그/AOP 기반 추적 포인트 구성",
-            ],
-          },
-          {
-            title: "기술 선택 이유",
-            bullets: [
-              "Redis: 실시간 조회와 DB 영속화 경로 분리",
-              "TimescaleDB: 시계열 로그 저장/조회 경로 확장",
-              "GitLab CI + Docker + Nginx: 배포 재현성과 운영 진입점 표준화",
-            ],
-          },
-        ],
-        rightBlocks: [
-          {
-            type: "figure",
-            title: "배포 흐름",
-            caption: "CI -> Image Build -> Container Deploy -> Nginx Routing",
-            bullets: ["Pipeline stage", "Runtime topology", "Rollback point"],
-          },
-          {
-            type: "metrics",
-            title: "운영 안정성 포인트",
-            items: [
-              "로그 기반 장애 추적",
-              "부하 테스트 시나리오 재현",
-              "배포 후 동작 검증 체크리스트",
-            ],
-          },
-        ],
-      },
-      {
-        key: "results",
-        label: "Results",
-        title: "정합성 중심 설계와 운영 관점 개선 결과",
-        summary: "수치와 운영 경험을 분리해 설명 가능한 성과로 정리했습니다.",
-        leftBlocks: [
-          {
-            title: "결과",
-            bullets: [
-              "상태 정합성 제어(ACK/FSM) 기반으로 명령 처리 안정성 강화",
-              "실시간 경로와 저장 경로 분리로 병목 관리 포인트 명확화",
-              "서버 구현부터 배포까지 연결된 역할 범위 수행",
-            ],
-          },
-          {
-            title: "배운 점 / 한계",
-            bullets: [
-              "실시간 시스템은 기능보다 정합성/운영 추적 설계가 우선",
-              "측정 수치는 실험 조건과 함께 제시해야 설득력 확보",
-              "확장 단계에서는 보안 정책과 브로커 구조 고도화 필요",
+              "문제: 고주파 텔레메트리, ACK 중복·유실·순서 역전, DB 저장과 실시간 전파가 한 경로에 섞여 있었습니다.",
+              "해결: MQTT 수신을 파서 -> 라우터 -> 핸들러 -> 도메인 계층으로 분리하고 ACK를 명령 ID/시퀀스로 매칭했습니다.",
+              "해결: DB 커밋 이후에만 MQTT/WS 이벤트를 발행하고 Redis 인덱스 세트와 일괄 조회로 전체 키 스캔을 제거했습니다.",
+              "결과: 종단 간 텔레메트리 평균 14ms~28ms를 달성했고, RDP 단순화로 페이로드와 저장 포인트를 약 90% 줄였습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
             type: "metrics",
-            title: "증빙 자료",
+            title: "핵심 수치",
             items: [
-              "성능 수치 카드(자기소개서 기준)",
-              "로그 캡처 / 부하 테스트 결과",
-              "관제 화면 캡처",
+              "종단 간 텔레메트리 평균 14ms~28ms",
+              "페이로드 바이트 90.36% 감소",
+              "저장 포인트 90.00% 감소",
+              "5회 반복 검증 손실 0건",
             ],
           },
+        ],
+      },
+      {
+        key: "improvement",
+        label: "Improvement",
+        title: "개선 방향",
+        leftBlocks: [
           {
-            type: "figure",
-            title: "Before / After",
-            caption: "개선 전후 수치 카드 배치 영역",
-            bullets: ["지연", "처리 안정성", "운영 재현성"],
+            title: "성능 개선 방향",
+            bullets: [
+              "대규모 WebSocket fan-out은 Spring simple broker에서 외부 브로커 릴레이 구조로 확장할 수 있습니다.",
+              "텔레메트리 저장량이 더 커질 경우 TimescaleDB hypertable 또는 Kafka 기반 비동기 적재를 검토할 수 있습니다.",
+              "지도·경로 조회 병목은 공간 인덱스와 캐시 무효화 전략을 결합해 개선할 수 있습니다.",
+            ],
+          },
+        ],
+        rightBlocks: [
+          {
+            type: "metrics",
+            title: "추가 검증 포인트",
+            items: [
+              "Java 서비스 + Redis + DB 통합 장기 부하 테스트",
+              "ACK/상태 전이 예외 케이스 회귀 테스트",
+              "로그인 병목과 실시간 관제 병목 분리 측정",
+            ],
           },
         ],
       },
@@ -177,157 +142,137 @@
   {
     id: "robotpal",
     name: "RobotPal",
-    oneLine: "실시간 스트리밍 병목을 구조적으로 개선하고 네트워크 전송과 시뮬레이션 움직임을 연결한 프로젝트",
-    roleLabel: "네트워크 + 스트리밍 + 시뮬레이션 움직임",
-    stackTags: ["C++", "Producer-Consumer", "Queue Policy", "PBO Async Readback", "JPEG Encoding"],
+    oneLine: "카메라 스트리밍 JPEG 병목을 측정하고 멀티 워커 인코딩으로 개선한 C++ 시뮬레이터",
+    stackTags: ["C++17", "OpenGL", "libjpeg", "TCP", "벤치마킹"],
     repo: "https://github.com/cgantro/RobotPal",
+    links: [{ label: "깃허브", href: "https://github.com/cgantro/RobotPal" }],
     slides: [
       {
         key: "overview",
         label: "Overview",
-        title: "스트리밍 병목 개선과 시뮬레이션 연동을 함께 수행",
-        summary: "병목 원인 분석부터 구조 개선, 검증까지 실시간 파이프라인 전체를 다뤘습니다.",
+        title: "카메라 스트리밍 병목 분석",
         leftBlocks: [
           {
-            title: "문제 상황",
+            title: "프로젝트 소개",
             bullets: [
-              "렌더-인코딩-전송이 단일 루프에 묶여 프레임 드랍이 발생했습니다.",
-              "GPU readback/JPEG 인코딩 구간에서 지연이 집중되었습니다.",
-              "스트리밍 처리와 시뮬레이션 객체 업데이트가 상호 간섭했습니다.",
+              "하드웨어 없이 로봇팔 동작과 카메라 스트리밍 경로를 검증할 수 있는 C++ 시뮬레이터입니다.",
+              "카메라 스트리밍 JPEG 병목을 측정하고 멀티 워커 인코딩으로 개선한 프로젝트입니다.",
+              "4인 프로젝트에서 스트리밍, 인코딩, 벤치마크 모듈 설계와 구현을 담당했습니다.",
             ],
           },
           {
-            title: "내 역할",
+            title: "핵심 기여",
             bullets: [
-              "네트워크 전송 경로와 스트리밍 파이프라인 재설계를 담당했습니다.",
-              "producer-consumer 구조와 drop-oldest queue policy를 적용했습니다.",
-              "시뮬레이션 이동 객체 움직임 연동과 검증 루프를 구현했습니다.",
+              "libjpeg 기반 JPEG 인코더를 구현했습니다.",
+              "인코딩 워커 수를 제어해 싱글/멀티 A/B 측정을 수행했습니다.",
+              "앱 FPS와 TCP 수신 FPS를 함께 수집해 병목 위치를 분리했습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
             type: "metrics",
-            title: "핵심 기술 스택",
-            items: ["C++", "PBO Async Readback", "Bounded Queue", "Multi Worker Encode"],
-          },
-          {
-            type: "figure",
-            title: "문제 구간",
-            caption: "기존 단일 루프 병목 지점 표시 다이어그램",
-            bullets: ["Render blocking", "Encode queue wait", "Network send lag"],
+            title: "아키텍처",
+            items: [
+              "렌더 프레임 -> 프레임 읽기",
+              "프레임 큐 -> 인코딩 워커",
+              "JPEG 버퍼 -> TCP 전송",
+              "TCP 수신기 -> FPS 측정",
+            ],
           },
         ],
       },
       {
-        key: "pipeline",
-        label: "Streaming Pipeline Redesign",
-        title: "렌더 루프와 스트리밍 루프 분리",
-        summary: "실시간성을 위해 처리량보다 지연 누적 제어를 우선하는 정책으로 전환했습니다.",
+        key: "tech",
+        label: "Tech Stack",
+        title: "기술 스택",
         leftBlocks: [
           {
-            title: "설계 의도",
+            title: "주요 기술 스택",
             bullets: [
-              "메인 루프에서 인코딩/전송 작업을 분리해 프레임 안정성 확보",
-              "큐 포화 시 drop-oldest 정책으로 지연 폭증 방지",
-              "네트워크 전송과 시뮬레이션 상태 갱신 경계 분리",
+              "C++17: 프레임 버퍼, 인코딩 워커, 큐 수명 관리를 명시적으로 제어했습니다.",
+              "OpenGL: 시뮬레이터 렌더 타겟을 스트리밍 입력으로 직접 연결했습니다.",
+              "libjpeg: 실제 JPEG 압축 비용을 벤치마크에 포함했습니다.",
             ],
           },
           {
-            title: "책임 분리",
+            title: "부 기술 스택",
             bullets: [
-              "RenderSystem: 프레임 생성",
-              "StreamingPipeline: 큐/워커 기반 인코딩",
-              "Network transport: 패킷 전송",
-              "Simulation update: 이동 객체 상태 반영",
+              "TCP 수신기로 인코딩 성능과 수신 처리량을 분리 측정했습니다.",
+              "워커 수 제어 옵션으로 동일 조건 A/B 테스트를 재현 가능하게 만들었습니다.",
+              "iGPU 강제 측정으로 그래픽 환경 편차를 별도 확인했습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
-            type: "figure",
-            title: "파이프라인 구조도",
-            caption: "Render -> Readback -> Queue -> Encode Worker -> Network",
-            bullets: ["thread boundary", "queue policy", "handoff point"],
+            type: "stack",
+            title: "기술 스택",
+            items: ["C++17", "OpenGL", "libjpeg", "TCP", "벤치마킹"],
           },
           {
             type: "metrics",
-            title: "정책 기준",
-            items: ["실시간성 우선", "지연 누적 억제", "재현 가능한 측정"],
+            title: "측정 조건",
+            items: [
+              "816 x 616 렌더 타겟",
+              "JPEG 품질 70",
+              "워커 1개 vs 19개",
+              "디버그 빌드, 리비전 b01af42",
+            ],
           },
         ],
       },
       {
-        key: "implementation",
-        label: "Implementation",
-        title: "구현과 측정을 함께 설계한 개선 과정",
-        summary: "코드 변경과 벤치마크를 분리하지 않고 같은 루프로 검증했습니다.",
+        key: "problem-solving",
+        label: "Problem Solving",
+        title: "문제 상황 / 해결 / 결과",
         leftBlocks: [
           {
-            title: "실제 구현 내용",
+            title: "문제 상황 + 해결 + 결과",
             bullets: [
-              "StreamingSystemModule에서 렌더 이후 프레임 전달 주기 분리",
-              "StreamingWorker 멀티 워커 제어 및 큐 처리 정책 적용",
-              "PBO 기반 비동기 readback으로 GPU-CPU sync 대기 완화",
-            ],
-          },
-          {
-            title: "기술 선택 이유",
-            bullets: [
-              "Producer-Consumer: 메인 루프 블로킹 완화",
-              "Drop-oldest: 큐 정체 시 지연 확산 방지",
-              "A/B Benchmark: 개선 전후 비교 재현성 확보",
+              "문제: 렌더 프레임을 JPEG로 압축해 TCP로 보내는 과정에서 앱 FPS가 흔들렸습니다.",
+              "해결: 생산자-소비자 구조로 렌더 루프와 인코딩 작업을 분리했습니다.",
+              "해결: 멀티 워커 인코딩으로 JPEG 처리와 메인 루프의 경쟁을 줄였습니다.",
+              "결과: 앱 FPS는 6.20%, 내장 GPU 환경 앱 FPS는 15.24% 개선됐습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
-            type: "figure",
-            title: "코드 흐름",
-            caption: "핵심 처리 흐름(enqueue/dequeue/encode/send) 설명 도식",
-            bullets: ["producer", "worker", "consumer"],
-          },
-          {
             type: "metrics",
-            title: "검증 자료",
-            items: ["벤치마크 결과 카드", "환경별 반복 측정 로그", "프레임 드랍 추이"],
+            title: "핵심 수치",
+            items: [
+              "앱 FPS 55.94 -> 59.41 (+6.20%)",
+              "수신 FPS 16.47 -> 17.10 (+3.83%)",
+              "내장 GPU 앱 FPS 58.10 -> 66.95 (+15.24%)",
+              "내장 GPU 수신 FPS 18.30 -> 21.91 (+19.69%)",
+            ],
           },
         ],
       },
       {
-        key: "results",
-        label: "Results",
-        title: "프레임 안정성과 실시간성 중심 개선 결과",
-        summary: "평균 성능보다 지연 분포/드랍률을 기준으로 개선 효과를 평가했습니다.",
+        key: "improvement",
+        label: "Improvement",
+        title: "개선 방향",
         leftBlocks: [
           {
-            title: "결과",
+            title: "성능 개선 방향",
             bullets: [
-              "실시간성 우선 파이프라인으로 프레임 안정성 개선",
-              "네트워크 전송-시뮬레이션 연동 경계가 명확해져 디버깅 효율 향상",
-              "측정 기반 구조 개선으로 팀 내 설명 가능성 강화",
-            ],
-          },
-          {
-            title: "배운 점 / 한계",
-            bullets: [
-              "정책 선택 근거와 실험 조건을 함께 제시해야 신뢰도 확보",
-              "환경 편차가 커 반복 실험과 로그 정리가 필수",
-              "추가 개선 시 지연 상한 목표를 더 명확히 정의할 필요",
+              "프레임 읽기 병목은 PBO 기반 비동기 readback과 더블 버퍼링으로 줄일 수 있습니다.",
+              "전송 FPS는 JPEG 품질 동적 조절과 프레임 드롭 정책을 결합해 안정화할 수 있습니다.",
+              "반복 측정은 릴리즈 빌드와 해상도별 매트릭스로 확장해 신뢰구간을 좁힐 수 있습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
-            type: "figure",
-            title: "결과 수치 카드",
-            caption: "FPS/드랍률/지연 지표 전후 비교 영역",
-            bullets: ["before", "after", "confidence"],
-          },
-          {
             type: "metrics",
-            title: "증빙 자료",
-            items: ["스트리밍 화면 캡처", "병목 분석 리포트", "벤치마크 로그"],
+            title: "추가 검증 포인트",
+            items: [
+              "릴리즈 빌드 3~5회 반복 측정",
+              "해상도와 씬 복잡도별 처리량 비교",
+              "큐 대기 시간과 프레임 드롭률 추적",
+            ],
           },
         ],
       },
@@ -336,199 +281,135 @@
   {
     id: "mausoleum",
     name: "mausoleum",
-    oneLine: "전용 서버 구조와 보이스 서버, 맵 로딩, 로직 레이어 분리로 멀티플레이 서버 책임을 설계한 프로젝트",
-    roleLabel: "서버 + 보이스 서버 + 맵 로딩 + 로직 레이어",
-    stackTags: ["Unreal Engine 5", "C++", "Dedicated Server", "WebSocket/UDP", "Room Isolation"],
-    repo: "",
+    oneLine: "UE5 멀티플레이 게임에서 로비, 게임, 보이스 서버 책임을 분리하고 음성 UX를 개선한 프로젝트",
+    stackTags: ["Unreal Engine 5", "C++", "전용 서버", "WebSocket", "UDP"],
     slides: [
       {
         key: "overview",
         label: "Overview",
-        title: "멀티플레이 협동 게임 서버 책임을 분리 설계",
-        summary: "전용 서버 구조와 룸 단위 분리를 중심으로 게임/보이스/로직 경계를 정리했습니다.",
+        title: "멀티플레이 보이스 시스템 개선",
         leftBlocks: [
           {
-            title: "문제 상황",
+            title: "프로젝트 소개",
             bullets: [
-              "게임/보이스/맵/로직 경계가 섞이면 운영 복잡도가 빠르게 증가합니다.",
-              "룸 단위 세션 분리 없이 동시성 처리를 하면 상태 안정성이 떨어집니다.",
+              "UE5 클라이언트, 전용 서버, C++ 로비 서버, UDP 음성 서버를 분리한 멀티플레이 게임 프로젝트입니다.",
+              "로비, 게임, 보이스 서버 책임을 분리하고 음성 UX를 개선한 프로젝트입니다.",
+              "6인 팀 프로젝트에서 보이스 UX, 음성 규칙, 서버 연동 로직을 담당했습니다.",
             ],
           },
           {
-            title: "내 역할",
+            title: "핵심 기여",
             bullets: [
-              "UE5 + C++ 전용 서버 구조 설계 및 구현",
-              "사설 보이스 서버, 물리 기반 맵 로딩 경로 구성",
-              "논리 기반 게임 로직 레이어 분리",
+              "클라이언트 음성 캡처 처리와 코덱 리셋 정책을 구현했습니다.",
+              "생존, 사망, 관전 상태에 따른 음성 청취 규칙을 재설계했습니다.",
+              "음성 처리 구간을 측정하는 RAII 기반 프로파일러를 추가했습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
             type: "metrics",
-            title: "핵심 기술 스택",
-            items: ["UE5/C++", "Dedicated Server", "WebSocket/UDP", "Room Isolation"],
-          },
-          {
-            type: "figure",
-            title: "구조 개요",
-            caption: "게임 서버-보이스 서버-룸 세션 관리자 관계도",
-            bullets: ["session isolation", "server responsibility", "logic boundary"],
+            title: "아키텍처",
+            items: [
+              "UE 클라이언트 -> 전용 서버",
+              "UE 클라이언트 -> 로비 서버(WebSocket)",
+              "UE 클라이언트 -> 음성 서버(UDP)",
+            ],
           },
         ],
       },
       {
-        key: "architecture",
-        label: "Server Architecture",
-        title: "서버 책임 분리와 룸 단위 격리 구조",
-        summary: "장애 전파 범위를 줄이고 유지보수성을 높이는 방향으로 설계했습니다.",
+        key: "tech",
+        label: "Tech Stack",
+        title: "기술 스택",
         leftBlocks: [
           {
-            title: "설계 의도",
+            title: "주요 기술 스택",
             bullets: [
-              "게임 상태 처리와 음성 통신을 분리해 장애 영향 범위 축소",
-              "물리 기반 맵 로딩과 게임 규칙 로직 경계 분리",
-              "룸 단위 세션 격리로 동시 사용자 처리 안정성 확보",
+              "UE 전용 서버: 플레이어 위치, 상태, 이벤트 판정을 서버 권위로 유지했습니다.",
+              "WebSocket: 방 생성, 입장, 준비 상태처럼 순서가 중요한 로비 이벤트에 사용했습니다.",
+              "UDP: 오래된 패킷의 완전성보다 최신 음성 프레임 도착이 중요한 경로에 사용했습니다.",
             ],
           },
           {
-            title: "시스템 경계",
+            title: "부 기술 스택",
             bullets: [
-              "Dedicated Game Server",
-              "Private Voice Server",
-              "Room Session Manager",
-              "Map Loading Layer / Logic Layer",
+              "C++ RAII 프로파일러로 음성 처리 구간 시간을 자동 기록했습니다.",
+              "전용 로비/음성 서버 분리로 게임 월드 부하와 음성 부하를 나눴습니다.",
+              "공간화 제어로 로비/인게임 상황에 맞는 재생 방식을 분리했습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
-            type: "figure",
-            title: "아키텍처 다이어그램",
-            caption: "컴포넌트 경계와 통신 경로(WS/UDP) 시각화 영역",
-            bullets: ["join flow", "room mapping", "voice channel"],
+            type: "stack",
+            title: "기술 스택",
+            items: ["Unreal Engine 5", "C++", "전용 서버", "WebSocket", "UDP"],
           },
           {
-            type: "figure",
-            title: "시퀀스 흐름",
-            caption: "입장 -> 룸 매핑 -> 게임/보이스 경로 흐름도 삽입 영역",
-            bullets: ["entry", "state update", "voice routing"],
+            type: "metrics",
+            title: "선정 이유",
+            items: [
+              "게임 상태는 전용 서버가 권위적으로 관리해야 했습니다.",
+              "로비 이벤트는 연결 유지와 순서 보장이 중요했습니다.",
+              "음성은 손실 없는 보존보다 최신성 유지가 중요했습니다.",
+            ],
           },
         ],
       },
       {
-        key: "results",
-        label: "Results",
-        title: "서버 역할 분리 중심의 구현 성과",
-        summary: "구조적 기준을 먼저 확립해 이후 기능 확장의 위험을 낮췄습니다.",
+        key: "problem-solving",
+        label: "Problem Solving",
+        title: "문제 상황 / 해결 / 결과",
         leftBlocks: [
           {
-            title: "결과",
+            title: "문제 상황 + 해결 + 결과",
             bullets: [
-              "서버/보이스/로직/맵 로딩 책임 경계 명확화",
-              "룸 단위 세션 분리 기준 정립",
-              "멀티 서버 구조의 운영 관점 설명 가능성 확보",
-            ],
-          },
-          {
-            title: "배운 점 / 한계",
-            bullets: [
-              "서버 책임 분리는 성능뿐 아니라 장애 격리 효과가 큼",
-              "공개 가능한 코드/수치 근거 연결 시 설득력 추가 확보 가능",
-              "추가 검증 단계에서 정량 로그 축적이 필요",
+              "문제: Alt-Tab 이후 누적 음성이 한 번에 재생되어 지연과 잡음이 발생했습니다.",
+              "문제: 사망자와 생존자 음성 규칙이 단순하면 정보 노출로 게임성이 깨질 수 있었습니다.",
+              "해결: 백그라운드 복귀 시 오래된 캡처 버퍼를 폐기하고 코덱을 리셋했습니다.",
+              "결과: 복귀 직후 지연 음성 재생을 제거하고 사망자 정보 과노출을 완화했습니다.",
             ],
           },
         ],
         rightBlocks: [
           {
             type: "metrics",
-            title: "증빙 자료",
-            items: ["서버 구조도", "플레이 화면 캡처", "세션 분리 로그"],
+            title: "핵심 결과",
+            items: [
+              "백그라운드 복귀 직후 지연 음성 재생 제거",
+              "사망자 정보 과노출 완화",
+              "릴리즈 오버헤드 없는 음성 구간 계측",
+            ],
           },
+        ],
+      },
+      {
+        key: "improvement",
+        label: "Improvement",
+        title: "개선 방향",
+        leftBlocks: [
           {
-            type: "figure",
-            title: "확장 포인트",
-            caption: "추가 검증 항목(부하/장애/지연) 배치 영역",
-            bullets: ["load", "failure isolation", "latency"],
+            title: "성능 개선 방향",
+            bullets: [
+              "UDP 음성 품질은 지터 버퍼와 적응형 재생 지연으로 더 안정화할 수 있습니다.",
+              "패킷 유실이 큰 환경에서는 FEC 또는 짧은 구간 재전송 정책을 검토할 수 있습니다.",
+              "VoiceServer는 방 단위 샤딩 수를 동적으로 조절해 특정 방 트래픽 집중을 완화할 수 있습니다.",
+            ],
+          },
+        ],
+        rightBlocks: [
+          {
+            type: "metrics",
+            title: "추가 검증 포인트",
+            items: [
+              "NAT/방화벽 환경별 UDP 품질 테스트",
+              "지터와 패킷 유실 조건별 정량 지표 수집",
+              "전용 서버 패키징과 LFS 자산 절차 자동화",
+            ],
           },
         ],
       },
     ],
   },
 ];
-
-export const inProgressDeck = {
-  id: "tempolink",
-  name: "TempoLink",
-  oneLine: "저지연 온라인 합주를 위해 데이터 플레인과 컨트롤 플레인을 분리 설계 중인 진행형 프로젝트",
-  roleLabel: "In Progress",
-  stackTags: ["C++ Realtime Core", "Spring Boot Control Plane", "P2P", "Jitter Buffer", "Clock Sync"],
-  repo: "https://github.com/cgantro/TempoLink",
-  slides: [
-    {
-      key: "motivation",
-      label: "Why This Project",
-      title: "저지연 온라인 합주를 위한 진행형 프로젝트",
-      summary: "완성 성과를 포장하지 않고, 검증 가능한 범위를 단계적으로 좁혀가고 있습니다.",
-      leftBlocks: [
-        {
-          title: "왜 시작했는지",
-          bullets: [
-            "Syncroom과 같은 저지연 합주 플랫폼을 구축하고 싶었습니다.",
-            "또한 앱을 사용하면서 불편했던 기능들에 대하여 개선해보고 싶습니다."
-          ],
-        },
-      ],
-      rightBlocks: [
-        {
-          type: "metrics",
-          title: "현재 목표",
-          items: ["낮은 지연", "안정적 동기화", "재현 가능한 검증"],
-        },
-        {
-          type: "figure",
-          title: "구조 방향",
-          caption: "Data Plane / Control Plane 분리 개념도",
-          bullets: ["audio path", "signaling path", "fallback path"],
-        },
-      ],
-    },
-    {
-      key: "scope",
-      label: "Current Scope / Next Validation",
-      title: "현재 구현 범위와 다음 검증 범위",
-      summary: "진행형 프로젝트이므로 구현 범위와 검증 계획을 분리해 관리합니다.",
-      leftBlocks: [
-        {
-          title: "현재 구현 범위",
-          bullets: [
-            "Clock sync / RTT 추정 및 지터 버퍼 핵심 로직 구현",
-            "Room/Signaling 중심 컨트롤 플레인 API 정의",
-            "로컬 P2P 연결 및 fallback 전환 시나리오 정리",
-          ],
-        },
-        {
-          title: "앞으로 검증할 항목",
-          bullets: [
-            "2인/4인 세션 지연·손실·지터 자동 수집",
-            "P2P 실패 감지와 relay 전환 안정성",
-            "플랫폼별 저지연 오디오 경로 실측 데이터 확보",
-          ],
-        },
-      ],
-      rightBlocks: [
-        {
-          type: "metrics",
-          title: "검증 산출물",
-          items: ["runbook", "session metrics", "network condition report"],
-        },
-        {
-          type: "figure",
-          title: "테스트 플랜",
-          caption: "실험 조건/측정 항목/판정 기준 표 배치 영역",
-          bullets: ["latency", "loss", "jitter"],
-        },
-      ],
-    },
-  ],
-};

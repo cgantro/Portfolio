@@ -1,16 +1,20 @@
-import { useState } from "react";
+ï»¿import { useState } from "react";
 import SlideNav from "./SlideNav";
 import ProjectSlide from "./ProjectSlide";
 
-function StackTags({ tags }) {
+function ProjectLinks({ project }) {
+  const links = project.links || (project.repo ? [{ label: "ê¹ƒí—ˆë¸Œ", href: project.repo }] : []);
+
+  if (!links.length) return null;
+
   return (
-    <div className="project-stack-tags">
-      {tags.map((tag) => (
-        <span key={tag} className="project-tag">
-          {tag}
-        </span>
+    <footer className="project-deck-footer">
+      {links.map((link) => (
+        <a key={link.href} href={link.href} target="_blank" rel="noreferrer">
+          {link.label}
+        </a>
       ))}
-    </div>
+    </footer>
   );
 }
 
@@ -19,16 +23,12 @@ export default function ProjectDeck({ project, sectionLabel }) {
 
   return (
     <article className="project-deck-card print-avoid-break">
-      <header className="project-deck-head">
+      <header className="project-deck-head is-simple">
         <div>
           <p className="project-deck-label">{sectionLabel}</p>
           <h3>{project.name}</h3>
           <p className="project-deck-summary">{project.oneLine}</p>
-          <p className="project-deck-role">
-            <strong>Role</strong> {project.roleLabel}
-          </p>
         </div>
-        <StackTags tags={project.stackTags} />
       </header>
 
       <SlideNav slides={project.slides} activeIndex={activeIndex} onSelect={setActiveIndex} />
@@ -44,11 +44,7 @@ export default function ProjectDeck({ project, sectionLabel }) {
         ))}
       </div>
 
-      <footer className="project-deck-footer">
-        <a href={project.repo || "#"} target="_blank" rel="noreferrer" className={project.repo ? "" : "is-disabled"}>
-          {project.repo ? "GitHub Repository" : "Repository ¸µÅ© ÁØºñÁß"}
-        </a>
-      </footer>
+      <ProjectLinks project={project} />
     </article>
   );
 }
