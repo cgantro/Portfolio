@@ -76,9 +76,11 @@ function RightBlock({ block }) {
 
 export default function ProjectSlide({ slide, projectName, isActive }) {
   const classes = ["project-slide", isActive ? "is-active" : ""].filter(Boolean).join(" ");
+  const rightBlocks = slide.rightBlocks || [];
+  const layoutClasses = ["project-slide-layout", rightBlocks.length === 0 ? "is-single-column" : ""].filter(Boolean).join(" ");
 
   return (
-    <article className={classes} aria-hidden={isActive ? "false" : "true"}>
+    <article className={classes} data-slide-key={slide.key} aria-hidden={isActive ? "false" : "true"}>
       <header className="project-slide-header">
         <p>{slide.label}</p>
         <h4>{slide.title}</h4>
@@ -90,18 +92,20 @@ export default function ProjectSlide({ slide, projectName, isActive }) {
         <h4>{slide.label}</h4>
       </header>
 
-      <div className="project-slide-layout">
+      <div className={layoutClasses}>
         <div className="project-slide-left">
           {slide.leftBlocks.map((block) => (
             <LeftBlock key={block.title} block={block} />
           ))}
         </div>
 
-        <div className="project-slide-right">
-          {slide.rightBlocks.map((block) => (
-            <RightBlock key={block.title} block={block} />
-          ))}
-        </div>
+        {rightBlocks.length > 0 ? (
+          <div className="project-slide-right">
+            {rightBlocks.map((block) => (
+              <RightBlock key={block.title} block={block} />
+            ))}
+          </div>
+        ) : null}
       </div>
     </article>
   );
