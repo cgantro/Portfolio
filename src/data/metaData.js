@@ -7,9 +7,9 @@ export const metaData = {
   subtitle:
     "비동기 실시간 환경에서 병목을 계측하고, 구조 재설계로 지연·정합성·운영 안정성을 함께 개선합니다.",
   targetRoles: [
-    "Spring Boot 백엔드 엔지니어",
-    "실시간 데이터 처리 엔지니어",
-    "시스템 신뢰성 엔지니어",
+    "백엔드 개발자 (Spring Boot)",
+    "실시간 데이터 처리 백엔드 개발자",
+    "서버 안정성·신뢰성 엔지니어",
   ],
   personalInfo: {
     birthYear: "2000년생",
@@ -20,8 +20,8 @@ export const metaData = {
   portrait: {
     src: profileImage,
     alt: "홍윤표 프로필 사진",
-    title: "프로필",
-    caption: "홍윤표 · 백엔드 / 실시간 시스템 엔지니어",
+    title: "",
+    caption: "",
     placeholder: "프로필 사진 준비중",
   },
   links: {
@@ -51,4 +51,3 @@ export const metaData = {
     ],
   },
 };
-
