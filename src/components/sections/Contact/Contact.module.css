@@ -1,0 +1,78 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.message {
+  font-size: 15px;
+  color: var(--fg);
+  line-height: 1.8;
+  max-width: 500px;
+}
+
+.links {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  overflow: hidden;
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg2);
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.link:not(:last-child) {
+  border-bottom: 1px solid var(--border);
+}
+
+.link:hover {
+  background: var(--bg3);
+}
+
+.link:hover .arrow {
+  transform: translate(4px, 0);
+  color: var(--accent);
+}
+
+.linkLabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  width: 60px;
+  flex-shrink: 0;
+}
+
+.linkVal {
+  font-size: 14px;
+  color: var(--fg-bright);
+  flex: 1;
+}
+
+.arrow {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--fg-dim);
+  transition: transform 0.15s, color 0.15s;
+}
+
+.footer {
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.footerText {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--fg-dim);
+}

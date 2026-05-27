@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(cd \"c:\\\\Users\\\\SSAFY\\\\Desktop\\\\2div\\\\autowing_Car\"; Get-ChildItem Backend -Recurse -Name -Depth 4 | Where-Object { $_ -notmatch \"node_modules|__pycache__|\\\\.class$|\\\\.jar$\" })",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\SSAFY\\\\Desktop\\\\2div\\\\영묘\" -Recurse -Depth 3 | Where-Object { $_.PSIsContainer } | Select-Object FullName)",
+      "Bash(xargs grep -l \"KmaWeather\\\\|WeatherService\\\\|WeatherCacheService\\\\|weather.*service\\\\|WeatherQuery\")",
+      "Bash(xargs grep -l \"@Cacheable\\\\|@CacheEvict\\\\|CacheNames\\\\.\")",
+      "Bash(dir \"c:\\\\Users\\\\SSAFY\\\\Desktop\\\\2div\")",
+      "Bash(xargs grep -l \"Security\\\\|JWT\\\\|WebSocket\\\\|Auth\")",
+      "Bash(xargs grep -l \"RunAfterCommitOrNow\\\\|runAfterCommit\")",
+      "Bash(xargs grep -l \"runAfterCommit\\\\|RunAfterCommit\\\\|afterCommit\")",
+      "Bash(xargs grep -l \"DailyRecommendation.*Job\\\\|recommendation.*publish\\\\|Job.*publish\")",
+      "Bash(xargs grep -l \"DailyRecommendationJob\\\\|SqsDailyRecommendation.*Publisher\\\\|daily.*sqs.*publish\")",
+      "Bash(npm --version)",
+      "Bash(mkdir -p /c/Users/SSAFY/Desktop/2div/Portfolio/portfolio-ppt)",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node build.js)",
+      "Bash(python3 -c ' *)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

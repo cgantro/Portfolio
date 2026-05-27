@@ -1,0 +1,24 @@
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  color: var(--fg-dim);
+  background: var(--bg3);
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.tag.accent {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.tag.yellow {
+  border-color: #4a3f00;
+  color: var(--yellow);
+  background: rgba(255, 204, 0, 0.05);
+}

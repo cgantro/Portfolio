@@ -1,0 +1,81 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  padding: 20px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--card-radius);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color 0.2s;
+  cursor: default;
+}
+
+.card:hover {
+  border-color: var(--border2);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fg-bright);
+}
+
+.ghLink {
+  color: var(--fg-dim);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.ghLink:hover {
+  color: var(--accent);
+}
+
+.subtitle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-dim);
+  letter-spacing: 0.04em;
+}
+
+.summary {
+  font-size: 12px;
+  color: var(--fg);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.period {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--fg-dim);
+  flex-shrink: 0;
+}
