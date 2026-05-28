@@ -1,9 +1,12 @@
 import styles from "./ArchitectureDiagram.module.css";
+import stickerArch   from "../../../asset/스티커_아키텍처.png";
+import robotpalArch  from "../../../asset/로봇팔_아키텍처.png";
+import mausoleumArch from "../../../asset/영묘_아키텍처.png";
 
 const ARCH_IMAGES = {
-  sticker:   "/스티커_아키텍처.png",
-  robotpal:  "/로봇팔_아키텍처.png",
-  mausoleum: "/영묘_아키텍처.png",
+  sticker:   stickerArch,
+  robotpal:  robotpalArch,
+  mausoleum: mausoleumArch,
 };
 
 export default function ArchitectureDiagram({ projectId }) {

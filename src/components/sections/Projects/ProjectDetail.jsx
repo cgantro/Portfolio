@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Tag from "../../ui/Tag";
 import CodeBlock from "../../ui/CodeBlock";
 import ArchitectureDiagram from "../../ui/ArchitectureDiagram";
+import { coverImages } from "../../data/projectImages";
 import styles from "./Projects.module.css";
 
 function getTabs(project) {
@@ -174,17 +175,18 @@ function ArchitecturePage({ projectId }) {
 }
 
 function OverviewSlide({ project }) {
+  const imgs = coverImages[project.id];
   return (
     <div className={styles.slideOverview}>
-      {project.cover && (
+      {imgs?.src && (
         <div className={styles.ovCover}>
           <img
-            src={project.cover}
+            src={imgs.src}
             alt={project.title}
             loading="lazy"
             decoding="async"
             onError={(e) => {
-              if (project.coverFallback) e.currentTarget.src = project.coverFallback;
+              if (imgs.fallback) e.currentTarget.src = imgs.fallback;
               else e.currentTarget.parentElement.style.display = "none";
             }}
           />
