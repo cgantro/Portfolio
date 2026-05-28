@@ -1,104 +1,176 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Tag from "../../ui/Tag";
 import CodeBlock from "../../ui/CodeBlock";
+import ArchitectureDiagram from "../../ui/ArchitectureDiagram";
 import styles from "./Projects.module.css";
 
-function buildSlides(project) {
-  const slides = [];
-  slides.push({ type: "overview" });
-  if (project.implementations?.length) {
-    slides.push({ type: "section-header", label: "구현" });
-    project.implementations.forEach((impl) => slides.push({ type: "impl", impl }));
-  }
-  if (project.problems?.length) {
-    slides.push({ type: "section-header", label: "문제 해결" });
-    project.problems.forEach((prob) => slides.push({ type: "problem", prob }));
-  }
-  if (project.teamFeatures?.length) {
-    slides.push({ type: "team" });
-  }
-  return slides;
+function getTabs(project) {
+  const tabs = ["개요"];
+  if (project.techChoice?.length) tabs.push("기술 선정");
+  tabs.push("구현", "문제 해결");
+  if (project.retrospective?.length) tabs.push("회고");
+  tabs.push("아키텍처");
+  return tabs;
 }
 
-export default function ProjectDetail({ project, onClose }) {
-  const slides = useMemo(() => buildSlides(project), [project]);
-  const [idx, setIdx]   = useState(0);
-  const [dir, setDir]   = useState(1);
-  const contentRef      = useRef(null);
+export default function ProjectDetail({ project, allProjects, onClose, onNavigate }) {
+  const [activeTab, setActiveTab]   = useState("개요");
+  const [animKey,   setAnimKey]     = useState(0);
+  const [probIdx,   setProbIdx]     = useState(0);
+  const [probDir,   setProbDir]     = useState(1);
+  const [probKey,   setProbKey]     = useState(0);
+  const contentRef = useRef(null);
+  const tabs       = getTabs(project);
+  const problems   = project.problems ?? [];
+  const projIndex  = allProjects ? allProjects.findIndex(p => p.id === project.id) : 0;
+  const hasNextProj = allProjects && projIndex < allProjects.length - 1;
+  const hasPrevProj = allProjects && projIndex > 0;
 
-  const go = useCallback((delta) => {
-    const next = idx + delta;
-    if (next < 0 || next >= slides.length) return;
-    setDir(delta);
-    setIdx(next);
+  const [modalDir, setModalDir] = useState(1);
+  const [modalKey, setModalKey] = useState(project.id);
+
+  const switchTab = useCallback((tab) => {
+    setActiveTab(tab);
+    setAnimKey(k => k + 1);
+    if (tab === "문제 해결") setProbIdx(0);
     contentRef.current?.scrollTo({ top: 0 });
-  }, [idx, slides.length]);
+  }, []);
+
+  const goProblem = useCallback((delta) => {
+    const next = probIdx + delta;
+    if (next < 0 || next >= problems.length) return;
+    setProbDir(delta);
+    setProbIdx(next);
+    setProbKey(k => k + 1);
+    contentRef.current?.scrollTo({ top: 0 });
+  }, [probIdx, problems.length]);
 
   useEffect(() => {
     const fn = (e) => {
-      if (e.key === "Escape")     onClose();
-      if (e.key === "ArrowRight") go(1);
-      if (e.key === "ArrowLeft")  go(-1);
+      if (e.key === "Escape") { onClose(); return; }
+      if (activeTab === "문제 해결") {
+        if (e.key === "ArrowRight") goProblem(1);
+        if (e.key === "ArrowLeft")  goProblem(-1);
+      }
     };
     window.addEventListener("keydown", fn);
     document.body.style.overflow = "hidden";
     return () => { window.removeEventListener("keydown", fn); document.body.style.overflow = ""; };
-  }, [go, onClose]);
+  }, [onClose, activeTab, goProblem]);
 
-  const slide = slides[idx];
-  const animClass = dir > 0 ? styles.slideNext : styles.slidePrev;
+  const isProbTab  = activeTab === "문제 해결";
+  const contentKey = isProbTab ? `prob-${probKey}` : `tab-${animKey}`;
+  const contentAnim = probDir > 0 ? styles.cubeNext : styles.cubePrev;
+
+  const handleNextProj = () => {
+    setModalDir(1);
+    setModalKey(allProjects[projIndex + 1].id);
+    onNavigate(allProjects[projIndex + 1]);
+  };
+  const handlePrevProj = () => {
+    setModalDir(-1);
+    setModalKey(allProjects[projIndex - 1].id);
+    onNavigate(allProjects[projIndex - 1]);
+  };
 
   return (
     <div className={styles.detailOverlay} onClick={onClose}>
-      <div className={styles.detailModal} onClick={(e) => e.stopPropagation()}>
+      <div 
+        key={modalKey} 
+        className={`${styles.detailModal} ${modalDir > 0 ? styles.modalCubeNext : styles.modalCubePrev}`} 
+        onClick={e => e.stopPropagation()}
+      >
 
         <div className={styles.detailHeader}>
-          <span className={styles.dNum}>{project.num}</span>
-          <span className={styles.dTitle}>{project.title}</span>
-          <span className={styles.dCounter}>
-            <span className={styles.dCurrent}>{idx + 1}</span>
-            <span className={styles.dSep}> / </span>
-            <span className={styles.dTotal}>{slides.length}</span>
-          </span>
-          <button className={styles.dClose} onClick={onClose}>✕</button>
+          <div className={styles.dHeaderLeft}>
+            <span className={styles.dNum}>{project.num}</span>
+            <span className={styles.dTitle}>{project.title}</span>
+          </div>
+          <div className={styles.dHeaderRight}>
+            {hasPrevProj && <button className={styles.projNavBtn} onClick={handlePrevProj}>‹ 이전</button>}
+            {hasNextProj && <button className={styles.projNavBtn} onClick={handleNextProj}>다음 ›</button>}
+            <button className={styles.dClose} onClick={onClose}>✕</button>
+          </div>
+        </div>
+
+        <div className={styles.detailTabs}>
+          {tabs.map(tab => (
+            <button
+              key={tab}
+              className={[styles.dTab, activeTab === tab ? styles.dTabActive : ""].join(" ")}
+              onClick={() => switchTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
         </div>
 
         <div className={styles.detailContent} ref={contentRef}>
-          {/* key가 바뀌면 재마운트 → 애니메이션 트리거 */}
-          <div key={`${project.id}-${idx}`} className={animClass}>
-            <SlideRenderer slide={slide} project={project} />
+          <div key={contentKey} className={contentAnim}>
+            <TabContent tab={activeTab} project={project} probIdx={probIdx} />
           </div>
         </div>
 
-        <div className={styles.detailNav}>
-          <button className={styles.dNavBtn} onClick={() => go(-1)} disabled={idx === 0}>←</button>
+        {isProbTab && problems.length > 1 && (
+          <div className={styles.probSliderNav}>
+            <button
+              className={styles.probNavBtn}
+              onClick={() => goProblem(-1)}
+              disabled={probIdx === 0}
+            >←</button>
 
-          <div className={styles.dDots}>
-            {slides.map((s, i) => (
-              <button
-                key={i}
-                className={[styles.dDot, i === idx ? styles.dDotActive : ""].join(" ")}
-                onClick={() => { setDir(i > idx ? 1 : -1); setIdx(i); contentRef.current?.scrollTo({ top: 0 }); }}
-              />
-            ))}
+            <div className={styles.probDots}>
+              {problems.map((_, i) => (
+                <button
+                  key={i}
+                  className={[styles.probDot, i === probIdx ? styles.probDotActive : ""].join(" ")}
+                  onClick={() => {
+                    setProbDir(i > probIdx ? 1 : -1);
+                    setProbIdx(i);
+                    setProbKey(k => k + 1);
+                    contentRef.current?.scrollTo({ top: 0 });
+                  }}
+                />
+              ))}
+            </div>
+
+            <span className={styles.probCounter}>
+              <span className={styles.dCur}>{probIdx + 1}</span>
+              <span className={styles.dSep}> / </span>
+              <span className={styles.dTot}>{problems.length}</span>
+            </span>
+
+            <button
+              className={styles.probNavBtn}
+              onClick={() => goProblem(1)}
+              disabled={probIdx === problems.length - 1}
+            >→</button>
           </div>
+        )}
 
-          <button className={styles.dNavBtn} onClick={() => go(1)} disabled={idx === slides.length - 1}>→</button>
-        </div>
       </div>
     </div>
   );
 }
 
-function SlideRenderer({ slide, project }) {
-  switch (slide.type) {
-    case "overview":       return <OverviewSlide project={project} />;
-    case "section-header": return <SectionHeaderSlide label={slide.label} />;
-    case "impl":           return <ImplSlide impl={slide.impl} />;
-    case "problem":        return <ProblemSlide prob={slide.prob} />;
-    case "team":           return <TeamSlide features={project.teamFeatures} />;
+function TabContent({ tab, project, probIdx }) {
+  switch (tab) {
+    case "개요":      return <OverviewSlide project={project} />;
+    case "구현":      return <ImplPage impls={project.implementations} />;
+    case "문제 해결": return <ProblemSlide prob={project.problems[probIdx]} />;
+    case "기술 선정": return <TechChoicePage choices={project.techChoice} />;
+    case "회고":      return <RetroPage retro={project.retrospective} />;
+    case "아키텍처":  return <ArchitecturePage projectId={project.id} />;
     default: return null;
   }
+}
+
+function ArchitecturePage({ projectId }) {
+  return (
+    <div className={styles.mdContainer} style={{ background: 'var(--bg2)', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: '32px 24px' }}>
+      <ArchitectureDiagram projectId={projectId} />
+    </div>
+  );
 }
 
 function OverviewSlide({ project }) {
@@ -124,10 +196,9 @@ function OverviewSlide({ project }) {
         <div className={styles.ovMeta}>
           <span className={styles.ovMetaLabel}>기간</span><span>{project.period}</span>
           <span className={styles.ovMetaLabel}>팀</span><span>{project.team}</span>
-          <span className={styles.ovMetaLabel}>역할</span><span>{project.role}</span>
         </div>
         <div className={styles.ovTags}>
-          {project.stack.map((s) => <Tag key={s}>{s}</Tag>)}
+          {project.stack.map(s => <Tag key={s}>{s}</Tag>)}
         </div>
         <ul className={styles.ovHighlights}>
           {project.highlights.map((h, i) => (
@@ -146,32 +217,36 @@ function OverviewSlide({ project }) {
   );
 }
 
-function SectionHeaderSlide({ label }) {
+function ImplPage({ impls }) {
   return (
-    <div className={styles.slideHeader}>
-      <div className={styles.shLine} />
-      <span className={styles.shLabel}>// {label}</span>
-      <div className={styles.shLine} />
-    </div>
-  );
-}
-
-function ImplSlide({ impl }) {
-  return (
-    <div className={styles.slideImpl}>
-      <h3 className={styles.implTitle}>{impl.title}</h3>
-      <ul className={styles.implItems}>
-        {impl.items.map((item, i) => (
-          <li key={i} className={styles.implItem}>
-            <span className={styles.implDot}>·</span><span>{item}</span>
-          </li>
-        ))}
-      </ul>
+    <div className={styles.implPage}>
+      {impls.map((impl, i) => (
+        <div key={i} className={styles.implBlock}>
+          <h3 className={styles.implTitle}>{impl.title}</h3>
+          <ul className={styles.implItems}>
+            {impl.items.map((item, j) => (
+              <li key={j} className={styles.implItem}>
+                <span className={styles.implDot}>·</span><span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          {impl.snippet && (
+            <div className={styles.probSnippet}>
+              {impl.snippet.type === "visual" && <VisualDiagram snippet={impl.snippet} />}
+              {impl.snippet.type === "table" && <DataTable snippet={impl.snippet} />}
+              {(!impl.snippet.type || impl.snippet.type === "code") && (
+                <CodeBlock code={impl.snippet.code} lang={impl.snippet.lang} label={impl.snippet.label} />
+              )}
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
 
 function ProblemSlide({ prob }) {
+  if (!prob) return null;
   return (
     <div className={styles.slideProb}>
       <h3 className={styles.probTitle}>{prob.title}</h3>
@@ -185,29 +260,94 @@ function ProblemSlide({ prob }) {
       </div>
       {prob.snippet && (
         <div className={styles.probSnippet}>
-          <CodeBlock code={prob.snippet.code} lang={prob.snippet.lang} label={prob.snippet.label} />
+          {prob.snippet.type === "visual" && <VisualDiagram snippet={prob.snippet} />}
+          {prob.snippet.type === "table" && <DataTable snippet={prob.snippet} />}
+          {(!prob.snippet.type || prob.snippet.type === "code") && (
+            <CodeBlock code={prob.snippet.code} lang={prob.snippet.lang} label={prob.snippet.label} />
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function TeamSlide({ features }) {
+function RetroPage({ retro }) {
   return (
-    <div className={styles.slideTeam}>
-      <h3 className={styles.implTitle}>팀 핵심 구현</h3>
-      {features.map((feat, i) => (
-        <div key={i} className={styles.teamBlock}>
-          <div className={styles.teamBlockTitle}>{feat.title}</div>
-          <ul className={styles.implItems} style={{ padding: "12px 14px", gap: "8px" }}>
-            {feat.items.map((item, j) => (
-              <li key={j} className={styles.implItem}>
-                <span className={styles.implDot}>·</span><span>{item}</span>
+    <div className={styles.retroPage}>
+      {retro.map((item, i) => (
+        <div key={i} className={styles.retroItem}>
+          <span className={styles.retroIdx}>{String(i + 1).padStart(2, "0")}</span>
+          <div className={styles.retroBody}>
+            <span className={styles.retroPoint}>{item.point}</span>
+            <p className={styles.retroDetail}>{item.detail}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TechChoicePage({ choices }) {
+  return (
+    <div className={styles.techPage}>
+      {choices.map((c, i) => (
+        <div key={i} className={styles.techRow}>
+          <div className={styles.techMeta}>
+            <span className={styles.techName}>{c.tech}</span>
+          </div>
+          <ul className={styles.techReasonList}>
+            {c.reason.map((r, j) => (
+              <li key={j} className={styles.techReasonItem}>
+                <span className={styles.techReasonDot}>·</span>
+                <span>{r}</span>
               </li>
             ))}
           </ul>
         </div>
       ))}
+    </div>
+  );
+}
+
+function VisualDiagram({ snippet }) {
+  return (
+    <div className={styles.visualWrap}>
+      <div className={styles.visualLabel}>{snippet.label}</div>
+      <div className={styles.visualFlow}>
+        {snippet.content.map((item, i) => (
+          <div key={item.id} className={styles.visualNodeWrap}>
+            {i > 0 && <div className={styles.visualArrow}>→</div>}
+            <div className={styles.visualNode}>
+              <span className={styles.visualNodeName}>{item.name}</span>
+              <span className={styles.visualNodeDesc}>{item.desc}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DataTable({ snippet }) {
+  return (
+    <div className={styles.tableWrap}>
+      <div className={styles.visualLabel}>{snippet.label}</div>
+      <div className={styles.tableScroll}>
+        <table className={styles.nativeTable}>
+          <thead>
+            <tr>
+              {snippet.headers.map((h, i) => <th key={i}>{h}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {snippet.rows.map((row, i) => (
+              <tr key={i}>
+                {row.map((cell, j) => <td key={j}>{cell}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

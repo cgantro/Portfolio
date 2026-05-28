@@ -1,0 +1,55 @@
+graph TD
+    subgraph "RobotPal (C++ Engine / WebAssembly)"
+        direction TB
+        ECS[Flecs ECS Core]
+        R[RenderSystem]
+        S[StreamingSystem]
+        C[ControllerSystem]
+        
+        ECS --> R
+        ECS --> S
+        ECS --> C
+        
+        R -->|Renders Frame| FBO[Frame Buffer Object]
+        FBO -->|Async PBO Readback| S
+        
+        S -->|Push JPEG Frame| NE[NetworkEngine]
+        C <--|Parse JSON Commands| NE
+        
+        NE --> TCP[TCP Transport]
+        NE --> WS[WebSocket Transport]
+    end
+
+    subgraph "RobotPal-python (Control & AI Server)"
+        direction TB
+        SS[SimulatorServer \n TCP:9998 / WS:9999]
+        API[Robot / Motor API]
+        AI[AI / ML Logic]
+        
+        SS -->|Decode & Resize to Numpy| AI
+        SS -->|Raw JPEG| J[Jupyter/Display]
+        API -->|Drive/Servo Commands| SS
+        AI --> API
+    end
+
+    subgraph "RobotPal-web (Browser)"
+        direction TB
+        HTML[template.html]
+        SW[coi-serviceworker.js]
+        WASM[RobotPal.wasm]
+    end
+
+    %% Connections
+    WS -.->|WebSocket via Bridge| SS
+    TCP <==>|Direct Desktop Network| SS
+    WASM -.-> WS
+    
+    %% Python Bridge Logic
+    subgraph "Jupyter / Colab Environment"
+        Bridge[bridge.py HTTP/WS Proxy]
+        JupyterUI[Smart Display Widget]
+    end
+    
+    WS --> Bridge
+    Bridge --> SS
+    SS --> JupyterUI

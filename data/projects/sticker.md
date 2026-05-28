@@ -616,3 +616,52 @@ AuthTokenProvider.TokenPair tokenPair = authTokenProvider.issueTokens(userId);
 - 역할: 백엔드 개발자 / 인프라 (CI/CD, Prometheus/Grafana, Redis, SQS)
 - 기술 스택: Spring Boot 3.5, Java 21 가상 스레드, AWS SQS/S3, Redis (Lettuce), Micrometer, Prometheus, Grafana, Traefik, Docker Buildx, GitLab CI/CD
 - 레포: GitLab (S14P31A408)
+
+---
+
+## 6. 프로젝트 리뷰 피드백 및 보완점
+
+프로젝트 코드 및 문서를 심층 분석하여 도출한 누락된 내용 및 보완 필요 사항입니다:
+
+### 6-1. 개선안의 실제 코드 미반영 (설정 누락)
+- **현상**: 부하 테스트 결과 문서(`docs/load_test/RESULTS.md`)에서 DB 커넥션 풀 부족으로 인한 대기 현상을 최적화하기 위해, `HikariCP maximum-pool-size`를 9에서 20으로 상향 조정하겠다고(RUN #2) 명시했습니다.
+- **문제점**: 하지만 실제 프로젝트의 `application-prod.yml` 파일 등 환경 설정에는 여전히 `maximum-pool-size: 9`로 방치되어 있어, 분석한 해결책이 코드베이스에 갱신되지 않았습니다. 
+- **개선안**: 문서에 적힌 최적화 전략과 실제 코드의 프로덕션 설정값을 일치시키도록 `maximum-pool-size`를 20(또는 도출된 최적값)으로 업데이트해야 합니다.
+
+### 6-2. 테스트 결과 기록 누락
+- **현상**: 부하 테스트 결과(`docs/load_test/RESULTS.md`) 문서 하단의 "RUN #2 (변경 후)" 섹션에 템플릿만 존재하고 실제 결과값이 빈칸으로 남아 있습니다.
+- **문제점**: 최적화 후 P95 응답 시간이나 Req/s 성능이 얼마나 개선되었는지 정량적인 결과(지표)가 없어, 트러블슈팅의 완결성이 떨어집니다.
+- **개선안**: DB 커넥션 풀과 캐시를 튜닝한 이후 재측정한 부하 테스트 결과 데이터를 문서에 명확하게 채워 넣어 "문제 발견 -> 가설 수립 -> 튜닝 -> 결과 검증" 파이프라인을 완성해야 합니다.
+
+---
+
+## 7. 심층 분석 리포트 (Subagent Analysis)
+
+소스 코드 전체(`docs/load_test/RESULTS.md` 포함)와 `git log` 히스토리를 5개의 서브 에이전트 관점에서 심층 분석한 리포트입니다.
+
+### 🤖 [Agent 1] Git Timeline (문제 해결 시계열 추적)
+`git log`를 바탕으로 한 핵심 백엔드/인프라 타임라인입니다.
+1. **모니터링 및 인프라 분리 (Day 22~28)**: Grafana 서브패스 라우팅 문제 해결 및 CI/CD 파이프라인 최적화. `docker-compose.monitoring.yml`에서 Traefik 설정이 조정됨.
+2. **캐싱 및 SQS 통합 (Day 25~28)**: `ClassCastException` 등 Redis 직렬화 이슈 해결, SQS 결과 소비를 위한 가상 스레드(`newVirtualThreadPerTaskExecutor`) 기반 `SmartLifecycle` 적용 및 분산 락(dedup) 구현.
+3. **성능 모니터링 고도화 (Day 30~31)**: Micrometer AOP를 도입하여 레이어별 성능 계측(app_operation_seconds) 설정. 
+4. **AI/Frontend 연동 최적화 (후반부)**: `adjust_preview_service.py` 자연어 보정 고도화 및 프론트엔드의 소셜 로그인(S14P31A408-188), UI 수정 커밋(S14P31A408-184 등)이 다수 병합되며 프로덕션 퀄리티 확보.
+
+### 🤖 [Agent 2] Architecture (기술 및 아키텍처 분석)
+- **비동기 이벤트 기반 백엔드**: Spring Boot 백엔드와 FastAPI AI 서버가 완전히 분리된 MSA(Microservices Architecture) 성격을 가집니다. 둘 사이의 통신은 AWS SQS를 통해 비동기로 처리되며, Redis를 활용한 분산 락과 Dedup 패턴을 통해 **"At-least-once" 전달 보장 환경에서의 중복 처리 문제를 완벽히 방어**하는 견고한 아키텍처를 구축했습니다.
+- **가상 스레드(Virtual Threads) 극대화**: I/O 대기가 잦은 외부 API 호출(기상청 날씨), SQS Long-polling, Meshy 스트림 등의 작업 스레드를 Java 21의 가상 스레드로 전환하여 컨텍스트 스위칭 오버헤드를 극적으로 줄였습니다.
+
+### 🤖 [Agent 3] Role & Code (내 역할 / 팀원 역할 검증)
+- **yoonpyo (백엔드 및 인프라 전담)**:
+  - Spring Security, JWT 갱신(Rotation), 이메일 및 소셜 인증 등 **코어 인증 서버(AuthService) 로직**을 전담.
+  - SQS Publisher/Consumer, Redis 캐싱 및 락(`RedisDailyRecommendationJobLockStore`), KMA 날씨 API 연동 등 백엔드의 중추적인 서비스 레이어를 직접 설계하고 구현했습니다.
+- **AI 파트 / 프론트엔드 파트 팀원**:
+  - AI 서버(`fastapi`)는 이미지 젠(OpenAI/Gemini), 스타일링 프롬프트(`adjust_preview_service`), 필터링 모듈이 주를 이루며 지속적으로 고도화되었습니다.
+  - 프론트엔드는 React Native 컴포넌트 분리 및 네비게이션 플로우 최적화에 집중했습니다.
+
+### 🤖 [Agent 4] Retrospective (회고 - 배운 점 및 아쉬운 점)
+- **배운 점 (Learned)**: SQS `ReceiveMessageRequest` 루프를 스프링 부트 생명주기에 안전하게 녹여내기 위해 `@Scheduled` 대신 `SmartLifecycle`을 도입한 경험은 Graceful Shutdown의 중요성을 깨닫게 했습니다. 또한 캐시 저장 시 `@class` 메타데이터 직렬화 누락으로 인한 런타임 캐스팅 에러를 겪으며, **Redis와 같은 외부 인메모리 저장소는 단순 도입보다 직렬화/역직렬화 설계가 훨씬 중요하다는 점**을 체득했습니다.
+- **아쉬운 점 (Regrets)**: `RESULTS.md`의 부하 테스트 문서에서 기준치(RUN #1)는 상세히 기록했으나 튜닝 후 결과(RUN #2) 작성을 완료하지 못했습니다. 프로덕션 환경의 `application.yml`에 HikariCP pool size(9→20)를 반영하는 것을 잊은 채 프로젝트가 마감된 점이 가장 아쉽습니다.
+
+### 🤖 [Agent 5] Quantitative (수치 분석)
+- **부하 테스트 지표 (베이스라인)**: 1,000명의 Virtual Users(VUs) 동시 접속 테스트(`02_wardrobe_flow.js`) 시 **92.52 Req/s**, 실패율 0.00%를 달성했습니다. 다만 DB 커넥션 큐 대기로 인해 최대 지연 7.37s, p(95) 1.97s를 기록하며 HikariCP 튜닝의 정량적 근거를 확보했습니다.
+- **가상 스레드 최적화 코드 적용**: `newSingleThreadExecutor`, `newCachedThreadPool`로 작성되었던 쓰레드 풀 2곳을 모두 `newVirtualThreadPerTaskExecutor`로 교체하여 I/O 블로킹 효율을 이론치에 가깝게 끌어올렸습니다.

@@ -1,53 +1,48 @@
 /**
  * 기술 스택 — 카테고리별 그룹
  * level: "primary" | "secondary" | "learning"
+ * skillicon: skillicons.dev 아이콘 ID (null이면 텍스트 폴백)
  */
 export const techStack = [
   {
-    category: "Languages",
+    category: "언어",
     icon: "{ }",
     items: [
-      { name: "C++17", level: "primary" },
-      { name: "Java 17/21", level: "primary" },
-      { name: "Python", level: "secondary" },
+      { name: "C++17",      level: 3, skillicon: "cpp"  },
+      { name: "Java 17/21", level: 3, skillicon: "java" },
+      { name: "Python",     level: 2, skillicon: "py"   },
     ],
   },
   {
-    category: "Backend",
+    category: "프레임워크",
     icon: "⚙",
     items: [
-      { name: "Spring Boot 3.5", level: "primary" },
-      { name: "Spring Security", level: "primary" },
-      { name: "uWebSockets", level: "secondary" },
+      { name: "Spring Boot 3.5",    level: 3, skillicon: "spring" },
+      { name: "Spring Security",    level: 3, skillicon: "spring" },
+      { name: "Unreal Engine 5",    level: 2, skillicon: "unrealengine" },
+      { name: "uWebSockets",        level: 2, skillicon: null     },
     ],
   },
   {
-    category: "Systems",
+    category: "툴",
     icon: "◈",
     items: [
-      { name: "Emscripten (WASM)", level: "primary" },
-      { name: "Unreal Engine 5 (C++)", level: "secondary" },
-      { name: "Opus Codec", level: "secondary" },
+      { name: "Docker / Buildx",   level: 2, skillicon: "docker" },
+      { name: "GitLab CI/CD",      level: 3, skillicon: "gitlab" },
+      { name: "Emscripten (WASM)", level: 3, skillicon: "wasm"   },
+      { name: "Opus Codec",        level: 2, skillicon: null     },
     ],
   },
   {
-    category: "Infrastructure",
+    category: "인프라 · DB",
     icon: "⬡",
     items: [
-      { name: "Docker / Docker Buildx", level: "primary" },
-      { name: "GitLab CI/CD", level: "primary" },
-      { name: "AWS (EC2, S3, SQS)", level: "primary" },
-      { name: "Redis (Lettuce)", level: "primary" },
-      { name: "Prometheus + Grafana", level: "secondary" },
-      { name: "Traefik", level: "secondary" },
-    ],
-  },
-  {
-    category: "Data / DB",
-    icon: "▤",
-    items: [
-      { name: "PostgreSQL", level: "primary" },
-      { name: "JPA / Hibernate", level: "primary" },
+      { name: "AWS (EC2, S3, SQS)",   level: 3, skillicon: "aws"      },
+      { name: "Redis (Lettuce)",      level: 3, skillicon: "redis"    },
+      { name: "PostgreSQL",           level: 2, skillicon: "postgres" },
+      { name: "JPA / Hibernate",      level: 3, skillicon: null       },
+      { name: "Prometheus + Grafana", level: 2, skillicon: "grafana"  },
+      { name: "Traefik",              level: 2, skillicon: null       },
     ],
   },
 ];

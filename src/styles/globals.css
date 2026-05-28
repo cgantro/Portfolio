@@ -1,19 +1,20 @@
 /* ── Design Tokens ── */
 :root {
-  --bg:         #050505;
-  --bg2:        #0c0c0c;
-  --bg3:        #111111;
-  --border:     #1e1e1e;
-  --border2:    #2a2a2a;
-  --fg:         #b8b8b8;
-  --fg-dim:     #555555;
-  --fg-bright:  #e0e0e0;
-  --accent:     #00ff41;
-  --accent-dim: #00cc33;
-  --accent-bg:  rgba(0, 255, 65, 0.06);
-  --red:        #ff4444;
-  --yellow:     #ffcc00;
-  --blue:       #4488ff;
+  --bg:         #090a0f;
+  --bg2:        #10121b;
+  --bg3:        #181a26;
+  --border:     #2a2f42;
+  --border2:    #39415c;
+  --fg:         #e2e8f0;
+  --fg-dim:     #94a3b8;
+  --fg-bright:  #ffffff;
+  --accent:     #60a5fa;
+  --accent-dim: #3b82f6;
+  --accent-bg:  rgba(96, 165, 250, 0.12);
+  --purple:     #a78bfa;
+  --red:        #f87171;
+  --yellow:     #fbbf24;
+  --green:      #4ade80;
 
   --font-mono:  'JetBrains Mono', 'Courier New', monospace;
   --font-body:  'Pretendard Variable', 'Noto Sans KR', -apple-system, sans-serif;
@@ -91,8 +92,10 @@ ul, ol {
   margin-left: var(--sidebar-w);
   flex: 1;
   min-width: 0;
-  padding: 0 48px 120px;
-  max-width: 860px;
+  padding-top: 0;
+  padding-bottom: 120px;
+  padding-left: max(48px, calc((100% - 1100px) / 2));
+  padding-right: max(48px, calc((100% - 1100px) / 2));
   width: 100%;
 }
 
