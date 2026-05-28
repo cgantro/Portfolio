@@ -3,6 +3,7 @@ import SectionLabel from "../../ui/SectionLabel";
 import ProjectDetail from "./ProjectDetail";
 import Tag from "../../ui/Tag";
 import useCardTilt from "../../../hooks/useCardTilt";
+import { coverImages } from "../../../data/projectImages";
 import styles from "./Projects.module.css";
 
 export default function Projects({ projects }) {
@@ -77,8 +78,8 @@ export default function Projects({ projects }) {
 }
 
 function BentoCard({ project, isLarge, onClick }) {
-  // Bento 타일에서도 틸팅(Glare) 효과 적용
   const { cardStyle, glarePos, onMouseMove, onMouseLeave } = useCardTilt(10);
+  const imgs = coverImages[project.id];
 
   return (
     <article
@@ -99,12 +100,13 @@ function BentoCard({ project, isLarge, onClick }) {
 
       {/* 커버 이미지 영역 */}
       <div className={styles.bentoCover}>
-        {project.cover ? (
+        {imgs?.src ? (
           <img
-            src={project.cover}
+            src={imgs.src}
             alt={project.title}
             onError={(e) => {
-              if (project.coverFallback) e.currentTarget.src = project.coverFallback;
+              e.currentTarget.onerror = null;
+              if (imgs.fallback) e.currentTarget.src = imgs.fallback;
               else e.currentTarget.parentElement.style.display = "none";
             }}
           />
