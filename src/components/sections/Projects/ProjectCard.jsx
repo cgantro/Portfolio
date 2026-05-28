@@ -1,7 +1,9 @@
 import Tag from "../../ui/Tag";
+import { coverImages } from "../../../data/projectImages";
 import styles from "./Projects.module.css";
 
 export default function ProjectCard({ project, index, onOpen }) {
+  const imgs = coverImages[project.id];
   return (
     <article className={styles.card} onClick={() => onOpen(project)}>
       {/* Number + divider */}
@@ -12,17 +14,15 @@ export default function ProjectCard({ project, index, onOpen }) {
 
       {/* Cover image */}
       <div className={styles.cover}>
-        {project.cover ? (
+        {imgs?.src ? (
           <img
-            src={project.cover}
+            src={imgs.src}
             alt={project.title}
             loading={index === 0 ? "eager" : "lazy"}
             onError={(e) => {
-              if (project.coverFallback) {
-                e.currentTarget.src = project.coverFallback;
-              } else {
-                e.currentTarget.style.display = "none";
-              }
+              e.currentTarget.onerror = null;
+              if (imgs.fallback) e.currentTarget.src = imgs.fallback;
+              else e.currentTarget.style.display = "none";
             }}
           />
         ) : (

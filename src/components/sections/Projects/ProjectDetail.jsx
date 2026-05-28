@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import Tag from "../../ui/Tag";
 import CodeBlock from "../../ui/CodeBlock";
 import ArchitectureDiagram from "../../ui/ArchitectureDiagram";
-import { coverImages } from "../../data/projectImages";
+import { coverImages } from "../../../data/projectImages";
 import styles from "./Projects.module.css";
 
 function getTabs(project) {
@@ -186,6 +186,7 @@ function OverviewSlide({ project }) {
             loading="lazy"
             decoding="async"
             onError={(e) => {
+              e.currentTarget.onerror = null;
               if (imgs.fallback) e.currentTarget.src = imgs.fallback;
               else e.currentTarget.parentElement.style.display = "none";
             }}
