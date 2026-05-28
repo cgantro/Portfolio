@@ -1,0 +1,76 @@
+graph TD
+    %% Frontend
+    subgraph Client [Mobile App]
+        Mobile[FashionApp<br/>React Native / Expo]
+    end
+
+    %% External APIs
+    subgraph External [External Services]
+        OAuth[Kakao / Google Auth]
+        FCM[Firebase Push]
+        Meshy[Meshy API 3D]
+        Decart[Decart AI Voice/Video]
+        KMA[KMA Weather API]
+        Gmail[Gmail API Email Auth]
+        S3[(AWS S3 Storage)]
+        OpenAI[OpenAI API]
+    end
+
+    %% Backend Server
+    subgraph Backend [Core Backend - Spring Boot]
+        Server[Java API Server]
+        PostgreSQL[(PostgreSQL)]
+        Redis[(Redis Cache)]
+    end
+
+    %% SQS Queues
+    subgraph AWS_SQS [AWS SQS Message Broker]
+        RecJob[Daily Rec Job Queue]
+        PreviewJob[Adjust Preview Job Queue]
+        RecResult[Rec Result Queue]
+    end
+
+    %% AI System
+    subgraph AISystem [AI Backend - Python FastAPI]
+        AIApi[FastAPI HTTP Endpoints]
+        AIPoller[SQS Background Consumers]
+        FashionCLIP[FashionCLIP Models]
+        RemBG[rembg Background Removal]
+    end
+
+    %% Connections - Mobile to Backend
+    Mobile -- "REST / WebSocket" --> Server
+    Mobile -- "OAuth" --> OAuth
+    FCM -- "Notifications" --> Mobile
+    Mobile -- "WebRTC" --> Decart
+
+    %% Connections - Backend to External
+    Server -- "Send Push" --> FCM
+    Server -- "Create 3D" --> Meshy
+    Meshy -- "Webhook Callback" --> Server
+    Server -- "Fetch Weather" --> KMA
+    Server -- "Send Email" --> Gmail
+    Server -- "Store Images" --> S3
+    Server -- "WebSocket / API" --> Decart
+
+    %% Connections - Backend to Data
+    Server -- "Read/Write" --> PostgreSQL
+    Server -- "Cache Data" --> Redis
+
+    %% Connections - Backend to AI (SQS + HTTP)
+    Server -- "Publish Job" --> RecJob
+    Server -- "Publish Job" --> PreviewJob
+    RecResult -- "Consume Result" --> Server
+    Server -- "HTTP GET /tip" --> AIApi
+
+    %% Connections - SQS to AI
+    RecJob -- "Poll" --> AIPoller
+    PreviewJob -- "Poll" --> AIPoller
+    AIPoller -- "Publish Result" --> RecResult
+
+    %% Connections - AI internal and external
+    AIPoller -- "Reasoning/NLP" --> OpenAI
+    AIApi -- "Reasoning/NLP" --> OpenAI
+    AIPoller -- "Remove Background" --> RemBG
+    AIPoller -- "Extract Embeddings" --> FashionCLIP
+    AIPoller -- "Read Images" --> S3

@@ -1,0 +1,26 @@
+graph TD
+    %% Definitions
+    subgraph Clients
+        C[A302Client (UE5 Game Client)]
+    end
+
+    subgraph Custom GameServer "Custom GameServer (C++20)"
+        direction TB
+        L[Lobby Server<br>WebSocket :8001]
+        B[Backend Service<br>WebSocket :8001]
+        V[Voice Server<br>UDP :48100]
+        
+        L -- "Internal API (Start Game)" --> B
+    end
+
+    subgraph DedicatedServers "Unreal Dedicated Servers"
+        DS[A302Server (UE5 Dedicated Server)]
+    end
+
+    %% Client Connections
+    C -- "WebSocket (Lobby, Matchmaking)" --> L
+    C -- "UDP (Join, VoiceData, Leave)" --> V
+    C -- "Unreal Protocol (Gameplay State)" --> DS
+
+    %% Dedicated Server Connections
+    DS -- "WebSocket (Register, Ready, Finish)" --> B

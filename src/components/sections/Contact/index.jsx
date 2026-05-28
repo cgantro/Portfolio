@@ -8,7 +8,6 @@ export default function Contact({ meta }) {
 
       <div className={styles.wrapper}>
         <p className={styles.message}>
-          시스템 구조 문제를 함께 풀어갈 기회를 찾고 있습니다.<br />
           메일이나 GitHub으로 편하게 연락주세요.
         </p>
 
