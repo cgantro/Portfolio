@@ -181,6 +181,8 @@ function OverviewSlide({ project }) {
           <img
             src={project.cover}
             alt={project.title}
+            loading="lazy"
+            decoding="async"
             onError={(e) => {
               if (project.coverFallback) e.currentTarget.src = project.coverFallback;
               else e.currentTarget.parentElement.style.display = "none";
