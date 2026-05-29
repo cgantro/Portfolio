@@ -1,69 +1,75 @@
-const { FONT, C } = require("../constants");
-const { addBoxP6, addHeader, addSoWhat, addBottomStrip } = require("../helpers");
+const path = require("path");
+const { FONT, C, BOX_STYLE } = require("../constants");
+const { addHeader, addSoWhat, addBottomStrip } = require("../helpers");
+
+const ARCH_IMG = path.resolve(__dirname, "../../asset/project-mausoleum-architecture.png");
 
 module.exports = function(pres) {
   const sld = pres.addSlide();
-  sld.background = { color: C.white };
+  sld.background = { color: C.bg };
 
-  addHeader(sld, "주요 프로젝트 02 · RobotPal",
-    "렌더와 인코딩을 분리하자 GPU 환경에 따라 앱 FPS +6~15% 개선을 수치로 확인했다",
-    "C++17 · OpenGL · libjpeg · 생산자-소비자 패턴 · 벤치마킹");
+  addHeader(sld, "주요 프로젝트 02 · 영묘 (Mausoleum)",
+    "UE5 멀티플레이어 던전 탈출 게임",
+    "Unreal Engine 5 (C++) · C++ GameServer · uWebSockets · UDP · Opus · HRTF · Docker");
 
-  addBoxP6(sld);
+  // ── Left box: 프로젝트 메타 ─────────────────────────────────────────
+  sld.addShape("roundRect", { x:0.422, y:2.20, w:4.95, h:3.85, ...BOX_STYLE(0.18) });
 
-  sld.addText("싱글 vs 멀티 워커 FPS 비교 (816×616, JPEG Q70, 디버그 빌드)", {
-    x:0.622, y:2.40, w:6.94, h:0.28,
-    fontFace:FONT, fontSize:10, bold:true, color:C.ink,
+  const lx = 0.622;
+
+  sld.addText("2026.02 – 2026.03", {
+    x:lx, y:2.38, w:4.55, h:0.24,
+    fontFace:FONT, fontSize:9, color:C.fgDim,
+  });
+  sld.addText("6인 (UE5 클라이언트 + C++ 서버 + 인프라)  ·  보이스 채팅 클라이언트 & 서버 · 게임 서버 구조 개선", {
+    x:lx, y:2.62, w:4.55, h:0.36,
+    fontFace:FONT, fontSize:9, color:C.fgDim, lineSpacingMultiple:1.3,
   });
 
-  const chartData = [
-    { name:"Single Worker", labels:["dGPU 앱 FPS", "iGPU 앱 FPS"], values:[55.94, 58.10] },
-    { name:"Multi Worker",  labels:["dGPU 앱 FPS", "iGPU 앱 FPS"], values:[59.41, 66.95] },
-  ];
-  sld.addChart("bar", chartData, {
-    x:0.622, y:2.72, w:6.94, h:2.80,
-    chartColors:[ C.brandT3, C.brand ],
-    barGrouping:"clustered", barDir:"col",
-    showValue:true, dataLabelFontSize:9, dataLabelColor:"FFFFFF",
-    catAxisLabelFontSize:9, valAxisLabelFontSize:9,
-    valAxisMinVal:45, valAxisMaxVal:75,
-    showLegend:true, legendFontSize:9,
-    catAxisLineShow:false, valAxisLineShow:false,
-    showTitle:false,
-  });
+  sld.addShape("line", { x:lx, y:3.06, w:4.35, h:0.01, line:{ color:C.border, width:0.8 } });
 
-  sld.addText("dGPU: 55.94 → 59.41 (+6.20%)  ·  iGPU: 58.10 → 66.95 (+15.24%)  ·  릴리즈 빌드 별도 미측정", {
-    x:0.622, y:5.60, w:6.94, h:0.28,
-    fontFace:FONT, fontSize:9, color:C.mute,
+  sld.addText("구현", {
+    x:lx, y:3.14, w:4.55, h:0.24,
+    fontFace:FONT, fontSize:9.5, bold:true, color:C.accent,
   });
-
-  sld.addText("문제 → 해결", {
-    x:8.162, y:2.45, w:4.55, h:0.28,
-    fontFace:FONT, fontSize:10, bold:true, color:C.mute,
-  });
-
-  const items = [
-    { t:"렌더 루프와 인코딩이 경쟁",     d:"압축 작업이 메인 루프 FPS를 점유",   c:C.mute  },
-    { t:"생산자-소비자로 루프 분리",      d:"렌더와 인코딩이 서로 방해하지 않음", c:C.brand },
-    { t:"멀티 워커로 인코딩 분산",        d:"압축 부하를 워커에 나눔",            c:C.brand },
-    { t:"iGPU 환경에서 더 큰 개선 확인",  d:"외장 GPU 없는 환경일수록 효과 컸음", c:C.brand },
-  ];
-  items.forEach((it, i) => {
-    const iy = 2.87 + i * 0.76;
-    sld.addShape("ellipse", {
-      x:8.162, y:iy + 0.07, w:0.13, h:0.13,
-      fill:{ color:it.c }, line: false,
-    });
-    sld.addText(it.t, {
-      x:8.33, y:iy, w:4.4, h:0.28,
-      fontFace:FONT, fontSize:10, bold:(it.c === C.brand), color:it.c,
-    });
-    sld.addText(it.d, {
-      x:8.33, y:iy + 0.28, w:4.4, h:0.28,
-      fontFace:FONT, fontSize:9, color:C.caption,
+  // 웹 implementations[].title 그대로
+  [
+    "보이스 채팅 클라이언트 (UE5 C++)",
+    "보이스 채팅 서버 (C++)",
+    "생사 분리 전략 패턴",
+    "C++ 게임 서버 구조 개선",
+    "페이즈 시스템",
+  ].forEach((item, i) => {
+    sld.addText("· " + item, {
+      x:lx, y:3.42 + i * 0.40, w:4.55, h:0.36,
+      fontFace:FONT, fontSize:9.5, color:C.fg, lineSpacingMultiple:1.25,
     });
   });
 
-  addSoWhat(sld, "렌더링 자체가 느린 게 아니었습니다. 렌더와 인코딩이 같은 루프에서 서로 기다리는 구조가 문제였습니다.");
-  addBottomStrip(sld, 5, "Source: RobotPal 병목분석.md — 디버그 빌드 b01af42, 릴리즈 빌드 미측정 (2026-04-09)");
+  sld.addShape("line", { x:lx, y:5.44, w:4.35, h:0.01, line:{ color:C.border, width:0.8 } });
+  [
+    "보이스 채팅 클라이언트·서버 전담",
+    "생사 분리 전략 패턴 설계",
+    "C++ 게임 서버 OOP 리팩토링",
+  ].forEach((h, i) => {
+    sld.addText("› " + h, {
+      x:lx, y:5.52 + i * 0.22, w:4.55, h:0.20,
+      fontFace:FONT, fontSize:8.5, color:C.accent,
+    });
+  });
+
+  // ── Right: 아키텍처 이미지 ─────────────────────────────────────────
+  sld.addText("아키텍처", {
+    x:5.70, y:2.22, w:7.0, h:0.24,
+    fontFace:FONT, fontSize:9.5, color:C.fgDim,
+  });
+  try {
+    sld.addImage({ path: ARCH_IMG, x:5.572, y:2.50, w:7.34, h:3.55 });
+  } catch(e) {
+    sld.addShape("roundRect", { x:5.572, y:2.50, w:7.34, h:3.55, fill:{ color:C.bg3 }, line:{ color:C.border, width:1 }, rectRadius:0.10 });
+    sld.addText("아키텍처 이미지를 찾을 수 없습니다", { x:5.572, y:3.90, w:7.34, h:0.40, fontFace:FONT, fontSize:10, color:C.fgDim, align:"center" });
+  }
+
+  addSoWhat(sld, "마이크 캡처부터 3D 공간음향 재생까지 전체 보이스 파이프라인을 직접 설계하고, 게임 상태에 따른 청취 규칙을 전략 패턴으로 분리했습니다.");
+  addBottomStrip(sld, 5, "Source: Mausoleum — UVoiceCaptureProcessor · IListenStrategy · uWebSockets 서버 (2026.02 – 2026.03)");
 };

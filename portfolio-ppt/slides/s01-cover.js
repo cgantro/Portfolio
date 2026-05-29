@@ -6,12 +6,12 @@ module.exports = function(pres) {
 
   sld.addShape("rect", { x:0, y:0, w:13.333, h:0.06, fill:{ color:C.brand }, line: false });
 
-  sld.addText("BACKEND DEVELOPER  ·  SPRING BOOT  ·  C++", {
+  sld.addText("BACKEND  ·  C++ SYSTEMS  ·  DEVOPS", {
     x:0.70, y:2.95, w:10.0, h:0.35,
     fontFace:FONT, fontSize:11, color:C.brandT3, bold:false, charSpacing:3,
   });
 
-  sld.addText("상태 정합성과\n운영 안정성을 먼저 생각하는\n백엔드 개발자", {
+  sld.addText("기능 구현보다\n시스템 문제를 분석하고\n구조적으로 해결합니다", {
     x:0.70, y:3.30, w:10.5, h:2.0,
     fontFace:FONT, fontSize:40, bold:true, color:C.white,
     lineSpacingMultiple:1.15, charSpacing:-1,

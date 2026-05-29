@@ -3,57 +3,69 @@ const { addBoxP3, addHeader, addSoWhat, addBottomStrip, addEmphasisCard } = requ
 
 module.exports = function(pres) {
   const sld = pres.addSlide();
-  sld.background = { color: C.white };
+  sld.background = { color: C.bg };
 
   addHeader(sld, "EXECUTIVE SUMMARY",
-    "비동기 실시간 환경에서 측정하고, 단계를 나누고, 구조로 해결했다",
-    "Autowing_car · RobotPal · mausoleum · STICKER");
+    "계측하고, 분리하고, 정합성을 지켰다",
+    "RobotPal · 영묘 (Mausoleum) · STICKER");
 
   addBoxP3(sld);
 
-  // Card 1 — emphasis
+  // ── Card 1 — RobotPal (emphasis) ──────────────────────────────────
   addEmphasisCard(sld, 0.442, 2.22, 4.003, 3.81);
-  sld.addText("관제 상태 불일치 원인을\n찾아 전송량 90% 줄였다", {
-    x:0.622, y:2.42, w:3.643, h:0.72,
-    fontFace:FONT, fontSize:12, bold:true, color:C.brand, lineSpacingMultiple:1.3,
+  sld.addText("TCP 프레임 밀림\n(지연 누적)", {
+    x:0.622, y:2.38, w:3.643, h:0.64,
+    fontFace:FONT, fontSize:13, bold:true, color:C.brand, lineSpacingMultiple:1.2,
   });
-  sld.addText("MQTT 발행이 DB 커밋 전에\n나가면서 관제 상태가 오염됨.\nafterCommit() 훅으로 순서 고정\n→ write points 90% 감소 (Redis\n배치화), payload 90.36% 감소\n(RDP 압축).", {
-    x:0.622, y:3.22, w:3.643, h:2.00,
-    fontFace:FONT, fontSize:10, color:C.ink, lineSpacingMultiple:1.5,
+  sld.addText("인코딩과 소켓 전송이 같은 스레드에서 순서대로 실행되었습니다. 큰 프레임을 인코딩하는 동안 다음 프레임 전송이 밀려나고, 그 지연이 계속 누적되어 스트리밍이 버벅거렸습니다.", {
+    x:0.622, y:3.08, w:3.643, h:1.00,
+    fontFace:FONT, fontSize:9.5, color:C.ink, lineSpacingMultiple:1.5,
   });
-  sld.addText("Autowing_car · STICKER", {
+  sld.addText("→ 생산자-소비자 구조로 분리\n→ dGPU +6.20% · iGPU +15.24% FPS 향상", {
+    x:0.622, y:4.14, w:3.643, h:0.60,
+    fontFace:FONT, fontSize:9.5, bold:true, color:C.brand, lineSpacingMultiple:1.4,
+  });
+  sld.addText("RobotPal  ·  C++17 · libjpeg-turbo", {
     x:0.622, y:5.58, w:3.643, h:0.27,
     fontFace:FONT, fontSize:9, color:C.brand,
   });
 
-  // Card 2
-  sld.addText("처리·전파·저장 단계를 나누자\n부하와 지연이 함께 줄었다", {
-    x:4.825, y:2.42, w:3.643, h:0.72,
-    fontFace:FONT, fontSize:12, bold:true, color:C.ink, lineSpacingMultiple:1.3,
+  // ── Card 2 — Mausoleum ────────────────────────────────────────────
+  sld.addText("캡처 디바이스 null —\n보이스 전혀 전송 안 됨", {
+    x:4.825, y:2.38, w:3.643, h:0.64,
+    fontFace:FONT, fontSize:13, bold:true, color:C.ink, lineSpacingMultiple:1.2,
   });
-  sld.addText("렌더 루프와 인코딩 루프가\n같은 스레드에서 경쟁했었음.\n생산자-소비자로 분리 후\nGPU 환경에 따라 +6~15%\nFPS 개선을 수치로 확인.", {
-    x:4.825, y:3.22, w:3.643, h:2.00,
-    fontFace:FONT, fontSize:10, color:C.ink, lineSpacingMultiple:1.5,
+  sld.addText("마이크의 표시 이름을 그대로 UE5 캡처 API에 전달했더니 null을 반환했습니다. 내부에서 DirectSound 디바이스 ID와 매칭을 시도하는데, Friendly Name은 매칭에 실패합니다.", {
+    x:4.825, y:3.08, w:3.643, h:0.80,
+    fontFace:FONT, fontSize:9.5, color:C.ink, lineSpacingMultiple:1.5,
   });
-  sld.addText("RobotPal · Autowing_car", {
+  sld.addText("→ 빈 문자열 전달 → OS 기본 장치 자동 매칭\n→ IListenStrategy로 생존자·영혼 청취 규칙 분리", {
+    x:4.825, y:3.94, w:3.643, h:0.60,
+    fontFace:FONT, fontSize:9.5, bold:true, color:C.ink, lineSpacingMultiple:1.4,
+  });
+  sld.addText("영묘 (Mausoleum)  ·  UE5 · UDP · Opus", {
     x:4.825, y:5.58, w:3.643, h:0.27,
     fontFace:FONT, fontSize:9, color:C.mute,
   });
 
-  // Card 3
-  sld.addText("코드를 건드리지 않고\n어느 레이어가 느린지 찾아냈다", {
-    x:9.048, y:2.42, w:3.643, h:0.72,
-    fontFace:FONT, fontSize:12, bold:true, color:C.ink, lineSpacingMultiple:1.3,
+  // ── Card 3 — STICKER ──────────────────────────────────────────────
+  sld.addText("DB 커밋 전 SQS 발행\n→ 데이터 불일치", {
+    x:9.048, y:2.38, w:3.643, h:0.64,
+    fontFace:FONT, fontSize:13, bold:true, color:C.ink, lineSpacingMultiple:1.2,
   });
-  sld.addText("AOP로 Service / Repository /\nExternal 레이어별 응답 시간을\n자동 수집. 코드 수정 없이\n어느 구간이 느린지 Grafana\np95·p99로 확인했다.", {
-    x:9.048, y:3.22, w:3.643, h:2.00,
-    fontFace:FONT, fontSize:10, color:C.ink, lineSpacingMultiple:1.5,
+  sld.addText("트랜잭션 안에서 SQS 메시지를 발행했더니 DB가 롤백되어도 메시지는 이미 큐에 들어간 상태가 됩니다. AI 서버가 메시지를 소비해 DB에 없는 데이터를 참조하면서 오류가 발생했습니다.", {
+    x:9.048, y:3.08, w:3.643, h:0.80,
+    fontFace:FONT, fontSize:9.5, color:C.ink, lineSpacingMultiple:1.5,
   });
-  sld.addText("STICKER", {
+  sld.addText("→ afterCommit() 훅 — DB 커밋 후에만 발행\n→ DB 상태와 메시지 큐 상태의 일관성 보장", {
+    x:9.048, y:3.94, w:3.643, h:0.60,
+    fontFace:FONT, fontSize:9.5, bold:true, color:C.ink, lineSpacingMultiple:1.4,
+  });
+  sld.addText("STICKER  ·  Spring Boot · SQS · Redis", {
     x:9.048, y:5.58, w:3.643, h:0.27,
     fontFace:FONT, fontSize:9, color:C.mute,
   });
 
-  addSoWhat(sld, "도메인이 달라도 같은 문제가 돌아왔습니다 — 상태 정합성, 처리 단계 분리, 병목 계측.");
+  addSoWhat(sld, "도메인이 달라도 같은 구조적 결함이 반복됩니다 — 같은 스레드에서 경쟁하거나, 순서를 지키지 않거나, 상태가 분리되지 않거나.");
   addBottomStrip(sld, 2, "");
 };
