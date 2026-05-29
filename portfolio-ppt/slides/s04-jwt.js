@@ -1,70 +1,95 @@
 const { FONT, C } = require("../constants");
-const { addBoxP1, addHeader, addSoWhat, addBottomStrip, addEmphasisCard } = require("../helpers");
+const { addBoxP6, addHeader, addSoWhat, addBottomStrip } = require("../helpers");
 
 module.exports = function(pres) {
   const sld = pres.addSlide();
-  sld.background = { color: C.white };
+  sld.background = { color: C.bg };
 
-  addHeader(sld, "주요 프로젝트 01 · Autowing_car — 인증 설계",
-    "WebSocket은 헤더를 못 써서 토큰이 URL에 드러난다 — 전용 1분 토큰으로 노출 시간을 줄였다",
-    "JWT 3종 분리 · Spring Security · Redis Refresh Token Rotation");
+  addHeader(sld, "주요 프로젝트 01 · RobotPal — 문제 해결",
+    "렌더와 인코딩이 경쟁 중이었다 — 분리하자 iGPU 환경에서 +15.24% FPS 향상",
+    "생산자-소비자 패턴 · PBO 더블버퍼 · libjpeg-turbo 워커 풀 · 1~19 워커 실측 벤치마킹");
 
-  addBoxP1(sld);
+  addBoxP6(sld);  // Left 7.34 / Right 4.95
 
-  const tokens = [
-    {
-      name:"ACCESS TOKEN",  life:"15분",
-      why:"REST API는 Authorization 헤더\n사용 가능 → 표준 방식으로 충분",
-      use:"일반 API 요청 인증",
-      color:C.brand, emphasis:false,
-    },
-    {
-      name:"SOCKET TOKEN",  life:"1분",
-      why:"WebSocket 핸드셰이크는 커스텀\n헤더 불가 → 토큰을 URL 파라미터에\n포함해야 함 → 노출 시간을 1분으로\n제한해 탈취 피해 범위를 줄임",
-      use:"WebSocket 연결 1회 전용",
-      color:C.brandDeep, emphasis:true,
-    },
-    {
-      name:"REFRESH TOKEN", life:"7일",
-      why:"장기 유효 → DB 대신 Redis에\nTTL로 저장. 이미 사용된 토큰이\n다시 들어오면 해당 계정 전체\n세션을 무효화하는 로직 구현",
-      use:"토큰 갱신 전용",
-      color:C.mute, emphasis:false,
-    },
+  // ── Left: FPS 차트 ────────────────────────────────────────────────
+  sld.addText("싱글 vs 멀티 워커 FPS 비교 (816×616, JPEG Q70, 디버그 빌드)", {
+    x:0.622, y:2.40, w:6.94, h:0.28,
+    fontFace:FONT, fontSize:10, bold:true, color:C.ink,
+  });
+
+  const chartData = [
+    { name:"Single Worker", labels:["dGPU 앱 FPS", "iGPU 앱 FPS"], values:[55.94, 58.10] },
+    { name:"12 Workers",    labels:["dGPU 앱 FPS", "iGPU 앱 FPS"], values:[59.41, 66.95] },
   ];
-
-  tokens.forEach((t, i) => {
-    const bx = 0.722 + i * 4.1;
-    if (t.emphasis) addEmphasisCard(sld, bx - 0.10, 2.42, 3.95, 3.35);
-
-    sld.addText(t.name, {
-      x:bx, y:2.60, w:3.75, h:0.32,
-      fontFace:FONT, fontSize:10, bold:true, color:t.color,
-    });
-    sld.addShape("roundRect", {
-      x:bx, y:3.00, w:0.85, h:0.28,
-      fill:{ color: t.emphasis ? C.brandPale : C.surface2 },
-      line:{ color: t.emphasis ? C.brandT3 : C.containerLine, width:1 },
-      rectRadius:0.05,
-    });
-    sld.addText(t.life, {
-      x:bx, y:3.00, w:0.85, h:0.28,
-      fontFace:FONT, fontSize:9, bold:true, color:t.color, align:"center", valign:"middle",
-    });
-    sld.addText(t.use, {
-      x:bx, y:3.35, w:3.75, h:0.28,
-      fontFace:FONT, fontSize:10, color:C.ink,
-    });
-    sld.addText(t.why, {
-      x:bx, y:3.72, w:3.75, h:1.40,
-      fontFace:FONT, fontSize:9.5, color:C.mute, lineSpacingMultiple:1.5,
-    });
+  sld.addChart("bar", chartData, {
+    x:0.622, y:2.72, w:6.94, h:2.72,
+    chartColors:[ C.brandT3, C.brand ],
+    barGrouping:"clustered", barDir:"col",
+    showValue:true, dataLabelFontSize:9, dataLabelColor:C.fgBright,
+    catAxisLabelFontSize:9, catAxisLabelColor:C.fgDim,
+    valAxisLabelFontSize:9, valAxisLabelColor:C.fgDim,
+    valAxisMinVal:45, valAxisMaxVal:75,
+    showLegend:true, legendFontSize:9, legendFontColor:C.fg,
+    catAxisLineShow:false, valAxisLineShow:false,
+    showTitle:false,
+    chartArea:{ fill:{ color:C.bg2 } },
+    plotArea:{ fill:{ color:C.bg2 } },
+  });
+  sld.addText("dGPU: 55.94 → 59.41 (+6.20%)  ·  iGPU: 58.10 → 66.95 (+15.24%)  ·  릴리즈 빌드 별도 미측정", {
+    x:0.622, y:5.52, w:6.94, h:0.26,
+    fontFace:FONT, fontSize:9, color:C.mute,
   });
 
-  sld.addText("로그인 시 3종 토큰 동시 발급  ·  SOCKET 토큰은 WebSocket 연결 1회에만 사용, 이후 폐기", {
-    x:0.722, y:5.38, w:11.89, h:0.30,
-    fontFace:FONT, fontSize:9.5, color:C.mute, align:"center",
+  // ── Right: 문제 → 해결 (웹 problem/solution/result 그대로) ─────────
+  const rx = 8.162;
+  const rw = 4.55;
+
+  // Problem 1 — glReadPixels 렌더 루프 블로킹
+  sld.addText("glReadPixels 렌더 루프 블로킹", {
+    x:rx, y:2.40, w:rw, h:0.28,
+    fontFace:FONT, fontSize:10, bold:true, color:C.brand,
+  });
+  sld.addText("고해상도(816×616)에서 glReadPixels를 호출하면 GPU 렌더 완료까지 CPU가 멈춰 대기합니다. 렌더 루프가 이 구간에서 매 프레임 블로킹되어 FPS가 크게 하락했습니다.", {
+    x:rx, y:2.72, w:rw, h:0.64,
+    fontFace:FONT, fontSize:9, color:C.ink, lineSpacingMultiple:1.45,
+  });
+  sld.addText("PBO 더블 버퍼 ping-pong 구조로 전환했습니다. CPU는 이미 완료된 이전 프레임 데이터를 읽고, GPU에는 비동기 쓰기만 발행합니다.", {
+    x:rx, y:3.40, w:rw, h:0.52,
+    fontFace:FONT, fontSize:9, bold:true, color:C.brand, lineSpacingMultiple:1.45,
+  });
+  sld.addShape("roundRect", {
+    x:rx, y:3.96, w:rw, h:0.26,
+    fill:{ color:C.brandPale }, line:{ color:C.brandT3, width:1 }, rectRadius:0.05,
+  });
+  sld.addText("CPU-GPU 동기화 압력 감소, 렌더 루프 스톨 빈도 저하", {
+    x:rx + 0.10, y:3.96, w:rw - 0.20, h:0.26,
+    fontFace:FONT, fontSize:8.5, color:C.brand, valign:"middle",
   });
 
-  addSoWhat(sld, "WebSocket은 토큰을 URL에 실어야 하는 구조입니다. 수명을 1분으로 제한해 탈취 시 피해 범위를 줄였습니다.");
-  addBottomStrip(sld, 4, "Source: Autowing_car — JWT 토큰 설계 커밋 (2026-01)");
+  sld.addShape("line", { x:rx, y:4.30, w:rw, h:0.01, line:{ color:C.containerLine, width:0.8 } });
+
+  // Problem 2 — TCP 프레임 밀림 (지연 누적)
+  sld.addText("TCP 프레임 밀림 (지연 누적)", {
+    x:rx, y:4.38, w:rw, h:0.28,
+    fontFace:FONT, fontSize:10, bold:true, color:C.brand,
+  });
+  sld.addText("인코딩과 소켓 전송이 같은 스레드에서 순서대로 실행되었습니다. 큰 프레임을 인코딩하는 동안 다음 프레임 전송이 밀려나고, 그 지연이 계속 누적되어 스트리밍이 버벅거렸습니다.", {
+    x:rx, y:4.70, w:rw, h:0.64,
+    fontFace:FONT, fontSize:9, color:C.ink, lineSpacingMultiple:1.45,
+  });
+  sld.addText("인코딩이 끝난 데이터를 큐에 넣으면 전송 스레드가 독립적으로 소비하는 생산자-소비자 구조로 전환했습니다.", {
+    x:rx, y:5.38, w:rw, h:0.40,
+    fontFace:FONT, fontSize:9, bold:true, color:C.brand, lineSpacingMultiple:1.45,
+  });
+  sld.addShape("roundRect", {
+    x:rx, y:5.82, w:rw, h:0.26,
+    fill:{ color:C.brandPale }, line:{ color:C.brandT3, width:1 }, rectRadius:0.05,
+  });
+  sld.addText("프레임 밀림 해소, 스트리밍 FPS 안정화", {
+    x:rx + 0.10, y:5.82, w:rw - 0.20, h:0.26,
+    fontFace:FONT, fontSize:8.5, color:C.brand, valign:"middle",
+  });
+
+  addSoWhat(sld, "렌더링 자체가 느린 게 아니었습니다. 렌더와 인코딩이 같은 루프에서 서로 기다리는 구조가 문제였습니다.");
+  addBottomStrip(sld, 4, "Source: RobotPal 병목분석.md — 디버그 빌드 b01af42, 릴리즈 빌드 미측정 (2026-04-09)");
 };

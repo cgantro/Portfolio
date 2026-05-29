@@ -1,64 +1,75 @@
-const { FONT, C } = require("../constants");
-const { addBoxP1, addHeader, addSoWhat, addBottomStrip } = require("../helpers");
+const path = require("path");
+const { FONT, C, BOX_STYLE } = require("../constants");
+const { addHeader, addSoWhat, addBottomStrip } = require("../helpers");
+
+const ARCH_IMG = path.resolve(__dirname, "../../asset/스티커_아키텍처.png");
 
 module.exports = function(pres) {
   const sld = pres.addSlide();
-  sld.background = { color: C.white };
+  sld.background = { color: C.bg };
 
-  addHeader(sld, "주요 프로젝트 04 · STICKER",
-    "SQS 소비기에 graceful shutdown과 재처리 불가 메시지 차단을 함께 구현했다",
-    "Spring Boot 3.5 · Java 21 가상 스레드 · AWS SQS/S3 · Micrometer · Prometheus · Grafana");
+  addHeader(sld, "주요 프로젝트 03 · STICKER",
+    "AI 날씨·일정 기반 패션 코디 추천 앱",
+    "Spring Boot 3.5 · Java 21 · AWS SQS/S3 · Redis · Prometheus · Grafana · Traefik · GitLab CI/CD");
 
-  addBoxP1(sld);
+  // ── Left box: 프로젝트 메타 ─────────────────────────────────────────
+  sld.addShape("roundRect", { x:0.422, y:2.20, w:4.95, h:3.85, ...BOX_STYLE(0.18) });
 
-  const layers = [
-    {
-      name:"Job 발행기", y:2.52,
-      fill:C.surface3,  line:C.containerLine,
-      text:"Redis 원자적 락으로 동시 중복 발행 차단 → SQS에 AI 추천 요청 전달",
-      color:C.mute,
-    },
-    {
-      name:"SQS 소비기", y:3.10,
-      fill:C.brandPale, line:C.brandT3,
-      text:"SmartLifecycle 구현: 서버 종료 시 루프 중단 대기 후 안전 종료 → 메시지 유실 없음",
-      color:C.brand,
-    },
-    {
-      name:"오류 처리",  y:3.68,
-      fill:C.brandPale, line:C.brandT3,
-      text:"포맷 위반 메시지: 즉시 삭제(재시도해도 안 됨) · 일시 장애: 삭제 보류 → SQS 자동 재처리",
-      color:C.brand,
-    },
-    {
-      name:"중복 방지",  y:4.26,
-      fill:C.surface3,  line:C.containerLine,
-      text:"SQS는 같은 메시지를 두 번 전달할 수 있음 → Redis에 jobId 기록해 중복 처리 차단",
-      color:C.mute,
-    },
-    {
-      name:"AOP 계측",   y:4.84,
-      fill:C.surface3,  line:C.containerLine,
-      text:"Service/Repository/External 레이어별 응답 시간 자동 수집 · p95·p99 Grafana 시각화",
-      color:C.mute,
-    },
-  ];
+  const lx = 0.622;
 
-  layers.forEach(l => {
-    sld.addShape("roundRect", {
-      x:0.622, y:l.y, w:11.89, h:0.46,
-      fill:{ color:l.fill }, line:{ color:l.line, width:1 }, rectRadius:0.07,
-    });
-    sld.addText(l.name, {
-      x:0.822, y:l.y, w:1.7, h:0.46,
-      fontFace:FONT, fontSize:10, bold:true, color:l.color, valign:"middle",
-    });
-    sld.addText(l.text, {
-      x:2.722, y:l.y, w:9.3, h:0.46,
-      fontFace:FONT, fontSize:9.5, color:C.mute, valign:"middle",
+  sld.addText("2026.04 – 2026.05", {
+    x:lx, y:2.38, w:4.55, h:0.24,
+    fontFace:FONT, fontSize:9, color:C.fgDim,
+  });
+  sld.addText("6인 (React Native + Spring Boot + FastAPI)  ·  백엔드 전담 · DevOps", {
+    x:lx, y:2.62, w:4.55, h:0.36,
+    fontFace:FONT, fontSize:9, color:C.fgDim, lineSpacingMultiple:1.3,
+  });
+
+  sld.addShape("line", { x:lx, y:3.06, w:4.35, h:0.01, line:{ color:C.border, width:0.8 } });
+
+  sld.addText("구현", {
+    x:lx, y:3.14, w:4.55, h:0.24,
+    fontFace:FONT, fontSize:9.5, bold:true, color:C.accent,
+  });
+  // 웹 implementations[].title 그대로
+  [
+    "SQS 비동기 AI 파이프라인",
+    "중복 실행 방어 (dedup + 분산 락)",
+    "인증 시스템",
+    "Redis 다층 캐시",
+    "CI/CD 파이프라인",
+  ].forEach((item, i) => {
+    sld.addText("· " + item, {
+      x:lx, y:3.42 + i * 0.40, w:4.55, h:0.36,
+      fontFace:FONT, fontSize:9.5, color:C.fg, lineSpacingMultiple:1.25,
     });
   });
 
-  addSoWhat(sld, "SQS는 같은 메시지를 두 번 이상 전달할 수 있습니다. 언제 삭제하고 언제 보류할지 오류 분류가 핵심입니다.");
-  addBottomStrip(sld, 7, "Source: STICKER — SmartLifecycle · ExecutionTimeAspect.java (2026-05-17)");
+  sld.addShape("line", { x:lx, y:5.44, w:4.35, h:0.01, line:{ color:C.border, width:0.8 } });
+  [
+    "Spring Boot 백엔드 전담",
+    "SQS 비동기 AI 파이프라인 설계",
+    "DevOps (CI/CD · 모니터링)",
+  ].forEach((h, i) => {
+    sld.addText("› " + h, {
+      x:lx, y:5.52 + i * 0.22, w:4.55, h:0.20,
+      fontFace:FONT, fontSize:8.5, color:C.accent,
+    });
+  });
+
+  // ── Right: 아키텍처 이미지 ─────────────────────────────────────────
+  sld.addText("아키텍처", {
+    x:5.70, y:2.22, w:7.0, h:0.24,
+    fontFace:FONT, fontSize:9.5, color:C.fgDim,
+  });
+  try {
+    sld.addImage({ path: ARCH_IMG, x:5.572, y:2.50, w:7.34, h:3.55 });
+  } catch(e) {
+    sld.addShape("roundRect", { x:5.572, y:2.50, w:7.34, h:3.55, fill:{ color:C.bg3 }, line:{ color:C.border, width:1 }, rectRadius:0.10 });
+    sld.addText("아키텍처 이미지를 찾을 수 없습니다", { x:5.572, y:3.90, w:7.34, h:0.40, fontFace:FONT, fontSize:10, color:C.fgDim, align:"center" });
+  }
+
+  addSoWhat(sld, "AI 추천은 수십 초가 걸립니다. 동기 호출 대신 SQS로 분리하고, 상태 정합성과 중복 방지를 함께 설계했습니다.");
+  addBottomStrip(sld, 7, "Source: STICKER — SQS 소비기 · afterCommit · Redis 분산 락 (2026-05-17)");
 };
