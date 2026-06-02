@@ -2,21 +2,6 @@
  * 서브 프로젝트 — 작은 카드 (어떤 프로젝트인지 + 기술 스택)
  */
 export const subProjects = [
-  // ── SSAFY 프로젝트 ──
-  {
-    id: "autowing",
-    title: "오토잉카 (AutoWing Car)",
-    subtitle: "공항 스마트 토잉카 관제 시스템",
-    period: "2026.01 – 2026.02",
-    team: "6인",
-    role: "백엔드 전담",
-    stack: ["Spring Boot 3.5", "Java 17", "MQTT", "WebSocket/STOMP", "A*", "Yen's K-Shortest", "Redis", "JWT"],
-    summary:
-      "MQTT로 실물 토잉카와 통신하고, A* + Yen's K-Shortest 서버 사이드 경로 계산으로 이동 명령을 생성하는 공항 지상 관제 시스템",
-    cover: "/project-autowing-cover.png",
-    links: {},
-  },
-
   // ── 부트캠프 ──
   {
     id: "snackshop",

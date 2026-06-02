@@ -1,84 +1,32 @@
-import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import SectionLabel from "../../ui/SectionLabel";
-import ProjectDetail from "./ProjectDetail";
 import Tag from "../../ui/Tag";
 import useCardTilt from "../../../hooks/useCardTilt";
 import { coverImages } from "../../../data/projectImages";
 import styles from "./Projects.module.css";
 
 export default function Projects({ projects }) {
-  const [selected, setSelected] = useState(null);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const sceneRef = useRef(null);
-  const [radius, setRadius] = useState(300);
-
-  useEffect(() => {
-    const updateRadius = () => {
-      if (sceneRef.current) {
-        const width = sceneRef.current.offsetWidth;
-        setRadius((width / 2) / Math.tan(Math.PI / 3));
-      }
-    };
-    updateRadius();
-    window.addEventListener("resize", updateRadius);
-    return () => window.removeEventListener("resize", updateRadius);
-  }, []);
-
-  const rotateY = currentIndex * -120;
+  const navigate = useNavigate();
 
   return (
     <>
       <SectionLabel>주력 프로젝트</SectionLabel>
 
-      <div className={styles.prismScene} ref={sceneRef}>
-        <button 
-          className={`${styles.prismNav} ${styles.prismPrev}`}
-          onClick={() => setCurrentIndex(i => i - 1)}
-        >
-          ‹
-        </button>
-
-        <div 
-          className={styles.prism}
-          style={{ transform: `translateZ(${-radius}px) rotateY(${rotateY}deg)` }}
-        >
-          {projects.map((p, i) => {
-            const faceAngle = i * 120;
-            return (
-              <div 
-                key={p.id} 
-                className={styles.prismFace}
-                style={{ transform: `rotateY(${faceAngle}deg) translateZ(${radius}px)` }}
-              >
-                <BentoCard project={p} onClick={() => setSelected(p)} />
-              </div>
-            );
-          })}
-        </div>
-
-        <button 
-          className={`${styles.prismNav} ${styles.prismNext}`}
-          onClick={() => setCurrentIndex(i => i + 1)}
-        >
-          ›
-        </button>
+      <div className={styles.projectGrid}>
+        {projects.map((project) => (
+          <BentoCard
+            key={project.id}
+            project={project}
+            onClick={() => navigate(`/projects/${project.id}`)}
+          />
+        ))}
       </div>
-
-      {selected && (
-        <ProjectDetail 
-          project={selected} 
-          allProjects={projects}
-          onClose={() => setSelected(null)} 
-          onNavigate={(newProject) => setSelected(newProject)}
-        />
-      )}
     </>
   );
 }
 
-function BentoCard({ project, isLarge, onClick }) {
-  const { cardStyle, glarePos, onMouseMove, onMouseLeave } = useCardTilt(10);
+function BentoCard({ project, onClick }) {
+  const { cardStyle, glarePos, onMouseMove, onMouseLeave } = useCardTilt(8);
   const imgs = coverImages[project.id];
 
   return (
@@ -88,26 +36,35 @@ function BentoCard({ project, isLarge, onClick }) {
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
       onClick={onClick}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onClick();
+        }
+      }}
+      tabIndex={0}
+      role="button"
     >
-      {/* 커서 글레어 */}
       <div
         className={styles.glare}
         style={{
-          background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(0,255,65,0.18) 0%, transparent 65%)`,
+          background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(0,255,65,0.15) 0%, transparent 68%)`,
           opacity: glarePos.opacity,
         }}
       />
 
-      {/* 커버 이미지 영역 */}
       <div className={styles.bentoCover}>
         {imgs?.src ? (
           <img
             src={imgs.src}
             alt={project.title}
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              if (imgs.fallback) e.currentTarget.src = imgs.fallback;
-              else e.currentTarget.parentElement.style.display = "none";
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              if (imgs.fallback) {
+                event.currentTarget.src = imgs.fallback;
+              } else {
+                event.currentTarget.parentElement.style.display = "none";
+              }
             }}
           />
         ) : (
@@ -119,7 +76,6 @@ function BentoCard({ project, isLarge, onClick }) {
         <span className={styles.numBadge}>{project.num}</span>
       </div>
 
-      {/* 정보 영역 */}
       <div className={styles.bentoBody}>
         <div className={styles.bentoHeader}>
           <h2 className={styles.title}>{project.title}</h2>
@@ -132,24 +88,28 @@ function BentoCard({ project, isLarge, onClick }) {
           <span>{project.team}</span>
         </div>
 
+        <p className={styles.roleText}>{project.role}</p>
+
         <div className={styles.bentoTags}>
-          {project.stack.slice(0, 4).map((s) => <Tag key={s}>{s}</Tag>)}
-          {project.stack.length > 4 && <Tag>+{project.stack.length - 4}</Tag>}
+          {project.stack.slice(0, 4).map((item) => (
+            <Tag key={item}>{item}</Tag>
+          ))}
+          {project.stack.length > 4 ? <Tag>+{project.stack.length - 4}</Tag> : null}
         </div>
 
         <div className={styles.bentoDivider} />
 
         <ul className={styles.bentoHighlights}>
-          {project.highlights.map((h, i) => (
-            <li key={i} className={styles.hl}>
+          {project.highlights.map((item) => (
+            <li key={item} className={styles.hl}>
               <span className={styles.arrow}>›</span>
-              <span>{h}</span>
+              <span>{item}</span>
             </li>
           ))}
         </ul>
 
         <div className={styles.cta}>
-          <span>자세히 보기</span>
+          <span>상세 페이지 보기</span>
           <span className={styles.ctaArrow}>↗</span>
         </div>
       </div>

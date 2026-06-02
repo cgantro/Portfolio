@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>장윤석 · 인증·회원 — STICKER 기술 포트폴리오</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="member.css">
+</head>
+<body style="--accent:var(--infra)">
+
+<header>
+  <div class="bar">
+    <a href="index.html" class="logo"><span class="dot">✦</span> STICKER <small>· 기술 포트폴리오</small></a>
+    <a href="index.html#team" class="back">← 팀 전체</a>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="wrap">
+    <div class="phead">
+      <div class="avatar"><img src="assets/profile/yoonseok.jpg" alt="장윤석" onerror="if(this.src.endsWith('.jpg')){this.src=this.src.slice(0,-4)+'.png'}else{this.remove()}">윤</div>
+      <div><div class="nm">장윤석</div><div class="role">인증 · 회원 (풀스택)</div></div>
+    </div>
+    <p class="bio">사용자가 서비스에 들어오는 첫 관문을 맡았습니다. 소셜·이메일 로그인, 회원가입/탈퇴 흐름, 그리고 토큰이 만료돼도 끊기지 않는 클라이언트 자동 갱신까지 — 인증·회원 도메인을 프론트와 서버 양쪽에서 구현했습니다.</p>
+    <div class="chips"><span class="chip"><i class="devicon-google-plain colored"></i>OAuth2 (Google)</span><span class="chip">JWT</span><span class="chip"><i class="devicon-react-original colored"></i>React Native</span><span class="chip"><i class="devicon-spring-original colored"></i>Spring Boot</span><span class="chip">fetch 인터셉트</span></div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <section class="psec" id="p1">
+    <div class="ix">1</div>
+    <h2>소셜·이메일 로그인 진입</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>가입 장벽을 낮추려면 소셜 로그인이 필요하고, 외부 OAuth 토큰을 우리 세션으로 안전하게 교환해야 했습니다.</b></div>
+    <p class="body">Google OAuth 서버 연동을 구현하고, 카카오·구글·이메일 로그인 화면과 회원가입 플로우를 만들었습니다. 외부 제공자 인증 후 우리 JWT로 교환해 이후 요청을 인증합니다.</p>
+    <h3>맡은 범위</h3>
+    <table class="spec"><thead><tr><th>영역</th><th>구현</th><th>비고</th></tr></thead><tbody>
+      <tr><td>소셜 로그인</td><td class="val">Google OAuth 서버 연동</td><td>+ 카카오/구글 로그인 화면</td></tr>
+      <tr><td>가입/로그인 화면</td><td class="val">이메일 로그인 · 회원가입 플로우</td><td>방식 선택 → 입력 → 가입</td></tr>
+      <tr><td>회원</td><td class="val">회원가입 · 탈퇴 · 프로필 API</td><td>사용자 도메인</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="psec" id="p2">
+    <div class="ix">2</div>
+    <h2>토큰이 만료돼도 끊기지 않는 자동 갱신</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>액세스 토큰은 짧게 살아야 안전하지만, 만료될 때마다 사용자가 다시 로그인하면 경험이 망가집니다.</b></div>
+    <p class="body">클라이언트 HTTP 계층에서 401 응답을 가로채 리프레시 토큰으로 새 토큰을 받아오고, 원래 요청을 자동으로 재시도하게 했습니다. 사용자는 만료를 눈치채지 못합니다. 갱신마저 실패하면 토큰을 비우고 로그인으로 안전하게 되돌립니다.</p>
+    <div class="figure">
+      <svg viewBox="0 0 600 96" role="img" aria-label="401 토큰 자동 갱신 흐름">
+        <defs><marker id="yb" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#5B8DEF"/></marker><marker id="yp" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#22B8A0"/></marker></defs>
+        <rect x="10" y="26" width="120" height="44" rx="12" fill="#FFF1F5" stroke="#FF3F73" stroke-width="2"/><text x="70" y="53" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1320">요청 → 401</text>
+        <rect x="186" y="26" width="150" height="44" rx="12" fill="#EEF3FE" stroke="#5B8DEF" stroke-width="2"/><text x="261" y="48" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1320">/auth/refresh</text><text x="261" y="63" text-anchor="middle" font-size="9" fill="#6B6470">새 토큰 발급</text>
+        <rect x="392" y="26" width="120" height="44" rx="12" fill="#E8F8F4" stroke="#22B8A0" stroke-width="2"/><text x="452" y="53" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1320">원요청 재시도</text>
+        <line x1="130" y1="48" x2="184" y2="48" stroke="#5B8DEF" stroke-width="1.8" marker-end="url(#yb)"/><line x1="336" y1="48" x2="390" y2="48" stroke="#22B8A0" stroke-width="2.4" marker-end="url(#yp)"/>
+        <text x="540" y="52" font-size="10.5" fill="#9A3412">실패 시</text><text x="540" y="66" font-size="9.5" fill="#9A3412">로그인 복귀</text>
+      </svg>
+    </div>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>트리거</td><td class="val">401 응답 가로채기</td><td>fetch 인터셉트</td></tr>
+      <tr><td>갱신</td><td class="val">/auth/refresh → 토큰 교체 → 재시도</td><td>사용자 무중단</td></tr>
+      <tr><td>실패</td><td class="val">토큰 clear → 로그인 복귀</td><td>안전 폴백</td></tr>
+    </tbody></table>
+    <h3>설계 트레이드오프</h3>
+    <div class="adrwrap"><div class="adr">
+      <div class="t">짧은 액세스 토큰 + 자동 갱신</div>
+      <div class="row"><div class="k">결정</div><div class="v">액세스 토큰을 짧게 유지하고 401 시 클라이언트가 투명하게 갱신</div></div>
+      <div class="row"><div class="k">근거</div><div class="v">토큰 탈취 위험은 줄이면서 사용자는 재로그인 없이 끊김 없는 경험</div></div>
+      <div class="row alt"><div class="k">버린 대안</div><div class="v">긴 수명 토큰 — 편하지만 탈취 시 노출 시간이 길어짐</div></div>
+    </div></div>
+    <div class="collab"><div>🤝</div><div><b>협업</b> — 서버측 JWT 발급·리프레시 저장(Redis)은 이혜연·홍윤표와 맞물립니다.</div></div>
+  </section>
+
+  <section class="psec" id="p3">
+    <div class="ix">3</div>
+    <h2>체형 분석 화면</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>개인화된 코디 경험을 위해, 사용자의 체형 정보를 입력받는 화면이 필요했습니다.</b></div>
+    <p class="body">체형 분석 페이지를 구현해, 프로필과 함께 사용자 맞춤 정보를 다룰 수 있는 기반을 마련했습니다.</p>
+  </section>
+
+  <div class="pnav">
+    <a href="member-jungsik.html">← 김정식 · Frontend 화면</a>
+    <a href="index.html#team">팀 전체 →</a>
+  </div>
+</div>
+
+<footer><div class="foot"><span>© 2026 STICKER · S14P31A408</span><span><a href="index.html#team">← 팀 전체 보기</a></span></div></footer>
+</body>
+</html>

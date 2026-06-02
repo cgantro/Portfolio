@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>김경배 · Frontend·Meshy — STICKER 기술 포트폴리오</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="member.css">
+</head>
+<body style="--accent:var(--fe)">
+
+<header>
+  <div class="bar">
+    <a href="index.html" class="logo"><span class="dot">✦</span> STICKER <small>· 기술 포트폴리오</small></a>
+    <a href="index.html#team" class="back">← 팀 전체</a>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="wrap">
+    <div class="phead">
+      <div class="avatar"><img src="assets/profile/kyungbae.jpg" alt="김경배" onerror="if(this.src.endsWith('.jpg')){this.src=this.src.slice(0,-4)+'.png'}else{this.remove()}">경</div>
+      <div><div class="nm">김경배</div><div class="role">Frontend 리드 · Meshy/SSE 풀스택</div></div>
+    </div>
+    <p class="bio">프론트엔드 리드로서 옷장의 핵심 인터랙션을 맡았습니다. Meshy 2D 모델화 연동을 프론트와 서버 양쪽에서 구현하고, 드래그앤드롭 코디 메이커와 음성 기반 상황 보정 UX를 만들었습니다.</p>
+    <div class="chips"><span class="chip"><i class="devicon-react-original colored"></i>React Native</span><span class="chip">react-native-sse</span><span class="chip"><i class="devicon-spring-original colored"></i>Spring SseEmitter</span><span class="chip">gesture-handler</span><span class="chip">reanimated</span><span class="chip">expo-speech-recognition</span></div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <section class="psec" id="p1">
+    <div class="ix">1</div>
+    <h2>변환 완료를 묻지 않고 받는 실시간 수신</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>Meshy의 2D 모델화는 수십 초가 걸립니다. 앱이 "다 됐나?"를 반복 질의하면 낭비가 크고 사용자는 멍하니 기다려야 합니다.</b></div>
+    <p class="body">앱은 변환을 요청한 직후 SSE로 서버와 연결을 한 번 열어두고, 완료 이벤트를 push 받습니다. 서버측은 백그라운드 가상 스레드가 Meshy의 완료 스트림을 대신 지켜보다가 끝나면 후처리·S3 업로드 후 앱의 SSE 연결로 결과를 밀어줍니다. 프론트(react-native-sse)와 서버(SseEmitter) 양쪽을 직접 구현했습니다.</p>
+    <div class="figure">
+      <svg viewBox="0 0 560 184" role="img" aria-label="폴링과 SSE 푸시 비교">
+        <defs><marker id="kg" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#94A3B8"/></marker><marker id="kb" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#5B8DEF"/></marker><marker id="kp" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#E8295E"/></marker></defs>
+        <text x="30" y="24" font-size="11" font-weight="800" fill="#94A3B8">폴링 (기존 방식)</text>
+        <rect x="30" y="32" width="84" height="38" rx="10" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/><text x="72" y="56" text-anchor="middle" font-size="12" fill="#64748B">📱 앱</text>
+        <rect x="400" y="32" width="120" height="38" rx="10" fill="#F1F5F9" stroke="#CBD5E1" stroke-width="1.5"/><text x="460" y="56" text-anchor="middle" font-size="12" fill="#64748B">⚙️ 서버</text>
+        <line x1="116" y1="46" x2="398" y2="46" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#kg)"/><text x="257" y="40" text-anchor="middle" font-size="10.5" fill="#94A3B8">반복 질문 · 다 됐어?</text>
+        <line x1="398" y1="60" x2="118" y2="60" stroke="#94A3B8" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#kg)"/><text x="257" y="74" text-anchor="middle" font-size="10.5" fill="#94A3B8">아직…</text>
+        <text x="30" y="114" font-size="11" font-weight="800" fill="#E8295E">SSE (STICKER)</text>
+        <rect x="30" y="122" width="84" height="38" rx="10" fill="#FFF1F5" stroke="#FF3F73" stroke-width="2"/><text x="72" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1320">📱 앱</text>
+        <rect x="400" y="122" width="120" height="38" rx="10" fill="#EEF3FE" stroke="#5B8DEF" stroke-width="2"/><text x="460" y="146" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1320">⚙️ 서버</text>
+        <line x1="116" y1="134" x2="398" y2="134" stroke="#5B8DEF" stroke-width="1.6" marker-end="url(#kb)"/><text x="257" y="128" text-anchor="middle" font-size="10.5" fill="#5B8DEF">연결 1회</text>
+        <line x1="398" y1="151" x2="118" y2="151" stroke="#E8295E" stroke-width="3" marker-end="url(#kp)"/><text x="257" y="169" text-anchor="middle" font-size="11" font-weight="800" fill="#E8295E">완료! 즉시 push</text>
+      </svg>
+    </div>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>클라 구독</td><td class="val">GET /wardrobe/sse/{taskId}</td><td>react-native-sse</td></tr>
+      <tr><td>이벤트</td><td class="val">completed {imageKey} / error {reason}</td><td>SSE 타임아웃 3분</td></tr>
+      <tr><td>서버 처리</td><td class="val">가상 스레드가 Meshy 스트림 소비</td><td>다운로드 → OpenCV → S3 → push</td></tr>
+    </tbody></table>
+    <h3>설계 트레이드오프</h3>
+    <div class="adrwrap"><div class="adr">
+      <div class="t">완료 통지에 WebSocket이 아닌 SSE</div>
+      <div class="row"><div class="k">결정</div><div class="v">서버→클라 단방향 Server-Sent Events</div></div>
+      <div class="row"><div class="k">근거</div><div class="v">알림은 단방향이라 양방향 채널이 불필요, HTTP 기반이라 인프라가 단순</div></div>
+      <div class="row alt"><div class="k">버린 대안</div><div class="v">WebSocket(불필요한 양방향), 폴링(질의 낭비)</div></div>
+    </div></div>
+    <h3>실패 · 엣지 처리</h3>
+    <div class="callouts">
+      <div class="callout"><div class="ic">!</div><div><b>구독·완료 레이스 (알려진 한계)</b><span>생성이 구독보다 먼저 끝나면 emitter가 없어 클라가 타임아웃(3분)까지 대기할 수 있습니다. 결과 캐시·재전송으로 보완할 여지가 있습니다.</span></div></div>
+    </div>
+  </section>
+
+  <section class="psec" id="p2">
+    <div class="ix">2</div>
+    <h2>끊김 없이 끌고 키우는 코디 메이커</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>옷을 직접 끌어다 코디를 짜는 화면에서, 손가락 조작이 버벅이면 금세 흥미를 잃습니다.</b></div>
+    <p class="body">옷장 그리드에서 캔버스로 끌어오는 드래그와, 캔버스 안에서 옮기고(Pan) 키우고(Pinch) 고르는(Tap) 멀티터치 조작을 분리해 구현했습니다. 위치·스케일 갱신은 reanimated로 처리해 JS 스레드 부하 없이 부드럽게 따라옵니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>제스처</td><td class="val">Simultaneous(Exclusive(Pan,Tap),Pinch)</td><td>gesture-handler</td></tr>
+      <tr><td>스케일 클램프</td><td class="val">0.5 ~ 2.0배</td><td>핀치 한계</td></tr>
+      <tr><td>그리드 드래그</td><td class="val">PanResponder 8px 임계값</td><td>오작동 방지</td></tr>
+    </tbody></table>
+    <h3>설계 트레이드오프</h3>
+    <div class="adrwrap"><div class="adr">
+      <div class="t">그리드 드래그와 캔버스 조작을 분리</div>
+      <div class="row"><div class="k">결정</div><div class="v">그리드→캔버스는 PanResponder, 캔버스 내 멀티터치는 gesture-handler</div></div>
+      <div class="row"><div class="k">근거</div><div class="v">단순 드래그와 핀치·동시 제스처는 요구가 달라 각각에 맞는 메커니즘 사용</div></div>
+      <div class="row alt"><div class="k">버린 대안</div><div class="v">한 라이브러리로 통합 — 제스처 충돌 처리가 복잡해짐</div></div>
+    </div></div>
+  </section>
+
+  <section class="psec" id="p3">
+    <div class="ix">3</div>
+    <h2>"스티커야" — 음성으로 거는 상황 보정</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>그날의 사정은 버튼으로 다 담을 수 없습니다. 말로 던진 맥락을 받아 코디 보정으로 연결해야 했습니다.</b></div>
+    <p class="body">호출어 "스티커야"를 평소엔 가볍게 엿듣다가, 감지되면 비연속 모드로 전환해 명령 문장을 받아 적습니다. 받은 텍스트는 상황 보정 엔드포인트로 보내 AI가 코디·준비물 팁을 돌려줍니다. 클라 훅과 서버 엔드포인트를 함께 구현했습니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>STT</td><td class="val">expo-speech-recognition</td><td>연속 감지 → 비연속 명령</td></tr>
+      <tr><td>호출어 · 캡처</td><td class="val">"스티커야" · 10초</td><td>불필요한 상시 녹음 방지</td></tr>
+      <tr><td>전송</td><td class="val">상황 보정 엔드포인트</td><td>팁·준비물 응답</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="psec" id="p4">
+    <div class="ix">4</div>
+    <h2>옷장 스크롤을 가볍게 — 이미지 캐싱·프리페치</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>옷장은 이미지가 많아, 매번 원격에서 받아 그리면 스크롤이 무겁고 깜빡입니다.</b></div>
+    <p class="body">이미지를 메모리·디스크 2단 캐시로 재사용하고, 홈 진입 시 옷장 데이터를 백그라운드에서 미리 불러옵니다(프리페치). 중복 요청은 진행 중 프로미스로 한 번만 나가게 묶었습니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>이미지 캐시</td><td class="val">expo-image · memory-disk</td><td>2단 캐시</td></tr>
+      <tr><td>프리페치</td><td class="val">홈 진입 시 백그라운드 로드</td><td>프로미스 dedup</td></tr>
+    </tbody></table>
+  </section>
+
+  <div class="pnav">
+    <a href="member-yoonpyo.html">← 홍윤표 · Backend·Infra</a>
+    <a href="member-jiyoung.html">문지영 · AI →</a>
+  </div>
+</div>
+
+<footer><div class="foot"><span>© 2026 STICKER · S14P31A408</span><span><a href="index.html#team">← 팀 전체 보기</a></span></div></footer>
+</body>
+</html>

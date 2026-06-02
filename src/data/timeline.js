@@ -37,4 +37,13 @@ export const timeline = [
     tags: ["SSAFY"],
     note: "프로젝트 3회 (오토잉카, 영묘, 스티커). 백엔드·시스템 역량 집중 강화",
   },
+  {
+    id: "robotpal",
+    type: "etc",
+    title: "RobotPal",
+    detail: "개인 프로젝트",
+    period: "2025.11 – 2026.04",
+    tags: ["C++", "Emscripten"],
+    note: "JETANK 로봇팔 시뮬레이션, 스트리밍 파이프라인, 웹 배포까지 포함한 크로스플랫폼 실험",
+  },
 ];

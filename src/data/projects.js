@@ -1,832 +1,725 @@
-/**
- * 주력 프로젝트 3개
- * - implementations: 구현 내용 (자연어)
- * - problems: 문제 원인 + 해결 + 코드 스니펫 (한 문제당 한 슬라이드)
- * - techChoice: 기술 선정 이유 + 대안 비교
- */
-export const projects = [
+import { projectDetailPages } from "./projectDetailPages";
+
+const baseProjects = [
   {
     id: "robotpal",
     num: "01",
     title: "RobotPal",
-    subtitle: "로봇팔 시뮬레이션 & 실시간 스트리밍",
+    subtitle: "JETANK 후배들을 위한 시뮬레이션 · 연동 플랫폼",
     period: "2025.11 – 2026.04",
-    team: "2인 (엔진 + 스트리밍)",
-    role: "핵심 제어 아키텍처 및 네트워크 엔진 설계 · 성능 최적화",
-    stack: ["C++17", "Emscripten", "libjpeg-turbo", "TCP/WebSocket", "ImGui", "CMake"],
-    cover: "/%EB%A1%9C%EB%B4%87%ED%8C%94%20%EC%8B%9C%EC%97%B0.webp",
-    coverFallback: "/project-robotpal-cover.png",
+    team: "2인",
+    role: "시뮬레이션 런타임, 스트리밍 경로, 웹 빌드 대응",
+    stack: ["C++17", "OpenGL", "Emscripten", "libjpeg-turbo", "TCP/WebSocket", "CMake"],
+    cover: "/project-robotpal-cover.png",
     highlights: [
-      "실시간 스트리밍 파이프라인 설계",
-      "GPU 비동기 readback(PBO) 최적화",
-      "Emscripten 웹 빌드 · CI/CD",
+      "JETANK 후속 실험을 위한 공통 플랫폼 구성",
+      "렌더, 캡처, 인코딩, 전송 파이프라인 분리",
+      "데스크톱과 웹을 함께 가져가는 크로스플랫폼 구조",
     ],
     implementations: [
       {
-        title: "제어 시스템 다형성 설계 및 네트워크 엔진 구축",
+        title: "시뮬레이터 중심 제어 런타임",
         items: [
-          "가상 환경(SimController)과 실제 로봇(RealController)을 통합하는 IRobotController 인터페이스 기반 다형성 제어 구조 설계",
-          "메인 렌더 스레드가 블로킹되지 않도록 Send/Recv 워커 스레드와 ConcurrentQueue로 분리된 논블로킹 TCP 통신 엔진 구축",
-          "C++ 시뮬레이터와 실제 로봇을 잇는 Python 브릿지 통신망(control_bridge.py) 개발",
-        ],
-        snippet: {
-          lang: "cpp",
-          label: "IRobotController 기반 다형성 제어 규격",
-          code: `\
-class IRobotController {
-public:
-    virtual ~IRobotController() = default;
-    virtual void UpdateJoints(const std::vector<float>& angles) = 0;
-    virtual void GetCurrentState(RobotState& outState) = 0;
-};
-
-// 시뮬레이터 환경 제어 구현체
-class SimController : public IRobotController { /* ... */ };
-
-// 실제 로봇 하드웨어 제어(Python 브릿지 TCP 연동) 구현체
-class RealController : public IRobotController { /* ... */ };`
-        }
-      },
-      {
-        title: "스트리밍 파이프라인",
-        items: [
-          "TCP와 WebSocket을 이중 레이어로 구성해 데스크톱과 브라우저 클라이언트를 동시 지원",
-          "인코딩 스레드와 전송 스레드를 큐로 분리해 큰 프레임이 전송을 막지 않도록 파이프라인 재설계",
+          "JETANK 로봇팔의 반복 실험을 위한 가상 환경을 구성하고, 움직임 검증이 가능한 시뮬레이션 루프를 설계했습니다.",
+          "현실 장비 의존도를 낮추는 것이 목표였기 때문에, 실험 시나리오를 빠르게 바꿀 수 있는 구조에 집중했습니다.",
+          "데스크톱 실행과 웹 배포를 모두 고려해 코어 로직을 C++ 중심으로 유지했습니다.",
         ],
         snippet: {
           type: "visual",
-          label: "네트워크 스트리밍 파이프라인 분리",
+          label: "RobotPal 런타임 구성",
           content: [
-            { id: "render", name: "Render Thread", desc: "60 FPS 렌더 루프 보장" },
-            { id: "queue", name: "Concurrent Queue", desc: "Non-blocking 버퍼링" },
-            { id: "network", name: "Network Workers", desc: "Send/Recv 독립 I/O" }
+            { id: "sim", name: "Simulation Loop", desc: "로봇팔 상태 계산 및 렌더링" },
+            { id: "capture", name: "Frame Capture", desc: "스트리밍용 프레임 추출" },
+            { id: "delivery", name: "Desktop / Web", desc: "플랫폼별 출력 경로 분리" }
           ]
         }
       },
       {
-        title: "GPU 비동기 Readback (PBO)",
+        title: "실시간 스트리밍 파이프라인",
         items: [
-          "두 개의 픽셀 버퍼를 번갈아 사용해 이번 프레임 쓰기와 이전 프레임 읽기를 동시에 진행",
-          "CPU가 GPU 작업 완료를 기다리지 않아도 되므로 렌더 루프가 블로킹되지 않음",
-          "렌더링 FPS를 유지하면서 픽셀 데이터를 안정적으로 가져올 수 있는 구조",
+          "프레임 생성, JPEG 인코딩, 네트워크 전송을 큐 기반 단계로 나눠 한 단계의 지연이 전체 루프를 막지 않게 했습니다.",
+          "데스크톱 클라이언트와 브라우저 클라이언트를 모두 고려해 TCP와 WebSocket 전달 경로를 함께 유지했습니다.",
+          "libjpeg-turbo 기반 병렬 인코딩 실험으로 프레임 처리량을 비교하고 워커 수를 조정했습니다.",
         ],
         snippet: {
           type: "visual",
-          label: "PBO 더블 버퍼링 (Ping-Pong 구조)",
+          label: "Render -> Encode -> Send",
           content: [
-            { id: "cpu", name: "CPU (이번 프레임)", desc: "완료된 [이전 프레임] 버퍼 매핑 & 읽기" },
-            { id: "gpu", name: "GPU (이번 프레임)", desc: "비동기 glReadPixels로 [이번] 버퍼 쓰기" },
-            { id: "swap", name: "Index Swap", desc: "매 프레임 read/write 인덱스 교체" }
+            { id: "render", name: "Render", desc: "시뮬레이터가 프레임 생성" },
+            { id: "encode", name: "JPEG Encode", desc: "워커가 병렬 압축" },
+            { id: "send", name: "Network Delivery", desc: "TCP / WebSocket 송신" }
           ]
         }
       },
       {
-        title: "멀티 스레드 JPEG 인코딩",
+        title: "웹 배포 대응",
         items: [
-          "libjpeg-turbo 기반 인코더를 워커 풀로 구성해 여러 프레임을 병렬 처리",
-          "1~19 워커 수를 바꾸며 FPS를 실측해 최적 워커 수(12개)를 데이터로 결정",
-          "워커 수가 적으면 병렬화 이득 없고, 너무 많으면 스케줄링 오버헤드로 오히려 역효과",
-        ],
-        snippet: {
-          type: "visual",
-          label: "libjpeg-turbo 워커 풀 파이프라인",
-          content: [
-            { id: "q_in", name: "Encode Queue (Input)", desc: "프레임 데이터 적재" },
-            { id: "workers", name: "12 Worker Threads", desc: "tjCompress2() 병렬 압축" },
-            { id: "q_out", name: "Send Queue (Output)", desc: "인코딩 완료 버퍼 전달" }
-          ]
-        }
-      },
-      {
-        title: "웹 빌드 (Emscripten)",
-        items: [
-          "기존 C++ OpenGL 코드를 재작성 없이 WebAssembly로 크로스컴파일",
-          "브라우저에서 멀티스레드를 쓰려면 SharedArrayBuffer가 필요하고, 이는 Cross-Origin Isolated 환경에서만 활성화됨",
-          "COI Service Worker를 추가해 모든 응답에 COOP/COEP 헤더를 자동 삽입, 웹 멀티스레드 활성화",
+          "Emscripten 빌드 경로를 별도로 두고 브라우저에서 실행 가능한 WebAssembly 결과물을 유지했습니다.",
+          "브라우저 멀티스레드 제약을 풀기 위해 COOP/COEP 대응과 Service Worker 기반 헤더 주입을 적용했습니다.",
+          "동일한 C++ 코어를 유지하면서 데스크톱과 웹을 함께 운영하는 방향으로 정리했습니다.",
         ],
         snippet: {
           lang: "javascript",
-          label: "Service Worker 헤더 삽입 (SharedArrayBuffer 활성화 규격)",
-          code: `\
-self.addEventListener("fetch", (event) => {
+          label: "COI Service Worker 헤더 주입",
+          code: `self.addEventListener("fetch", (event) => {
   event.respondWith(
     fetch(event.request).then((response) => {
-      const newHeaders = new Headers(response.headers);
-      // 웹 멀티스레드(WASM Pthreads) 필수 헤더 강제 주입
-      newHeaders.set("Cross-Origin-Embedder-Policy", "require-corp");
-      newHeaders.set("Cross-Origin-Opener-Policy", "same-origin");
-      
-      return new Response(response.body, {
-        status: response.status,
-        headers: newHeaders,
-      });
+      const headers = new Headers(response.headers);
+      headers.set("Cross-Origin-Embedder-Policy", "require-corp");
+      headers.set("Cross-Origin-Opener-Policy", "same-origin");
+      return new Response(response.body, { status: response.status, headers });
     })
   );
 });`
         }
-      },
+      }
     ],
     problems: [
       {
-        title: "glReadPixels 렌더 루프 블로킹",
+        title: "glReadPixels로 인한 렌더 루프 정지",
         problem:
-          "고해상도(816×616)에서 glReadPixels를 호출하면 GPU 렌더 완료까지 CPU가 멈춰 대기합니다. 렌더 루프가 이 구간에서 매 프레임 블로킹되어 FPS가 크게 하락했습니다.",
+          "렌더링된 프레임을 스트리밍으로 보내기 위해 픽셀 데이터를 읽어올 때 CPU가 GPU 완료를 기다리며 멈추는 구간이 생겼습니다.",
         solution:
-          "PBO(Pixel Buffer Object) 더블 버퍼 ping-pong 구조로 전환했습니다. 이번 프레임에선 GPU에 비동기 쓰기만 발행하고, CPU는 이미 완료된 이전 프레임 데이터를 읽습니다. 매 프레임 read/write 인덱스를 교체해 블로킹 없이 픽셀 데이터를 가져옵니다.",
-        result: "CPU-GPU 동기화 압력 감소, 렌더 루프 스톨 빈도 저하",
+          "README와 구현 노트에 맞춰 PBO 더블 버퍼 ping-pong 구조를 적용했습니다. 현재 프레임은 GPU가 버퍼에 쓰고, CPU는 이전 프레임 버퍼를 읽도록 분리했습니다.",
+        result: "CPU-GPU 동기화 압력을 줄이고 프레임 스톨 빈도를 낮췄습니다.",
         snippet: {
           type: "visual",
-          label: "PBO Ping-Pong 교차 접근",
+          label: "PBO Ping-Pong Readback",
           content: [
-            { id: "cpu", name: "CPU Read", desc: "이미 완료된 pbo[readIndex] 비동기 매핑" },
-            { id: "gpu", name: "GPU Write", desc: "pbo[writeIndex]에 glReadPixels 발행 (논블로킹)" },
-            { id: "swap", name: "Index Swap", desc: "매 틱마다 read/write 타겟을 스왑" }
-          ]
-        },
-      },
-      {
-        title: "TCP 프레임 밀림 (지연 누적)",
-        problem:
-          "인코딩과 소켓 전송이 같은 스레드에서 순서대로 실행되었습니다. 큰 프레임을 인코딩하는 동안 다음 프레임 전송이 밀려나고, 그 지연이 계속 누적되어 스트리밍이 버벅거렸습니다.",
-        solution:
-          "인코딩 스레드와 전송 스레드를 완전히 분리했습니다. 인코딩이 끝난 데이터를 큐에 넣으면 전송 스레드가 독립적으로 소비하는 생산자-소비자 구조로 전환했습니다.",
-        result: "프레임 밀림 해소, 스트리밍 FPS 안정화",
-        snippet: {
-          type: "visual",
-          label: "파이프라인 재설계 (생산자-소비자 구조)",
-          content: [
-            { id: "enc", name: "인코딩 스레드", desc: "프레임 분할 압축" },
-            { id: "queue", name: "Concurrent Queue", desc: "데이터 버퍼링" },
-            { id: "tx", name: "전송 스레드 (Tx)", desc: "논블로킹 소켓 I/O" }
+            { id: "gpu-write", name: "GPU Write", desc: "이번 프레임을 write buffer에 기록" },
+            { id: "cpu-read", name: "CPU Read", desc: "이전 프레임을 read buffer에서 복사" },
+            { id: "swap", name: "Swap", desc: "프레임마다 read/write 인덱스 교체" }
           ]
         }
       },
       {
-        title: "멀티 스레드 최적 워커 수 불명확",
+        title: "인코딩과 전송이 같은 속도로 묶인 문제",
         problem:
-          "워커가 너무 많으면 락 경쟁과 캐시 간섭이 생기고, 너무 적으면 병렬화 이득이 없습니다. 직관으로 정하면 오히려 성능이 나빠질 수 있었습니다.",
+          "프레임 인코딩과 소켓 전송이 서로 같은 타이밍에 묶이면, 큰 프레임 하나가 뒤따르는 프레임의 지연을 연쇄적으로 키웠습니다.",
         solution:
-          "1~19 워커 수를 바꾸며 같은 조건(816×616, 3회 평균)으로 FPS를 실측했습니다. 12 워커에서 최고 성능이 나와 그 값을 채택했습니다.",
-        result: "싱글(67 FPS) 대비 12 워커(85+ FPS) — +27% APP FPS / iGPU SINK FPS +19.69%",
-        snippet: {
-          type: "table",
-          label: "벤치마크 결과 — 816×616 해상도, 3회 평균",
-          headers: ["Workers", "APP FPS", "SINK FPS", "비고"],
-          rows: [
-            ["1", "67.xx", "24.xx", "싱글 스레드 기준"],
-            ["6", "84.91", "29.40", "-"],
-            ["12", "85.72", "29.43", "최적 채택 (최고 성능)"],
-            ["19", "83.45", "28.45", "스케줄링 오버헤드 역전"]
-          ]
-        },
-      },
-      {
-        title: "브라우저에서 멀티스레드 동작 불가",
-        problem:
-          "Emscripten으로 빌드한 WASM에서 pthreads 기반 멀티스레드 워커가 브라우저에서 전혀 실행되지 않았습니다. SharedArrayBuffer는 Cross-Origin Isolated 환경에서만 활성화되는데, 일반 서버 응답에는 COOP/COEP 헤더가 없어 비활성 상태였기 때문입니다.",
-        solution:
-          "COI(Cross-Origin Isolation) Service Worker를 빌드에 추가했습니다. 이 Service Worker가 모든 응답에 COOP: same-origin과 COEP: require-corp 헤더를 강제 삽입해 SharedArrayBuffer를 활성화합니다.",
-        result: "웹 빌드에서 12개 인코딩 워커 정상 동작, 브라우저 배포 파이프라인 완성",
+          "생성자-소비자 구조로 인코딩 단계와 전송 단계를 분리하고 큐로 속도 차이를 흡수했습니다.",
+        result: "스트리밍 지연 누적을 줄이고 전달 경로를 디버깅하기 쉬운 구조로 만들었습니다.",
         snippet: {
           type: "visual",
-          label: "COI Service Worker 헤더 주입",
+          label: "Queue 기반 단계 분리",
           content: [
-            { id: "server", name: "정적 파일 서버", desc: "일반 응답 (헤더 없음)" },
-            { id: "sw", name: "Service Worker", desc: "COOP/COEP 헤더 강제 삽입" },
-            { id: "browser", name: "WASM 브라우저", desc: "SharedArrayBuffer 활성화" }
+            { id: "enc", name: "Encode Worker", desc: "압축 처리 전담" },
+            { id: "queue", name: "Concurrent Queue", desc: "단계 간 버퍼링" },
+            { id: "tx", name: "Send Worker", desc: "소켓 송신 전담" }
           ]
         }
       },
+      {
+        title: "브라우저 멀티스레드가 바로 동작하지 않는 문제",
+        problem:
+          "웹 빌드에서는 SharedArrayBuffer와 Cross-Origin Isolation 제약 때문에 데스크톱과 같은 멀티스레드 구성이 바로 실행되지 않았습니다.",
+        solution:
+          "COI Service Worker를 추가해 필요한 헤더를 강제 주입하고, Emscripten pthreads 실행 조건을 맞췄습니다.",
+        result: "웹 배포에서도 멀티스레드 인코딩 실험을 이어갈 수 있는 기반을 만들었습니다.",
+        snippet: {
+          type: "visual",
+          label: "Web Thread Enablement",
+          content: [
+            { id: "static", name: "Static Assets", desc: "기본 응답만 제공" },
+            { id: "coi", name: "COI Service Worker", desc: "COOP / COEP 헤더 삽입" },
+            { id: "wasm", name: "WASM Threads", desc: "SharedArrayBuffer 활성화" }
+          ]
+        }
+      }
     ],
     techChoice: [
       {
         tech: "C++17",
         reason: [
-          "가비지 컬렉터 중단 현상(GC Pause)이 없어 렌더 루프의 낮은 지연시간 보장",
-          "멀티스레드 제어 및 메모리 직접 관리에 최적화",
-          "Emscripten WASM 크로스컴파일 지원이 가장 강력한 언어",
+          "시뮬레이션 루프와 스트리밍 경로를 한 언어에서 다루기 쉬웠습니다.",
+          "데스크톱 빌드와 Emscripten 웹 빌드를 함께 가져가기에 가장 자연스러운 선택이었습니다.",
         ],
       },
       {
         tech: "Emscripten",
         reason: [
-          "기존 작성된 C++ OpenGL 코드를 재작성 없이 브라우저로 이식 가능",
-          "자바스크립트(JS) 포팅 대비 압도적인 개발 생산성 확보",
-          "WebAssembly 네이티브급 성능으로 렌더링 프레임 방어",
+          "데스크톱용 C++ 코어를 크게 바꾸지 않고 브라우저로 가져갈 수 있었습니다.",
+          "설치 없는 체험판을 만들기 위해 웹 배포 경로가 필요했습니다.",
         ],
       },
       {
         tech: "libjpeg-turbo",
         reason: [
-          "SIMD 명령어를 활용한 하드웨어 가속으로 타 라이브러리(stb_image) 대비 월등한 압축 속도",
-          "단일 헤더 및 정적 라이브러리 추가만으로 무거운 의존성(OpenCV 등) 없이 경량화 연동",
+          "프레임 스트리밍에서 JPEG 압축 비용이 크기 때문에 병렬 인코딩 실험 대상으로 적합했습니다.",
+          "무거운 영상 라이브러리 없이 비교적 가볍게 붙일 수 있었습니다.",
         ],
       },
       {
         tech: "TCP / WebSocket",
         reason: [
-          "WebRTC/UDP 기반 통신 대비 구현 난이도가 현저히 낮아 단기간 프로토타입 개발에 적합",
-          "NAT 순회(STUN/TURN) 등 복잡한 인프라 설정 없이 기존 방화벽 환경에서 100% 동작",
+          "데스크톱과 브라우저 클라이언트 전달 경로를 나눠 가져가기 쉬웠습니다.",
+          "프로토타입 단계에서 네트워크 동작을 빨리 검증하는 데 유리했습니다.",
         ],
       },
       {
         tech: "OpenGL",
         reason: [
-          "Emscripten이 WebGL2로의 자동 API 변환을 공식 지원",
-          "Vulkan이나 DirectX와 달리 단일 코드로 크로스 플랫폼(네이티브 + 웹) 렌더링 가능",
+          "렌더링과 픽셀 readback 실험을 직접 다루기에 적합했습니다.",
+          "Emscripten 경로에서 WebGL 대응을 함께 가져가기 쉬웠습니다.",
         ],
-      },
-      {
-        tech: "Python (브릿지)",
-        reason: [
-          "JETANK 하드웨어 제조사 SDK가 Python 바인딩만을 공식 제공",
-          "ROS2 등 무거운 미들웨어를 도입하는 대신, C++ 메인 엔진과 소켓으로 통신하는 경량 브릿지로 채택",
-        ],
-      },
-      {
-        tech: "CMake",
-        reason: [
-          "C++ 네이티브 환경과 WebAssembly 컴파일 타겟을 단일 빌드 스크립트로 통합 관리 가능",
-          "의존성 라이브러리 링킹을 명시적으로 제어하기에 가장 안정적인 사실상의 업계 표준",
-        ],
-      },
+      }
     ],
     retrospective: [
       {
-        point: "TCP → UDP 기반 스트리밍",
-        detail: "영상 스트리밍에서 패킷 하나가 지연되면 TCP head-of-line blocking으로 뒤 프레임들이 전부 밀립니다. 손실을 허용하되 최신 프레임만 전달하는 UDP 방식을 선택했다면 체감 레이턴시를 더 낮출 수 있었을 것입니다.",
+        point: "전송 프로토콜 실험 확장",
+        detail: "현재 구조는 구현 난이도와 검증 속도에 강점이 있었지만, 최신 프레임 우선 전달이 중요한 상황에선 UDP 기반 비교 실험이 추가로 필요했습니다.",
       },
       {
-        point: "Debug 빌드 기준 벤치마크",
-        detail: "워커 수 스윕 측정이 Debug 빌드로 진행됐습니다. Release 빌드에서는 컴파일러 최적화로 절대 수치가 다를 수 있습니다. Release 빌드 기준으로 재측정하고 씬 복잡도별 변화도 함께 기록했다면 더 신뢰도 높은 데이터를 남길 수 있었을 것입니다.",
+        point: "벤치마크 자동화 부족",
+        detail: "워커 수 비교는 남겼지만 해상도, 씬 복잡도, 빌드 타입별 반복 측정을 자동화하면 성능 근거를 더 안정적으로 쌓을 수 있었습니다.",
       },
       {
-        point: "워커 수 동적 조절",
-        detail: "실측으로 12를 찾아 하드코딩했지만, 렌더 루프 FPS 피드백을 받아 런타임에 동적으로 조절하는 구조였다면 배포 환경의 CPU 코어 수가 달라도 최적 성능을 낼 수 있었을 것입니다.",
-      },
+        point: "실물 연동 경계 정리",
+        detail: "현재 저장소에서 실물 연동 계층은 완결된 제품 기능보다 확장 방향에 가깝습니다. 시뮬레이터와 외부 제어 브리지 간 계약을 더 명확히 두는 작업이 남아 있습니다.",
+      }
     ],
     links: {
       github: "https://github.com/Junwoo-Seo-1998/RobotPal",
+      demo: "https://junwoo-seo-1998.github.io/RobotPal/",
     },
   },
-
   {
-    id: "mausoleum",
+    id: "autowing",
     num: "02",
-    title: "영묘 (Mausoleum)",
-    subtitle: "UE5 멀티플레이어 던전 탈출 게임",
-    period: "2026.02 – 2026.03",
-    team: "6인 (UE5 클라이언트 + C++ 서버 + 인프라)",
-    role: "보이스 채팅 클라이언트 & 서버 · 게임 서버 구조 개선",
-    stack: ["Unreal Engine 5 (C++)", "C++ GameServer", "uWebSockets", "UDP", "Opus", "HRTF", "Docker"],
-    cover: "/%EC%98%81%EB%AC%98.png",
-    coverFallback: "/project-mausoleum-cover.png",
+    title: "오토잉카",
+    subtitle: "공항 스마트 토잉카 관제 시스템",
+    period: "2025.08 – 2025.10",
+    team: "6인",
+    role: "백엔드 관제 연동, 경로 제어, 실시간 통신 구조 정리",
+    stack: ["Spring Boot", "React", "MQTT", "WebRTC", "A*", "Yen's Algorithm"],
+    cover: "/project-autowing-cover.png",
     highlights: [
-      "보이스 채팅 클라이언트·서버 전담",
-      "생사 분리 전략 패턴 설계",
-      "C++ 게임 서버 OOP 리팩토링",
+      "관제탑, 토잉카, 기장, 마샬러 시나리오 기반 설계",
+      "명령 채널과 라이브 피드를 분리한 관제 구조",
+      "경로 탐색과 재탐색을 포함한 공항 이동 시나리오 정리",
     ],
     implementations: [
       {
-        title: "보이스 채팅 클라이언트 (UE5 C++)",
+        title: "관제 명령 채널과 상태 전달",
         items: [
-          "마이크 캡처, 코덱(Opus), 네트워크 전송, 재생, 청취 규칙 5개 모듈을 완전히 분리해 Facade 패턴으로 조합",
-          "Opus 16kHz·20ms·24kbps 설정에 FEC와 DTX를 활성화해 패킷 손실 복구와 무음 구간 대역폭 절감을 동시에 처리",
-          "화자마다 독립적인 코덱 인스턴스를 유지해 디코드 상태 간섭을 방지하고, HRTF로 3D 공간음향을 구현",
+          "관제 화면과 백엔드에서 토잉카 상태, 미션 진행, 승인 흐름을 다룰 수 있도록 명령과 상태 이벤트 경로를 정리했습니다.",
+          "소스 구조상 MQTT를 명령/상태 전달 채널로 사용해 차량과 서버 간 메시지 기반 제어를 구성했습니다.",
+          "긴급 정지, 이동 승인, 수동 전환 같은 이벤트를 실시간 제어 흐름에 맞춰 나눴습니다.",
         ],
         snippet: {
           type: "visual",
-          label: "UVoiceCaptureProcessor 캡처 및 전송 흐름",
+          label: "관제 명령 채널",
           content: [
-            { id: "mic", name: "VoiceCapture", desc: "마이크 버퍼 획득 (RawData)" },
-            { id: "opus", name: "Opus Codec", desc: "FEC/DTX 내장 인코딩" },
-            { id: "net", name: "NetworkClient", desc: "UDP 소켓 비동기 전송" }
+            { id: "tower", name: "Control Center", desc: "승인, 재탐색, 비상 명령" },
+            { id: "backend", name: "Backend + MQTT", desc: "명령/상태 메시지 중계" },
+            { id: "car", name: "Towing Car", desc: "주행 및 상태 보고" }
           ]
         }
       },
       {
-        title: "보이스 채팅 서버 (C++)",
+        title: "경로 계획과 재탐색",
         items: [
-          "uWebSockets 라이브러리를 활용해 수천 명의 동시 접속을 버틸 수 있는 고성능 룸(Room) 기반 릴레이 서버 구축",
-          "Protobuf를 이용해 패킷 직렬화/역직렬화를 최적화하고, 패킷 구조를 Header-Body 포맷으로 통일",
-          "Docker를 이용해 C++ 서버 빌드 환경을 격리하고, Jenkins 파이프라인으로 AWS EC2 자동 배포 구성",
-        ],
-        snippet: {
-          lang: "protobuf",
-          label: "보이스 채팅 서버 Protobuf 패킷 스키마 규격",
-          code: `\
-// 패킷 다형성을 위한 Header-Body 통합 규격
-message VoicePacket {
-  enum PacketType {
-    JOIN_ROOM = 0;
-    LEAVE_ROOM = 1;
-    VOICE_DATA = 2;
-  }
-  
-  PacketType type = 1;     // Header: 메시지 타입
-  string room_id = 2;      // Routing: 목적지 방 ID
-  uint32 sender_id = 3;    // Routing: 발신자 ID
-  bytes opus_payload = 4;  // Body: 인코딩된 오디오 청크
-}`
-        }
-      },
-      {
-        title: "생사 분리 전략 패턴",
-        items: [
-          "전략 인터페이스를 두고 생존자용과 영혼용 청취 규칙을 각각 구현체로 분리",
-          "생존자: 거리 기반으로 청취 범위를 제한하고 사망자 목소리를 차단",
-          "영혼: 다른 영혼과는 항상 통화 가능, 특정 조건 충족 시에만 생존자에게 들림",
-        ],
-        snippet: {
-          lang: "cpp",
-          label: "다형성을 활용한 청취 규칙 전략 인터페이스",
-          code: `\
-class IListenStrategy {
-public:
-    virtual ~IListenStrategy() = default;
-    // 화자의 소리가 청자에게 들리는지 여부를 판단하는 핵심 규격
-    virtual bool CanHear(APlayer* Listener, APlayer* Speaker) = 0;
-};
-
-class SurvivorStrategy : public IListenStrategy {
-    bool CanHear(APlayer* L, APlayer* S) override { 
-        /* 거리 계산 및 상태(생존/사망) 기반 필터링 */ 
-        return true;
-    }
-};`
-        }
-      },
-      {
-        title: "C++ 게임 서버 구조 개선",
-        items: [
-          "네트워크 이벤트 루프를 인터페이스로 추상화해 UDP/TCP 루프의 책임을 명확히 분리",
-          "소켓 라이프사이클 관리를 별도 컴포넌트로 분리해 플랫폼 구현체를 교체 가능한 구조로 개선",
-          "방 입장 시 기존 플레이어 목록 스냅샷 전송, 퇴장 시 방장 변경 이벤트 처리",
+          "백엔드 `MapService`에서 A*와 Yen's Algorithm 기반 경로 탐색 로직을 확인하고, 관제 시나리오에 맞는 우회 경로 구성을 정리했습니다.",
+          "임베디드 경로 계획 디렉터리에는 grid A*와 trailer hybrid A* 구현이 있어, 차량 제약을 고려한 주행 계획 실험이 분리되어 있습니다.",
+          "막힌 구간이 생기면 마지막 통과 노드를 기준으로 재탐색하는 흐름을 시나리오 문서와 맞춰 정리했습니다.",
         ],
         snippet: {
           type: "visual",
-          label: "네트워크 책임 분리 아키텍처",
+          label: "경로 탐색 계층",
           content: [
-            { id: "udp", name: "UDP Event Loop", desc: "보이스 전용 (Opus/HRTF, 지연시간 최소화)" },
-            { id: "tcp", name: "TCP Event Loop", desc: "상태 동기화 전용 (위상, 신뢰성 전송)" },
-            { id: "manager", name: "LifeCycle Manager", desc: "연결/해제/룸 세션 중앙 제어" }
+            { id: "mission", name: "Mission Route", desc: "A* / Yen 기반 후보 계산" },
+            { id: "block", name: "Blocked Segment", desc: "차단 구역 반영" },
+            { id: "planner", name: "Vehicle Planner", desc: "Hybrid A* 계열 주행 계획" }
           ]
         }
       },
       {
-        title: "페이즈 시스템",
+        title: "현장 피드와 AI 보조",
         items: [
-          "시간 기반 타이머를 제거하고 조각상 완료 횟수(count) 기반으로 페이즈를 전환해 게임 일시정지 버그를 해소",
-          "P0→P1→P2→Ended 전환 흐름을 중앙에서 관리하고, 전체 완료 감지 시 탈출 루트를 개방",
+          "관제 화면은 WebRTC 라이브 피드를 통해 현장 영상을 확인하고, 명령 채널과는 분리된 경로로 시야를 확보합니다.",
+          "저장소에는 `gesture_ai.py`, `docking_ai.py`가 포함되어 있어 마샬러 수신호와 도킹 보조 인식을 별도 AI 모듈로 다룹니다.",
+          "수동/자동 전환과 AI 판단 신호를 관제 시나리오와 연결해 실제 운용 절차를 설명 가능한 구조로 만들었습니다.",
         ],
         snippet: {
-          lang: "cpp",
-          label: "카운트 기반(Phase Transition) 규격 코드",
-          code: `\
-void APhaseManager::OnStatueCompleted() {
-    CompletedStatuesCount++;
-    
-    // 시간 타이머 대신 확정적인 상태(Count) 규격을 기반으로 페이즈 전환
-    if (CompletedStatuesCount == 1 && CurrentPhase == EPhase::P0) {
-        TransitionToPhase(EPhase::P1);
-    } 
-    else if (CompletedStatuesCount == 3 && CurrentPhase == EPhase::P1) {
-        TransitionToPhase(EPhase::P2);
-    }
-    else if (CompletedStatuesCount >= MaxStatues) {
-        TransitionToPhase(EPhase::Ended);
-        OpenEscapeRoute(); // 탈출구 개방
-    }
-}`
+          type: "visual",
+          label: "명령과 피드 분리",
+          content: [
+            { id: "cmd", name: "MQTT Control", desc: "상태/명령 메시지" },
+            { id: "video", name: "WebRTC Feed", desc: "현장 영상 확인" },
+            { id: "ai", name: "AI Signals", desc: "도킹·수신호 인식" }
+          ]
         }
-      },
+      }
     ],
     problems: [
       {
-        title: "캡처 디바이스 null — 보이스 전혀 전송 안 됨",
+        title: "제어 메시지와 영상 피드를 같은 경로로 다루기 어려운 문제",
         problem:
-          "마이크의 표시 이름('마이크(Realtek Audio)')을 그대로 UE5 캡처 API에 전달했더니 null을 반환했습니다. 내부에서 DirectSound 디바이스 ID와 매칭을 시도하는데, Friendly Name은 매칭에 실패합니다. 결과적으로 캡처 객체가 없어 빈 데이터만 전송되었습니다.",
+          "실시간 제어 명령은 작고 즉시 처리되어야 하지만, 영상 피드는 대역폭과 지연 특성이 전혀 다릅니다. 둘을 같은 성격으로 다루면 운영 포인트가 흐려집니다.",
         solution:
-          "빈 문자열을 전달하면 OS 기본 장치를 선택하고 항상 유효한 캡처 객체를 반환한다는 것을 확인했습니다. 장치 이름 대신 빈 문자열로 초기화하는 것으로 수정했습니다.",
-        result: "보이스 채팅 프로토타입 완료 (Day 10)",
-        snippet: {
-          lang: "cpp",
-          label: "언리얼 캡처 장치 매칭 트러블슈팅",
-          code: `\
-// ❌ 마이크 이름을 직접 전달하면 내부 DirectSound ID 불일치로 null 반환
-FVoiceModule::Get().CreateVoiceCapture(TEXT("마이크(Realtek(R) Audio)"));
-
-// ✅ 빈 문자열 전달 규격: OS 기본 녹음 장치 자동 매칭 (항상 유효한 캡처 객체 획득)
-FVoiceModule::Get().CreateVoiceCapture(TEXT(""));`,
-        },
-      },
-      {
-        title: "백그라운드 복귀 시 오래된 음성 한꺼번에 재생",
-        problem:
-          "게임을 백그라운드로 전환하는 동안 마이크 캡처 버퍼가 계속 쌓입니다. 다시 포커스를 되찾으면 쌓인 버퍼가 한꺼번에 전송·재생되어 오래된 음성이 뭉쳐서 들렸습니다.",
-        solution:
-          "포커스가 복귀하는 시점에 캡처 버퍼를 전량 폐기하고 코덱 상태를 리셋했습니다. 이전 버퍼가 남아있지 않으므로 복귀 직후부터 깨끗한 음성이 전송됩니다.",
-        result: "포커스 복귀 직후 깨짐 현상 해소",
+          "제어와 상태는 MQTT 메시지 경로로, 현장 영상은 WebRTC 피드로 나눠 각 채널의 책임을 분리했습니다.",
+        result: "관제 지시와 현장 확인 흐름을 분리해 디버깅 포인트가 선명해졌습니다.",
         snippet: {
           type: "visual",
-          label: "백그라운드 복귀 처리 흐름",
+          label: "채널 책임 분리",
           content: [
-            { id: "focus", name: "OnFocusChanged", desc: "게임 포커스 복귀 이벤트 감지" },
-            { id: "drop", name: "Flush Buffer", desc: "누적된 마이크 잔여 버퍼 전량 폐기" },
-            { id: "reset", name: "Codec Reset", desc: "디코더 상태 초기화로 노이즈 방지" }
-          ]
-        },
-      },
-      {
-        title: "두 시계 혼용으로 페이즈 타이머 오작동",
-        problem:
-          "렌더 프레임 시계와 게임 월드 시계를 목적 구분 없이 혼용했습니다. 게임이 일시정지되면 게임 시계는 멈추지만 렌더 시계는 계속 흘러, 페이즈 타이머가 멈추지 않고 진행되는 버그가 발생했습니다.",
-        solution:
-          "페이즈 전환 조건을 시간 기반에서 조각상 완료 횟수(count) 기반으로 변경했습니다. 렌더 시계는 렌더 전용, 게임 시계는 게임 로직 전용으로 사용처를 명확히 분리했습니다.",
-        result: "페이즈 전환 타이밍 정확성 확보, 일시정지 연동 버그 해소",
-        snippet: {
-          type: "visual",
-          label: "시계 사용처 분리 (책임 명확화)",
-          content: [
-            { id: "render", name: "렌더 시계 (DeltaTime)", desc: "애니메이션, 시각 효과 전용" },
-            { id: "game", name: "조각상 카운트 (Count)", desc: "페이즈 전환, 게임 로직 전용" }
+            { id: "mqtt", name: "MQTT", desc: "명령 / 상태 / 이벤트" },
+            { id: "webrtc", name: "WebRTC", desc: "실시간 현장 영상" }
           ]
         }
       },
+      {
+        title: "경로 차단 시 우회 기준점이 필요한 문제",
+        problem:
+          "활주로 일부가 막히면 현재 미션을 처음부터 다시 계산하는 것보다, 실제 차량 위치와 마지막 통과 노드를 기준으로 다시 계산해야 운영 흐름에 맞습니다.",
+        solution:
+          "시나리오 문서 기준으로 차단 구간을 반영하고 마지막 통과 노드부터 목적지까지 재탐색하는 절차를 정리했습니다.",
+        result: "관제 시나리오와 경로 계산 설명이 한 문맥으로 연결됐습니다.",
+        snippet: {
+          type: "visual",
+          label: "재탐색 기준점",
+          content: [
+            { id: "current", name: "Current Position", desc: "현재 차량 위치 확인" },
+            { id: "last", name: "Last Passed Node", desc: "재탐색 시작점" },
+            { id: "new", name: "New Route", desc: "차단 구간 우회" }
+          ]
+        }
+      },
+      {
+        title: "출발 조건이 사람과 AI 신호에 따라 달라지는 문제",
+        problem:
+          "마샬러가 있는 경우와 없는 경우, 그리고 긴급 정지 후 복귀 흐름은 출발 조건이 서로 다릅니다.",
+        solution:
+          "기장 승인, 마샬러 수신호, 비상 운전수 개입을 시나리오 단위로 나눠 상태 전이 관점에서 설명 가능한 구조로 정리했습니다.",
+        result: "운영 절차 설명과 시스템 책임 분리가 쉬워졌습니다.",
+        snippet: {
+          type: "table",
+          label: "출발 조건 분기",
+          headers: ["상황", "트리거", "동작"],
+          rows: [
+            ["마샬러 있음", "출발 수신호 인식", "토잉카 출발"],
+            ["마샬러 없음", "기장 이동 승인", "토잉카 출발"],
+            ["비상 상황 후", "수동 해제 + 재승인", "주행 재개"]
+          ]
+        }
+      }
+    ],
+    techChoice: [
+      {
+        tech: "MQTT",
+        reason: [
+          "차량과 서버 사이의 명령/상태 이벤트를 메시지 기반으로 다루기 적합했습니다.",
+          "토픽 구조로 차량별 제어 흐름을 나누기 쉬웠습니다.",
+        ],
+      },
+      {
+        tech: "WebRTC",
+        reason: [
+          "관제 화면에서 현장 영상을 저지연으로 확인하는 목적에 맞았습니다.",
+          "제어 메시지 경로와 분리해 운영 책임을 선명하게 둘 수 있었습니다.",
+        ],
+      },
+      {
+        tech: "A* / Yen's Algorithm",
+        reason: [
+          "기본 최단 경로와 대안 경로 후보를 함께 다루기 좋았습니다.",
+          "차단 구간 발생 시 우회 시나리오를 설명하기 쉬웠습니다.",
+        ],
+      },
+      {
+        tech: "Hybrid A* 계열 플래너",
+        reason: [
+          "단순 격자 경로보다 차량의 회전 반경과 트레일러 제약을 고려한 주행 계획 실험이 가능했습니다.",
+          "백엔드 미션 경로와 온보드 경로 계획의 역할을 분리할 수 있었습니다.",
+        ],
+      },
+      {
+        tech: "React + Vite",
+        reason: [
+          "관제실 대시보드 UI를 빠르게 반복하면서 패널형 인터페이스를 구성하기 좋았습니다.",
+          "실시간 상태와 mock 데이터를 바꿔가며 운영 화면을 검증하기 쉬웠습니다.",
+        ],
+      }
+    ],
+    retrospective: [
+      {
+        point: "실제 텔레메트리 연결 강화",
+        detail: "프론트 문서 일부는 아직 설명용 mock 데이터 전제를 갖고 있습니다. 실주행 텔레메트리와 동일한 이벤트 계약으로 끝까지 맞추는 작업이 더 필요합니다.",
+      },
+      {
+        point: "상태 전이 모델 중앙화",
+        detail: "기장, 마샬러, 관제탑, 비상 운전수의 승인 흐름은 상태 머신으로 명시하면 더 견고해집니다. 현재는 문서와 모듈이 나뉘어 있어 중앙 규격화 여지가 있습니다.",
+      },
+      {
+        point: "실패 재현 로그 축적",
+        detail: "비상 정지와 재탐색은 재현 가능한 시나리오 로그가 쌓일수록 디버깅 속도가 빨라집니다. 이벤트 리플레이 체계까지 이어가면 운영 포폴 근거가 더 강해집니다.",
+      }
+    ],
+    links: {},
+  },
+  {
+    id: "mausoleum",
+    num: "03",
+    title: "영묘 (Mausoleum)",
+    subtitle: "UE5 멀티플레이 게임과 C++ 보이스 서버",
+    period: "2026.02 – 2026.03",
+    team: "6인",
+    role: "보이스 채팅 클라이언트·서버, 게임 서버 구조 개선",
+    stack: ["Unreal Engine 5", "C++", "uWebSockets", "UDP", "Opus", "Protobuf"],
+    cover: "/project-mausoleum-cover.png",
+    highlights: [
+      "UE5 클라이언트와 별도 C++ 음성 서버 분리",
+      "UDP + Opus 기반 실시간 보이스 채팅 처리",
+      "페이즈 시스템과 상태 전략 정리",
+    ],
+    implementations: [
+      {
+        title: "UE5 보이스 클라이언트",
+        items: [
+          "클라이언트 소스에는 캡처, 코덱, 네트워크, 재생, 프로파일링, 전략 계층이 분리되어 있어 보이스 흐름의 책임이 비교적 명확합니다.",
+          "마이크 캡처부터 인코딩, UDP 전송, 수신 재생까지 런타임 경로를 UE5 C++ 안에서 직접 제어했습니다.",
+          "상태에 따라 들을 수 있는 대상을 바꾸는 전략 계층으로 게임 규칙을 음성 로직과 연결했습니다.",
+        ],
+        snippet: {
+          type: "visual",
+          label: "UE5 보이스 클라이언트 흐름",
+          content: [
+            { id: "capture", name: "Capture", desc: "마이크 입력 수집" },
+            { id: "codec", name: "Opus Codec", desc: "실시간 인코딩 / 디코딩" },
+            { id: "network", name: "UDP Network", desc: "보이스 패킷 송수신" }
+          ]
+        }
+      },
+      {
+        title: "별도 C++ 보이스 / 로비 서버",
+        items: [
+          "서버 README 기준으로 로비는 WebSocket, 보이스는 UDP + Protobuf 경로로 분리되어 있습니다.",
+          "uWebSockets, protobuf, JSON 파싱 의존성을 기준으로 룸/세션과 음성 중계 책임을 나눴습니다.",
+          "게임 로직과 음성 전송 요구사항이 다른 만큼 서버 경로를 나눠 다룬 점이 핵심입니다.",
+        ],
+        snippet: {
+          type: "visual",
+          label: "게임 서버와 보이스 서버 역할 분리",
+          content: [
+            { id: "lobby", name: "WebSocket Lobby", desc: "방 입장 및 상태 동기화" },
+            { id: "voice", name: "UDP Voice", desc: "실시간 음성 중계" },
+            { id: "room", name: "Room Logic", desc: "플레이어 세션 관리" }
+          ]
+        }
+      },
+      {
+        title: "게임 규칙과 페이즈 관리",
+        items: [
+          "플레이어 생존 상태에 따라 청취 규칙을 나누는 전략 패턴을 적용해 규칙 분기를 객체 구조로 정리했습니다.",
+          "페이즈 매니저와 서버 페이즈 구조를 기준으로 게임 진행 상태 전환 책임을 중앙화했습니다.",
+          "타이머와 상호작용 이벤트가 섞이는 구간을 줄이기 위해 게임 규칙 단위를 분리해 접근했습니다.",
+        ],
+        snippet: {
+          type: "table",
+          label: "상태별 청취 규칙",
+          headers: ["상태", "청취 대상", "처리 방식"],
+          rows: [
+            ["생존자", "주변 생존자", "거리 및 상태 기반 제한"],
+            ["사망자", "다른 영혼", "별도 규칙으로 허용"],
+            ["특수 상황", "선별된 대상", "전략 구현체에서 결정"]
+          ]
+        }
+      }
+    ],
+    problems: [
+      {
+        title: "게임 상태 동기화와 음성 전송의 요구사항 차이",
+        problem:
+          "게임 상태는 신뢰성과 구조화가 중요하고, 음성은 손실보다 지연이 더 중요합니다. 둘을 같은 채널 성격으로 취급하기 어렵습니다.",
+        solution:
+          "로비/상태 동기화는 WebSocket 경로, 음성은 UDP + Opus 경로로 분리해 각자의 목적에 맞게 처리했습니다.",
+        result: "게임 규칙과 실시간 보이스의 운영 포인트를 따로 볼 수 있게 됐습니다.",
+        snippet: {
+          type: "visual",
+          label: "서버 경로 분리",
+          content: [
+            { id: "sync", name: "Reliable Sync", desc: "WebSocket 기반 상태 동기화" },
+            { id: "voice", name: "Low-latency Voice", desc: "UDP 기반 음성 전송" }
+          ]
+        }
+      },
+      {
+        title: "생존/사망 상태에 따라 보이스 규칙이 달라지는 문제",
+        problem:
+          "게임 특성상 살아 있는 플레이어와 죽은 플레이어가 같은 음성 규칙을 쓰면 플레이 감각과 정보 흐름이 무너집니다.",
+        solution:
+          "청취 전략을 인터페이스로 분리하고 상태별 구현체로 규칙을 나눴습니다.",
+        result: "게임 디자인 요구사항을 코드 구조로 연결할 수 있었습니다.",
+        snippet: {
+          type: "visual",
+          label: "전략 패턴 적용",
+          content: [
+            { id: "interface", name: "Listen Strategy", desc: "공통 판정 인터페이스" },
+            { id: "alive", name: "Survivor Rule", desc: "생존자 청취 규칙" },
+            { id: "dead", name: "Ghost Rule", desc: "사망자 청취 규칙" }
+          ]
+        }
+      },
+      {
+        title: "게임 진행 전환을 시간 기반으로만 처리하기 어려운 문제",
+        problem:
+          "멀티플레이 환경에서는 일시정지, 이벤트 순서, 클라이언트 상태 차이 때문에 시간만으로 페이즈를 전환하면 흔들리는 구간이 생깁니다.",
+        solution:
+          "조각상 완료와 같은 확정 이벤트를 기준으로 페이즈 전환 책임을 중앙화하는 방향으로 정리했습니다.",
+        result: "상태 전환 근거를 더 명확하게 만들었습니다.",
+        snippet: {
+          type: "table",
+          label: "페이즈 전환 기준",
+          headers: ["이전 방식", "개선 방향", "효과"],
+          rows: [
+            ["시간 중심", "확정 이벤트 중심", "전환 근거 명확화"],
+            ["분산 판단", "매니저 중앙화", "디버깅 단순화"]
+          ]
+        }
+      }
     ],
     techChoice: [
       {
         tech: "UDP",
         reason: [
-          "TCP의 고질적인 Head-of-line Blocking 방지: 패킷 하나 지연 시 전체 스트림이 막히는 현상을 원천 차단",
-          "실시간 음성 채팅에서는 데이터 무결성(패킷 손실)보다 '지연시간 최소화'가 압도적으로 중요하기 때문에 채택",
+          "실시간 음성에서 가장 중요한 것은 낮은 지연이었습니다.",
+          "패킷 일부 손실보다 대화 감각 유지가 더 중요했습니다.",
         ],
       },
       {
-        tech: "Opus Codec",
+        tech: "Opus",
         reason: [
-          "20ms 프레임 단위의 실시간 대화에 최적화된 저지연 고효율 오디오 코덱",
-          "무음 구간 대역폭을 아끼는 DTX와, 패킷 유실을 복구하는 FEC 기능이 자체 내장되어 있어 UDP의 불안정성을 완벽히 상쇄",
+          "실시간 보이스 채팅에 맞는 저지연 오디오 코덱입니다.",
+          "패킷 손실 환경에서도 비교적 안정적인 음성 품질을 기대할 수 있습니다.",
         ],
       },
       {
         tech: "uWebSockets",
         reason: [
-          "존재하는 C++ 웹소켓/네트워크 라이브러리 중 가장 높은 I/O 처리량(Throughput) 달성",
-          "Boost.Beast 대비 코드가 간결하고, libwebsockets 대비 추상화가 잘 되어 있어 룸 샤딩 구조 구현에 적합",
-        ],
-      },
-      {
-        tech: "HRTF",
-        reason: [
-          "단순 좌우 스테레오 패닝을 넘어, 머리 전달 함수를 활용해 3D 공간 상의 소리 위치를 현실감 있게 재현",
-          "언리얼 엔진(UE5)에 기본 플러그인으로 내장되어 있어 별도의 무거운 외부 오디오 미들웨어 없이 즉시 적용 가능",
+          "로비와 상태 이벤트를 처리하는 C++ 네트워크 서버 구성에 적합했습니다.",
+          "C++ 서버 코드와 함께 가져가기 쉬운 선택이었습니다.",
         ],
       },
       {
         tech: "Protobuf",
         reason: [
-          "스키마 기반 바이너리 직렬화를 통해 JSON 대비 데이터 크기를 줄이고 파싱 속도 대폭 향상",
-          "C++ 클라이언트와 서버 간의 데이터 구조를 .proto 파일 하나로 강제하여 타입 불일치(Type Safety) 문제 해소",
+          "음성 패킷 구조를 명확하게 정의할 수 있습니다.",
+          "클라이언트/서버 간 이진 데이터 규격을 통일하기 좋았습니다.",
         ],
       },
       {
-        tech: "Docker",
+        tech: "Unreal Engine 5 C++",
         reason: [
-          "C++ 컴파일러 및 의존성 라이브러리(Opus 등) 버전 불일치로 인한 '내 컴퓨터에선 되는데' 문제를 원천 차단",
-          "팀원 전체가 완벽하게 동일한 격리 빌드 환경을 갖추고, AWS EC2 배포 환경까지 일관되게 유지 가능",
+          "게임 플레이 로직과 보이스 런타임을 엔진 안에서 직접 다루기 위해 필요했습니다.",
+          "블루프린트만으로 처리하기 어려운 저수준 오디오/네트워크 경로를 제어할 수 있었습니다.",
         ],
-      },
-      {
-        tech: "Jenkins",
-        reason: [
-          "기존 팀 내 구축된 서버 인프라를 재사용할 수 있어 추가 클라우드 CI/CD 비용이 0원",
-          "C++ CMake 빌드 파이프라인과 Docker 이미지 빌드 로직을 자유롭게 스크립팅할 수 있는 확장성",
-        ],
-      },
-      {
-        tech: "CMake",
-        reason: [
-          "C++ 게임 서버와 보이스 서버의 복잡한 의존성(uWebSockets, Protobuf, Opus) 링킹을 명시적으로 제어하기 위함",
-          "Visual Studio, CLion 등 팀원들의 다양한 개발 도구를 모두 지원하는 범용 메타 빌드 시스템",
-        ],
-      },
+      }
     ],
     retrospective: [
       {
-        point: "Jitter Buffer 미구현",
-        detail: "UDP는 패킷 순서가 보장되지 않아 도착 순서가 뒤바뀐 패킷이 그대로 재생되어 순간적으로 음성이 어긋나는 현상이 있었습니다. 수십 ms 크기의 jitter buffer를 두어 재정렬 후 일정 속도로 재생했다면 음질이 더 안정적이었을 것입니다.",
+        point: "보이스 품질 계측 확장",
+        detail: "손실률, RTT, jitter를 인게임 디버그 UI와 연결하면 음성 품질 문제를 감각이 아닌 수치로 다룰 수 있습니다.",
       },
       {
-        point: "음성 품질 지표 미계측",
-        detail: "'들린다/안 들린다' 수준으로 테스트했습니다. MD에도 'VoiceProfiler 데이터를 인게임 디버그 UI로 노출'이 추가 목표로 남았는데, 패킷 손실률·RTT·jitter를 서버에서 집계하는 구조였다면 품질 튜닝을 데이터 기반으로 할 수 있었을 것입니다.",
+        point: "재정렬 버퍼 실험",
+        detail: "UDP 패킷 순서 뒤바뀜에 대응하는 jitter buffer까지 연결하면 실제 플레이에서 체감 품질을 더 안정화할 수 있습니다.",
       },
       {
-        point: "ProcessCapture 포커스 체크 미사전 설계",
-        detail: "백그라운드 복귀 시 보이스 깨짐 버그를 Day 29에 발견하고 FApp::HasFocus() 체크를 추가했습니다. 버퍼 누적이 보이스 품질에 미치는 영향을 설계 시점에 고려했다면 처음부터 방어 코드가 들어갔을 것입니다.",
-      },
+        point: "규칙 상태 머신 명시화",
+        detail: "생존/사망/페이즈 규칙을 더 큰 상태 머신으로 명시하면 멀티플레이 규칙 변경 시 유지보수가 쉬워집니다.",
+      }
     ],
     links: {},
   },
-
   {
     id: "sticker",
-    num: "03",
+    num: "04",
     title: "STICKER",
-    subtitle: "AI 날씨·일정 기반 패션 코디 추천 앱",
+    subtitle: "디지털 옷장과 AI 코디 추천 서비스",
     period: "2026.04 – 2026.05",
-    team: "6인 (React Native + Spring Boot + FastAPI)",
-    role: "백엔드 전담 · DevOps",
-    stack: ["Spring Boot 3.5", "Java 21", "AWS SQS/S3", "Redis", "Prometheus", "Grafana", "Traefik", "GitLab CI/CD", "Docker Buildx"],
+    team: "6인",
+    role: "백엔드 전담, 비동기 추천 파이프라인, 운영/배포",
+    stack: ["Spring Boot 3.5", "Java 21", "AWS SQS", "Redis", "FastAPI", "React Native"],
     cover: "/Sticker.png",
     highlights: [
-      "Spring Boot 백엔드 전담",
-      "SQS 비동기 AI 파이프라인 설계",
-      "DevOps (CI/CD · 모니터링)",
+      "옷장 데이터를 추천 가능한 자산으로 바꾸는 서비스 설계",
+      "SQS 기반 AI 비동기 추천 파이프라인",
+      "인증, 캐시, 모니터링, 배포까지 백엔드 운영 전담",
     ],
     implementations: [
       {
-        title: "SQS 비동기 AI 파이프라인",
+        title: "AI 추천 비동기 파이프라인",
         items: [
-          "AI 추천 요청을 SQS 메시지로 발행하고, 소비자가 AI 서버에 전달하는 비동기 구조로 설계해 메인 서버 응답 속도와 AI 처리를 완전히 분리",
-          "Java 21 가상 스레드로 소비자를 실행해 SQS long-polling 블로킹 구간에서 OS 스레드를 점유하지 않음",
-          "에러 종류를 두 가지로 분류: 비즈니스 오류는 재시도해도 결과가 같으므로 즉시 삭제, 인프라 오류는 visibility timeout으로 자동 재큐",
+          "앱 요청과 AI 추천 생성을 직접 동기로 묶지 않고, SQS를 중심으로 백엔드와 AI 서버를 분리했습니다.",
+          "일별 추천, 조정, 결과 처리를 큐 단위로 나눠 긴 작업이 사용자 응답을 막지 않도록 했습니다.",
+          "Java 21 가상 스레드로 long polling 소비자를 운영해 대기 비용을 줄였습니다.",
         ],
         snippet: {
           type: "visual",
-          label: "가상 스레드 기반 SQS Long-polling",
+          label: "STICKER 추천 흐름",
           content: [
-            { id: "vthread", name: "Virtual Thread", desc: "블로킹 대기 시 OS 스레드 양보" },
-            { id: "logic", name: "Process Result", desc: "AI 추천 로직 실행 및 판정" },
-            { id: "ack", name: "Ack Strategy", desc: "비즈니스 오류(즉시 삭제) / 인프라 오류(재큐)" }
+            { id: "app", name: "App", desc: "추천 요청 전송" },
+            { id: "api", name: "Spring API", desc: "검증 후 큐 적재" },
+            { id: "queue", name: "AWS SQS", desc: "비동기 작업 버퍼" },
+            { id: "ai", name: "FastAPI AI", desc: "추천 / 조정 / 결과 생성" },
+            { id: "result", name: "Save + Notify", desc: "결과 저장 및 알림" }
           ]
         }
       },
       {
-        title: "중복 실행 방어 (dedup + 분산 락)",
+        title: "중복 실행 방어와 인증 경계",
         items: [
-          "Redis setIfAbsent로 사용자+날짜 조합의 분산 락을 획득한 요청만 AI 추천 진행, 동시 중복 요청 차단",
-          "처리 완료된 jobId를 7일 TTL로 Redis에 마킹해 SQS at-least-once delivery로 인한 중복 소비를 방지",
-          "락 소유자만 해제 가능하도록 구현해 다른 요청이 락을 빼앗는 상황을 방지",
+          "같은 사용자와 날짜 조합의 추천이 동시에 여러 번 돌지 않도록 Redis 분산 락과 결과 dedup 키를 함께 사용했습니다.",
+          "ACCESS, REFRESH, SOCKET 토큰을 분리해 REST, 재발급, WebSocket 경계를 명확히 나눴습니다.",
+          "리프레시 토큰 재사용을 탈취 신호로 간주하는 회전 정책으로 세션 방어 로직을 구성했습니다.",
         ],
         snippet: {
           lang: "java",
-          label: "Redis 원자적 분산 락 획득 규격 (setIfAbsent)",
-          code: `\
-public boolean tryLock(UUID userId, LocalDate date, String jobId, Duration ttl) {
+          label: "Redis 분산 락 획득",
+          code: `public boolean tryLock(UUID userId, LocalDate date, String jobId, Duration ttl) {
     String key = "ai:daily-rec:lock:" + userId + ":" + date;
-    // 원자적 처리: 키가 없을 때만 생성하고 true 반환 (동시성 방어)
-    Boolean locked = redisTemplate.opsForValue()
-                                  .setIfAbsent(key, jobId, ttl);
+    Boolean locked = redisTemplate.opsForValue().setIfAbsent(key, jobId, ttl);
     return Boolean.TRUE.equals(locked);
 }`
         }
       },
       {
-        title: "인증 시스템",
+        title: "날씨 캐시와 운영 관측",
         items: [
-          "JWT를 세 종류로 분리: ACCESS(15분)는 REST API, REFRESH(7일)는 토큰 갱신, SOCKET(1분)은 WebSocket 핸드셰이크 전용",
-          "Refresh Token 교환 시 기존 토큰을 즉시 폐기하고, 이미 폐기된 토큰으로 재시도가 들어오면 탈취로 간주해 해당 사용자의 모든 세션을 무효화",
-          "소셜 로그인 시 mode 파라미터로 신규 가입과 기존 계정 로그인을 분리해 의도치 않은 계정 생성을 방지",
+          "기상청 발표 시각에 맞춰 TTL이 달라지는 날씨 캐시를 두고, 자주 바뀌는 사용자 데이터는 별도 단기 캐시로 분리했습니다.",
+          "Micrometer, Prometheus, Grafana를 통해 API와 운영 지표를 확인할 수 있는 구성을 만들었습니다.",
+          "GitLab CI, Docker Buildx, Traefik 기반 배포로 백엔드/AI/모니터링 변경을 나눠 반영했습니다.",
         ],
         snippet: {
           type: "table",
-          label: "JWT 토큰 규격 및 용도 분리",
-          headers: ["토큰 종류", "수명 (TTL)", "주요 용도", "비고"],
+          label: "다층 캐시 예시",
+          headers: ["대상", "TTL", "이유"],
           rows: [
-            ["ACCESS", "15분", "REST API 인증", "짧은 수명으로 탈취 피해 최소화"],
-            ["REFRESH", "7일", "Access 재발급", "사용 시 1회용 폐기 (RTR 방식)"],
-            ["SOCKET", "1분", "WebSocket 핸드셰이크", "쿼리 스트링 노출 대비 극단적 짧은 수명"]
+            ["기상청 예보", "수시간", "발표 주기 기준"],
+            ["최저 / 최고 기온", "발표 시각 가변", "일별 갱신 시점 반영"],
+            ["옷장 / 코디", "10분", "사용자 변경 빈도 고려"]
           ]
         }
-      },
-      {
-        title: "Redis 다층 캐시",
-        items: [
-          "날씨 API 응답을 데이터 종류별로 TTL을 다르게 설정: 요약 데이터 10분, 예보 데이터 4시간, 최저기온 28시간",
-          "기상청 데이터 발표 시각 기준으로 TTL을 동적으로 계산해 발표 직후에는 짧게, 이후엔 길게 설정",
-          "자주 바뀌는 옷장/코디 데이터는 10분 단기 캐싱으로 DB 조회 부담 감소",
-        ],
-        snippet: {
-          type: "table",
-          label: "데이터 생명주기(TTL) 기반 다층 캐시 규격",
-          headers: ["Cache Name", "TTL 규격", "설정 근거"],
-          rows: [
-            ["KMA_FORECAST", "4시간", "기상청 단기예보 API 업데이트 주기와 일치"],
-            ["KMA_TMN (최저)", "최대 28시간", "전날 02:10 발표값 → 익일 자정 이후까지 유효"],
-            ["KMA_TMX (최고)", "최대 16시간", "당일 11:10 발표값 → 익일 업데이트 전까지 유효"],
-            ["WARDROBE / CODI", "10분", "사용자 데이터 변경 빈도를 고려한 타협점"]
-          ]
-        }
-      },
-      {
-        title: "CI/CD 파이프라인",
-        items: [
-          "루트 파이프라인이 changes 필터로 변경된 도메인(backend/ai/monitoring)만 재배포 트리거",
-          "Docker Buildx로 멀티 아키텍처 이미지를 빌드해 Docker Hub에 푸시, SSH로 EC2에 배포",
-          "Traefik이 컨테이너 라벨을 읽어 라우팅을 자동 구성, nginx 설정 파일 없이 서비스 노출",
-        ],
-        snippet: {
-          lang: "yaml",
-          label: "GitLab CI - Changes 필터 기반 도메인별 독립 파이프라인 규격",
-          code: `\
-backend_push_deploy_pipeline:
-  rules:
-    - changes: [Server/**/*]   # Server 폴더 내부 변경시에만 트리거
-  trigger:
-    include: .gitlab/ci/backend-deploy.yml
-
-monitoring_push_deploy_pipeline:
-  rules:
-    - changes: [monitoring/**/*]  # 모니터링 인프라 설정 변경시에만 트리거
-  trigger:
-    include: .gitlab/ci/monitoring-deploy.yml`
-        }
-      },
+      }
     ],
     problems: [
       {
-        title: "DB 커밋 전 SQS 발행 → 데이터 불일치",
+        title: "같은 추천 요청이 중복 실행되는 문제",
         problem:
-          "트랜잭션 안에서 SQS 메시지를 발행했더니 DB가 롤백되어도 메시지는 이미 큐에 들어간 상태가 됩니다. AI 서버가 메시지를 소비해 DB에 없는 데이터를 참조하면서 오류가 발생했습니다.",
+          "일별 추천은 한 번만 생성되어야 하는데, 사용자가 연속 요청하거나 메시지가 중복 소비되면 같은 결과 생성 로직이 여러 번 돌 수 있습니다.",
         solution:
-          "TransactionSynchronization.afterCommit() 훅에 SQS 발행 로직을 등록했습니다. DB 커밋이 완료된 이후에만 실행되므로 롤백 시에는 메시지가 발행되지 않습니다.",
-        result: "DB 상태와 메시지 큐 상태의 일관성 보장",
-        snippet: {
-          lang: "java",
-          label: "afterCommit 훅을 이용한 DB-SQS 일관성 제어",
-          code: `\
-public static void executeAfterCommit(Runnable task) {
-    TransactionSynchronizationManager.registerSynchronization(
-        new TransactionSynchronization() {
-            @Override
-            public void afterCommit() {
-                task.run(); // DB 커밋이 완전 종료된 이후에만 콜백 실행
-            }
-        }
-    );
-}
-
-// 롤백 발생 시 큐 발행 안 됨 (일관성 보장)
-txUtil.executeAfterCommit(
-    () -> sqsPublisher.publish(new AIRecommendationJob(userId, jobId))
-);`,
-        },
-      },
-      {
-        title: "SQS 메시지 유실 vs 무한 재시도 딜레마",
-        problem:
-          "처리 실패 메시지를 즉시 삭제하면 유실되고, 무조건 재시도하면 항상 실패하는 poison pill 메시지가 큐 전체를 블록합니다. 이 두 가지를 동시에 막아야 했습니다.",
-        solution:
-          "에러 종류를 두 가지로 분류해 ack 전략을 분리했습니다. 비즈니스 로직 오류(잘못된 메시지 형식 등)는 재시도해도 결과가 같으므로 즉시 삭제합니다. 인프라 오류(DB 연결 실패 등)는 일시적이므로 ack를 보류해 visibility timeout 후 자동 재큐됩니다.",
-        result: "메시지 유실 없이 poison pill 격리",
+          "Redis 락으로 같은 날짜 조합의 동시 실행을 막고, 처리 완료된 작업은 dedup 키로 다시 소비되지 않게 했습니다.",
+        result: "중복 추천 실행과 중복 결과 저장을 함께 줄였습니다.",
         snippet: {
           type: "visual",
-          label: "에러 종류별 ACK 전략 분리",
+          label: "중복 실행 방어",
           content: [
-            { id: "success", name: "성공", desc: "deleteMessage (정상 처리 완료)" },
-            { id: "biz", name: "비즈니스 오류", desc: "즉시 deleteMessage (Poison Pill 격리)" },
-            { id: "infra", name: "인프라 오류", desc: "ACK 미전송 (Timeout 후 자동 재처리)" }
+            { id: "lock", name: "Distributed Lock", desc: "동시 요청 1회만 통과" },
+            { id: "job", name: "Recommendation Job", desc: "실제 AI 처리" },
+            { id: "dedup", name: "Dedup Key", desc: "완료 작업 재처리 방지" }
           ]
-        },
+        }
       },
       {
-        title: "Refresh Token 탈취 대응",
+        title: "재시도와 poison pill을 같은 방식으로 처리하기 어려운 문제",
         problem:
-          "탈취된 Refresh Token이 재사용되어도 서버가 구분할 방법이 없습니다. 기존 토큰과 새 토큰이 동시에 유효한 상태가 유지되어 공격자가 계속 세션을 유지할 수 있었습니다.",
+          "메시지 실패를 무조건 재시도하면 항상 실패하는 메시지가 큐를 오염시키고, 반대로 즉시 삭제하면 일시 장애 때 작업이 유실됩니다.",
         solution:
-          "토큰 교환 시 기존 토큰을 즉시 폐기합니다. 이미 폐기된 토큰으로 재시도가 들어오면 탈취로 판단하고 해당 사용자의 모든 세션을 강제 만료합니다.",
-        result: "탈취 토큰으로 로그인 시도 시 전체 세션 강제 만료",
+          "비즈니스 오류와 인프라 오류를 나눠 ACK 전략을 다르게 가져갔습니다. 재시도 가치가 없는 메시지는 정리하고, 일시 장애는 visibility timeout 재처리를 이용했습니다.",
+        result: "재시도와 정리 기준을 분리해 큐 운영 안정성을 높였습니다.",
+        snippet: {
+          type: "table",
+          label: "ACK 전략 분리",
+          headers: ["상황", "처리", "의도"],
+          rows: [
+            ["성공", "delete", "정상 종료"],
+            ["비즈니스 오류", "delete", "poison pill 정리"],
+            ["인프라 오류", "재시도", "일시 장애 복구 대기"]
+          ]
+        }
+      },
+      {
+        title: "리프레시 토큰 재사용을 탐지해야 하는 문제",
+        problem:
+          "탈취된 리프레시 토큰이 재사용되면 기존 사용자 세션과 공격자 세션이 동시에 유지될 수 있습니다.",
+        solution:
+          "리프레시 토큰은 회전 시 즉시 폐기하고, 폐기된 토큰이 다시 들어오면 재사용으로 판단해 해당 사용자 세션을 전체 만료시켰습니다.",
+        result: "토큰 탈취 후 재사용 공격에 대한 방어력을 높였습니다.",
         snippet: {
           lang: "java",
-          label: "RTR 재사용 감지 및 세션 강제 만료 로직",
-          code: `\
-public TokenPair rotate(String refreshToken) {
+          label: "Refresh Token Rotation",
+          code: `public TokenPair rotate(String refreshToken) {
     RefreshToken stored = repository.findByToken(refreshToken)
-        .orElseThrow(() -> {
-            // 토큰 존재 안함 = 이미 폐기된 토큰의 불법 재사용 시도 → 탈취로 확정
-            revokeAllByUserId(extractUserId(refreshToken)); // 해당 유저의 모든 연결 세션 강제 폭파
-            return new TokenReusedException();
-        });
-
-    repository.delete(stored);               // 사용된 토큰은 1회용 폐기
-    return issueNewPair(stored.getUserId()); // 신규 토큰 발급
-}`,
-        },
-      },
+        .orElseThrow(TokenReusedException::new);
+    repository.delete(stored);
+    return issueNewPair(stored.getUserId());
+}`
+        }
+      }
     ],
     techChoice: [
       {
         tech: "AWS SQS",
         reason: [
-          "AI 추천 처리 수십 초 소요 → 동기 HTTP 호출 불가",
-          "at-least-once 보장 + visibility timeout 재처리 기본 내장",
-          "RabbitMQ는 직접 운영 필요, Kafka는 파티션·컨슈머 설정 과다",
+          "추천과 조정 작업이 동기 HTTP 처리에 비해 길기 때문에 비동기 버퍼가 필요했습니다.",
+          "작업 단위를 큐로 분리해 앱 응답과 AI 처리 시간을 절연할 수 있었습니다.",
         ],
       },
       {
-        tech: "Java 21 가상 스레드",
+        tech: "Java 21 Virtual Threads",
         reason: [
-          "SQS long-polling(20s) 블로킹 구간에서 OS 스레드 미점유",
-          "기존 블로킹 코드 그대로 유지 — 코드 변경 없이 스레드 비용 제거",
-          "ThreadPoolExecutor는 OS 스레드 수 한도, 코루틴은 스택 전환 필요",
+          "SQS long polling 같은 블로킹 대기 구간을 비교적 단순한 코드로 유지할 수 있었습니다.",
+          "기존 스레드 모델을 크게 바꾸지 않고 소비자 비용을 낮출 수 있었습니다.",
         ],
       },
       {
         tech: "Redis",
         reason: [
-          "분산 락·결과 dedup·날씨 캐시를 단일 인프라로 처리",
-          "Memcached는 분산 락 구현 불가, 로컬 캐시는 다중 인스턴스 불일치",
-          "TTL, setIfAbsent, 원자적 연산이 모두 필요한 사용 패턴",
+          "분산 락, dedup, 캐시를 한 인프라에서 함께 처리할 수 있었습니다.",
+          "TTL과 원자적 setIfAbsent 패턴이 필요한 작업과 잘 맞았습니다.",
         ],
       },
       {
         tech: "Prometheus + Grafana",
         reason: [
-          "Micrometer AOP로 코드 수정 없이 계층별 메트릭 수집",
-          "p95/p99 SLO를 직접 쿼리하고 대시보드 시각화",
-          "Datadog은 유료, CloudWatch는 AWS 종속",
+          "백엔드와 운영 지표를 직접 수집하고 시각화하기 좋았습니다.",
+          "배포 후 병목 구간과 응답 시간 분포를 같이 보기 쉬웠습니다.",
         ],
       },
       {
-        tech: "Spring Security",
+        tech: "Gmail API (OAuth2)",
         reason: [
-          "JWT 필터 체인·OAuth2·role 접근 제어를 Security Filter Chain으로 일원화",
-          "SOCKET 전용 토큰 검증 경로를 별도 필터로 분리",
-          "OAuth2 제공자 추가 시 설정만 확장하면 됨",
+          "이메일 인증코드 발송을 서비스 로직 안에서 제어할 수 있었습니다.",
+          "README 기준 외부 서비스 구성이 Gmail API로 명시되어 있어 구현 설명과 맞습니다.",
         ],
       },
       {
-        tech: "Kakao / Google OAuth2",
+        tech: "기상청 API",
         reason: [
-          "Spring Security OAuth2 Client로 소셜 로그인 통합",
-          "mode 파라미터로 신규 가입·기존 로그인 분리 — 의도치 않은 계정 생성 방지",
-          "추후 제공자 추가 시 설정만 확장하면 됨",
+          "국내 날씨 데이터를 기준으로 추천 문맥을 만드는 서비스 목적과 잘 맞았습니다.",
+          "발표 시각을 캐시 TTL 전략에 직접 반영할 수 있었습니다.",
         ],
-      },
-      {
-        tech: "Gmail SMTP",
-        reason: [
-          "SecureRandom OTP + Redis 5분 TTL로 재발송 쿨다운 구현",
-          "SendGrid·SES는 도메인 인증·유료 플랜 필요",
-          "개발 단계에서 별도 설정 없이 즉시 연동 가능",
-        ],
-      },
-      {
-        tech: "FCM",
-        reason: [
-          "앱 백그라운드 상태에서도 푸시 수신 가능",
-          "WebSocket 폴링은 앱이 백그라운드일 때 동작하지 않음",
-          "Firebase Admin SDK 한 번으로 iOS·Android 크로스 플랫폼 전송",
-        ],
-      },
-      {
-        tech: "HikariCP 튜닝",
-        reason: [
-          "가상 스레드 환경에서 I/O 빈도 증가에 맞춘 풀 크기 조정",
-          "커넥션 고갈 타임아웃 방지",
-          "maximumPoolSize·connectionTimeout 부하 테스트 기반으로 결정",
-        ],
-      },
-      {
-        tech: "KMA 단기예보 API",
-        reason: [
-          "국내 관측 데이터 → 국내 패션 추천 정확도 우위",
-          "발표 시각 기반 TTL 동적 계산으로 API 호출 최소화",
-          "상용 해외 API는 국내 측정 오차 존재",
-        ],
-      },
-      {
-        tech: "S3 Presigned URL",
-        reason: [
-          "클라이언트가 직접 S3 업로드 → 서버 메모리·트래픽 제거",
-          "URL Redis 캐싱으로 반복 발급 최소화",
-          "서명 만료로 접근 제어 자동 처리",
-        ],
-      },
-      {
-        tech: "SmartLifecycle",
-        reason: [
-          "stop() 훅에서 처리 중인 메시지 완료 대기 후 종료 — Graceful Shutdown",
-          "@PostConstruct/ApplicationRunner는 shutdown 타이밍 제어 불가",
-          "배포 중 메시지 유실 방지",
-        ],
-      },
+      }
     ],
     retrospective: [
       {
-        point: "SQS DLQ(Dead Letter Queue) 미구성",
-        detail: "재시도 한도를 초과한 메시지를 격리하는 DLQ를 연결하지 않았습니다. DLQ가 있었다면 최종 실패 메시지를 유실 없이 추적하고 수동 재처리하는 운영 편의성이 크게 높아졌을 것입니다.",
+        point: "DLQ 운영 보강",
+        detail: "반복 실패 메시지를 더 명확히 격리하려면 DLQ와 재처리 절차까지 같이 갖추는 편이 운영에 유리합니다.",
       },
       {
-        point: "캐시 개선 효과 수치화 미흡",
-        detail: "Redis 캐시 도입 전후 응답 시간을 Grafana baseline으로 남기지 않았습니다. 캐시 적용 전 app_operation_seconds를 먼저 기록하고 진행했다면 개선 효과를 p95/p99 수치로 증명할 수 있었을 것입니다.",
+        point: "성능 개선 수치 축적",
+        detail: "캐시와 비동기 파이프라인 효과를 더 설득력 있게 보여주려면 적용 전후 p95, p99 지표를 꾸준히 남겨야 합니다.",
       },
       {
-        point: "날씨 캐시 선제 갱신 설계 오버",
-        detail: "날씨 캐시에 스케줄러 기반 선제 갱신을 도입했다가 복잡성이 커서 on-demand 방식으로 단순화했습니다. 처음부터 on-demand로 설계했다면 동일한 결과를 불필요한 복잡성 없이 얻을 수 있었을 것입니다.",
-      },
+        point: "추천 결과 설명 가능성 강화",
+        detail: "사용자 입장에서는 왜 이 코디가 추천됐는지가 중요합니다. 추천 이유를 더 구조적으로 노출하는 설계가 다음 단계입니다.",
+      }
     ],
     links: {},
   },
 ];
+
+export const projects = baseProjects.map((project) => ({
+  ...project,
+  detailPage: projectDetailPages[project.id],
+}));

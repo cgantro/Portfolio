@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이혜연 · Backend 도메인 — STICKER 기술 포트폴리오</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="member.css">
+</head>
+<body style="--accent:var(--be)">
+
+<header>
+  <div class="bar">
+    <a href="index.html" class="logo"><span class="dot">✦</span> STICKER <small>· 기술 포트폴리오</small></a>
+    <a href="index.html#team" class="back">← 팀 전체</a>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="wrap">
+    <div class="phead">
+      <div class="avatar"><img src="assets/profile/hyeyeon.jpg" alt="이혜연" onerror="if(this.src.endsWith('.jpg')){this.src=this.src.slice(0,-4)+'.png'}else{this.remove()}">혜</div>
+      <div><div class="nm">이혜연</div><div class="role">Backend · 옷장 / 코디 / 추천 도메인</div></div>
+    </div>
+    <p class="bio">옷장·코디·추천 도메인의 백엔드 API를 폭넓게 맡았습니다. S3 직접 업로드 서비스, 조회 API, 상황 보정 처리, FCM 알림과 인증까지 — 사용자가 만지는 데이터 흐름 대부분의 서버 측을 설계했습니다.</p>
+    <div class="chips"><span class="chip"><i class="devicon-spring-original colored"></i>Spring Boot</span><span class="chip"><i class="devicon-hibernate-plain colored"></i>Spring Data JPA</span><span class="chip"><i class="devicon-amazonwebservices-plain-wordmark colored"></i>S3 Presigned</span><span class="chip"><i class="devicon-firebase-plain colored"></i>FCM</span><span class="chip">JWT · Kakao OAuth</span></div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <section class="psec" id="p1">
+    <div class="ix">1</div>
+    <h2>큰 이미지를 서버 부담 없이 올리는 업로드 계약</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>용량 큰 옷 사진을 전부 서버로 받아 중계하면 서버가 업로드 트래픽만으로 병목이 됩니다.</b></div>
+    <p class="body">백엔드는 이미지를 직접 받는 대신 presigned PUT URL만 발급하고, 실제 파일은 앱에서 S3로 직행합니다. content-type 화이트리스트·키 구조·만료로 업로드를 통제하고, 업로드 후 별도 등록 호출로 옷장 아이템과 연결합니다.</p>
+    <div class="figure">
+      <svg viewBox="0 0 600 214" role="img" aria-label="업로드 시퀀스 다이어그램">
+        <defs><marker id="hb" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#5B8DEF"/></marker><marker id="hg" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#94A3B8"/></marker><marker id="ht" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#22B8A0"/></marker></defs>
+        <rect x="40" y="12" width="100" height="30" rx="8" fill="#FFF1F5" stroke="#FF3F73" stroke-width="1.6"/><text x="90" y="32" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1A1320">📱 App</text>
+        <rect x="250" y="12" width="100" height="30" rx="8" fill="#EEF3FE" stroke="#5B8DEF" stroke-width="1.6"/><text x="300" y="32" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1A1320">⚙️ 서버</text>
+        <rect x="460" y="12" width="100" height="30" rx="8" fill="#E8F8F4" stroke="#22B8A0" stroke-width="1.6"/><text x="510" y="32" text-anchor="middle" font-size="12.5" font-weight="800" fill="#1A1320">☁️ S3</text>
+        <line x1="90" y1="44" x2="90" y2="192" stroke="#D8DEE6" stroke-width="1.2" stroke-dasharray="3 3"/><line x1="300" y1="44" x2="300" y2="192" stroke="#D8DEE6" stroke-width="1.2" stroke-dasharray="3 3"/><line x1="510" y1="44" x2="510" y2="192" stroke="#D8DEE6" stroke-width="1.2" stroke-dasharray="3 3"/>
+        <line x1="90" y1="66" x2="298" y2="66" stroke="#5B8DEF" stroke-width="1.8" marker-end="url(#hb)"/><text x="195" y="60" text-anchor="middle" font-size="10.5" font-weight="700" fill="#5B8DEF">① presign 요청</text>
+        <line x1="300" y1="92" x2="92" y2="92" stroke="#94A3B8" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#hg)"/><text x="196" y="86" text-anchor="middle" font-size="10.5" fill="#64748B">② presigned URL · 5분 만료</text>
+        <line x1="90" y1="128" x2="508" y2="128" stroke="#22B8A0" stroke-width="3" marker-end="url(#ht)"/><text x="300" y="122" text-anchor="middle" font-size="10.5" font-weight="800" fill="#1A9985">③ 이미지 PUT (Content-Type 헤더만)</text>
+        <line x1="90" y1="164" x2="298" y2="164" stroke="#5B8DEF" stroke-width="1.8" marker-end="url(#hb)"/><text x="195" y="158" text-anchor="middle" font-size="10.5" font-weight="700" fill="#5B8DEF">④ POST /wardrobe/items 등록</text>
+        <text x="300" y="204" text-anchor="middle" font-size="10.5" fill="#6B6470">S3 이벤트 미사용 — 업로드 후 클라이언트 등록 호출로 연결</text>
+      </svg>
+    </div>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>업로드</td><td class="val">presigned PUT · 5분 만료</td><td>Content-Type 헤더만</td></tr>
+      <tr><td>키 구조</td><td class="val">users/{userId}/items/{itemId}/…</td><td>소유자 스코프</td></tr>
+      <tr><td>검증</td><td class="val">image/jpeg·png·webp</td><td>파일 30MB · 요청 35MB</td></tr>
+      <tr><td>등록</td><td class="val">POST /wardrobe/items</td><td>S3 이벤트 미사용 · 클라 드리븐</td></tr>
+    </tbody></table>
+    <h3>실패 · 엣지 처리</h3>
+    <div class="callouts">
+      <div class="callout"><div class="ic">!</div><div><b>서명 무결성</b><span>Content-Type이 서명과 정확히 일치해야 하며, 그 외 헤더 추가 시 서명이 깨집니다.</span></div></div>
+      <div class="callout"><div class="ic">!</div><div><b>고아 객체</b><span>S3 이벤트가 아닌 클라 등록 호출에 의존하므로, 업로드만 하고 등록하지 않으면 미연결 객체가 남을 수 있습니다.</span></div></div>
+    </div>
+  </section>
+
+  <section class="psec" id="p2">
+    <div class="ix">2</div>
+    <h2>옷장 · 코디셋 · 추천 조회 API</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>앱의 거의 모든 화면이 데이터를 읽습니다. 옷장·코디셋·추천 결과를 일관된 형태로 안정적으로 내려줘야 했습니다.</b></div>
+    <p class="body">옷장 목록·상세, 코디셋 목록·상세, 추천 코디 조회와 아이템 상세 조회 API를 설계·구현했습니다. 자주 조회되는 목록은 캐시와 맞물려 DB 부하를 줄입니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>영역</th><th>API</th><th>비고</th></tr></thead><tbody>
+      <tr><td>옷장</td><td class="val">목록 · 상세 조회</td><td>WardrobeQuery</td></tr>
+      <tr><td>코디셋</td><td class="val">목록 · 상세 조회</td><td>CodiSet</td></tr>
+      <tr><td>추천</td><td class="val">추천 코디 · 아이템 상세 조회</td><td>DailyRecommendationQuery</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="psec" id="p3">
+    <div class="ix">3</div>
+    <h2>상황 보정 — 중복 요청을 막는 처리</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>상황 보정은 비동기 작업이라, 같은 요청이 연달아 들어오면 중복 처리·중복 결과가 생길 수 있습니다.</b></div>
+    <p class="body">보정 작업의 job 발행과 preview 결과 처리를 구현하면서, 동시·중복 요청에 락을 걸어 한 번만 처리되도록 했습니다. AI 서버와의 ENUM·DTO 양식도 통일해 큐 연동을 안정화했습니다.</p>
+    <h3>실패 · 엣지 처리</h3>
+    <div class="callouts">
+      <div class="callout"><div class="ic">🔒</div><div><b>중복 요청 락</b><span>같은 보정 요청이 중복 처리되지 않도록 락으로 단일 처리를 보장합니다.</span></div></div>
+    </div>
+    <div class="collab"><div>🤝</div><div><b>협업</b> — 보정 작업의 큐 발행/결과 수신은 백엔드(홍윤표)의 SQS 인프라, 실제 보정 스코어링·이미지는 AI 서버(문지영)와 맞물립니다.</div></div>
+  </section>
+
+  <section class="psec" id="p4">
+    <div class="ix">4</div>
+    <h2>알림 전송과 인증</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>추천 완료를 사용자에게 알리고, 모든 요청을 안전하게 인증해야 했습니다.</b></div>
+    <p class="body">FCM 알림 전송 처리를 구현하고, JWT 토큰 발급과 카카오 소셜 로그인 연동을 담당했습니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>알림</td><td class="val">FCM 전송 처리</td><td>NotificationDispatch</td></tr>
+      <tr><td>인증</td><td class="val">JWT 발급 · Kakao OAuth</td><td>토큰 기반</td></tr>
+    </tbody></table>
+    <div class="collab"><div>🤝</div><div><b>협업</b> — FCM 디바이스 토큰 등록·세팅(infra)은 김정식, Google OAuth·클라 토큰 갱신은 장윤석과 함께 인증 흐름을 이룹니다.</div></div>
+  </section>
+
+  <div class="pnav">
+    <a href="member-jiyoung.html">← 문지영 · AI</a>
+    <a href="member-jungsik.html">김정식 · Frontend 화면 →</a>
+  </div>
+</div>
+
+<footer><div class="foot"><span>© 2026 STICKER · S14P31A408</span><span><a href="index.html#team">← 팀 전체 보기</a></span></div></footer>
+</body>
+</html>
