@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import styles from "./Sidebar.module.css";
 
 export default function Sidebar({ meta, sections, activeSection }) {
@@ -12,7 +13,9 @@ export default function Sidebar({ meta, sections, activeSection }) {
             onError={(e) => { e.currentTarget.style.display = "none"; }}
           />
         </div>
-        <div className={styles.name}>{meta.name}</div>
+        <Link to="/" className={styles.name}>
+          {meta.name}
+        </Link>
         <div className={styles.role}>{meta.role}</div>
       </div>
 

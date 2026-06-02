@@ -1,11 +1,10 @@
 import styles from "./ProjectPage.module.css";
 import {
   ArchitectureBlock,
-  CopyCard,
-  DesignConsiderationPanel,
   EvidenceList,
-  FactCard,
   HeroCard,
+  PlainCopy,
+  PlainFacts,
   ProjectSection,
   RetrospectivePanel,
   SimpleTable,
@@ -26,8 +25,8 @@ export default function RobotPalPage({ project, detailPage, links }) {
         lead="실물을 바로 붙이지 않아도 데이터 수집, 학습, 연동 흐름을 먼저 검증할 수 있도록 공통 플랫폼을 만드는 데 초점을 맞췄습니다."
       >
         <div className={styles.splitBoard}>
-          <CopyCard title="배경" paragraphs={detailPage.context.body} />
-          <FactCard title="정리한 범위" facts={detailPage.context.facts} />
+          <PlainCopy paragraphs={detailPage.context.body} />
+          <PlainFacts facts={detailPage.context.facts} />
         </div>
       </ProjectSection>
 
@@ -67,6 +66,7 @@ export default function RobotPalPage({ project, detailPage, links }) {
               snippet={item.snippet}
             />
           ))}
+          <TechChoicePanel items={project.techChoice} />
         </div>
       </ProjectSection>
 
@@ -76,10 +76,18 @@ export default function RobotPalPage({ project, detailPage, links }) {
         title="렌더 루프를 막는 병목을 단계별로 풀었습니다"
         lead="성능 문제는 대부분 한 지점의 최적화보다 파이프라인 경계를 다시 자르는 쪽에서 풀렸습니다."
       >
-        <div className={styles.issueGrid}>
+        <div className={styles.stackLayout}>
           {project.problems.map((item) => (
             <TroubleshootingCard key={item.title} item={item} />
           ))}
+          <article className={styles.surfaceCard}>
+            <h3 className={styles.cardTitle}>{detailPage.benchmarkTable.title}</h3>
+            <SimpleTable
+              headers={detailPage.benchmarkTable.headers}
+              rows={detailPage.benchmarkTable.rows}
+            />
+            <p className={styles.tableNote}>{detailPage.benchmarkTable.note}</p>
+          </article>
         </div>
       </ProjectSection>
 
@@ -89,18 +97,7 @@ export default function RobotPalPage({ project, detailPage, links }) {
         title="설명은 측정값과 문서 기준으로만 남겼습니다"
         lead="성과 수치가 확인되는 부분은 병목 분석 문서 기준으로 제시하고, 나머지는 README와 빌드 구조에서 검증 가능한 항목만 정리했습니다."
       >
-        <div className={styles.evidenceBoard}>
-          <article className={styles.surfaceCard}>
-            <h3 className={styles.cardTitle}>{detailPage.benchmarkTable.title}</h3>
-            <SimpleTable
-              headers={detailPage.benchmarkTable.headers}
-              rows={detailPage.benchmarkTable.rows}
-            />
-            <p className={styles.tableNote}>{detailPage.benchmarkTable.note}</p>
-          </article>
-          <EvidenceList notes={detailPage.evidenceNotes} />
-          <TechChoicePanel items={project.techChoice} />
-        </div>
+        <EvidenceList notes={detailPage.evidenceNotes} />
       </ProjectSection>
 
       <ProjectSection
@@ -109,24 +106,8 @@ export default function RobotPalPage({ project, detailPage, links }) {
         title="플랫폼으로 묶은 만큼 이후 실험 경계를 더 분명히 남겨야 합니다"
         lead="지금 구조는 시작 비용을 줄이는 데 초점을 맞췄고, 다음 단계에서는 실물 브리지와 자동화된 벤치 체계를 더 또렷하게 남겨야 합니다."
       >
-        <div className={styles.splitBoard}>
-          <RetrospectivePanel items={project.retrospective} />
-          <DesignConsiderationPanel
-            title="이번 프로젝트에서 남긴 판단"
-            items={[
-              {
-                title: "후배의 시작 비용을 먼저 줄인다",
-                body: "완전한 제품보다 반복 실험에 필요한 공통 런타임과 전달 경로를 먼저 만드는 편이 팀 전체 생산성에 더 직접적이었습니다.",
-              },
-              {
-                title: "성능 문제는 경계 분리로 푼다",
-                body: "render, readback, encode, send를 같은 리듬으로 묶지 않고 각 단계의 책임을 분리하는 것이 최적화보다 먼저였습니다.",
-              },
-            ]}
-          />
-        </div>
+        <RetrospectivePanel items={project.retrospective} />
       </ProjectSection>
     </>
   );
 }
-
