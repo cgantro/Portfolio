@@ -1,0 +1,34 @@
+
+> yoonpyo-portfolio@0.1.0 dev
+> vite --host 127.0.0.1 --port 4173
+
+Re-optimizing dependencies because lockfile has changed
+
+  [32m[1mVITE[22m v5.4.21[39m  [2mready in [0m[1m324[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m4173[22m/Portfolio/[39m
+[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
+[2m오전 9:25:33[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mpublic/sticker-portfolio/index.html[22m
+[2m오전 9:25:33[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mpublic/sticker-portfolio/member-hyeyeon.html[22m
+[2m오전 9:25:33[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mpublic/sticker-portfolio/member-jiyoung.html[22m
+[2m오전 9:25:33[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mpublic/sticker-portfolio/member-jungsik.html[22m
+[2m오전 9:25:33[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mpublic/sticker-portfolio/member-kyungbae.html[22m
+[2m오전 9:25:33[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mpublic/sticker-portfolio/member-yoonpyo.html[22m
+[2m오전 9:25:33[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2mpublic/sticker-portfolio/member-yoonseok.html[22m
+[2m오전 10:08:29[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/main.jsx[22m
+[2m오전 10:08:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/sections/Projects/index.jsx[22m
+[2m오전 10:08:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/ui/ArchitectureDiagram.jsx[22m
+[2m오전 10:08:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.jsx, /src/pages/ProjectPage.jsx[22m
+[2m오전 10:08:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.jsx, /src/pages/ProjectPage.jsx[22m
+[2m오전 10:08:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.jsx, /src/pages/ProjectPage.jsx[22m
+[2m오전 10:17:25[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.jsx, /src/pages/ProjectPage.jsx[22m
+[2m오전 10:21:16[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/pages/HomePage.jsx, /src/pages/ProjectPage.jsx[22m
+[2m오전 10:21:23[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/data/projectDetailPages.js[22m
+[2m오전 10:23:34[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/data/projectDetailPages.js[22m
+[2m오전 10:23:41[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/sections/Projects/index.jsx[22m
+[2m오전 10:24:04[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/sections/Projects/index.jsx[22m
+[2m오전 10:24:29[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/sections/Projects/ProjectPageContent.jsx[22m
+[2m오전 10:24:37[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/sections/Projects/ProjectPageContent.jsx[22m
+[2m오전 10:25:50[22m [36m[1m[vite][22m[39m [32mhmr update [39m[2m/src/components/sections/Projects/ProjectPageContent.jsx[22m
+[2m오전 10:25:56[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/components/sections/Projects/ProjectPage.module.css[22m
+[2m오전 10:26:56[22m [36m[1m[vite][22m[39m [32mpage reload [39m[2msrc/components/sections/Projects/ProjectPage.module.css[22m

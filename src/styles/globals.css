@@ -94,8 +94,8 @@ ul, ol {
   min-width: 0;
   padding-top: 0;
   padding-bottom: 120px;
-  padding-left: max(48px, calc((100% - 1100px) / 2));
-  padding-right: max(48px, calc((100% - 1100px) / 2));
+  padding-left: max(var(--main-gutter, 48px), calc((100% - var(--content-max, 1100px)) / 2));
+  padding-right: max(var(--main-gutter, 48px), calc((100% - var(--content-max, 1100px)) / 2));
   width: 100%;
 }
 

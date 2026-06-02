@@ -1,60 +1,13 @@
 /* ────────────────────────────────────────────
-   3D PRISM SLIDER
+   PROJECT GRID
 ──────────────────────────────────────────── */
-.prismScene {
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-  margin: 60px auto 40px;
-  perspective: 2000px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.projectGrid {
+  margin-top: 56px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+  align-items: stretch;
 }
-
-.prism {
-  position: relative;
-  width: 100%;
-  height: 520px;
-  transform-style: preserve-3d;
-  transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.prismFace {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 0;
-}
-
-.prismNav {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--bg2);
-  border: 1px solid var(--border);
-  color: var(--fg);
-  font-size: 24px;
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.2s;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-}
-.prismNav:hover {
-  background: var(--bg3);
-  color: var(--accent);
-  border-color: var(--accent);
-  transform: translateY(-50%) scale(1.1);
-}
-.prismPrev { left: -80px; }
-.prismNext { right: -80px; }
 
 .bentoCard {
   position: relative;
@@ -65,7 +18,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s, border-color 0.3s;
   will-change: transform;
 }
@@ -182,15 +135,22 @@
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--fg-dim);
+  flex-wrap: wrap;
 }
 
 .dot2 { color: var(--border2); }
+
+.roleText {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--fg);
+}
 
 .bentoTags { display: flex; flex-wrap: wrap; gap: 6px; }
 
 .bentoDivider { height: 1px; background: var(--border); margin: 4px 0; }
 
-.bentoHighlights { display: flex; flex-direction: column; gap: 8px; }
+.bentoHighlights { display: flex; flex-direction: column; gap: 8px; flex: 1; }
 
 .hl {
   display: flex;
@@ -232,9 +192,10 @@
 .bentoCard:hover .ctaArrow { transform: translate(3px, -3px); }
 
 @media (max-width: 900px) {
-  .bentoGrid { grid-template-columns: 1fr; }
-  .bentoCardLarge { grid-column: span 1; flex-direction: column; }
-  .bentoCardLarge .bentoCover { width: 100%; aspect-ratio: 16 / 9; }
+  .projectGrid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 

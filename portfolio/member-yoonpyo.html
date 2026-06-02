@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>홍윤표 · Backend·Infra — STICKER 기술 포트폴리오</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="member.css">
+</head>
+<body style="--accent:var(--be)">
+
+<header>
+  <div class="bar">
+    <a href="index.html" class="logo"><span class="dot">✦</span> STICKER <small>· 기술 포트폴리오</small></a>
+    <a href="index.html#team" class="back">← 팀 전체</a>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="wrap">
+    <div class="phead">
+      <div class="avatar"><img src="assets/profile/yoonpyo.jpg" alt="홍윤표" onerror="if(this.src.endsWith('.jpg')){this.src=this.src.slice(0,-4)+'.png'}else{this.remove()}">홍</div>
+      <div><div class="nm">홍윤표</div><div class="role">Backend · Infra 리드</div></div>
+    </div>
+    <p class="bio">추천 비동기 파이프라인의 백엔드 축, 캐싱·관측성·배포를 맡았습니다. AI 서버와 큐로 안전하게 주고받고, 조회 부하를 캐시로 덜어내며, 운영 중 문제를 메트릭·알림으로 먼저 잡도록 시스템을 계측했습니다.</p>
+    <div class="chips"><span class="chip"><i class="devicon-spring-original colored"></i>Spring Boot</span><span class="chip"><i class="devicon-amazonwebservices-plain-wordmark colored"></i>AWS SQS</span><span class="chip"><i class="devicon-redis-plain colored"></i>Redis · Caffeine</span><span class="chip">Virtual Threads</span><span class="chip"><i class="devicon-grafana-plain colored"></i>Prometheus · Grafana</span><span class="chip"><i class="devicon-gitlab-plain colored"></i>GitLab CI</span></div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <section class="psec" id="p1">
+    <div class="ix">1</div>
+    <h2>추천 작업을 큐에 맡기고 백엔드는 손을 뗀다</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>무거운 AI 연산을 백엔드가 직접 떠안으면, 추천이 오래 걸릴 때 일반 API 요청까지 줄줄이 밀립니다.</b></div>
+    <p class="body">추천·보정 작업을 SQS 큐에 적재하고 바로 응답한 뒤, AI 결과는 별도 결과 큐를 long-polling으로 소비합니다. 저장 로직의 순서 가정을 지키기 위해 결과 소비를 단일 가상 스레드로 돌리되, 20초 long-poll 동안 OS 스레드를 점유하지 않게 했습니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>큐</td><td class="val">일별추천 · 보정 · 결과 3개</td><td>BE↔AI 디커플링</td></tr>
+      <tr><td>결과 소비</td><td class="val">단일 가상 스레드 · long-poll 20s · 10건</td><td>SmartLifecycle로 수명 관리</td></tr>
+      <tr><td>멱등</td><td class="val">jobId 기반 Redis dedup</td><td>중복 결과 방지</td></tr>
+    </tbody></table>
+    <h3>설계 트레이드오프</h3>
+    <div class="adrwrap">
+      <div class="adr">
+        <div class="t">AI 호출을 SQS 비동기로 분리</div>
+        <div class="row"><div class="k">결정</div><div class="v">동기 호출 대신 큐 적재 후 비동기 결과 수신</div></div>
+        <div class="row"><div class="k">근거</div><div class="v">백엔드 응답성 보존 · AI 독립 스케일 · 장애 격리 · 재시도 내장</div></div>
+        <div class="row alt"><div class="k">버린 대안</div><div class="v">동기 HTTP/gRPC — AI 지연이 백엔드 스레드를 그대로 점유</div></div>
+      </div>
+      <div class="adr">
+        <div class="t">결과 소비는 단일 가상 스레드</div>
+        <div class="row"><div class="k">결정</div><div class="v">멀티 컨슈머 대신 단일 가상 스레드로 결과 큐 소비</div></div>
+        <div class="row"><div class="k">근거</div><div class="v">저장 로직의 순서 가정을 보존하면서 long-poll 중 OS 스레드 미점유</div></div>
+        <div class="row alt"><div class="k">버린 대안</div><div class="v">멀티 컨슈머 — 처리량은 늘지만 순서 보장이 깨짐</div></div>
+      </div>
+    </div>
+    <h3>실패 · 엣지 처리</h3>
+    <div class="callouts">
+      <div class="callout"><div class="ic">!</div><div><b>poison 메시지</b><span>계약 위반(파싱 불가) 메시지는 즉시 ack·삭제해 무한 재시도를 차단합니다.</span></div></div>
+      <div class="callout"><div class="ic">↻</div><div><b>일시 실패 재처리</b><span>일시적 실패는 ack를 보류해 SQS visibility timeout 후 다시 가시화되어 재처리됩니다. (DLQ는 미구성 — 개선 여지)</span></div></div>
+    </div>
+    <div class="collab"><div>🤝</div><div><b>협업</b> — 큐에서 꺼낸 작업의 실제 스코어링·이미지 생성은 AI 서버(문지영), 추천 결과를 쓰는 조회 API는 이혜연이 담당합니다.</div></div>
+  </section>
+
+  <section class="psec" id="p2">
+    <div class="ix">2</div>
+    <h2>반복 조회 부하를 캐시로 덜어내기</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>옷장·코디 목록처럼 자주 열리는 화면이 매번 DB를 때리면 부하가 쌓입니다.</b></div>
+    <p class="body">자주 조회되는 목록을 Redis에 짧게 캐싱해 DB 쿼리를 제거했습니다. 반면 S3 presigned 뷰 URL은 인스턴스 로컬 Caffeine에 캐싱했는데, URL에 AWS 타임스탬프 서명이 박혀 인스턴스 간 공유가 의미 없기 때문입니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>Redis 목록 캐시</td><td class="val">옷장·코디목록·코디상세 10분</td><td>날씨요약 10분 · 기상청예보 4h</td></tr>
+      <tr><td>뷰 URL 캐시</td><td class="val">Caffeine 55분 / 2만 건</td><td>presigned GET 2시간</td></tr>
+      <tr><td>커넥션 풀</td><td class="val">HikariCP max 9</td><td>max-lifetime 10분</td></tr>
+    </tbody></table>
+    <h3>설계 트레이드오프</h3>
+    <div class="adrwrap"><div class="adr">
+      <div class="t">뷰 URL은 Redis가 아닌 인스턴스 로컬 Caffeine</div>
+      <div class="row"><div class="k">결정</div><div class="v">presigned GET URL을 Caffeine에 로컬 캐싱</div></div>
+      <div class="row"><div class="k">근거</div><div class="v">URL에 인스턴스 무관한 시간 서명이 박혀 공유 캐시의 이점이 없음</div></div>
+      <div class="row alt"><div class="k">버린 대안</div><div class="v">Redis 공유 캐시 — 네트워크·직렬화 비용만 추가</div></div>
+    </div></div>
+  </section>
+
+  <section class="psec" id="p3">
+    <div class="ix">3</div>
+    <h2>운영 문제를 메트릭·알림으로 먼저 잡기</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>장애를 사용자 신고로 알게 되면 늦습니다. API·DB 상태를 상시 계측해 임계 초과를 자동으로 알려야 했습니다.</b></div>
+    <p class="body">AOP로 계층별 실행 시간을 커스텀 메트릭(<code>app_operation_seconds</code>)으로 노출하고, Prometheus가 15초 간격으로 스크랩, Grafana 대시보드로 가시화합니다. p95 지연·5xx 비율·DB 커넥션 대기에 알림 규칙을 걸어 임계 초과 시 경보가 울립니다.</p>
+    <h3>메트릭</h3>
+    <table class="spec"><thead><tr><th>메트릭</th><th>태그 / 내용</th><th>비고</th></tr></thead><tbody>
+      <tr><td>app_operation_seconds</td><td class="val">endpoint·layer·operation·result</td><td>커스텀 · 계층별 실행 시간</td></tr>
+      <tr><td>app_db_query_candidate_seconds</td><td class="val">class·method</td><td>느린 쿼리 후보</td></tr>
+      <tr><td>http.server.requests</td><td class="val">p95·p99 히스토그램</td><td>Spring 기본</td></tr>
+    </tbody></table>
+    <h3>알림 임계값</h3>
+    <table class="spec"><thead><tr><th>알림</th><th>조건</th><th>심각도</th></tr></thead><tbody>
+      <tr><td>ApiHighP95Latency</td><td class="val">p95 &gt; 1.5s · 5분</td><td>warning</td></tr>
+      <tr><td>ApiHigh5xxRatio</td><td class="val">5xx &gt; 5% · 5분</td><td>critical</td></tr>
+      <tr><td>DbConnectionPendingHigh</td><td class="val">대기 커넥션 &gt; 10 · 3분</td><td>warning</td></tr>
+      <tr><td>느린 요청 / 쿼리</td><td class="val">1000ms / 300ms</td><td>로깅 경고 임계</td></tr>
+    </tbody></table>
+  </section>
+
+  <section class="psec" id="p4">
+    <div class="ix">4</div>
+    <h2>이메일 인증 — 안전한 가입 흐름</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>이메일 인증코드는 무차별 시도·스팸 발송에 노출되기 쉽습니다. 검증과 함께 레이트리밋이 필요했습니다.</b></div>
+    <p class="body">6자리 코드를 발급하고 만료·시도 횟수·재발송 간격·전역 발송량에 제한을 둬, 무차별 대입과 발송 남용을 막았습니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>코드</td><td class="val">6자리 · TTL 5분</td><td>SecureRandom</td></tr>
+      <tr><td>시도 제한</td><td class="val">최대 5회</td><td>초과 시 폐기</td></tr>
+      <tr><td>발송 제한</td><td class="val">재발송 60s · 분당 30건</td><td>스팸 방지</td></tr>
+    </tbody></table>
+  </section>
+
+  <div class="pnav">
+    <a href="index.html#team">← 팀 전체</a>
+    <a href="member-kyungbae.html">김경배 · Frontend·Meshy →</a>
+  </div>
+</div>
+
+<footer><div class="foot"><span>© 2026 STICKER · S14P31A408</span><span><a href="index.html#team">← 팀 전체 보기</a></span></div></footer>
+</body>
+</html>

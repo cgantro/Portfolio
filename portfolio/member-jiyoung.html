@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>문지영 · AI 엔지니어 — STICKER 기술 포트폴리오</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="member.css">
+</head>
+<body style="--accent:var(--ai)">
+
+<header>
+  <div class="bar">
+    <a href="index.html" class="logo"><span class="dot">✦</span> STICKER <small>· 기술 포트폴리오</small></a>
+    <a href="index.html#team" class="back">← 팀 전체</a>
+  </div>
+</header>
+
+<section class="phero">
+  <div class="wrap">
+    <div class="phead">
+      <div class="avatar"><img src="assets/profile/jiyoung.jpg" alt="문지영" onerror="if(this.src.endsWith('.jpg')){this.src=this.src.slice(0,-4)+'.png'}else{this.remove()}">지</div>
+      <div>
+        <div class="nm">문지영</div>
+        <div class="role">AI 엔지니어 · 추천/생성 파이프라인 전담</div>
+      </div>
+    </div>
+    <p class="bio">FastAPI AI 서버를 단독으로 맡아, "오늘 뭐 입지"를 푸는 추천 알고리즘과 코디 이미지 생성 파이프라인을 설계했습니다. 옷의 어울림과 날씨 적합도를 점수로 정의하고, 자연어 명령을 추천 조건으로 번역하는 부분을 담당했습니다.</p>
+    <div class="chips"><span class="chip"><i class="devicon-fastapi-plain colored"></i>FastAPI</span><span class="chip">FashionCLIP</span><span class="chip"><i class="devicon-numpy-plain colored"></i>numpy</span><span class="chip">OpenAI 호환 LLM</span><span class="chip">rembg</span><span class="chip"><i class="devicon-amazonwebservices-plain-wordmark colored"></i>boto3 · SQS</span></div>
+  </div>
+</section>
+
+<div class="wrap">
+
+  <!-- P1 cohesion -->
+  <section class="psec" id="p1">
+    <div class="ix">1</div>
+    <h2>"이 옷들이 서로 어울리는가"를 숫자로 정의하기</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>추천이 설득력을 가지려면 옷 조합의 '어울림'을 사람 감각이 아니라 일관된 점수로 만들어야 했습니다.</b></div>
+    <p class="body">패션 특화 임베딩 모델 <b>FashionCLIP</b>으로 옷마다 특징 벡터를 뽑고, 한 코디 안 아이템들의 쌍별 코사인 유사도 평균을 '조합 점수(cohesion)'로 정의했습니다. 임베딩을 L2 정규화한 뒤 행렬곱으로 한 번에 계산해 비용을 줄였고, 아이템이 부족하거나 캐시에 없으면 추천을 왜곡하지 않도록 중립값으로 폴백합니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>임베딩</td><td class="val">FashionCLIP ViT-B/32 · 512차원</td><td>모델 리비전 SHA 고정</td></tr>
+      <tr><td>유사도</td><td class="val">L2 정규화 후 코사인 (행렬곱)</td><td>상삼각 평균, numpy 벡터화</td></tr>
+      <tr><td>대상 카테고리</td><td class="val">TOP·BOTTOM·OUTER·ONEPIECE·SHOES·LEGWEAR</td><td>가방·모자 등 AUX 제외</td></tr>
+      <tr><td>폴백</td><td class="val">중립 0.5</td><td>아이템 2개 미만 / 캐시 미스</td></tr>
+    </tbody></table>
+    <h3>설계 트레이드오프</h3>
+    <div class="adrwrap"><div class="adr">
+      <div class="t">규칙 기반이 아닌 임베딩 단독으로 어울림 산정</div>
+      <div class="row"><div class="k">결정</div><div class="v">색·패턴 규칙 가중치를 0으로 두고 FashionCLIP 임베딩 코사인만 사용</div></div>
+      <div class="row"><div class="k">근거</div><div class="v">손으로 짠 규칙보다 학습된 임베딩이 시각적 어울림을 직접 포착, 규칙 튜닝 부담 제거</div></div>
+      <div class="row alt"><div class="k">버린 대안</div><div class="v">규칙+임베딩 혼합(α 블렌딩) — 가중치 튜닝이 복잡하고 효과 불명확</div></div>
+    </div></div>
+  </section>
+
+  <!-- P2 warmth + final -->
+  <section class="psec" id="p2">
+    <div class="ix">2</div>
+    <h2>날씨를 점수에 녹이고, 6개 항목을 가중합으로</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>같은 옷이라도 날씨에 따라 적절함이 다릅니다. 어울림·보온·격식 같은 서로 다른 기준을 하나의 추천 점수로 합쳐야 했습니다.</b></div>
+    <p class="body">기온을 레벨로 나눠 '기대 보온값' 룩업 테이블을 만들고, 낮 최고기온·아침 최저기온 두 커버리지를 가중 합산했습니다. 추운 날일수록 최저기온 쪽 비중을 높여(0.45/0.55 → 0.35/0.65) 체감 불편을 줄였습니다. 최종 점수는 보온·어울림·격식·스타일·활동·주의 6개 항목의 가중합(합 100)으로, 상황(비·격식·활동·스타일)에 따라 가중치를 동적으로 재조정합니다.</p>
+    <div class="figure">
+      <svg viewBox="0 0 600 142" role="img" aria-label="추천 점수 가중치 분포">
+        <text x="24" y="20" font-size="12.5" font-weight="800" fill="#1A1320">최종 점수 = 6개 항목 가중합 (합 100)</text>
+        <rect x="24" y="34" width="176.6" height="44" fill="#5B8DEF"/><rect x="200.6" y="34" width="110.4" height="44" fill="#9B5DE5"/><rect x="311" y="34" width="82.8" height="44" fill="#FF6B8A"/><rect x="393.8" y="34" width="82.8" height="44" fill="#FF3F73"/><rect x="476.6" y="34" width="55.2" height="44" fill="#22B8A0"/><rect x="531.8" y="34" width="44.2" height="44" fill="#F59E0B"/>
+        <text x="112" y="61" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">보온 32</text><text x="255" y="61" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">어울림 20</text><text x="352" y="61" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">격식 15</text><text x="435" y="61" text-anchor="middle" font-size="10" font-weight="700" fill="#fff">스타일 15</text><text x="504" y="61" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">활동 10</text><text x="554" y="61" text-anchor="middle" font-size="9.5" font-weight="700" fill="#fff">주의 8</text>
+        <text x="300" y="102" text-anchor="middle" font-size="11" fill="#6B6470">상황(비·격식·활동·스타일)에 따라 가중치를 동적으로 재조정</text>
+        <text x="300" y="126" text-anchor="middle" font-size="10.5" fill="#9A3412">임계 페널티 — 격식 레벨 폭 ≥4 후보 탈락 · 비비드/패턴 과다 각 −10 (최대 −20)</text>
+      </svg>
+    </div>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>보온 커버리지</td><td class="val">기온 레벨 룩업 + max/min 가중</td><td>기본 0.45/0.55 · 추울수록 0.35/0.65</td></tr>
+      <tr><td>열 보정</td><td class="val">WARMER/COOLER ±1 레벨</td><td>기대 테이블 시프트</td></tr>
+      <tr><td>가중치(합 100)</td><td class="val">보온32·어울림20·격식15·스타일15·활동10·주의8</td><td>상황별 동적</td></tr>
+      <tr><td>임계 페널티</td><td class="val">격식폭 ≥4 탈락 · 각 −10 (cap −20)</td><td>비비드 ≥4·패턴 ≥3·커버리지 &lt;0.35</td></tr>
+    </tbody></table>
+  </section>
+
+  <!-- P3 LLM -->
+  <section class="psec" id="p3">
+    <div class="ix">3</div>
+    <h2>자유로운 말을 코디 조건으로 번역하기</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>"오늘 면접 있어" 같은 자유 발화를 추천 엔진이 결정적으로 소비할 수 있는 구조로 바꿔야 했습니다.</b></div>
+    <p class="body">LLM(gpt-4o-mini, OpenAI 호환 게이트웨이)으로 자연어를 정해진 enum과 override가 있는 구조화 출력으로 파싱했습니다. 짧은 호출 예산(타임아웃 5초·재시도 1회)을 둬, 실패하면 즉시 메뉴 기본값으로 폴백해 사용자 체감 지연을 막습니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>모델 · 예산</td><td class="val">gpt-4o-mini · timeout 5s · retry 1</td><td>OpenAI 호환 게이트웨이</td></tr>
+      <tr><td>출력 스키마</td><td class="val">contextTag/styleTag enum + override</td><td>Pydantic · keywords · itemConstraints</td></tr>
+      <tr><td>파싱 실패</td><td class="val">None → 기본값 폴백</td><td>LLM 미사용으로 진행</td></tr>
+    </tbody></table>
+    <h3>설계 트레이드오프</h3>
+    <div class="adrwrap"><div class="adr">
+      <div class="t">자유 발화를 LLM으로 enum 구조화</div>
+      <div class="row"><div class="k">결정</div><div class="v">자연어를 정해진 enum·override로 변환해 엔진이 결정적으로 소비</div></div>
+      <div class="row"><div class="k">근거</div><div class="v">표현이 제각각인 자연어를 키워드 규칙으로 받으면 다양성을 못 따라감</div></div>
+      <div class="row alt"><div class="k">버린 대안</div><div class="v">키워드 규칙 매칭 — 동의어·맥락 처리에 한계</div></div>
+    </div></div>
+  </section>
+
+  <!-- P4 image gen -->
+  <section class="psec" id="p4">
+    <div class="ix">4</div>
+    <h2>코디 이미지를 2단계로 합성하기</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>상황 보정 전후 이미지가 따로 노는 느낌 없이, 같은 코디가 자연스럽게 이어져 보여야 했습니다.</b></div>
+    <p class="body">먼저 코디 이미지를 만들고, 그 원본을 바탕으로 상황 장면을 덧입히는 2단계 합성 구조를 만들었습니다. 같은 base에서 출발하기 때문에 보정 전후가 일관됩니다. 결과 이미지는 4:5로 center-crop하고, rembg(U2Net)로 투명 배경을 만든 뒤 그린 디스필로 가장자리 색번짐을 잡습니다.</p>
+    <div class="figure">
+      <svg viewBox="0 0 640 114" role="img" aria-label="음성에서 결과까지의 2단계 합성 흐름">
+        <defs><marker id="vg" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#94A3B8"/></marker><marker id="vp" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L8,4 L0,8 z" fill="#E8295E"/></marker></defs>
+        <rect x="8" y="18" width="104" height="52" rx="12" fill="#FFF1F5" stroke="#FF3F73" stroke-width="2"/><text x="60" y="48" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1A1320">🎙️ 음성</text>
+        <rect x="136" y="18" width="104" height="52" rx="12" fill="#F5EEFB" stroke="#9B5DE5" stroke-width="2"/><text x="188" y="42" text-anchor="middle" font-size="12" font-weight="700" fill="#1A1320">조건 변환</text><text x="188" y="60" text-anchor="middle" font-size="9.5" fill="#6B6470">LLM</text>
+        <rect x="264" y="18" width="104" height="52" rx="12" fill="#FFF6E8" stroke="#F59E0B" stroke-width="2"/><text x="316" y="48" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1320">① 코디 이미지</text>
+        <rect x="392" y="18" width="104" height="52" rx="12" fill="#FFF6E8" stroke="#F59E0B" stroke-width="2"/><text x="444" y="48" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1A1320">② +상황 합성</text>
+        <rect x="520" y="18" width="104" height="52" rx="12" fill="#E8F8F4" stroke="#22B8A0" stroke-width="2"/><text x="572" y="48" text-anchor="middle" font-size="12.5" font-weight="700" fill="#1A1320">결과</text>
+        <line x1="112" y1="44" x2="134" y2="44" stroke="#94A3B8" stroke-width="1.6" marker-end="url(#vg)"/><line x1="240" y1="44" x2="262" y2="44" stroke="#94A3B8" stroke-width="1.6" marker-end="url(#vg)"/><line x1="368" y1="44" x2="390" y2="44" stroke="#E8295E" stroke-width="2.4" marker-end="url(#vp)"/><line x1="496" y1="44" x2="518" y2="44" stroke="#94A3B8" stroke-width="1.6" marker-end="url(#vg)"/>
+        <text x="320" y="106" text-anchor="middle" font-size="10.5" fill="#6B6470">같은 원본 코디에 상황을 덧입혀 — 보정 전후가 자연스럽게 이어집니다</text>
+      </svg>
+    </div>
+    <h3>실패 · 엣지 처리</h3>
+    <div class="callouts">
+      <div class="callout"><div class="ic">✓</div><div><b>부분 성공</b><span>2단계 중 2번째 합성이 실패해도 1단계 코디 preview는 반환합니다 — 이미지가 아예 비는 일이 없습니다.</span></div></div>
+      <div class="callout"><div class="ic">i</div><div><b>콜드 스타트</b><span>rembg는 첫 호출이 느려 앱 부팅 시 warmup으로 모델을 미리 올려둡니다.</span></div></div>
+    </div>
+  </section>
+
+  <!-- P5 SQS consumer -->
+  <section class="psec" id="p5">
+    <div class="ix">5</div>
+    <h2>백엔드와 큐로만 연결되는 비동기 처리</h2>
+    <div class="problem-box"><span class="q">풀어야 했던 문제</span><b>무거운 AI 연산이 백엔드 요청을 막지 않으면서, 실패한 작업이 큐를 막지 않아야 했습니다.</b></div>
+    <p class="body">AI 서버는 SQS 큐를 long-polling으로 소비하고 결과를 다시 결과 큐로 회신합니다. 계약 위반 메시지는 즉시 삭제해 poison loop를 막고, 처리 실패는 FAILED 결과로 회신해 백엔드가 사용자에게 상태를 전달하게 했습니다.</p>
+    <h3>계약 · 수치</h3>
+    <table class="spec"><thead><tr><th>항목</th><th>값</th><th>비고</th></tr></thead><tbody>
+      <tr><td>폴링</td><td class="val">long-poll 20s · 최대 10건</td><td>boto3</td></tr>
+      <tr><td>실패 처리</td><td class="val">FAILED 결과 회신 · 메시지 삭제</td><td>무한 재시도 차단</td></tr>
+      <tr><td>병렬 생성</td><td class="val">ThreadPoolExecutor</td><td>코디 후보 동시 이미지 생성</td></tr>
+    </tbody></table>
+    <div class="collab"><div>🤝</div><div><b>협업</b> — 큐 메시지 계약(jobType·jobId)과 결과 수신은 백엔드(홍윤표)의 SQS 발행/소비와 맞물립니다. ENUM·DTO 양식은 이혜연과 통일했습니다.</div></div>
+  </section>
+
+  <div class="pnav">
+    <a href="member-kyungbae.html">← 김경배 · Frontend·Meshy</a>
+    <a href="member-hyeyeon.html">이혜연 · Backend 도메인 →</a>
+  </div>
+</div>
+
+<footer><div class="foot"><span>© 2026 STICKER · S14P31A408</span><span><a href="index.html#team">← 팀 전체 보기</a></span></div></footer>
+</body>
+</html>
