@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
 import styles from "./MobileHeader.module.css";
 
@@ -7,7 +8,9 @@ export default function MobileHeader({ meta, sections, activeSection }) {
   return (
     <>
       <header className={styles.header}>
-        <div className={styles.name}>{meta.name}</div>
+        <Link to="/" className={styles.name}>
+          {meta.name}
+        </Link>
         <button className={styles.menuBtn} onClick={() => setOpen(!open)} aria-label="메뉴">
           <span className={styles.menuLine} />
           <span className={styles.menuLine} />

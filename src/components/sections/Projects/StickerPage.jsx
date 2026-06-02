@@ -1,13 +1,11 @@
 import styles from "./ProjectPage.module.css";
 import {
   ArchitectureBlock,
-  CopyCard,
-  DesignConsiderationPanel,
   EvidenceList,
-  FactCard,
   FlowGrid,
   HeroCard,
-  LinkGroup,
+  PlainCopy,
+  PlainFacts,
   ProjectSection,
   RetrospectivePanel,
   SummaryCard,
@@ -16,8 +14,6 @@ import {
 } from "./ProjectPageBlocks";
 
 export default function StickerPage({ project, detailPage, links }) {
-  const referenceLinks = detailPage.links ?? [];
-
   return (
     <>
       <HeroCard project={project} detailPage={detailPage} links={links} />
@@ -29,8 +25,8 @@ export default function StickerPage({ project, detailPage, links }) {
         lead="STICKER는 내 옷을 디지털 자산으로 정리하고, 매일의 추천과 조정을 운영 가능한 백엔드 흐름으로 연결하는 데 초점을 맞춘 서비스입니다."
       >
         <div className={styles.splitBoard}>
-          <CopyCard title="서비스 맥락" paragraphs={detailPage.context.body} />
-          <FactCard title="핵심 범위" facts={detailPage.context.facts} />
+          <PlainCopy paragraphs={detailPage.context.body} />
+          <PlainFacts facts={detailPage.context.facts} />
         </div>
       </ProjectSection>
 
@@ -71,6 +67,7 @@ export default function StickerPage({ project, detailPage, links }) {
             />
           ))}
         </div>
+        <TechChoicePanel items={project.techChoice} />
       </ProjectSection>
 
       <ProjectSection
@@ -79,7 +76,7 @@ export default function StickerPage({ project, detailPage, links }) {
         title="운영 중복과 실패 분기를 먼저 통제했습니다"
         lead="AI 파이프라인은 성공 경로보다 실패와 중복이 더 빨리 문제를 만듭니다. 그래서 큐 소비, 중복 추천, 토큰 재사용 방어를 우선 정리했습니다."
       >
-        <div className={styles.issueGrid}>
+        <div className={styles.stackLayout}>
           {project.problems.map((item, index) => (
             <TroubleshootingCard
               key={item.title}
@@ -96,11 +93,7 @@ export default function StickerPage({ project, detailPage, links }) {
         title="정량 수치보다 운영 정책과 코드 경계를 근거로 남겼습니다"
         lead="측정된 latency 통계가 없는 영역은 억지 숫자를 만들지 않고, TTL, 락, ACK 전략, 토큰 정책 같은 설계 기준으로 설명을 묶었습니다."
       >
-        <div className={styles.evidenceBoard}>
-          <EvidenceList notes={detailPage.evidenceNotes} />
-          <DesignConsiderationPanel title="운영 설계 기준" items={detailPage.designConsiderations} />
-          <TechChoicePanel items={project.techChoice} />
-        </div>
+        <EvidenceList notes={detailPage.evidenceNotes} />
       </ProjectSection>
 
       <ProjectSection
@@ -109,20 +102,8 @@ export default function StickerPage({ project, detailPage, links }) {
         title="다음 단계는 수치 계측과 추천 설명 가능성 강화입니다"
         lead="운영 경계는 먼저 정리됐고, 이제는 추천 품질과 성능을 더 직접적인 지표로 남기는 단계가 필요합니다."
       >
-        <div className={styles.stackLayout}>
-          <RetrospectivePanel items={project.retrospective} />
-          {referenceLinks.length > 0 ? (
-            <article className={styles.surfaceCard}>
-              <h3 className={styles.cardTitle}>참고 자료</h3>
-              <p className={styles.bodyText}>
-                팀 포트폴리오 원본은 보조 레퍼런스로만 유지했습니다. 본문 설명의 기준은 저장소와 구현 구조입니다.
-              </p>
-              <LinkGroup links={referenceLinks} />
-            </article>
-          ) : null}
-        </div>
+        <RetrospectivePanel items={project.retrospective} />
       </ProjectSection>
     </>
   );
 }
-

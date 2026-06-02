@@ -1,11 +1,10 @@
 import styles from "./ProjectPage.module.css";
 import {
   ArchitectureBlock,
-  CopyCard,
-  DesignConsiderationPanel,
   EvidenceList,
-  FactCard,
   HeroCard,
+  PlainCopy,
+  PlainFacts,
   ProjectSection,
   RetrospectivePanel,
   SummaryCard,
@@ -25,8 +24,8 @@ export default function MausoleumPage({ project, detailPage, links }) {
         lead="영묘는 멀티플레이 규칙과 음성 채팅이 서로 다른 제약을 갖기 때문에, 둘을 한 구조에 섞지 않는 것이 핵심이었습니다."
       >
         <div className={styles.splitBoard}>
-          <CopyCard title="프로젝트 배경" paragraphs={detailPage.context.body} />
-          <FactCard title="중심 과제" facts={detailPage.context.facts} />
+          <PlainCopy paragraphs={detailPage.context.body} />
+          <PlainFacts facts={detailPage.context.facts} />
         </div>
       </ProjectSection>
 
@@ -38,7 +37,7 @@ export default function MausoleumPage({ project, detailPage, links }) {
       >
         <div className={styles.splitBoard}>
           <ArchitectureBlock notes={detailPage.architectureNotes} />
-          <DesignConsiderationPanel title="설계 판단" items={detailPage.designConsiderations} />
+          <SummaryCard title="프로젝트에서 정리한 핵심" items={project.highlights} />
         </div>
       </ProjectSection>
 
@@ -66,6 +65,7 @@ export default function MausoleumPage({ project, detailPage, links }) {
             items={project.implementations[2].items}
             snippet={project.implementations[2].snippet}
           />
+          <TechChoicePanel items={project.techChoice} />
         </div>
       </ProjectSection>
 
@@ -75,13 +75,9 @@ export default function MausoleumPage({ project, detailPage, links }) {
         title="지연, 규칙, 상태 전환을 같은 방식으로 풀지 않았습니다"
         lead="보이스와 게임 규칙이 서로 다른 종류의 문제였기 때문에, 전송 경로 분리와 상태 전략 분리를 각각 따로 다뤘습니다."
       >
-        <div className={styles.issueGrid}>
-          {project.problems.map((item, index) => (
-            <TroubleshootingCard
-              key={item.title}
-              item={item}
-              consideration={detailPage.designConsiderations[index]}
-            />
+        <div className={styles.stackLayout}>
+          {project.problems.map((item) => (
+            <TroubleshootingCard key={item.title} item={item} />
           ))}
         </div>
       </ProjectSection>
@@ -92,10 +88,7 @@ export default function MausoleumPage({ project, detailPage, links }) {
         title="측정 수치보다 구조 선택의 이유를 명확히 남겼습니다"
         lead="이 프로젝트는 저지연 음성, 상태 규칙, 서버 분리의 판단 근거를 소스 구조와 README 기준으로 정리하는 것이 더 중요했습니다."
       >
-        <div className={styles.evidenceBoard}>
-          <EvidenceList notes={detailPage.evidenceNotes} />
-          <TechChoicePanel items={project.techChoice} />
-        </div>
+        <EvidenceList notes={detailPage.evidenceNotes} />
       </ProjectSection>
 
       <ProjectSection
@@ -109,4 +102,3 @@ export default function MausoleumPage({ project, detailPage, links }) {
     </>
   );
 }
-

@@ -1,11 +1,10 @@
 import styles from "./ProjectPage.module.css";
 import {
   ArchitectureBlock,
-  CopyCard,
-  DesignConsiderationPanel,
   EvidenceList,
-  FactCard,
   HeroCard,
+  PlainCopy,
+  PlainFacts,
   ProjectSection,
   RetrospectivePanel,
   SimpleTable,
@@ -27,8 +26,8 @@ export default function AutowingPage({ project, detailPage, links }) {
         lead="오토잉카에서 중요한 것은 화려한 주행 데모보다 운영 절차를 설명 가능한 시스템으로 만드는 일이었습니다."
       >
         <div className={styles.splitBoard}>
-          <CopyCard title="도메인 맥락" paragraphs={detailPage.context.body} />
-          <FactCard title="이번에 정리한 축" facts={detailPage.context.facts} />
+          <PlainCopy paragraphs={detailPage.context.body} />
+          <PlainFacts facts={detailPage.context.facts} />
         </div>
       </ProjectSection>
 
@@ -40,23 +39,7 @@ export default function AutowingPage({ project, detailPage, links }) {
       >
         <div className={styles.splitBoard}>
           <ArchitectureBlock notes={detailPage.architectureNotes} />
-          <DesignConsiderationPanel
-            title="역할 분리 기준"
-            items={[
-              {
-                title: "관제실",
-                body: "운영 UI와 현장 확인을 맡고, 승인과 개입의 근거를 남기는 쪽에 집중합니다.",
-              },
-              {
-                title: "백엔드",
-                body: "명령 라우팅, 상태 수집, 경로 계산과 재탐색 판단을 담당합니다.",
-              },
-              {
-                title: "차량과 AI 모듈",
-                body: "온보드 주행 제약과 도킹/수신호 같은 현장 판단을 로컬에 가까운 계층에서 다룹니다.",
-              },
-            ]}
-          />
+          <SummaryCard title="프로젝트에서 정리한 핵심" items={project.highlights} />
         </div>
       </ProjectSection>
 
@@ -110,6 +93,7 @@ export default function AutowingPage({ project, detailPage, links }) {
               />
             ))}
           </div>
+          <TechChoicePanel items={project.techChoice} />
         </div>
       </ProjectSection>
 
@@ -119,14 +103,18 @@ export default function AutowingPage({ project, detailPage, links }) {
         title="운영 시나리오와 시스템 응답이 어긋나지 않게 정리했습니다"
         lead="이 프로젝트의 문제 해결은 알고리즘 자체보다도 실제 현장 절차와 시스템 반응을 한 문맥으로 맞추는 데 가까웠습니다."
       >
-        <div className={styles.issueGrid}>
-          {project.problems.map((item, index) => (
-            <TroubleshootingCard
-              key={item.title}
-              item={item}
-              consideration={detailPage.designConsiderations[index]}
-            />
+        <div className={styles.stackLayout}>
+          {project.problems.map((item) => (
+            <TroubleshootingCard key={item.title} item={item} />
           ))}
+          <article className={styles.surfaceCard}>
+            <h3 className={styles.cardTitle}>{detailPage.designMetrics.title}</h3>
+            <SimpleTable
+              headers={detailPage.designMetrics.headers}
+              rows={detailPage.designMetrics.rows}
+            />
+            <p className={styles.tableNote}>{detailPage.designMetrics.note}</p>
+          </article>
         </div>
       </ProjectSection>
 
@@ -136,18 +124,7 @@ export default function AutowingPage({ project, detailPage, links }) {
         title="성과 수치보다 설계 기준과 운영 파라미터를 근거로 남겼습니다"
         lead="오토잉카는 화려한 벤치마크보다 운영 파라미터를 어떤 제약 아래서 잡았는지가 더 중요했습니다."
       >
-        <div className={styles.evidenceBoard}>
-          <article className={styles.surfaceCard}>
-            <h3 className={styles.cardTitle}>{detailPage.designMetrics.title}</h3>
-            <SimpleTable
-              headers={detailPage.designMetrics.headers}
-              rows={detailPage.designMetrics.rows}
-            />
-            <p className={styles.tableNote}>{detailPage.designMetrics.note}</p>
-          </article>
-          <EvidenceList notes={detailPage.evidenceNotes} />
-          <TechChoicePanel items={project.techChoice} />
-        </div>
+        <EvidenceList notes={detailPage.evidenceNotes} />
       </ProjectSection>
 
       <ProjectSection
@@ -161,4 +138,3 @@ export default function AutowingPage({ project, detailPage, links }) {
     </>
   );
 }
-

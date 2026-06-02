@@ -4,9 +4,6 @@ import styles from "./ProjectPage.module.css";
 export function PageHeader({ previousProject, nextProject }) {
   return (
     <header className={styles.pageHeader}>
-      <Link className={styles.backLink} to="/">
-        메인 페이지로 돌아가기
-      </Link>
       <nav className={styles.pager} aria-label="project pager">
         {previousProject ? (
           <Link className={styles.pagerLink} to={`/projects/${previousProject.id}`}>
@@ -38,11 +35,6 @@ export function HeroCard({ project, detailPage, links }) {
         />
       </div>
       <div className={styles.heroBody}>
-        <div className={styles.heroActions}>
-          <Link className={styles.backLink} to="/">
-            메인 페이지로 돌아가기
-          </Link>
-        </div>
         <span className={styles.heroEyebrow}>{detailPage.hero.eyebrow}</span>
         <span className={styles.projectNumber}>{project.num}</span>
         <h1 className={styles.heroTitle}>{detailPage.hero.title}</h1>
@@ -110,6 +102,18 @@ export function CopyCard({ title, paragraphs }) {
   );
 }
 
+export function PlainCopy({ paragraphs }) {
+  return (
+    <div className={styles.plainCopy}>
+      {paragraphs.map((paragraph) => (
+        <p key={paragraph} className={styles.bodyText}>
+          {paragraph}
+        </p>
+      ))}
+    </div>
+  );
+}
+
 export function FactCard({ title, facts }) {
   return (
     <aside className={styles.factCard}>
@@ -126,21 +130,16 @@ export function FactCard({ title, facts }) {
   );
 }
 
-export function NotesCard({ title, items, ordered = false }) {
-  const ListTag = ordered ? "ol" : "ul";
-
+export function PlainFacts({ facts }) {
   return (
-    <article className={styles.surfaceCard}>
-      {title ? <h3 className={styles.cardTitle}>{title}</h3> : null}
-      <ListTag className={styles.bulletList}>
-        {items.map((item) => (
-          <li key={item} className={styles.bulletItem}>
-            <span className={styles.bulletMark}>{ordered ? "0" : "•"}</span>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ListTag>
-    </article>
+    <dl className={styles.plainFacts}>
+      {facts.map((fact) => (
+        <div key={`${fact.label}-${fact.value}`} className={styles.plainFactRow}>
+          <dt className={styles.factLabel}>{fact.label}</dt>
+          <dd className={styles.factValue}>{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -175,14 +174,21 @@ export function SnippetBlock({ snippet }) {
     return (
       <div className={styles.snippetBlock}>
         <p className={styles.infoKicker}>{snippet.label}</p>
-        <ul className={styles.visualList}>
-          {snippet.content.map((node) => (
-            <li key={node.id} className={styles.visualItem}>
-              <span className={styles.visualName}>{node.name}</span>
-              <p className={styles.visualDesc}>{node.desc}</p>
-            </li>
+        <div className={styles.visualFlow}>
+          {snippet.content.map((node, index) => (
+            <div key={node.id} className={styles.visualFlowUnit}>
+              <div className={styles.visualItem}>
+                <span className={styles.visualName}>{node.name}</span>
+                <p className={styles.visualDesc}>{node.desc}</p>
+              </div>
+              {index < snippet.content.length - 1 ? (
+                <span className={styles.visualArrow} aria-hidden="true">
+                  →
+                </span>
+              ) : null}
+            </div>
           ))}
-        </ul>
+        </div>
       </div>
     );
   }
@@ -205,6 +211,19 @@ export function TroubleshootingCard({ item, consideration }) {
         <h3 className={styles.cardTitle}>{item.title}</h3>
         <p className={styles.bodyText}>{item.problem}</p>
       </div>
+      {item.process?.length ? (
+        <div className={styles.issueSection}>
+          <span className={styles.issueLabel}>해결 과정</span>
+          <ol className={styles.processList}>
+            {item.process.map((step, index) => (
+              <li key={step} className={styles.processItem}>
+                <span className={styles.processIndex}>{String(index + 1).padStart(2, "0")}</span>
+                <span>{step}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
       <div className={styles.issueSection}>
         <span className={styles.issueLabel}>해결</span>
         <p className={styles.bodyText}>{item.solution}</p>
@@ -251,7 +270,7 @@ export function SimpleTable({ headers, rows, compact = false }) {
 
 export function EvidenceList({ notes }) {
   return (
-    <article className={styles.surfaceCard}>
+    <div className={styles.plainStack}>
       <h3 className={styles.cardTitle}>정리 기준</h3>
       <ul className={styles.bulletList}>
         {notes.map((note) => (
@@ -261,7 +280,7 @@ export function EvidenceList({ notes }) {
           </li>
         ))}
       </ul>
-    </article>
+    </div>
   );
 }
 
@@ -289,14 +308,24 @@ export function TechChoicePanel({ items }) {
         {items.map((item) => (
           <div key={item.tech} className={styles.choiceCard}>
             <h4 className={styles.choiceName}>{item.tech}</h4>
-            <ul className={styles.bulletList}>
-              {item.reason.map((reason) => (
-                <li key={reason} className={styles.bulletItem}>
-                  <span className={styles.bulletMark}>•</span>
-                  <span>{reason}</span>
-                </li>
-              ))}
-            </ul>
+            <dl className={styles.specList}>
+              <div className={styles.specRow}>
+                <dt className={styles.specLabel}>특징</dt>
+                <dd className={styles.specValue}>{item.feature}</dd>
+              </div>
+              <div className={styles.specRow}>
+                <dt className={styles.specLabel}>장점</dt>
+                <dd className={styles.specValue}>{item.advantage}</dd>
+              </div>
+              <div className={styles.specRow}>
+                <dt className={styles.specLabel}>비교</dt>
+                <dd className={styles.specValue}>{item.comparison}</dd>
+              </div>
+              <div className={styles.specRow}>
+                <dt className={styles.specLabel}>선정 이유</dt>
+                <dd className={styles.specValue}>{item.decision}</dd>
+              </div>
+            </dl>
           </div>
         ))}
       </div>
@@ -404,19 +433,28 @@ export function ArchitectureBlock({ notes }) {
 
 export function buildProjectLinks(project, detailPage) {
   const links = [];
+  const seen = new Set();
+
+  const pushLink = (link) => {
+    const key = `${link.label}::${link.href}`;
+    if (seen.has(key)) {
+      return;
+    }
+    seen.add(key);
+    links.push(link);
+  };
 
   if (project.links?.github) {
-    links.push({ label: "GitHub", href: project.links.github });
+    pushLink({ label: "GitHub", href: project.links.github });
   }
 
   if (project.links?.demo) {
-    links.push({ label: "Demo", href: project.links.demo });
+    pushLink({ label: "Demo", href: project.links.demo });
   }
 
   if (Array.isArray(detailPage.links)) {
-    detailPage.links.forEach((link) => links.push(link));
+    detailPage.links.forEach((link) => pushLink(link));
   }
 
   return links;
 }
-
