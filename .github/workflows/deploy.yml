@@ -16,6 +16,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      PAGES_ADMIN_TOKEN: ${{ secrets.PAGES_ADMIN_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,10 +35,10 @@ jobs:
         run: npm run build
 
       - name: Configure Pages bootstrap
-        if: ${{ secrets.PAGES_ADMIN_TOKEN != '' }}
+        if: ${{ env.PAGES_ADMIN_TOKEN != '' }}
         uses: actions/configure-pages@v5
         with:
-          token: ${{ secrets.PAGES_ADMIN_TOKEN }}
+          token: ${{ env.PAGES_ADMIN_TOKEN }}
           enablement: true
 
       - name: Prepare GitHub Pages files
