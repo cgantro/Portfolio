@@ -2,67 +2,74 @@ import { Link } from "react-router-dom";
 import styles from "./ProjectPage.module.css";
 
 export function PageHeader({ previousProject, nextProject }) {
+  if (!previousProject && !nextProject) {
+    return null;
+  }
+
   return (
     <header className={styles.pageHeader}>
       <nav className={styles.pager} aria-label="project pager">
         {previousProject ? (
           <Link className={styles.pagerLink} to={`/projects/${previousProject.id}`}>
-            이전 · {previousProject.title}
+            Previous Project · {previousProject.title}
           </Link>
-        ) : (
-          <span className={styles.pagerGhost}>이전 프로젝트 없음</span>
-        )}
+        ) : null}
         {nextProject ? (
           <Link className={styles.pagerLink} to={`/projects/${nextProject.id}`}>
-            다음 · {nextProject.title}
+            Next Project · {nextProject.title}
           </Link>
-        ) : (
-          <span className={styles.pagerGhost}>다음 프로젝트 없음</span>
-        )}
+        ) : null}
       </nav>
     </header>
   );
 }
 
 export function HeroCard({ project, detailPage, links }) {
+  const coreStack = project.stack?.slice(0, 4) ?? [];
+
   return (
     <section className={styles.hero}>
+      <div className={styles.heroBody}>
+        <span className={styles.heroEyebrow}>{detailPage.hero.eyebrow}</span>
+        <span className={styles.projectNumber}>{project.num}</span>
+        <h1 className={styles.heroTitle}>{detailPage.hero.title}</h1>
+        <div className={styles.heroMeta}>
+          <span>{project.period}</span>
+          <span className={styles.metaDivider}>/</span>
+          <span>{project.team}</span>
+          <span className={styles.metaDivider}>/</span>
+          <span>{project.stack.slice(0, 2).join(" · ")}</span>
+        </div>
+        {detailPage.hero.subtitle ? (
+          <p className={styles.heroSummary}>{detailPage.hero.subtitle}</p>
+        ) : null}
+        {detailPage.hero.description ? (
+          <p className={styles.heroDescription}>{detailPage.hero.description}</p>
+        ) : null}
+        {detailPage.context?.body?.length ? (
+          <div className={styles.plainCopy}>
+            {detailPage.context.body.map((paragraph) => (
+              <p key={paragraph} className={styles.bodyText}>
+                {paragraph}
+              </p>
+            ))}
+          </div>
+        ) : null}
+        <div className={styles.tagRow}>
+          {coreStack.map((tag) => (
+            <span key={tag} className={styles.tagChip}>
+              {tag}
+            </span>
+          ))}
+        </div>
+        {links.length > 0 ? <LinkGroup links={links} /> : null}
+      </div>
       <div className={styles.heroMediaCard}>
         <img
           className={styles.heroMedia}
           src={detailPage.hero.media.src}
           alt={detailPage.hero.media.alt}
         />
-      </div>
-      <div className={styles.heroBody}>
-        <span className={styles.heroEyebrow}>{detailPage.hero.eyebrow}</span>
-        <span className={styles.projectNumber}>{project.num}</span>
-        <h1 className={styles.heroTitle}>{detailPage.hero.title}</h1>
-        <p className={styles.heroSubtitle}>{detailPage.hero.subtitle}</p>
-        <p className={styles.heroDescription}>{detailPage.hero.description}</p>
-        <div className={styles.heroMeta}>
-          <span>{project.period}</span>
-          <span className={styles.metaDivider}>·</span>
-          <span>{project.team}</span>
-          <span className={styles.metaDivider}>·</span>
-          <span>{project.role}</span>
-        </div>
-        <div className={styles.tagRow}>
-          {project.stack.map((tag) => (
-            <span key={tag} className={styles.tagChip}>
-              {tag}
-            </span>
-          ))}
-        </div>
-        <ul className={styles.highlightList}>
-          {project.highlights.map((item) => (
-            <li key={item} className={styles.highlightItem}>
-              <span className={styles.bulletMark}>›</span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-        {links.length > 0 ? <LinkGroup links={links} /> : null}
       </div>
     </section>
   );
@@ -87,21 +94,6 @@ export function SectionHeader({ label, title, lead }) {
   );
 }
 
-export function CopyCard({ title, paragraphs }) {
-  return (
-    <article className={styles.surfaceCard}>
-      {title ? <h3 className={styles.cardTitle}>{title}</h3> : null}
-      <div className={styles.copyStack}>
-        {paragraphs.map((paragraph) => (
-          <p key={paragraph} className={styles.bodyText}>
-            {paragraph}
-          </p>
-        ))}
-      </div>
-    </article>
-  );
-}
-
 export function PlainCopy({ paragraphs }) {
   return (
     <div className={styles.plainCopy}>
@@ -111,22 +103,6 @@ export function PlainCopy({ paragraphs }) {
         </p>
       ))}
     </div>
-  );
-}
-
-export function FactCard({ title, facts }) {
-  return (
-    <aside className={styles.factCard}>
-      {title ? <h3 className={styles.cardTitle}>{title}</h3> : null}
-      <dl className={styles.factList}>
-        {facts.map((fact) => (
-          <div key={`${fact.label}-${fact.value}`} className={styles.factRow}>
-            <dt className={styles.factLabel}>{fact.label}</dt>
-            <dd className={styles.factValue}>{fact.value}</dd>
-          </div>
-        ))}
-      </dl>
-    </aside>
   );
 }
 
@@ -143,20 +119,72 @@ export function PlainFacts({ facts }) {
   );
 }
 
-export function SummaryCard({ title, items, snippet }) {
+export function OverviewInfoGrid({ items }) {
+  return (
+    <div className={styles.overviewInfoGrid}>
+      {items.map((item) => (
+        <article key={item.label} className={styles.overviewInfoCard}>
+          <span className={styles.specLabel}>{item.label}</span>
+          {Array.isArray(item.values) ? (
+            <ul className={styles.overviewValueList}>
+              {item.values.map((value) => (
+                <li key={value} className={styles.overviewValueChip}>
+                  {value}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className={styles.sectionGuideText}>{item.value}</p>
+          )}
+        </article>
+      ))}
+    </div>
+  );
+}
+
+export function FactPanel({ title, facts, snippet }) {
   return (
     <article className={styles.surfaceCard}>
       <h3 className={styles.cardTitle}>{title}</h3>
+      <PlainFacts facts={facts} />
+      {snippet ? <SnippetBlock snippet={snippet} /> : null}
+    </article>
+  );
+}
+
+export function SummaryCard({ title, items, snippet, className = "" }) {
+  return (
+    <article className={[styles.surfaceCard, className].filter(Boolean).join(" ")}>
+      <h3 className={styles.cardTitle}>{title}</h3>
+      {snippet?.type === "visual" ? <SnippetBlock snippet={snippet} /> : null}
       <ul className={styles.bulletList}>
         {items.map((item) => (
           <li key={item} className={styles.bulletItem}>
-            <span className={styles.bulletMark}>•</span>
+            <span className={styles.bulletMark}>+</span>
             <span>{item}</span>
           </li>
         ))}
       </ul>
-      {snippet ? <SnippetBlock snippet={snippet} /> : null}
+      {snippet && snippet.type !== "visual" ? <SnippetBlock snippet={snippet} /> : null}
     </article>
+  );
+}
+
+export function SummaryCardGrid({ items }) {
+  return (
+    <div className={styles.altBoard}>
+      {items.map((item, index) => (
+        <SummaryCard
+          key={item.title}
+          className={
+            items.length % 2 === 1 && index === items.length - 1 ? styles.fullSpanCard : ""
+          }
+          title={item.title}
+          items={item.items}
+          snippet={item.snippet}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -166,6 +194,7 @@ export function SnippetBlock({ snippet }) {
       <div className={styles.snippetBlock}>
         <p className={styles.infoKicker}>{snippet.label}</p>
         <SimpleTable headers={snippet.headers} rows={snippet.rows} compact />
+        {snippet.note ? <p className={styles.bodyText}>{snippet.note}</p> : null}
       </div>
     );
   }
@@ -183,12 +212,13 @@ export function SnippetBlock({ snippet }) {
               </div>
               {index < snippet.content.length - 1 ? (
                 <span className={styles.visualArrow} aria-hidden="true">
-                  →
+                  -&gt;
                 </span>
               ) : null}
             </div>
           ))}
         </div>
+        {snippet.note ? <p className={styles.bodyText}>{snippet.note}</p> : null}
       </div>
     );
   }
@@ -199,11 +229,20 @@ export function SnippetBlock({ snippet }) {
       <pre className={styles.codeBlock}>
         <code>{snippet.code}</code>
       </pre>
+      {snippet.note ? <p className={styles.bodyText}>{snippet.note}</p> : null}
     </div>
   );
 }
 
 export function TroubleshootingCard({ item, consideration }) {
+  const causeText = item.background ?? item.unexpected ?? "";
+  const hasMoreDetails = Boolean(
+    (item.unexpected && item.unexpected !== causeText) ||
+      item.process?.length ||
+      item.decision ||
+      consideration,
+  );
+
   return (
     <article className={styles.issueCard}>
       <div className={styles.issueSection}>
@@ -211,17 +250,10 @@ export function TroubleshootingCard({ item, consideration }) {
         <h3 className={styles.cardTitle}>{item.title}</h3>
         <p className={styles.bodyText}>{item.problem}</p>
       </div>
-      {item.process?.length ? (
+      {causeText ? (
         <div className={styles.issueSection}>
-          <span className={styles.issueLabel}>해결 과정</span>
-          <ol className={styles.processList}>
-            {item.process.map((step, index) => (
-              <li key={step} className={styles.processItem}>
-                <span className={styles.processIndex}>{String(index + 1).padStart(2, "0")}</span>
-                <span>{step}</span>
-              </li>
-            ))}
-          </ol>
+          <span className={styles.issueLabel}>원인</span>
+          <p className={styles.bodyText}>{causeText}</p>
         </div>
       ) : null}
       <div className={styles.issueSection}>
@@ -232,14 +264,79 @@ export function TroubleshootingCard({ item, consideration }) {
         <span className={styles.issueLabel}>결과</span>
         <p className={styles.bodyText}>{item.result}</p>
       </div>
-      {consideration ? (
-        <div className={styles.issueSection}>
-          <span className={styles.issueLabel}>판단 기준</span>
-          <p className={styles.bodyText}>{consideration.body}</p>
-        </div>
+      {hasMoreDetails ? (
+        <details className={styles.issueDetails}>
+          <summary className={styles.issueDetailsSummary}>판단 과정 더보기</summary>
+          <div className={styles.issueDetailsBody}>
+            {item.unexpected && item.unexpected !== causeText ? (
+              <div className={styles.issueSection}>
+                <span className={styles.issueLabel}>예상과 달랐던 점</span>
+                <p className={styles.bodyText}>{item.unexpected}</p>
+              </div>
+            ) : null}
+            {item.process?.length ? (
+              <div className={styles.issueSection}>
+                <span className={styles.issueLabel}>판단 과정</span>
+                <ol className={styles.processList}>
+                  {item.process.map((step, index) => (
+                    <li key={step} className={styles.processItem}>
+                      <span className={styles.processIndex}>{String(index + 1).padStart(2, "0")}</span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+            ) : null}
+            {item.decision ? (
+              <div className={styles.issueSection}>
+                <span className={styles.issueLabel}>채택 이유</span>
+                <p className={styles.bodyText}>{item.decision}</p>
+              </div>
+            ) : null}
+            {consideration ? (
+              <div className={styles.issueSection}>
+                <span className={styles.issueLabel}>판단 기준</span>
+                <p className={styles.bodyText}>{consideration.body}</p>
+              </div>
+            ) : null}
+          </div>
+        </details>
       ) : null}
       {item.snippet ? <SnippetBlock snippet={item.snippet} /> : null}
     </article>
+  );
+}
+
+export function CompactTroubleshootingGrid({ items }) {
+  if (!items?.length) {
+    return null;
+  }
+
+  return (
+    <div className={styles.issueSummaryWrap}>
+      <div className={styles.issueSummaryHeader}>
+        <h3 className={styles.cardTitle}>추가 이슈</h3>
+      </div>
+      <div className={styles.issueSummaryGrid}>
+        {items.map((item) => (
+          <article key={item.title} className={styles.issueMiniCard}>
+            <h4 className={styles.choiceName}>{item.title}</h4>
+            <div className={styles.issueMiniBlock}>
+              <span className={styles.specLabel}>문제</span>
+              <p className={`${styles.bodyText} ${styles.issueMiniText}`}>{item.problem}</p>
+            </div>
+            <div className={styles.issueMiniBlock}>
+              <span className={styles.specLabel}>해결</span>
+              <p className={`${styles.bodyText} ${styles.issueMiniText}`}>{item.solution}</p>
+            </div>
+            <div className={styles.issueMiniResult}>
+              <span className={styles.specLabel}>결과</span>
+              <p className={styles.bodyText}>{item.result}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -268,62 +365,23 @@ export function SimpleTable({ headers, rows, compact = false }) {
   );
 }
 
-export function EvidenceList({ notes }) {
-  return (
-    <div className={styles.plainStack}>
-      <h3 className={styles.cardTitle}>정리 기준</h3>
-      <ul className={styles.bulletList}>
-        {notes.map((note) => (
-          <li key={note} className={styles.bulletItem}>
-            <span className={styles.bulletMark}>•</span>
-            <span>{note}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export function DesignConsiderationPanel({ title = "설계 판단", items }) {
-  return (
-    <article className={styles.surfaceCard}>
-      <h3 className={styles.cardTitle}>{title}</h3>
-      <div className={styles.choiceStack}>
-        {items.map((item) => (
-          <div key={item.title} className={styles.choiceCard}>
-            <h4 className={styles.choiceName}>{item.title}</h4>
-            <p className={styles.bodyText}>{item.body}</p>
-          </div>
-        ))}
-      </div>
-    </article>
-  );
-}
-
 export function TechChoicePanel({ items }) {
   return (
     <article className={styles.surfaceCard}>
-      <h3 className={styles.cardTitle}>기술 선택 이유</h3>
+      <h3 className={styles.cardTitle}>핵심 기술 선택</h3>
       <div className={styles.choiceStack}>
         {items.map((item) => (
           <div key={item.tech} className={styles.choiceCard}>
             <h4 className={styles.choiceName}>{item.tech}</h4>
+            <p className={styles.bodyText}>{item.decision}</p>
             <dl className={styles.specList}>
               <div className={styles.specRow}>
-                <dt className={styles.specLabel}>특징</dt>
-                <dd className={styles.specValue}>{item.feature}</dd>
-              </div>
-              <div className={styles.specRow}>
-                <dt className={styles.specLabel}>장점</dt>
+                <dt className={styles.specLabel}>강점</dt>
                 <dd className={styles.specValue}>{item.advantage}</dd>
               </div>
               <div className={styles.specRow}>
-                <dt className={styles.specLabel}>비교</dt>
+                <dt className={styles.specLabel}>트레이드오프</dt>
                 <dd className={styles.specValue}>{item.comparison}</dd>
-              </div>
-              <div className={styles.specRow}>
-                <dt className={styles.specLabel}>선정 이유</dt>
-                <dd className={styles.specValue}>{item.decision}</dd>
               </div>
             </dl>
           </div>
@@ -338,7 +396,6 @@ export function RetrospectivePanel({ items }) {
     <div className={styles.retroGrid}>
       {items.map((item) => (
         <article key={item.point} className={styles.retroCard}>
-          <span className={styles.issueLabel}>회고</span>
           <h3 className={styles.retroPoint}>{item.point}</h3>
           <p className={styles.bodyText}>{item.detail}</p>
         </article>
@@ -402,7 +459,7 @@ export function TimelinePanel({ title, items }) {
               <ul className={styles.bulletList}>
                 {item.items.map((point) => (
                   <li key={point} className={styles.bulletItem}>
-                    <span className={styles.bulletMark}>•</span>
+                    <span className={styles.bulletMark}>+</span>
                     <span>{point}</span>
                   </li>
                 ))}
@@ -422,7 +479,7 @@ export function ArchitectureBlock({ notes }) {
       <ul className={styles.bulletList}>
         {notes.map((note) => (
           <li key={note} className={styles.bulletItem}>
-            <span className={styles.bulletMark}>•</span>
+            <span className={styles.bulletMark}>+</span>
             <span>{note}</span>
           </li>
         ))}
@@ -440,6 +497,7 @@ export function buildProjectLinks(project, detailPage) {
     if (seen.has(key)) {
       return;
     }
+
     seen.add(key);
     links.push(link);
   };

@@ -10,10 +10,10 @@ import useActiveSection from "../hooks/useActiveSection";
 import { meta, projects, subProjects, timeline, activities, techStack } from "../data";
 
 const SECTIONS = [
+  { id: "projects", label: "주력 프로젝트" },
+  { id: "techstack", label: "기술 스택" },
   { id: "timeline", label: "이력" },
   { id: "activities", label: "대외활동" },
-  { id: "techstack", label: "기술 스택" },
-  { id: "projects", label: "주력 프로젝트" },
   { id: "sub-projects", label: "서브 프로젝트" },
   { id: "contact", label: "연락처" },
 ];
@@ -24,20 +24,20 @@ export default function HomePage() {
 
   return (
     <AppShell meta={meta} sections={SECTIONS} activeSection={activeSection}>
-      <section id="timeline" className="section">
-        <Timeline items={timeline} />
-      </section>
-
-      <section id="activities" className="section">
-        <Activities items={activities} />
+      <section id="projects" className="section">
+        <Projects projects={projects} />
       </section>
 
       <section id="techstack" className="section">
         <TechStack stack={techStack} />
       </section>
 
-      <section id="projects" className="section">
-        <Projects projects={projects} />
+      <section id="timeline" className="section">
+        <Timeline items={timeline} />
+      </section>
+
+      <section id="activities" className="section">
+        <Activities items={activities} />
       </section>
 
       <section id="sub-projects" className="section">

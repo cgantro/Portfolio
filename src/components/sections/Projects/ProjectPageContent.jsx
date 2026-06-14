@@ -11,8 +11,8 @@ export default function ProjectPageContent({ project, previousProject, nextProje
 
   return (
     <div className={styles.page}>
-      <PageHeader previousProject={previousProject} nextProject={nextProject} />
       <ProjectBody project={project} detailPage={detailPage} links={links} />
+      <PageHeader previousProject={previousProject} nextProject={nextProject} />
     </div>
   );
 }

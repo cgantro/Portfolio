@@ -17,6 +17,7 @@ export default function Sidebar({ meta, sections, activeSection }) {
           {meta.name}
         </Link>
         <div className={styles.role}>{meta.role}</div>
+        <p className={styles.tagline}>{meta.tagline}</p>
       </div>
 
       {/* Nav */}
