@@ -27,7 +27,7 @@ export default function AutowingPage({ project, detailPage, links }) {
     },
     {
       label: "재계산 기준",
-      value: "현재 위치와 진행 문맥을 기준으로 그래프 탐색 시작점을 다시 잡아 설명 가능한 경로 추천 흐름을 유지했습니다.",
+      value: "현재 위치와 마지막 통과 노드를 기준으로 그래프 탐색 시작점을 다시 잡아 설명 가능한 경로 추천 흐름을 유지했습니다.",
     },
   ];
 
@@ -37,7 +37,6 @@ export default function AutowingPage({ project, detailPage, links }) {
 
       <ProjectSection id="implementation" label="구현" title="구현 내용">
         <div className={styles.stackLayout}>
-          <FactPanel title="상태 전이 흐름" snippet={project.implementations[0].snippet} facts={[]} />
           <TimelinePanel
             title="프로토타입 시나리오 흐름"
             items={[
@@ -58,7 +57,7 @@ export default function AutowingPage({ project, detailPage, links }) {
               {
                 title: "차단 구간과 우회",
                 items: [
-                  "주행 도중 길이 막히면 현재 위치와 이미 진행된 구간을 기준으로 우회 경로를 다시 계산합니다.",
+                  "주행 도중 길이 막히면 현재 위치와 마지막 통과 노드를 기준으로 우회 경로를 다시 계산합니다.",
                   "운영자는 영상 피드로 현장 상황을 확인하고, 시스템은 재계산된 경로를 기준으로 이후 상태 흐름을 갱신합니다.",
                 ],
               },
@@ -96,7 +95,7 @@ export default function AutowingPage({ project, detailPage, links }) {
       <ProjectSection id="architecture" label="아키텍처" title="구조 설계">
         <div className={styles.splitBoard}>
           <ArchitectureBlock notes={detailPage.architectureNotes} />
-          <FactPanel title="설계 판단" facts={architectureFacts} snippet={project.implementations[1].snippet} />
+          <FactPanel title="설계 판단" facts={architectureFacts} />
         </div>
       </ProjectSection>
 

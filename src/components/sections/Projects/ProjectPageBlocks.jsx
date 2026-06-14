@@ -152,19 +152,32 @@ export function FactPanel({ title, facts, snippet }) {
   );
 }
 
-export function SummaryCard({ title, items, snippet, className = "" }) {
+export function SummaryCard({ title, summary, details, items, snippet, className = "" }) {
+  const hasNarrative = Boolean(summary || details?.length);
+
   return (
     <article className={[styles.surfaceCard, className].filter(Boolean).join(" ")}>
       <h3 className={styles.cardTitle}>{title}</h3>
+      {summary ? <p className={styles.summaryLead}>{summary}</p> : null}
       {snippet?.type === "visual" ? <SnippetBlock snippet={snippet} /> : null}
-      <ul className={styles.bulletList}>
-        {items.map((item) => (
-          <li key={item} className={styles.bulletItem}>
-            <span className={styles.bulletMark}>+</span>
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
+      {hasNarrative ? (
+        <div className={styles.detailStack}>
+          {details?.map((detail) => (
+            <p key={detail} className={styles.bodyText}>
+              {detail}
+            </p>
+          ))}
+        </div>
+      ) : (
+        <ul className={styles.bulletList}>
+          {items.map((item) => (
+            <li key={item} className={styles.bulletItem}>
+              <span className={styles.bulletMark}>+</span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       {snippet && snippet.type !== "visual" ? <SnippetBlock snippet={snippet} /> : null}
     </article>
   );
@@ -180,6 +193,8 @@ export function SummaryCardGrid({ items }) {
             items.length % 2 === 1 && index === items.length - 1 ? styles.fullSpanCard : ""
           }
           title={item.title}
+          summary={item.summary}
+          details={item.details}
           items={item.items}
           snippet={item.snippet}
         />

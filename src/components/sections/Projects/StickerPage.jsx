@@ -35,7 +35,6 @@ export default function StickerPage({ project, detailPage, links }) {
       <HeroCard project={project} detailPage={detailPage} links={links} />
 
       <ProjectSection id="implementation" label="구현" title="구현 내용">
-        <FactPanel title="비동기 추천 흐름" snippet={project.implementations[0].snippet} facts={[]} />
         <FlowGrid items={detailPage.userFlows} />
         <SummaryCardGrid items={project.implementations} />
         <TechChoicePanel items={project.techChoice} />
@@ -57,11 +56,7 @@ export default function StickerPage({ project, detailPage, links }) {
       <ProjectSection id="architecture" label="아키텍처" title="구조 설계">
         <div className={styles.splitBoard}>
           <ArchitectureBlock notes={detailPage.architectureNotes} />
-          <FactPanel
-            title="설계 판단"
-            facts={architectureFacts}
-            snippet={project.implementations[0].snippet}
-          />
+          <FactPanel title="설계 판단" facts={architectureFacts} />
         </div>
       </ProjectSection>
 
