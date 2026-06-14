@@ -37,8 +37,8 @@ export default function ProjectPage() {
         "--project-accent-soft": detailPage.theme.accentSoft,
         "--project-surface": detailPage.theme.surface,
         "--project-glow": detailPage.theme.glow,
-        "--content-max": "1600px",
-        "--main-gutter": "20px",
+        "--content-max": "1360px",
+        "--main-gutter": "24px",
       }}
     >
       <ProjectPageContent

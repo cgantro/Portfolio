@@ -8,8 +8,8 @@ import mausoleumFallback from "../../asset/project-mausoleum-cover.png";
 import stickerCover    from "../../asset/Sticker.png";
 
 export const coverImages = {
-  robotpal:  { src: robotpalDemo,   fallback: robotpalFallback },
-  autowing:  { src: autowingCover,  fallback: autowingFallback },
-  mausoleum: { src: mausoleumCover, fallback: mausoleumFallback },
-  sticker:   { src: stickerCover,   fallback: null },
+  robotpal:  { src: robotpalDemo,   fallback: robotpalFallback, fit: "contain" },
+  autowing:  { src: autowingCover,  fallback: autowingFallback, fit: "contain" },
+  mausoleum: { src: mausoleumCover, fallback: mausoleumFallback, fit: "contain" },
+  sticker:   { src: stickerCover,   fallback: null, fit: "cover" },
 };

@@ -1,112 +1,87 @@
 import styles from "./ProjectPage.module.css";
 import {
   ArchitectureBlock,
-  EvidenceList,
+  CompactTroubleshootingGrid,
+  FactPanel,
   HeroCard,
-  PlainCopy,
-  PlainFacts,
   ProjectSection,
   RetrospectivePanel,
   SimpleTable,
-  SummaryCard,
+  SummaryCardGrid,
   TechChoicePanel,
   TimelinePanel,
   TroubleshootingCard,
 } from "./ProjectPageBlocks";
 
 export default function AutowingPage({ project, detailPage, links }) {
+  const mainProblems = project.problems.slice(0, 2);
+  const extraProblems = project.problems.slice(2);
+  const architectureFacts = [
+    {
+      label: "책임 분리",
+      value: "관리 UI는 상태 확인과 모니터링에 집중하고, 백엔드는 명령 라우팅과 인메모리 맵 그래프 기반 경로 추천을 맡도록 분리했습니다.",
+    },
+    {
+      label: "채널 분리",
+      value: "명령과 상태는 MQTT, 현장 영상은 WebRTC 기반 스트림으로 분리해 서로 다른 지연 기준이 한 흐름에 묶이지 않게 했습니다.",
+    },
+    {
+      label: "재계산 기준",
+      value: "현재 위치와 진행 문맥을 기준으로 그래프 탐색 시작점을 다시 잡아 설명 가능한 경로 추천 흐름을 유지했습니다.",
+    },
+  ];
+
   return (
     <>
       <HeroCard project={project} detailPage={detailPage} links={links} />
 
-      <ProjectSection
-        id="overview"
-        label="개요"
-        title="공항 지상 이동 절차를 시스템 구조로 바꾸는 작업"
-        lead="오토잉카에서 중요한 것은 화려한 주행 데모보다 운영 절차를 설명 가능한 시스템으로 만드는 일이었습니다."
-      >
-        <div className={styles.splitBoard}>
-          <PlainCopy paragraphs={detailPage.context.body} />
-          <PlainFacts facts={detailPage.context.facts} />
-        </div>
-      </ProjectSection>
-
-      <ProjectSection
-        id="architecture"
-        label="아키텍처"
-        title="명령, 영상, 경로 계획의 책임을 분리한 관제 구조"
-        lead="같은 실시간 데이터라도 지연 허용치와 장애 양상이 다르기 때문에 채널을 나누고, 관제실과 차량 사이의 책임을 구분했습니다."
-      >
-        <div className={styles.splitBoard}>
-          <ArchitectureBlock notes={detailPage.architectureNotes} />
-          <SummaryCard title="프로젝트에서 정리한 핵심" items={project.highlights} />
-        </div>
-      </ProjectSection>
-
-      <ProjectSection
-        id="implementation"
-        label="구현"
-        title="운영 절차를 명령 채널과 상태 전이로 정리했습니다"
-        lead="장식용 타일 대신 실제 시나리오 기준으로 관제 흐름을 단계별로 설명하고, 각 구현 축을 별도 카드로 나눴습니다."
-      >
+      <ProjectSection id="implementation" label="구현" title="구현 내용">
         <div className={styles.stackLayout}>
+          <FactPanel title="상태 전이 흐름" snippet={project.implementations[0].snippet} facts={[]} />
           <TimelinePanel
-            title="운영 시나리오"
+            title="프로토타입 시나리오 흐름"
             items={[
               {
-                title: "도킹과 연결 요청",
+                title: "차량 연결 요청",
                 items: [
-                  "기체와 토잉카 연결 요청이 올라오면 관제실이 상태와 승인을 확인합니다.",
-                  "마샬러 신호와 도킹 AI 보조 판단은 출발 가능 여부의 입력으로 사용됩니다.",
+                  "기체와 견인차 연결 요청이 오면 관리 화면 상태와 차량 상태를 먼저 확인합니다.",
+                  "마커 신호와 AI 서버에서 전달된 보조 판단 결과는 출발 가능 여부를 결정하는 입력으로 사용합니다.",
                 ],
               },
               {
-                title: "미션 경로 생성과 출발 승인",
+                title: "미션 경로 생성과 출발 확인",
                 items: [
                   "백엔드는 미션 경로를 계산하고, 차량은 현재 위치와 상태를 MQTT 경로로 보고합니다.",
-                  "기장 승인 또는 수신호 조건이 충족되어야 실제 출발 상태로 전이됩니다.",
+                  "운영자가 승인하거나 출발 조건이 충족돼야 실제 출발 상태로 전이됩니다.",
                 ],
               },
               {
                 title: "차단 구간과 우회",
                 items: [
-                  "활주로 일부가 막히면 마지막 통과 노드와 현재 위치를 기준으로 우회 경로를 다시 계산합니다.",
-                  "관제실은 영상 피드로 현장 상황을 확인하고, 차량은 재계산된 경로를 따릅니다.",
+                  "주행 도중 길이 막히면 현재 위치와 이미 진행된 구간을 기준으로 우회 경로를 다시 계산합니다.",
+                  "운영자는 영상 피드로 현장 상황을 확인하고, 시스템은 재계산된 경로를 기준으로 이후 상태 흐름을 갱신합니다.",
                 ],
               },
               {
                 title: "비상 정지와 복귀",
                 items: [
-                  "긴급 정지 후에는 수동 개입, 승인 해제, 재출발 조건을 다시 통과해야 합니다.",
+                  "긴급 정지 이후에는 수동 개입, 확인 해제, 재출발 조건을 다시 통과해야 합니다.",
                   "이 흐름을 상태 전이 기준으로 분리해 제어와 운영 설명이 어긋나지 않게 했습니다.",
                 ],
               },
             ]}
           />
-          <div className={styles.splitBoard}>
-            {project.implementations.map((item) => (
-              <SummaryCard
-                key={item.title}
-                title={item.title}
-                items={item.items}
-                snippet={item.snippet}
-              />
-            ))}
-          </div>
+          <SummaryCardGrid items={project.implementations} />
           <TechChoicePanel items={project.techChoice} />
         </div>
       </ProjectSection>
 
-      <ProjectSection
-        id="troubleshooting"
-        label="트러블슈팅"
-        title="운영 시나리오와 시스템 응답이 어긋나지 않게 정리했습니다"
-        lead="이 프로젝트의 문제 해결은 알고리즘 자체보다도 실제 현장 절차와 시스템 반응을 한 문맥으로 맞추는 데 가까웠습니다."
-      >
+      <ProjectSection id="troubleshooting" label="트러블슈팅" title="메인 문제 해결">
         <div className={styles.stackLayout}>
-          {project.problems.map((item) => (
+          {mainProblems.map((item) => (
             <TroubleshootingCard key={item.title} item={item} />
           ))}
+          <CompactTroubleshootingGrid items={extraProblems} />
           <article className={styles.surfaceCard}>
             <h3 className={styles.cardTitle}>{detailPage.designMetrics.title}</h3>
             <SimpleTable
@@ -118,21 +93,14 @@ export default function AutowingPage({ project, detailPage, links }) {
         </div>
       </ProjectSection>
 
-      <ProjectSection
-        id="evidence"
-        label="근거"
-        title="성과 수치보다 설계 기준과 운영 파라미터를 근거로 남겼습니다"
-        lead="오토잉카는 화려한 벤치마크보다 운영 파라미터를 어떤 제약 아래서 잡았는지가 더 중요했습니다."
-      >
-        <EvidenceList notes={detailPage.evidenceNotes} />
+      <ProjectSection id="architecture" label="아키텍처" title="구조 설계">
+        <div className={styles.splitBoard}>
+          <ArchitectureBlock notes={detailPage.architectureNotes} />
+          <FactPanel title="설계 판단" facts={architectureFacts} snippet={project.implementations[1].snippet} />
+        </div>
       </ProjectSection>
 
-      <ProjectSection
-        id="retrospective"
-        label="회고"
-        title="운영 시나리오를 코드 계약으로 더 강하게 고정할 필요가 남았습니다"
-        lead="설명 가능한 관제 구조까지는 정리했지만, 다음 단계에서는 상태 머신과 이벤트 리플레이 수준으로 더 명시화해야 합니다."
-      >
+      <ProjectSection id="retrospective" label="회고" title="회고">
         <RetrospectivePanel items={project.retrospective} />
       </ProjectSection>
     </>

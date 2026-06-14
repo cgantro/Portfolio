@@ -55,6 +55,13 @@
   text-transform: uppercase;
 }
 
+.tagline {
+  margin-top: 8px;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--fg-dim);
+}
+
 /* Nav */
 .nav {
   display: flex;

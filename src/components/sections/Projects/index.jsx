@@ -28,6 +28,7 @@ export default function Projects({ projects }) {
 function BentoCard({ project, onClick }) {
   const { cardStyle, glarePos, onMouseMove, onMouseLeave } = useCardTilt(8);
   const imgs = coverImages[project.id];
+  const [roleSpotlight, problemSpotlight, resultSpotlight] = project.detailPage?.spotlight ?? [];
 
   return (
     <article
@@ -58,6 +59,7 @@ function BentoCard({ project, onClick }) {
           <img
             src={imgs.src}
             alt={project.title}
+            style={{ objectFit: imgs.fit ?? "cover" }}
             onError={(event) => {
               event.currentTarget.onerror = null;
               if (imgs.fallback) {
@@ -79,7 +81,6 @@ function BentoCard({ project, onClick }) {
       <div className={styles.bentoBody}>
         <div className={styles.bentoHeader}>
           <h2 className={styles.title}>{project.title}</h2>
-          <p className={styles.subtitle}>{project.subtitle}</p>
         </div>
 
         <div className={styles.metaRow}>
@@ -88,7 +89,20 @@ function BentoCard({ project, onClick }) {
           <span>{project.team}</span>
         </div>
 
-        <p className={styles.roleText}>{project.role}</p>
+        <div className={styles.signalGrid}>
+          <article className={styles.signalCard}>
+            <span className={styles.signalLabel}>문제</span>
+            <p className={styles.signalValue}>{problemSpotlight?.value ?? project.problems[0]?.title}</p>
+          </article>
+          <article className={styles.signalCard}>
+            <span className={styles.signalLabel}>역할</span>
+            <p className={styles.signalValue}>{roleSpotlight?.value ?? project.role}</p>
+          </article>
+          <article className={styles.signalCard}>
+            <span className={styles.signalLabel}>결과</span>
+            <p className={styles.signalValue}>{resultSpotlight?.value ?? project.highlights[0]}</p>
+          </article>
+        </div>
 
         <div className={styles.bentoTags}>
           {project.stack.slice(0, 4).map((item) => (
@@ -96,17 +110,6 @@ function BentoCard({ project, onClick }) {
           ))}
           {project.stack.length > 4 ? <Tag>+{project.stack.length - 4}</Tag> : null}
         </div>
-
-        <div className={styles.bentoDivider} />
-
-        <ul className={styles.bentoHighlights}>
-          {project.highlights.map((item) => (
-            <li key={item} className={styles.hl}>
-              <span className={styles.arrow}>›</span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
 
         <div className={styles.cta}>
           <span>상세 페이지 보기</span>

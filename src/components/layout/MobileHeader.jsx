@@ -20,6 +20,10 @@ export default function MobileHeader({ meta, sections, activeSection }) {
 
       {open && (
         <nav className={styles.drawer} onClick={() => setOpen(false)}>
+          <div className={styles.intro}>
+            <div className={styles.introRole}>{meta.role}</div>
+            <p className={styles.introTagline}>{meta.tagline}</p>
+          </div>
           {sections.map((s) => (
             <a
               key={s.id}
