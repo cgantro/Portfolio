@@ -17,15 +17,15 @@ export default function MausoleumPage({ project, detailPage, links }) {
   const architectureFacts = [
     {
       label: "책임 분리",
-      value: "보이스 클라이언트는 캡처, 코덱, UDP 전송, 재생 단계로 나눴습니다.",
+      value: "클라이언트는 캡처, 코덱, UDP 전송, 재생 단계로 나누고 서버는 방 단위 처리와 청취 판정을 분리했습니다.",
     },
     {
       label: "데이터 경로",
-      value: "보이스 서버는 roomCode 기준으로 패킷을 워커 큐에 분산했습니다.",
+      value: "roomCode 기준 큐 적재와 방 단위 브로드캐스트 흐름을 따로 둬 보이스 경로를 추적하기 쉽게 만들었습니다.",
     },
     {
       label: "규칙 확장",
-      value: "청취 가능 여부는 생사 상태별 전략으로 분리해 보이스 파이프라인과 게임 규칙을 분리했습니다.",
+      value: "생사 상태별 청취 가능 여부는 전략 레이어에서 바꾸고, 전송 파이프라인은 그대로 유지했습니다.",
     },
   ];
 

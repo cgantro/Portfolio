@@ -18,15 +18,15 @@ export default function StickerPage({ project, detailPage, links }) {
   const architectureFacts = [
     {
       label: "책임 분리",
-      value: "요청 검증과 작업 처리를 분리해 API 응답 경로가 긴 AI 작업에 묶이지 않도록 했습니다.",
+      value: "API 응답 경로, 추천 작업 생성, 결과 저장과 알림 흐름을 나눠 긴 작업이 응답 경로를 점유하지 않게 했습니다.",
     },
     {
       label: "중복 방어",
-      value: "Redis 락은 1차 방어선으로 두고, 결과 저장 단계에서는 jobId 기준 dedup을 한 번 더 걸어 중복 반영을 줄였습니다.",
+      value: "Redis 락으로 작업 시작을 한 번 걸고, 결과 저장 직전에는 jobId/date 기준으로 다시 확인해 중복 반영을 줄였습니다.",
     },
     {
-      label: "일관성 기준",
-      value: "afterCommit 발행, dedup, 메시지 삭제/재처리 분리로 외부 작업 시작 시점과 실패 처리 기준을 명확히 잡았습니다.",
+      label: "재처리 기준",
+      value: "afterCommit 이후 외부 작업 시작, 실패 유형 분리, 토큰 회전 정책을 나눠 운영 흐름을 추적하기 쉽게 했습니다.",
     },
   ];
 
@@ -35,9 +35,11 @@ export default function StickerPage({ project, detailPage, links }) {
       <HeroCard project={project} detailPage={detailPage} links={links} />
 
       <ProjectSection id="implementation" label="구현" title="구현 내용">
-        <FlowGrid items={detailPage.userFlows} />
-        <SummaryCardGrid items={project.implementations} />
-        <TechChoicePanel items={project.techChoice} />
+        <div className={styles.stackLayout}>
+          <SummaryCardGrid items={project.implementations} />
+          <FlowGrid items={detailPage.userFlows} />
+          <TechChoicePanel items={project.techChoice} />
+        </div>
       </ProjectSection>
 
       <ProjectSection id="troubleshooting" label="트러블슈팅" title="메인 문제 해결">
