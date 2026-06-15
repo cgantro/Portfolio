@@ -26,6 +26,7 @@ export function PageHeader({ previousProject, nextProject }) {
 
 export function HeroCard({ project, detailPage, links }) {
   const coreStack = project.stack?.slice(0, 4) ?? [];
+  const contextBody = detailPage.context?.body ?? [];
 
   return (
     <section className={styles.hero}>
@@ -46,9 +47,9 @@ export function HeroCard({ project, detailPage, links }) {
         {detailPage.hero.description ? (
           <p className={styles.heroDescription}>{detailPage.hero.description}</p>
         ) : null}
-        {detailPage.context?.body?.length ? (
+        {contextBody.length ? (
           <div className={styles.plainCopy}>
-            {detailPage.context.body.map((paragraph) => (
+            {contextBody.map((paragraph) => (
               <p key={paragraph} className={styles.bodyText}>
                 {paragraph}
               </p>
@@ -310,7 +311,7 @@ export function TroubleshootingCard({ item, consideration }) {
             ) : null}
             {consideration ? (
               <div className={styles.issueSection}>
-                <span className={styles.issueLabel}>판단 기준</span>
+                <span className={styles.issueLabel}>설계 기준</span>
                 <p className={styles.bodyText}>{consideration.body}</p>
               </div>
             ) : null}
@@ -388,6 +389,7 @@ export function TechChoicePanel({ items }) {
         {items.map((item) => (
           <div key={item.tech} className={styles.choiceCard}>
             <h4 className={styles.choiceName}>{item.tech}</h4>
+            {item.feature ? <p className={styles.choiceFeature}>{item.feature}</p> : null}
             <p className={styles.bodyText}>{item.decision}</p>
             <dl className={styles.specList}>
               <div className={styles.specRow}>
@@ -424,7 +426,7 @@ export function LinkGroup({ links }) {
     <div className={styles.linkGroup}>
       {links.map((link) => (
         <a
-          key={`${link.label}-${link.href}`}
+          key={link.href}
           className={styles.ctaLink}
           href={link.href}
           target="_blank"
@@ -508,12 +510,11 @@ export function buildProjectLinks(project, detailPage) {
   const seen = new Set();
 
   const pushLink = (link) => {
-    const key = `${link.label}::${link.href}`;
-    if (seen.has(key)) {
+    if (!link?.href || seen.has(link.href)) {
       return;
     }
 
-    seen.add(key);
+    seen.add(link.href);
     links.push(link);
   };
 
