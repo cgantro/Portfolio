@@ -159,20 +159,12 @@ const baseProjects = [
     ],
     techChoice: [
       {
-        tech: "OpenGL + PBO",
-        feature: "GPU-CPU readback 병목을 직접 다룰 수 있는 경로",
+        tech: "JPEG",
+        feature: "네트워크 대역폭 절감을 위해 선택함",
         decision:
-          "화면 품질보다 readback 병목을 직접 확인하는 것이 중요했기 때문에 OpenGL과 PBO를 사용해 GPU-CPU 데이터 이동 지점을 명시적으로 제어했습니다.",
-        advantage: "렌더링 이후 어느 지점에서 CPU가 기다리는지 구조적으로 분리해 확인하기 좋았습니다.",
-        comparison: "추상화가 높은 경로보다 readback 병목을 직접 계측하고 조정하기 쉬웠습니다.",
-      },
-      {
-        tech: "JPEG Encoder",
-        feature: "프레임 단위 인코딩 처리량을 비교하기 쉬운 경로",
-        decision:
-          "비디오 파이프라인 완성보다 인코딩 단계 병목을 먼저 분리해 확인하는 것이 목표여서 JPEG Encoder 경로를 선택했습니다.",
+          "비디오 파이프라인 완성보다 인코딩 단계 병목을 먼저 분리해 확인하는 것이 목표여서 JPEG을 선택했습니다.",
         advantage: "워커 수 변화에 따라 인코딩 처리량이 어떻게 달라지는지 비교하기 좋았습니다.",
-        comparison: "H.264/WebRTC 같은 비디오 파이프라인보다 현재 병목을 단순한 단계로 나눠 보기 쉬웠습니다.",
+        comparison: "H.264/WebRTC 같은 비디오 파이프라인보다 구현하기 쉬웠습니다.",
       },
       {
         tech: "Emscripten",
