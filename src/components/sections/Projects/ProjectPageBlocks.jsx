@@ -47,12 +47,44 @@ export function HeroCard({ project, detailPage, links }) {
         {detailPage.hero.description ? (
           <p className={styles.heroDescription}>{detailPage.hero.description}</p>
         ) : null}
+        {project.summary?.length ? (
+          <ul className={styles.bulletList}>
+            {project.summary.map((item) => (
+              <li key={item} className={styles.bulletItem}>
+                <span className={styles.bulletMark}>+</span><span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
         {contextBody.length ? (
           <div className={styles.plainCopy}>
             {contextBody.map((paragraph) => (
               <p key={paragraph} className={styles.bodyText}>
                 {paragraph}
               </p>
+            ))}
+          </div>
+        ) : null}
+        {project.roleItems?.length ? (
+          <article className={styles.surfaceCard}>
+            <p className={styles.infoKicker}>MY ROLE</p>
+            <ul className={styles.bulletList}>
+              {project.roleItems.map((item) => (
+                <li key={item} className={styles.bulletItem}>
+                  <span className={styles.bulletMark}>+</span><span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </article>
+        ) : null}
+        {project.outcomes?.length ? (
+          <div className={styles.outcomeGrid}>
+            {project.outcomes.map((outcome) => (
+              <article key={outcome.label} className={styles.outcomeCard}>
+                <span className={styles.outcomeLabel}>{outcome.label}</span>
+                <strong className={styles.outcomeValue}>{outcome.value}</strong>
+                <span className={styles.outcomeDetail}>{outcome.detail}</span>
+              </article>
             ))}
           </div>
         ) : null}
@@ -66,11 +98,10 @@ export function HeroCard({ project, detailPage, links }) {
         {links.length > 0 ? <LinkGroup links={links} /> : null}
       </div>
       <div className={styles.heroMediaCard}>
-        <img
-          className={styles.heroMedia}
-          src={detailPage.hero.media.src}
-          alt={detailPage.hero.media.alt}
-        />
+        <figure className={styles.heroFigure}>
+          <img className={styles.heroMedia} src={detailPage.hero.media.src} alt={detailPage.hero.media.alt} />
+          {detailPage.hero.media.caption ? <figcaption className={styles.imageCaption}>{detailPage.hero.media.caption}</figcaption> : null}
+        </figure>
       </div>
     </section>
   );
@@ -88,7 +119,6 @@ export function ProjectSection({ id, label, title, lead, children }) {
 export function SectionHeader({ label, title, lead }) {
   return (
     <header className={styles.sectionHeader}>
-      <span className={styles.sectionEyebrow}>{label}</span>
       <h2 className={styles.sectionTitle}>{title}</h2>
       {lead ? <p className={styles.sectionLead}>{lead}</p> : null}
     </header>
@@ -384,26 +414,12 @@ export function SimpleTable({ headers, rows, compact = false }) {
 export function TechChoicePanel({ items }) {
   return (
     <article className={styles.surfaceCard}>
-      <h3 className={styles.cardTitle}>핵심 기술 선택</h3>
-      <div className={styles.choiceStack}>
-        {items.map((item) => (
-          <div key={item.tech} className={styles.choiceCard}>
-            <h4 className={styles.choiceName}>{item.tech}</h4>
-            {item.feature ? <p className={styles.choiceFeature}>{item.feature}</p> : null}
-            <p className={styles.bodyText}>{item.decision}</p>
-            <dl className={styles.specList}>
-              <div className={styles.specRow}>
-                <dt className={styles.specLabel}>강점</dt>
-                <dd className={styles.specValue}>{item.advantage}</dd>
-              </div>
-              <div className={styles.specRow}>
-                <dt className={styles.specLabel}>트레이드오프</dt>
-                <dd className={styles.specValue}>{item.comparison}</dd>
-              </div>
-            </dl>
-          </div>
-        ))}
-      </div>
+      <h3 className={styles.cardTitle}>기술 선택</h3>
+      <SimpleTable
+        headers={["기술", "선택 이유", "제한사항"]}
+        rows={items.map((item) => [item.tech, item.decision, item.comparison])}
+        compact
+      />
     </article>
   );
 }
@@ -414,7 +430,11 @@ export function RetrospectivePanel({ items }) {
       {items.map((item) => (
         <article key={item.point} className={styles.retroCard}>
           <h3 className={styles.retroPoint}>{item.point}</h3>
-          <p className={styles.bodyText}>{item.detail}</p>
+          {item.detail.includes("\n") ? (
+            <ul className={styles.bulletList}>
+              {item.detail.split("\n").map((line) => <li key={line} className={styles.bulletItem}><span className={styles.bulletMark}>+</span><span>{line}</span></li>)}
+            </ul>
+          ) : <p className={styles.bodyText}>{item.detail}</p>}
         </article>
       ))}
     </div>
@@ -492,15 +512,13 @@ export function TimelinePanel({ title, items }) {
 export function ArchitectureBlock({ notes }) {
   return (
     <article className={styles.architectureBlock}>
-      <h3 className={styles.cardTitle}>시스템 구조</h3>
-      <ul className={styles.bulletList}>
-        {notes.map((note) => (
-          <li key={note} className={styles.bulletItem}>
-            <span className={styles.bulletMark}>+</span>
-            <span>{note}</span>
-          </li>
-        ))}
-      </ul>
+      {notes.map((note) =>
+        note.includes("→") ? (
+          <div key={note} className={styles.architectureFlow}>{note}</div>
+        ) : (
+          <p key={note} className={styles.architectureCopy}>{note}</p>
+        ),
+      )}
     </article>
   );
 }
@@ -519,7 +537,7 @@ export function buildProjectLinks(project, detailPage) {
   };
 
   if (project.links?.github) {
-    pushLink({ label: "GitHub", href: project.links.github });
+    pushLink({ label: "Repository", href: project.links.github });
   }
 
   if (project.links?.demo) {

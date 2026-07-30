@@ -5,14 +5,24 @@ const baseProjects = [
     id: "robotpal",
     num: "01",
     title: "RobotPal",
-    subtitle: "rendering, readback, JPEG 인코딩, 전달 단계를 나눠 병목을 확인한 C++ 시뮬레이터",
-    period: "2025.11 - 2025.12",
+    subtitle: "C++ 기반 AGV 시뮬레이터의 카메라 프레임 스트리밍 기능을 개발하고, 렌더링 흐름의 병목을 개선한 프로젝트",
+    period: "2025.11 – 2026.04",
     team: "2인",
-    role: "C++ 런타임 구조 설계 · 스트리밍 파이프라인 분리 · 웹 실행 경로 대응",
-    stack: ["C++17", "OpenGL", "Emscripten", "JPEG Encoder", "PBO"],
+    role: "카메라 프레임 스트리밍 · 네트워크 모듈 · 성능 측정 및 병목 개선",
+    roleItems: ["카메라 프레임 스트리밍 기능 개발", "인코딩·전송 병목 측정 및 개선", "TCP·WebSocket 전송 인터페이스 분리"],
+    metric: "17.6% → 0.8%",
+    metricLabel: "Frame Drop Rate",
+    benchmark: "1,800-frame fixed benchmark",
+    summary: [
+      "카메라 프레임을 캡처해 JPEG로 인코딩하고 외부 클라이언트로 전송했다.",
+      "스트리밍을 켜면 JPEG 인코딩과 전송이 렌더링 프레임을 막았다.",
+      "PBO readback, 작업 큐, 멀티 워커, 프레임 폐기 정책을 적용했다.",
+      "1,800프레임 고정 조건에서 드랍률을 17.6%에서 0.8%로 낮췄다.",
+    ],
+    stack: ["C++17", "CMake", "Qt", "OpenGL", "libjpeg-turbo", "TCP", "WebSocket", "Multithreading", "Emscripten"],
     cover: "/project-robotpal-cover.png",
     highlights: [
-      "readback, JPEG 인코딩, 전달 단계를 분리해 병목 지점을 따로 확인했습니다.",
+      "고정된 1,800프레임 조건에서 프레임 드랍률 17.6%를 확인했습니다.",
       "같은 C++ 코어를 데스크톱과 WebAssembly 실행 경로로 확장했습니다.",
       "워커 수 실험으로 처리량 변화가 실제로 어떻게 달라지는지 비교했습니다.",
     ],
@@ -22,7 +32,7 @@ const baseProjects = [
         summary: "입력 처리, 제어 계산, 렌더링 결과를 같은 런타임 안에서 추적할 수 있도록 C++ 루프를 먼저 정리했습니다.",
         details: [
           "실물 장비 없이도 상위 제어 로직이 어떻게 반응하는지 확인할 수 있도록 시뮬레이션 루프와 제어 계층을 분리했습니다.",
-          "Controller Layer를 따로 두어 상위 조작 로직이 렌더링 루프에 직접 묶이지 않게 했고, 이후 기능 확장 시에도 책임 경계가 유지되도록 구성했습니다.",
+          "Controller Layer를 두어 상위 조작 로직과 렌더링 루프의 호출 경로를 분리했습니다.",
           "이 구조 덕분에 데스크톱 경로와 WebAssembly 경로가 같은 코어 로직을 공유하면서도 실행 환경별 차이는 별도 계층에서 다룰 수 있었습니다.",
         ],
         snippet: {
@@ -116,11 +126,11 @@ const baseProjects = [
           "그래서 인코딩 결과를 큐에 적재하고, 전달 단계는 별도 워커가 소비하도록 바꾸기로 했습니다.",
         ],
         solution:
-          "Queue 기반으로 JPEG 인코딩 결과를 적재하고, Delivery Worker가 별도 흐름에서 전달 단계를 소비하도록 분리했습니다.",
+          "프레임 작업을 큐에 넣고, JPEG 워커가 인코딩한 결과를 전송 경로에서 처리하도록 분리했습니다.",
         decision:
           "압축과 전달 단계를 따로 조정할 수 있어야 워커 수 변화와 처리량 차이를 실험으로 비교할 수 있었기 때문에, 큐 기반 분리가 가장 적합했습니다.",
         result:
-          "동일 벤치마크 조건에서 Single Worker 대비 12 Workers 조건의 APP FPS와 SINK FPS가 모두 개선됐습니다.",
+          "단일 워커를 멀티 워커 풀로 바꾼 뒤, 같은 조건에서 드랍률을 별도로 비교했습니다.",
         snippet: {
           type: "visual",
           label: "Queue-based Separation",
@@ -178,27 +188,36 @@ const baseProjects = [
     retrospective: [
       {
         point: "배운 점",
-        detail: "성능 문제를 단일 함수 최적화가 아니라 단계 간 결합 문제로 봐야 한다는 점을 배웠습니다.",
+        detail: "실시간 화면 전송에서는 오래된 프레임을 폐기하고 최신 프레임을 유지하는 방식을 적용했습니다.",
       },
       {
         point: "아쉬운 점",
-        detail: "벤치마크는 남겼지만, 릴리즈 빌드와 다양한 씬 복잡도 조건까지 확장하지 못한 점은 아쉽습니다.",
+        detail: "Release 빌드와 해상도·JPEG 품질별 CPU 사용량을 반복 측정하지 못했습니다.",
       },
     ],
     links: {
-      github: "https://github.com/Junwoo-Seo-1998/RobotPal",
-      demo: "https://junwoo-seo-1998.github.io/RobotPal/",
+      github: "https://github.com/cgantro/RobotPal",
     },
   },
   {
     id: "mausoleum",
     num: "02",
-    title: "영묘",
-    subtitle: "UE5 환경에서 roomCode 기반 보이스 워커 큐와 생사 상태별 청취 규칙을 분리한 실시간 음성 프로젝트",
-    period: "2026.02 - 2026.03",
+    title: "UE5 Multiplayer Voice Communication",
+    subtitle: "UE5 클라이언트에서 음성을 캡처하고 Opus로 처리하며, UDP 서버가 같은 방 사용자에게 음성 패킷을 중계하는 시스템",
+    period: "2026.02 – 2026.03",
     team: "6인",
-    role: "보이스 클라이언트·서버 파이프라인 구성 · roomCode 워커 큐 · 청취 규칙 분리",
-    stack: ["UE5 C++", "UDP", "Opus", "Voice Runtime"],
+    role: "음성 캡처·인코딩·재생 · UDP 음성 서버 · 패킷 검증 및 중계",
+    roleItems: ["UE5 음성 캡처·Opus 인코딩·재생", "UDP 음성 중계 서버 구현", "패킷 유형·크기 검증 및 RoomCode 라우팅"],
+    metric: "−90.3%",
+    metricLabel: "Application Voice Payload",
+    benchmark: "16-bit PCM 대비 Opus payload",
+    summary: [
+      "UE5 클라이언트에서 16kHz·20ms 단위 음성을 Opus로 인코딩해 UDP 서버로 전송했습니다.",
+      "서버는 패킷 유형과 크기를 확인한 뒤 같은 RoomCode 사용자에게 전달했습니다.",
+      "앱 포커스 복귀 시 대기 패킷을 버리고 코덱 상태를 초기화했습니다.",
+      "16-bit PCM 원본과 비교해 Opus 애플리케이션 페이로드를 약 90.3% 줄였습니다.",
+    ],
+    stack: ["C++", "Unreal Engine 5", "UDP", "Opus", "Protobuf", "Multithreading", "CMake"],
     cover: "/project-mausoleum-cover.png",
     highlights: [
       "마이크 캡처, Opus 인코딩, UDP 전송, 재생 단계를 책임별로 나눴습니다.",
@@ -367,10 +386,20 @@ const baseProjects = [
     id: "autowing",
     num: "03",
     title: "오토잉카",
-    subtitle: "상태 전이, 실시간 채널, 맵 그래프 기반 경로 추천을 분리한 관제형 백엔드 프로토타입",
-    period: "2026.01 - 2026.02",
+    subtitle: "모의 토잉카 클라이언트의 텔레메트리를 수집하고, 관제 명령과 장비 상태를 처리하는 실시간 관제 시스템",
+    period: "2026.01 – 2026.02",
     team: "6인",
-    role: "백엔드 관제 연동 · 상태 전이 기준 정리 · 맵 그래프 기반 경로 추천",
+    role: "상태 전이 · 실시간 채널 분리 · 경로 추천 · 부하 테스트",
+    roleItems: ["상태 전이와 실제 장비 상태 이벤트 분리", "실시간 채널 분리 및 경로 추천 구현", "500개 모의 차량 클라이언트 부하 테스트"],
+    metric: "8,935 msg/s",
+    metricLabel: "Peak Throughput",
+    benchmark: "500 simulated clients × 10Hz",
+    summary: [
+      "관제 명령 요청과 장비 상태 이벤트를 분리해 상태를 반영했습니다.",
+      "DB 트랜잭션이 끝난 뒤 MQTT와 WebSocket 메시지를 발행했습니다.",
+      "500개 모의 차량 클라이언트가 각각 10Hz로 텔레메트리를 전송하는 환경을 구성했습니다.",
+      "5분 부하 테스트에서 132만 메시지를 처리했고 유실 0건, 최대 8,935msg/s를 기록했습니다.",
+    ],
     stack: ["Spring Boot", "MQTT", "WebRTC", "Map Graph"],
     cover: "/project-autowing-cover.png",
     highlights: [
@@ -492,7 +521,7 @@ const baseProjects = [
         tech: "MQTT",
         feature: "상태와 명령을 빠르게 주고받는 제어 채널",
         decision: "빠르게 바뀌는 차량 상태와 관제 명령 흐름을 맞추기 위해 MQTT를 선택했습니다.",
-        advantage: "상태 보고와 관제 명령을 HTTP 요청-응답 구조보다 자연스럽게 분리할 수 있었습니다.",
+        advantage: "상태 보고와 관제 명령을 HTTP 요청-응답 경로와 분리해 처리했습니다.",
         comparison: "일반 HTTP 요청-응답 구조만으로는 자주 바뀌는 차량 상태를 설명하기 어려웠습니다.",
       },
       {
@@ -695,6 +724,128 @@ const baseProjects = [
   },
 ];
 
+// Sticker는 보조 프로젝트로 유지하며, 주력 3개 뒤에 배치한다.
+const portfolioContent = {
+  robotpal: {
+    roleItems: ["카메라 프레임 스트리밍 기능 개발", "PBO 기반 readback 구현", "인코딩·전송 병목 측정 및 개선", "벤치마크 환경 구성 및 드랍률 측정", "TCP·WebSocket 전송 인터페이스 분리"],
+    metricDefinition: "생성 프레임 중 원본 프레임 큐 적체로 폐기된 프레임 비율",
+    benchmark: "1,800-frame fixed benchmark · single vs multi worker",
+    summary: [
+      "카메라 프레임을 캡처해 JPEG로 인코딩하고 외부 클라이언트로 전송했습니다.",
+      "JPEG 인코딩과 전송이 렌더링 루프를 지연시켰습니다.",
+      "PBO readback, 작업 큐, 멀티 워커, 프레임 폐기 정책을 적용했습니다. 동일 조건에서 단일·멀티 워커를 비교해 드랍률을 17.6%에서 0.8%로 낮췄습니다.",
+    ],
+    outcomes: [
+      { label: "Frame Drop Rate", value: "17.6% → 0.8%", detail: "1,800프레임 · 단일/멀티 워커 비교" },
+      { label: "Frame Queue", value: "6 frames", detail: "가득 차면 원본 프레임 중 가장 오래된 항목 폐기" },
+      { label: "Transport", value: "TCP / WebSocket", detail: "네이티브와 WebAssembly 빌드에 다른 구현체 적용" },
+    ],
+    highlights: ["PBO readback과 JPEG 인코딩을 분리했다.", "큐가 가득 차면 가장 오래된 프레임을 폐기했다.", "드랍률을 17.6%에서 0.8%로 낮췄다."],
+    implementations: [
+      { title: "프레임 캡처와 readback", summary: "OpenGL PBO 두 개를 번갈아 사용했습니다. GPU는 현재 프레임을 기록하고 CPU는 이전 프레임을 읽었습니다." },
+      { title: "인코딩과 전송", summary: "캡처한 프레임을 크기 6의 원본 프레임 큐에 넣었습니다. JPEG 워커가 libjpeg-turbo로 인코딩한 뒤 NetworkEngine을 호출했습니다." },
+      { title: "WebAssembly 빌드", summary: "C++ 코어를 Emscripten으로 빌드했습니다. 브라우저에서는 TCP 대신 WebSocket을 사용했고, pthreads 실행에는 SharedArrayBuffer 조건이 필요했습니다." },
+    ],
+    problems: [
+      { title: "동기식 readback으로 렌더링 루프가 대기한 문제", problem: "glReadPixels 호출에서 렌더링 루프가 대기했습니다.", background: "CPU가 현재 프레임의 GPU 작업 완료를 기다렸습니다.", solution: "PBO 두 개를 번갈아 사용해 GPU는 현재 프레임을 기록하고 CPU는 이전 프레임을 읽도록 변경했습니다.", result: "CPU가 현재 프레임의 GPU 작업 완료를 기다리는 구간을 줄이고, readback과 인코딩 시간을 별도로 측정했습니다." },
+      { title: "인코딩 적체로 오래된 프레임이 쌓인 문제", problem: "단일 인코딩 워커가 프레임 생산 속도를 따라가지 못했습니다.", background: "원본 프레임 큐에 작업이 쌓이고 오래된 프레임이 최신 화면 전달을 늦췄습니다.", solution: "원본 프레임 큐의 크기를 6으로 제한하고, 가득 차면 가장 오래된 프레임을 폐기했습니다. 멀티 워커가 JPEG 인코딩을 처리했습니다.", result: "같은 입력·JPEG 품질·큐 크기·실행 시간 조건에서 단일·멀티 워커를 비교해 드랍률을 17.6%에서 0.8%로 낮췄습니다." },
+      { title: "WebAssembly pthreads 실행 조건", problem: "브라우저에서 SharedArrayBuffer 조건이 맞지 않아 pthreads 경로가 실행되지 않았습니다.", background: "SharedArrayBuffer에는 COOP·COEP 교차 출처 격리 조건이 필요했고, GitHub Pages에서는 응답 헤더를 직접 설정할 수 없었습니다.", solution: "데모 환경에 COI Service Worker를 적용했습니다.", result: "정적 배포 환경에서 pthreads 실행 조건을 보완했습니다." },
+    ],
+    techChoice: [
+      { tech: "libjpeg-turbo", feature: "프레임 단위 JPEG 인코딩", decision: "프레임마다 독립적으로 압축하고 데스크톱과 WebAssembly 빌드에서 같은 처리 방식을 사용하기 위해 선택했다.", advantage: "카메라 프레임 압축과 TCP·WebSocket 전송에 적용했다.", comparison: "연속 영상 코덱보다 대역폭 효율이 낮고 고해상도에서는 CPU 인코딩 비용이 커진다." },
+      { tech: "Emscripten", feature: "C++ 코어의 WebAssembly 빌드", decision: "데스크톱과 브라우저에서 같은 C++ 코어를 실행하기 위해 사용했다.", advantage: "브라우저 빌드에서는 WebSocket 구현체를 연결했다.", comparison: "pthreads에는 SharedArrayBuffer와 교차 출처 격리 조건이 필요하다." },
+    ],
+    retrospective: [
+      { point: "현재 한계", detail: "워커 수별 CPU 사용률과 실제 네트워크 지연·패킷 손실 조건을 함께 기록하지 않았습니다." },
+      { point: "추가 검증", detail: "Release 빌드 반복 측정\n해상도별 CPU 사용량 비교\nJPEG 품질별 처리량 비교\n네트워크 지연·손실 조건 검증" },
+    ],
+  },
+  mausoleum: {
+    roleItems: ["UPrivateVoiceChatComponent 기반 보이스 모듈 구현", "UDP VoiceServer와 RoomCode 해시 샤딩 구현", "화자별 Opus 코덱과 포커스 복귀 처리 구현"],
+    metric: "2 shards",
+    metricLabel: "Voice Worker Queues",
+    benchmark: "RoomCode hash routing",
+    summary: [
+      "UE5 클라이언트에서 캡처·코덱·네트워크·재생 모듈을 분리했습니다.",
+      "UDP VoiceServer가 RoomCode 해시로 패킷을 두 개의 워커 큐에 분배했습니다.",
+      "포커스 복귀 시 남은 PCM을 폐기하고 Opus 상태를 초기화해 오래된 음성 재생을 막았습니다.",
+    ],
+    outcomes: [
+      { label: "Voice Routing", value: "2 shards", detail: "RoomCode 해시로 같은 방 패킷을 같은 워커 큐에 전달" },
+      { label: "Audio Frame", value: "20 ms", detail: "16kHz 모노 PCM 640B를 Opus로 인코딩" },
+      { label: "Realtime Guard", value: "8 KB", detail: "포커스 복귀 후 오래된 캡처 데이터 hard drop 기준" },
+    ],
+    highlights: ["캡처·코덱·네트워크·재생 모듈을 분리했습니다.", "RoomCode 해시로 두 개의 보이스 워커 큐에 분배했습니다.", "포커스 복귀 시 오래된 PCM을 폐기했습니다."],
+    implementations: [
+      { title: "보이스 클라이언트", summary: "UPrivateVoiceChatComponent 아래에 캡처, 코덱, 네트워크, 재생 클래스를 나눴습니다. 화자별 Opus 코덱을 관리해 디코드 상태가 섞이지 않도록 했습니다." },
+      { title: "UDP VoiceServer", summary: "패킷 유형과 크기를 확인했습니다. RoomCode 해시로 두 개의 워커 큐 중 하나를 선택하고, 같은 방의 송신자 외 사용자에게 공유 페이로드를 전송했습니다." },
+      { title: "오디오 프레임", summary: "16kHz 모노 PCM을 20ms 단위로 모아 24kbps Opus로 인코딩했습니다. FEC와 DTX를 적용하고 패킷은 길이 2바이트와 Opus 데이터로 구성했습니다." },
+    ],
+    problems: [
+      { title: "포커스 복귀 후 누적 음성이 재생된 문제", problem: "포그라운드 복귀 뒤 캡처 버퍼와 Opus 링버퍼에 남은 PCM이 한꺼번에 처리됐습니다.", background: "백그라운드에서도 캡처 데이터가 쌓였고, 이전 오디오가 다음 전송 프레임에 섞였습니다.", solution: "포커스가 없을 때 캡처 데이터를 비우고 코덱을 다시 초기화했습니다. 복귀 뒤 8KB를 넘는 데이터도 전량 폐기했습니다.", result: "복귀 시점 이전의 PCM을 전송·재생 경로에서 제외했습니다." },
+      { title: "방이 많은 경우 단일 큐에 패킷이 쌓인 문제", problem: "한 개의 ConcurrentQueue에서 모든 방의 UDP 패킷을 처리하면 큰 방의 패킷이 다른 방 처리를 막았습니다.", background: "워커 수만 늘리면 단일 큐 경쟁이 커졌습니다.", solution: "RoomCode 해시로 두 개의 워커 큐를 선택하도록 변경했습니다.", result: "같은 방 패킷은 같은 워커가 순서대로 처리하고, 다른 방 패킷은 별도 큐에서 처리했습니다." },
+      { title: "음성 캡처 객체가 생성되지 않은 문제", problem: "장치 이름을 전달했을 때 캡처 객체가 생성되지 않았습니다.", background: "UE5 캡처 API가 운영체제 Friendly Name과 다른 DirectSound 장치 ID를 사용했습니다.", solution: "빈 장치 식별자로 OS 기본 입력 장치를 사용했습니다.", result: "마이크 입력을 캡처해 UDP 전송 경로로 전달했습니다." },
+    ],
+    techChoice: [
+      { tech: "RoomCode Sharding", feature: "방 단위 UDP 패킷 처리", decision: "큰 방의 패킷이 다른 방 처리 지연으로 이어지지 않도록 RoomCode 해시로 워커 큐를 선택했습니다.", advantage: "두 개의 ConcurrentQueue와 워커가 방 단위 패킷을 처리했습니다.", comparison: "워커 수와 샤드 수를 늘릴 때의 CPU 사용률과 지연은 추가 측정이 필요합니다." },
+      { tech: "Opus", feature: "20ms 음성 프레임 인코딩", decision: "16-bit PCM 640B 프레임을 압축하고, 패킷 손실 상황에서 FEC를 적용하기 위해 사용했습니다.", advantage: "16kHz·24kbps·FEC·DTX 설정으로 음성 전송에 적용했습니다.", comparison: "90.3%는 IP·UDP 헤더를 포함하지 않은 애플리케이션 페이로드 비교값입니다." },
+    ],
+    retrospective: [
+      { point: "현재 한계", detail: "샤드 수별 패킷 처리 지연, CPU 사용률, 손실 복원률을 수치로 기록하지 않았습니다." },
+      { point: "추가 검증", detail: "패킷 손실률별 FEC 복원률 측정\n샤드 수별 큐 적체량과 CPU 사용률 비교\n지연·손실 조건의 음성 품질 기록" },
+    ],
+  },
+  autowing: {
+    highlights: ["명령 요청과 장비 상태 이벤트를 분리했다.", "500개 모의 차량 클라이언트 부하 환경을 구성했다.", "최대 처리량 8,935msg/s를 측정했다."],
+    implementations: [
+      { title: "상태 전이", summary: "관제 명령만으로 상태를 확정하지 않았다. 장비가 보낸 상태 이벤트를 기준으로 최종 상태를 반영했다." },
+      { title: "메시지 채널", summary: "DB 트랜잭션이 끝난 뒤 MQTT와 WebSocket 메시지를 발행했다. 제어·영상·보조 데이터를 다른 채널로 나눴다." },
+      { title: "경로 추천", summary: "공항 이동 경로를 노드와 간선 그래프로 관리했다. 현재 위치와 통제 조건을 반영해 경로 추천과 우회 정책을 구현했다." },
+    ],
+    problems: [
+      { title: "명령과 실제 상태가 달라진 문제", problem: "명령 요청만으로 서버 상태를 바꾸면 실제 장비 상태와 화면 상태가 달라질 수 있었다.", background: "명령 요청과 장비 상태 이벤트의 의미가 달랐다.", solution: "장비 상태 이벤트를 기준으로 최종 상태를 반영하고, 트랜잭션이 끝난 뒤 외부 메시지를 발행했다.", result: "명령 처리와 상태 반영의 기준을 분리했다." },
+      { title: "고빈도 텔레메트리 부하", problem: "여러 모의 차량이 동시에 텔레메트리를 전송하는 상황을 확인해야 했다.", background: "제어·영상·보조 데이터가 같은 경로를 사용하면 한 종류의 트래픽이 다른 처리에 영향을 줄 수 있었다.", solution: "데이터 채널을 분리하고 500개 모의 차량 클라이언트가 각각 10Hz로 전송하는 부하 환경을 구성했다.", result: "5분간 132만 메시지를 처리했고, 이 테스트에서 E2E 지연 14~28ms와 유실 0건을 기록했다." },
+    ],
+    techChoice: [
+      { tech: "MQTT와 WebSocket", feature: "상태 이벤트와 관제 화면 갱신", decision: "DB 트랜잭션이 끝난 뒤 상태 이벤트를 발행하고 관제 화면에 전달하기 위해 사용했다.", advantage: "명령 요청과 장비 상태 이벤트를 분리하는 흐름에 적용했다.", comparison: "부하 결과는 500개 모의 클라이언트가 10Hz로 전송한 5분 테스트 기준이다." },
+      { tech: "그래프 기반 경로", feature: "경로 추천과 우회", decision: "이동 경로와 통제 조건을 노드·간선 관계로 처리하기 위해 사용했다.", advantage: "현재 위치와 통제 조건을 반영한 추천과 우회 경로에 적용했다.", comparison: "실제 공항 운영 환경에서의 검증은 수행하지 않았다." },
+    ],
+    retrospective: [
+      { point: "판단 기준", detail: "관제 명령과 장비 상태 이벤트는 같은 값으로 취급하지 않고, 장비 이벤트를 최종 상태 기준으로 사용했다." },
+      { point: "추가 검증", detail: "실제 차량, 네트워크 장애, WebSocket 연결 수 증가 조건은 검증하지 않았다." },
+    ],
+  },
+  sticker: {
+    metric: "2-stage",
+    metricLabel: "Duplicate Check",
+    benchmark: "before enqueue / before persist",
+    summary: ["AI 추천 작업을 요청 처리 경로에서 분리했다.", "추천 작업 시작과 결과 저장에서 중복 실행을 확인했다."],
+    outcomes: [
+      { label: "Job Start", value: "afterCommit", detail: "DB 저장이 끝난 뒤 외부 작업을 시작" },
+      { label: "Duplicate Check", value: "2-stage", detail: "작업 적재 전과 결과 저장 전 중복 여부 확인" },
+      { label: "Failure Path", value: "Queue", detail: "긴 추천 작업을 API 응답 경로와 분리" },
+    ],
+    roleItems: ["추천 작업 큐와 결과 저장 흐름 구현", "Redis 기반 중복 실행 방어", "트랜잭션 이후 작업 시작 순서 적용"],
+    highlights: ["추천 작업을 비동기 경로로 분리했다.", "afterCommit 이후 작업을 시작했다.", "Redis 기준으로 중복 실행을 확인했다."],
+    implementations: [
+      { title: "작업 시작 순서", summary: "요청 데이터를 저장한 뒤 afterCommit에서 SQS 메시지를 발행했습니다. 추천 작업은 API 응답과 다른 경로에서 시작했습니다." },
+      { title: "두 단계 중복 확인", summary: "작업 적재 전 Redis 락으로 중복 실행을 확인했습니다. 결과 저장 전에는 jobId와 날짜 기준으로 다시 확인했습니다." },
+    ],
+    problems: [
+      { title: "저장 전 추천 작업이 시작된 문제", problem: "DB 상태가 저장되기 전에 후속 추천 작업이 시작될 수 있었습니다.", background: "트랜잭션 완료와 메시지 발행 순서가 맞지 않았습니다.", solution: "커밋 이후에만 SQS 메시지를 발행하도록 변경했습니다.", result: "저장 완료 상태를 기준으로 추천 작업을 시작했습니다." },
+      { title: "같은 추천 작업이 중복 실행된 문제", problem: "같은 사용자와 날짜의 추천 요청이 겹칠 수 있었습니다.", background: "작업 시작과 결과 저장이 서로 다른 시간에 처리됐습니다.", solution: "Redis 락과 결과 저장 전 jobId·날짜 확인을 적용했습니다.", result: "작업 시작과 결과 반영에서 중복 여부를 확인하는 기준을 두었습니다." },
+    ],
+    techChoice: [
+      { tech: "SQS", feature: "추천 작업 비동기 처리", decision: "추천 생성이 오래 걸려도 요청 응답을 막지 않도록 사용했다.", advantage: "추천 생성 작업을 API 요청 경로 밖에서 처리했다.", comparison: "처리 지연과 실패는 별도 상태 확인이 필요하다." },
+      { tech: "Redis", feature: "중복 작업 확인", decision: "동일 요청이 겹칠 때 작업 시작과 결과 저장을 확인하기 위해 사용했다.", advantage: "추천 작업 시작과 결과 반영 전에 중복 여부를 확인했다.", comparison: "Redis 락만으로 저장 단계의 중복을 모두 막을 수 없어 저장 전 확인을 함께 사용했다." },
+    ],
+    retrospective: [
+      { point: "판단 기준", detail: "긴 작업의 시작 시점은 저장 완료 상태와 맞춰야 했다." },
+      { point: "추가 검증", detail: "큐 처리 시간과 중복 차단 횟수는 수치로 기록하지 못했다." },
+    ],
+  },
+};
+
 const projectOrder = ["robotpal", "mausoleum", "autowing", "sticker"];
 
 export const projects = projectOrder.map((id) => {
@@ -702,6 +853,7 @@ export const projects = projectOrder.map((id) => {
 
   return {
     ...project,
+    ...portfolioContent[project.id],
     detailPage: projectDetailPages[project.id],
   };
 });

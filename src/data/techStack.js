@@ -1,48 +1,50 @@
-/**
- * 기술 스택 — 카테고리별 그룹
- * level: "primary" | "secondary" | "learning"
- * skillicon: skillicons.dev 아이콘 ID (null이면 텍스트 폴백)
- */
+/** C++ 응용 소프트웨어 지원을 기준으로 정렬한 기술 스택 */
 export const techStack = [
   {
-    category: "언어",
+    category: "Core",
     icon: "{ }",
     items: [
-      { name: "C++17",      level: 3, skillicon: "cpp"  },
-      { name: "Java 17/21", level: 3, skillicon: "java" },
-      { name: "Python",     level: 2, skillicon: "py"   },
+      { name: "C++17", skillicon: "cpp" },
+      { name: "C", skillicon: "c" },
+      { name: "CMake", skillicon: "cmake" },
+      { name: "Qt", skillicon: "qt" },
+      { name: "Linux", skillicon: "linux" },
+      { name: "Windows", skillicon: "windows" },
     ],
   },
   {
-    category: "프레임워크",
-    icon: "⚙",
+    category: "Networking & Concurrency",
+    icon: "↔",
     items: [
-      { name: "Spring Boot 3.5",    level: 3, skillicon: "spring" },
-      { name: "Spring Security",    level: 3, skillicon: "spring" },
-      { name: "Unreal Engine 5",    level: 2, skillicon: "unrealengine" },
-      { name: "uWebSockets",        level: 2, skillicon: null     },
+      { name: "TCP/IP", skillicon: null },
+      { name: "UDP", skillicon: null },
+      { name: "WebSocket", skillicon: null },
+      { name: "MQTT", skillicon: null },
+      { name: "Multithreading", skillicon: null },
+      { name: "Producer–Consumer", skillicon: null },
     ],
   },
   {
-    category: "툴",
+    category: "Runtime & Libraries",
     icon: "◈",
     items: [
-      { name: "Docker / Buildx",   level: 2, skillicon: "docker" },
-      { name: "GitLab CI/CD",      level: 3, skillicon: "gitlab" },
-      { name: "Emscripten (WASM)", level: 3, skillicon: "wasm"   },
-      { name: "Opus Codec",        level: 2, skillicon: null     },
+      { name: "OpenGL", skillicon: "opengl" },
+      { name: "Emscripten", skillicon: "wasm" },
+      { name: "Unreal Engine 5", skillicon: "unrealengine" },
+      { name: "libjpeg-turbo", skillicon: null },
+      { name: "Opus", skillicon: null },
+      { name: "Protobuf", skillicon: null },
     ],
   },
   {
-    category: "인프라 · DB",
-    icon: "⬡",
+    category: "Secondary",
+    icon: "+",
     items: [
-      { name: "AWS (EC2, S3, SQS)",   level: 3, skillicon: "aws"      },
-      { name: "Redis (Lettuce)",      level: 3, skillicon: "redis"    },
-      { name: "PostgreSQL",           level: 2, skillicon: "postgres" },
-      { name: "JPA / Hibernate",      level: 3, skillicon: null       },
-      { name: "Prometheus + Grafana", level: 2, skillicon: "grafana"  },
-      { name: "Traefik",              level: 2, skillicon: null       },
+      { name: "Java", skillicon: "java" },
+      { name: "Spring Boot", skillicon: "spring" },
+      { name: "Redis", skillicon: "redis" },
+      { name: "PostgreSQL", skillicon: "postgres" },
+      { name: "Docker", skillicon: "docker" },
     ],
   },
 ];

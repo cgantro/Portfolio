@@ -19,7 +19,7 @@ const TYPE_COLOR = {
 export default function Timeline({ items }) {
   return (
     <>
-      <SectionLabel>이력</SectionLabel>
+      <SectionLabel>Education & Certification</SectionLabel>
 
       <div className={styles.list}>
         {items.map((item) => (
@@ -36,7 +36,7 @@ export default function Timeline({ items }) {
             <div className={styles.content}>
               <div className={styles.header}>
                 <span className={styles.title}>{item.title}</span>
-                <span className={styles.period}>{item.period}</span>
+                {item.period && <span className={styles.period}>{item.period}</span>}
               </div>
               <div className={styles.detail}>
                 <Tag variant={TYPE_COLOR[item.type]}>{item.detail}</Tag>

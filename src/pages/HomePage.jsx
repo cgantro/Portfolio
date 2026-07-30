@@ -4,18 +4,18 @@ import Timeline from "../components/sections/Timeline";
 import Activities from "../components/sections/Activities";
 import TechStack from "../components/sections/TechStack";
 import Projects from "../components/sections/Projects";
-import SubProjects from "../components/sections/SubProjects";
 import Contact from "../components/sections/Contact";
+import Intro from "../components/sections/Intro";
 import useActiveSection from "../hooks/useActiveSection";
-import { meta, projects, subProjects, timeline, activities, techStack } from "../data";
+import { meta, projects, timeline, activities, techStack } from "../data";
 
 const SECTIONS = [
-  { id: "projects", label: "주력 프로젝트" },
-  { id: "techstack", label: "기술 스택" },
-  { id: "timeline", label: "이력" },
-  { id: "activities", label: "대외활동" },
-  { id: "sub-projects", label: "서브 프로젝트" },
-  { id: "contact", label: "연락처" },
+  { id: "intro", label: "Intro" },
+  { id: "projects", label: "Projects" },
+  { id: "techstack", label: "Technical Skills" },
+  { id: "timeline", label: "Education & Certification" },
+  { id: "activities", label: "Activity" },
+  { id: "contact", label: "Contact" },
 ];
 
 export default function HomePage() {
@@ -24,6 +24,7 @@ export default function HomePage() {
 
   return (
     <AppShell meta={meta} sections={SECTIONS} activeSection={activeSection}>
+      <Intro />
       <section id="projects" className="section">
         <Projects projects={projects} />
       </section>
@@ -38,10 +39,6 @@ export default function HomePage() {
 
       <section id="activities" className="section">
         <Activities items={activities} />
-      </section>
-
-      <section id="sub-projects" className="section">
-        <SubProjects projects={subProjects} />
       </section>
 
       <section id="contact" className="section">

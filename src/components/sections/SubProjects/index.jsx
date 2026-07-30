@@ -5,7 +5,7 @@ import styles from "./SubProjects.module.css";
 export default function SubProjects({ projects }) {
   return (
     <>
-      <SectionLabel>서브 프로젝트</SectionLabel>
+      <SectionLabel>Sticker & More</SectionLabel>
 
       <div className={styles.grid}>
         {projects.map((p) => (

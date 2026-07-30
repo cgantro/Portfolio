@@ -5,7 +5,7 @@ import styles from "./Activities.module.css";
 export default function Activities({ items }) {
   return (
     <>
-      <SectionLabel>대외활동</SectionLabel>
+      <SectionLabel>Activity</SectionLabel>
 
       <div className={styles.list}>
         {items.map((act) => (
