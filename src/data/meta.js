@@ -3,8 +3,8 @@ import profileImg from "../../asset/증사.jpg";
 export const meta = {
   name: "홍윤표",
   nameEn: "Hong Yoonpyo",
-  role: "C++ Application & Backend Developer",
-  tagline: "병목, 정합성, 상태 전이를\n구조로 해결하는 개발자",
+  role: "C++ Application Software Engineer",
+  tagline: "C++ 기반 시뮬레이터와 실시간 통신 기능을 개발합니다.",
   profile: profileImg,
   email: "cgantro@gmail.com",
   github: "https://github.com/cgantro",

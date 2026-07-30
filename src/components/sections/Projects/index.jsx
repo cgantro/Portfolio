@@ -10,7 +10,7 @@ export default function Projects({ projects }) {
 
   return (
     <>
-      <SectionLabel>주력 프로젝트</SectionLabel>
+      <SectionLabel>Projects</SectionLabel>
 
       <div className={styles.projectGrid}>
         {projects.map((project) => (
@@ -81,6 +81,7 @@ function BentoCard({ project, onClick }) {
       <div className={styles.bentoBody}>
         <div className={styles.bentoHeader}>
           <h2 className={styles.title}>{project.title}</h2>
+          <p className={styles.subtitle}>{project.subtitle}</p>
         </div>
 
         <div className={styles.metaRow}>
@@ -88,6 +89,14 @@ function BentoCard({ project, onClick }) {
           <span className={styles.dot2}>·</span>
           <span>{project.team}</span>
         </div>
+
+        {project.metric ? (
+          <div className={styles.metric}>
+            <strong>{project.metric}</strong>
+            <span>{project.metricLabel}</span>
+            <small>{project.benchmark}</small>
+          </div>
+        ) : null}
 
         <div className={styles.signalGrid}>
           <article className={styles.signalCard}>

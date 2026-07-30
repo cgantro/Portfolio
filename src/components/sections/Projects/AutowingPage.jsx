@@ -9,7 +9,6 @@ import {
   SimpleTable,
   SummaryCardGrid,
   TechChoicePanel,
-  TimelinePanel,
   TroubleshootingCard,
 } from "./ProjectPageBlocks";
 
@@ -18,16 +17,16 @@ export default function AutowingPage({ project, detailPage, links }) {
   const extraProblems = project.problems.slice(2);
   const architectureFacts = [
     {
-      label: "source of truth",
-      value: "상태 전이의 기준은 DB와 백엔드 서비스가 잡고, 화면과 차량 이벤트는 그 흐름을 따라가도록 정리했습니다.",
+      label: "상태 반영",
+      value: "관제 명령이 아니라 장비가 보낸 상태 이벤트를 기준으로 최종 상태를 반영합니다.",
     },
     {
-      label: "event boundary",
-      value: "트랜잭션이 활성화된 경우 커밋 이후에만 MQTT 이벤트가 시작되도록 분리해 커밋 전 상태 노출을 줄였습니다.",
+      label: "메시지 순서",
+      value: "DB 트랜잭션이 끝난 뒤 MQTT와 WebSocket 메시지를 발행합니다.",
     },
     {
-      label: "channel responsibility",
-      value: "MQTT는 상태와 명령, WebRTC는 영상 확인, AI 결과는 보조 입력으로 구분해 채널별 책임을 분명하게 했습니다.",
+      label: "채널",
+      value: "제어, 영상, 보조 데이터를 다른 채널로 전송합니다.",
     },
   ];
 
@@ -35,15 +34,14 @@ export default function AutowingPage({ project, detailPage, links }) {
     <>
       <HeroCard project={project} detailPage={detailPage} links={links} />
 
-      <ProjectSection id="implementation" label="구현" title="구현 내용">
+      <ProjectSection id="implementation" label="구현 내용" title="구현 내용">
         <div className={styles.stackLayout}>
           <SummaryCardGrid items={project.implementations} />
-          <TimelinePanel title="상태 전이 시나리오" items={detailPage.scenarios} />
           <TechChoicePanel items={project.techChoice} />
         </div>
       </ProjectSection>
 
-      <ProjectSection id="troubleshooting" label="트러블슈팅" title="메인 문제 해결">
+      <ProjectSection id="troubleshooting" label="문제 해결" title="문제 해결">
         <div className={styles.stackLayout}>
           {mainProblems.map((item) => (
             <TroubleshootingCard key={item.title} item={item} />
@@ -52,7 +50,7 @@ export default function AutowingPage({ project, detailPage, links }) {
         </div>
       </ProjectSection>
 
-      <ProjectSection id="architecture" label="아키텍처" title="구조 설계">
+      <ProjectSection id="architecture" label="시스템 구성" title="시스템 구성">
         <div className={styles.stackLayout}>
           <div className={styles.splitBoard}>
             <ArchitectureBlock notes={detailPage.architectureNotes} />
@@ -69,7 +67,7 @@ export default function AutowingPage({ project, detailPage, links }) {
         </div>
       </ProjectSection>
 
-      <ProjectSection id="retrospective" label="회고" title="회고">
+      <ProjectSection id="retrospective" label="한계와 추가 검증" title="한계와 추가 검증">
         <RetrospectivePanel items={project.retrospective} />
       </ProjectSection>
     </>
