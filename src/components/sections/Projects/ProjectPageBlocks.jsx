@@ -31,13 +31,13 @@ export function HeroCard({ project, detailPage, links }) {
   return (
     <section className={styles.hero}>
       <div className={styles.heroBody}>
-        <span className={styles.heroEyebrow}>{detailPage.hero.eyebrow}</span>
+        <span className={styles.heroEyebrow}>프로젝트 상세</span>
         <span className={styles.projectNumber}>{project.num}</span>
         <h1 className={styles.heroTitle}>{detailPage.hero.title}</h1>
         <div className={styles.heroMeta}>
           <span>{project.period}</span>
           <span className={styles.metaDivider}>/</span>
-          <span>{project.team}</span>
+          <span>{project.team} 팀 프로젝트</span>
           <span className={styles.metaDivider}>/</span>
           <span>{project.stack.slice(0, 2).join(" · ")}</span>
         </div>

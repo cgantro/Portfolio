@@ -1,7 +1,19 @@
-.intro { padding: 96px 0 32px; }
-.eyebrow { font-family: var(--font-mono); color: var(--accent); font-size: 11px; letter-spacing: .12em; }
-.role { margin-top: 12px; color: var(--fg-bright); font-family: var(--font-mono); font-size: clamp(24px, 4vw, 42px); line-height: 1.2; }
-.description { margin-top: 24px; color: var(--fg); font-size: 16px; line-height: 1.9; }
-.keywords { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
-.keywords span { padding: 6px 10px; border: 1px solid var(--border2); color: var(--fg-dim); font: 11px var(--font-mono); }
-@media (max-width: 768px) { .intro { padding-top: 16px; } .description br { display: none; } }
+.intro { padding-top: clamp(7rem, 16vw, 11rem); }
+.heroCopy { max-width: 760px; margin: 0 auto; text-align: center; }
+.eyebrow { color: var(--accent); font: 700 11px var(--font-mono); letter-spacing: .12em; }
+.symbol { margin: 28px 0 22px; color: var(--accent); font-size: 76px; line-height: .8; font-weight: 700; }
+.role { color: var(--fg-bright); font-size: clamp(34px, 5.4vw, 62px); line-height: 1.22; letter-spacing: -.055em; }
+.role em { color: var(--accent); font-style: normal; }
+.description { max-width: 610px; margin: 28px auto 0; color: var(--fg-dim); font-size: clamp(15px, 1.6vw, 18px); line-height: 1.9; word-break: keep-all; }
+.keywords { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
+.keywords span { padding: 7px 12px; border-radius: 999px; background: #fff; border: 1px solid var(--border); color: var(--fg-dim); font: 600 11px var(--font-mono); }
+.strengthSection { margin-top: clamp(7rem, 15vw, 10rem); text-align: center; }
+.strengthSection > h2 { color: var(--accent); font-size: clamp(28px, 3.6vw, 40px); letter-spacing: -.04em; }
+.strengthSection > p { margin-top: 8px; color: var(--fg-dim); font-size: 15px; }
+.strengthGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 42px; text-align: left; }
+.strengthCard { min-height: 220px; padding: 26px; border: 1px solid var(--border); border-radius: 18px; background: var(--bg2); box-shadow: 0 10px 25px rgba(15,23,42,.045); transition: transform .2s, box-shadow .2s; }
+.strengthCard:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(37,99,235,.12); }
+.strengthIcon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--accent-bg); color: var(--accent); font-size: 25px; }
+.strengthCard h3 { margin-top: 20px; color: var(--fg-bright); font-size: 19px; letter-spacing: -.03em; }
+.strengthCard p { margin-top: 10px; color: var(--fg-dim); font-size: 14px; line-height: 1.75; word-break: keep-all; }
+@media (max-width: 720px) { .intro { padding-top: 86px; } .strengthGrid { grid-template-columns: 1fr; } .strengthCard { min-height: 0; } .role { letter-spacing: -.045em; } }

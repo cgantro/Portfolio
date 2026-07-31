@@ -1,40 +1,24 @@
-import SectionLabel from "../../ui/SectionLabel";
-import Tag from "../../ui/Tag";
 import styles from "./SubProjects.module.css";
 
 export default function SubProjects({ projects }) {
   return (
-    <>
-      <SectionLabel>Sticker & More</SectionLabel>
-
+    <div className={styles.wrap}>
+      <div className={styles.heading}>
+        <p>기타 구현</p>
+        <h2>학습과 실험으로 완성한 부 프로젝트</h2>
+      </div>
       <div className={styles.grid}>
-        {projects.map((p) => (
-          <article key={p.id} className={styles.card}>
-            <div className={styles.cardHead}>
-              <span className={styles.title}>{p.title}</span>
-              {p.links?.github && (
-                <a
-                  href={p.links.github}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.ghLink}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  ⌥
-                </a>
-              )}
-            </div>
-            <p className={styles.subtitle}>{p.subtitle}</p>
-            <p className={styles.summary}>{p.summary}</p>
-            <div className={styles.footer}>
-              <div className={styles.tags}>
-                {p.stack.slice(0, 4).map((s) => <Tag key={s}>{s}</Tag>)}
-              </div>
-              <span className={styles.period}>{p.period}</span>
-            </div>
+        {projects.map((project, index) => (
+          <article key={project.id} className={styles.card}>
+            <span className={styles.logo}>{String(index + 1).padStart(2, "0")}</span>
+            <h3>{project.title}</h3>
+            <p className={styles.subtitle}>{project.subtitle}</p>
+            <p className={styles.team}>{project.team} · {project.period}</p>
+            <ul className={styles.tags}>{project.stack.map((tag) => <li key={tag}>{tag}</li>)}</ul>
+            {project.links?.github ? <a className={styles.link} href={project.links.github} target="_blank" rel="noopener noreferrer">Repository ↗</a> : null}
           </article>
         ))}
       </div>
-    </>
+    </div>
   );
 }

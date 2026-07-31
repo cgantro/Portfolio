@@ -1,58 +1,26 @@
 import SectionLabel from "../../ui/SectionLabel";
-import Tag from "../../ui/Tag";
 import styles from "./Timeline.module.css";
-
-const TYPE_ICON = {
-  edu:  "◎",
-  cert: "◈",
-  work: "◆",
-  etc:  "◇",
-};
-
-const TYPE_COLOR = {
-  edu:  "accent",
-  cert: "yellow",
-  work: "accent",
-  etc:  "default",
-};
 
 export default function Timeline({ items }) {
   return (
-    <>
-      <SectionLabel>Education & Certification</SectionLabel>
-
+    <div className={styles.sectionWrap}>
+      <SectionLabel>교육 및 자격증</SectionLabel>
+      <p className={styles.lead}>학습과 검증을 통해 C++ 응용 소프트웨어 개발 역량을 확장했습니다.</p>
+      <div className={styles.divider}><span>Education & Certification</span></div>
       <div className={styles.list}>
         {items.map((item) => (
-          <div key={item.id} className={styles.item}>
-            {/* Left: icon + line */}
-            <div className={styles.rail}>
-              <div className={[styles.icon, styles[`icon_${item.type}`]].join(" ")}>
-                {TYPE_ICON[item.type] || "·"}
-              </div>
-              <div className={styles.line} />
-            </div>
-
-            {/* Right: content */}
+          <article key={item.id} className={styles.item}>
+            <p className={styles.period}>{item.period || "상시"}</p>
             <div className={styles.content}>
-              <div className={styles.header}>
-                <span className={styles.title}>{item.title}</span>
-                {item.period && <span className={styles.period}>{item.period}</span>}
-              </div>
-              <div className={styles.detail}>
-                <Tag variant={TYPE_COLOR[item.type]}>{item.detail}</Tag>
-              </div>
-              {item.note && (
-                <p className={styles.note}>{item.note}</p>
-              )}
-              {item.tags && item.tags.length > 0 && (
-                <div className={styles.tags}>
-                  {item.tags.map((t) => <Tag key={t}>{t}</Tag>)}
-                </div>
-              )}
+              <div className={styles.type}>{item.type === "cert" ? "CERTIFICATION" : "EDUCATION"}</div>
+              <h3>{item.title}</h3>
+              <p className={styles.detail}>{item.detail}</p>
+              {item.note ? <p className={styles.note}>{item.note}</p> : null}
+              {item.tags?.length ? <ul className={styles.tags}>{item.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul> : null}
             </div>
-          </div>
+          </article>
         ))}
       </div>
-    </>
+    </div>
   );
 }
