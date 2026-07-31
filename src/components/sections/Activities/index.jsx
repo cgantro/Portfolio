@@ -5,7 +5,6 @@ export default function Activities({ items }) {
   return (
     <div className={styles.wrap}>
       <SectionLabel>경험 및 활동</SectionLabel>
-      <p className={styles.lead}>프로젝트 밖에서도 C++·시스템·문제 해결 역량을 쌓았습니다.</p>
       <div className={styles.divider}><span>Experience</span></div>
       <div className={styles.list}>
         {items.map((activity) => (
