@@ -6,7 +6,7 @@ const baseProjects = [
     num: "01",
     title: "RobotPal",
     subtitle: "C++ 기반 AGV 시뮬레이터의 카메라 프레임 스트리밍 기능을 개발하고, 렌더링 흐름의 병목을 개선한 프로젝트",
-    period: "2025.11 – 2026.04",
+    period: "2025.11 – 2025.12",
     team: "2인",
     role: "카메라 프레임 스트리밍 · 네트워크 모듈 · 성능 측정 및 병목 개선",
     roleItems: ["카메라 프레임 스트리밍 기능 개발", "인코딩·전송 병목 측정 및 개선", "TCP·WebSocket 전송 인터페이스 분리"],
@@ -846,6 +846,41 @@ const portfolioContent = {
   },
 };
 
+const stickerAccurateContent = {
+  subtitle: "AI 추천 비동기 파이프라인과 캐시·관측·배포를 설계한 백엔드·인프라 프로젝트",
+  stack: ["Spring Boot", "AWS SQS", "Redis", "Caffeine", "Virtual Threads", "Prometheus", "Grafana", "GitLab CI"],
+  role: "Backend · Infra Lead",
+  roleItems: [
+    "SQS 기반 추천·보정 작업 비동기 파이프라인 구현",
+    "Virtual Thread 기반 20초 long-poll 결과 조회 구현",
+    "Redis·Caffeine 계층별 캐시와 HikariCP 설정 설계",
+    "Prometheus·Grafana 메트릭, 알림 규칙, GitLab CI 구성",
+    "이메일 인증 코드의 만료·시도·재발송 제한 구현",
+  ],
+  implementations: [
+    { title: "추천 작업 비동기화", summary: "무거운 AI 추천·보정 작업을 SQS에 적재하고 API는 즉시 응답하도록 분리했습니다. poison 메시지는 즉시 ack·삭제하고, 일시 실패는 SQS visibility timeout으로 재처리했습니다." },
+    { title: "Virtual Thread long-poll", summary: "결과 조회를 Virtual Thread에서 20초 long-poll로 처리해 대기 중 OS 스레드를 점유하지 않도록 했고, SmartLifecycle로 수신 워커의 생명주기를 관리했습니다." },
+    { title: "계층별 캐시", summary: "옷장·코디 목록과 상세는 Redis에 10분 캐시했습니다. S3 presigned URL은 공유 캐시 대신 인스턴스 로컬 Caffeine에 55분·최대 2만 건으로 캐시했습니다." },
+    { title: "관측과 알림", summary: "AOP로 서비스 실행 시간을 app_operation_seconds로 수집하고 Prometheus 15초 scrape, Grafana 대시보드와 p95·5xx·DB 대기 커넥션 알림 규칙을 구성했습니다." },
+    { title: "이메일 인증 가드레일", summary: "SecureRandom 기반 6자리 코드에 TTL 5분, 최대 5회 시도, 재발송 60초, 분당 30건 제한을 적용했습니다." },
+  ],
+  problems: [
+    { title: "AI 추천 연산이 API 응답을 막은 문제", problem: "무거운 AI 연산을 백엔드 요청 스레드에서 직접 호출하면 일반 API 요청까지 지연됐습니다.", solution: "추천·보정 작업을 SQS로 분리하고, 결과는 별도 long-poll 경로로 조회하게 했습니다.", result: "API 응답 경로와 AI 처리 경로를 분리하고 재처리 가능한 작업 흐름을 만들었습니다." },
+    { title: "반복 조회가 DB 부하로 이어진 문제", problem: "옷장과 코디 목록처럼 자주 열리는 화면이 매번 DB를 조회했습니다.", solution: "목록·상세는 Redis에, presigned URL은 인스턴스 로컬 Caffeine에 캐시했습니다.", result: "데이터 성격과 공유 필요성에 따라 캐시 위치와 TTL을 분리했습니다." },
+    { title: "운영 이상을 늦게 발견하는 문제", problem: "API·DB 상태를 요청 로그만으로 확인해 임계치 초과를 즉시 알기 어려웠습니다.", solution: "AOP 메트릭, Prometheus scrape, Grafana 대시보드와 p95·5xx·DB pending 알림을 구성했습니다.", result: "지연과 오류, DB 대기 증가를 지표와 알림으로 먼저 확인할 수 있게 했습니다." },
+    { title: "이메일 인증의 무차별 시도와 스팸 발송", problem: "인증 코드 발급과 검증에 만료·시도·재발송 제한이 필요했습니다.", solution: "6자리 코드 TTL 5분, 최대 5회 검증, 재발송 60초, 분당 30건 제한을 적용했습니다.", result: "인증 검증과 메일 발송 경로에 기본적인 남용 방어를 적용했습니다." },
+  ],
+  techChoice: [
+    { tech: "AWS SQS + Virtual Threads", feature: "추천 작업 비동기화와 long-poll", decision: "AI 처리와 결과 대기를 요청 스레드에서 분리했습니다.", advantage: "즉시 응답과 대기 스레드 비용 제어를 함께 달성했습니다.", comparison: "DLQ 운영 기준과 실제 부하 조건은 추가 검증이 필요합니다." },
+    { tech: "Redis + Caffeine", feature: "공유 목록과 presigned URL 캐시", decision: "공유가 필요한 목록은 Redis, 인스턴스 종속 URL은 로컬 Caffeine으로 구분했습니다.", advantage: "S3 URL을 불필요하게 분산 공유하지 않고 반복 조회를 줄였습니다.", comparison: "TTL과 최대 크기는 실사용 트래픽 기준으로 조정이 필요합니다." },
+    { tech: "Prometheus + Grafana", feature: "서비스 실행 시간과 운영 알림", decision: "AOP 메트릭과 Spring 기본 HTTP 지표를 함께 수집했습니다.", advantage: "p95·5xx·DB pending을 대시보드와 알림으로 확인했습니다.", comparison: "알림 임계치는 운영 데이터로 계속 보정해야 합니다." },
+  ],
+  retrospective: [
+    { point: "캐시 위치는 데이터 성격으로 결정했습니다.", detail: "공유가 필요한 목록은 Redis, 짧은 수명과 인스턴스 종속성이 있는 presigned URL은 Caffeine으로 분리했습니다." },
+    { point: "추가 검증", detail: "SQS 재처리·DLQ, long-poll 동시 연결, 캐시 hit ratio, p95·DB pending 알림 임계치를 운영 부하에서 추가 검증해야 합니다." },
+  ],
+};
+
 const projectOrder = ["robotpal", "mausoleum", "autowing", "sticker"];
 
 export const projects = projectOrder.map((id) => {
@@ -854,6 +889,7 @@ export const projects = projectOrder.map((id) => {
   return {
     ...project,
     ...portfolioContent[project.id],
+    ...(project.id === "sticker" ? stickerAccurateContent : {}),
     detailPage: projectDetailPages[project.id],
   };
 });

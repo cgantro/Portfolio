@@ -25,6 +25,7 @@ export const timeline = [
     type: "cert",
     title: "삼성 SW 역량테스트 Pro 취득",
     detail: "알고리즘 역량 인증",
+    period: "2026.03",
     tags: ["Samsung SW Expert Academy"],
   },
   {

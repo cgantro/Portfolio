@@ -1,39 +1,25 @@
 import SectionLabel from "../../ui/SectionLabel";
-import Tag from "../../ui/Tag";
 import styles from "./Activities.module.css";
 
 export default function Activities({ items }) {
   return (
-    <>
-      <SectionLabel>Activity</SectionLabel>
-
+    <div className={styles.wrap}>
+      <SectionLabel>경험 및 활동</SectionLabel>
+      <p className={styles.lead}>프로젝트 밖에서도 C++·시스템·문제 해결 역량을 쌓았습니다.</p>
+      <div className={styles.divider}><span>Experience</span></div>
       <div className={styles.list}>
-        {items.map((act) => (
-          <div key={act.id} className={styles.card}>
-            <div className={styles.cardHead}>
-              <div className={styles.titleRow}>
-                <span className={styles.title}>{act.title}</span>
-                <Tag variant={act.category === "교육" ? "accent" : "default"}>
-                  {act.category}
-                </Tag>
-              </div>
-              <div className={styles.sub}>
-                <span className={styles.subtitle}>{act.subtitle}</span>
-                <span className={styles.period}>{act.period}</span>
-              </div>
+        {items.map((activity) => (
+          <article key={activity.id} className={styles.item}>
+            <p className={styles.period}>{activity.period}</p>
+            <div className={styles.content}>
+              <p className={styles.category}>{activity.category}</p>
+              <h3>{activity.title}</h3>
+              <p className={styles.subtitle}>{activity.subtitle}</p>
+              <ul>{activity.items.map((item) => <li key={item}>{item}</li>)}</ul>
             </div>
-
-            <ul className={styles.items}>
-              {act.items.map((item, i) => (
-                <li key={i} className={styles.item}>
-                  <span className={styles.dot}>·</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          </article>
         ))}
       </div>
-    </>
+    </div>
   );
 }

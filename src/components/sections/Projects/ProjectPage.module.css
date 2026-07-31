@@ -1007,3 +1007,62 @@
     height: 1px;
   }
 }
+
+/* Reference-aligned project case study layout */
+.page {
+  width: min(100%, 980px);
+  gap: 0;
+  padding-top: 68px;
+}
+
+.hero {
+  max-width: 920px;
+  gap: 28px;
+}
+
+.heroBody {
+  align-items: center;
+  padding: 0 0 8px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+
+.heroBody::before { display: none; }
+.heroEyebrow { background: var(--project-accent-soft); }
+.heroTitle { max-width: 780px; font-size: clamp(38px, 5vw, 62px); letter-spacing: -.055em; }
+.heroMeta { justify-content: center; }
+.heroDescription { max-width: 720px; text-align: center; }
+.heroBody > .bulletList { width: min(100%, 760px); margin-top: 8px; padding: 18px 22px; border: 1px solid var(--border); border-radius: 16px; background: #fff; text-align: left; }
+.heroBody > .surfaceCard { width: min(100%, 760px); padding: 22px; border-radius: 16px; text-align: left; }
+.heroBody > .tagRow, .heroBody > .linkGroup { justify-content: center; }
+.heroMediaCard { padding: 14px; border-radius: 18px; box-shadow: 0 16px 36px rgba(15,23,42,.08); }
+.imageCaption { padding: 0 4px; text-align: left; }
+.outcomeGrid { width: min(100%, 920px); border-radius: 16px; overflow: hidden; background: var(--border); }
+.outcomeCard { padding: 20px; background: #fff; text-align: left; }
+.outcomeValue { color: var(--fg-bright); }
+.tagChip { border-color: var(--border); background: #fff; }
+
+/* Keep the project detail header as concise as the project directory. */
+.heroBody > .bulletList,
+.heroBody > .surfaceCard,
+.heroBody > .outcomeGrid { display: none; }
+.heroBody { gap: 16px; }
+.heroMeta { padding: 9px 14px; border-radius: 999px; background: var(--bg3); font-size: 12px; }
+
+.projectSection { gap: 26px; margin-top: 112px; }
+.sectionHeader { align-items: center; text-align: center; }
+.sectionTitle { color: var(--accent); font-size: clamp(30px, 4vw, 42px); letter-spacing: -.045em; }
+.sectionTitle::after { content: ""; display: block; width: 36px; height: 3px; margin: 14px auto 0; border-radius: 999px; background: var(--project-accent); }
+.surfaceCard, .factCard, .retroCard, .architectureBlock, .imageFeatureCard { border-radius: 16px; box-shadow: 0 10px 26px rgba(15,23,42,.045); }
+.architectureFlow { border-radius: 12px; background: var(--project-accent-soft); }
+.issueCard { border-radius: 16px; background: #fff; box-shadow: 0 8px 22px rgba(15,23,42,.04); }
+.table th, .compactTable th { background: var(--bg3); }
+.retroCard { background: #fff; }
+
+@media (max-width: 768px) {
+  .page { padding-top: 42px; }
+  .heroBody > .bulletList, .heroBody > .surfaceCard { padding: 16px; }
+  .projectSection { margin-top: 78px; }
+}

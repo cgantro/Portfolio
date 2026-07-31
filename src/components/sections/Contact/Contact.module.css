@@ -1,78 +1,9 @@
-.wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-.message {
-  font-size: 15px;
-  color: var(--fg);
-  line-height: 1.8;
-  max-width: 500px;
-}
-
-.links {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  border: 1px solid var(--border);
-  border-radius: var(--card-radius);
-  overflow: hidden;
-}
-
-.link {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  background: var(--bg2);
-  text-decoration: none;
-  transition: background 0.15s;
-}
-
-.link:not(:last-child) {
-  border-bottom: 1px solid var(--border);
-}
-
-.link:hover {
-  background: var(--bg3);
-}
-
-.link:hover .arrow {
-  transform: translate(4px, 0);
-  color: var(--accent);
-}
-
-.linkLabel {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--fg-dim);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  width: 60px;
-  flex-shrink: 0;
-}
-
-.linkVal {
-  font-size: 14px;
-  color: var(--fg-bright);
-  flex: 1;
-}
-
-.arrow {
-  font-family: var(--font-mono);
-  font-size: 14px;
-  color: var(--fg-dim);
-  transition: transform 0.15s, color 0.15s;
-}
-
-.footer {
-  padding-top: 24px;
-  border-top: 1px solid var(--border);
-}
-
-.footerText {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--fg-dim);
-}
+.wrapper { max-width: 760px; margin: 0 auto; padding: 86px 0 20px; border-top: 1px solid var(--border); text-align: center; }
+.eyebrow { color: var(--accent); font: 700 11px var(--font-mono); letter-spacing: .12em; }
+.wrapper h2 { margin-top: 16px; color: var(--fg-bright); font-size: clamp(34px, 5vw, 54px); line-height: 1.22; letter-spacing: -.055em; }
+.message { max-width: 530px; margin: 20px auto 0; color: var(--fg-dim); font-size: 16px; line-height: 1.8; word-break: keep-all; }
+.links { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+.links a { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border: 1px solid var(--border2); border-radius: 999px; background: #fff; color: var(--fg-bright); font-size: 14px; font-weight: 700; transition: transform .18s, border-color .18s, color .18s; }
+.links a:hover { transform: translateY(-2px); border-color: var(--accent); color: var(--accent); }
+.links span { color: var(--accent); font-size: 17px; }
+.footer { margin-top: 72px; color: var(--fg-dim); font: 11px var(--font-mono); }

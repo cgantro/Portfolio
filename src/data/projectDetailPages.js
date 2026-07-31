@@ -96,3 +96,15 @@ export const projectDetailPages = {
     sections: FORMAL_SECTIONS,
   },
 };
+
+Object.assign(projectDetailPages.sticker, {
+  hero: {
+    ...projectDetailPages.sticker.hero,
+    eyebrow: "Backend · Infrastructure · Observability",
+    description: "추천 비동기 파이프라인을 SQS로 분리하고, Virtual Thread long-poll·계층별 캐시·메트릭과 알림으로 응답성 및 운영 관측성을 설계했습니다.",
+  },
+  architectureNotes: [
+    "API → SQS → AI Recommendation Worker → Result Store → Virtual Thread Long-poll",
+    "목록·상세 조회는 Redis로, S3 presigned URL은 인스턴스 로컬 Caffeine으로 캐시했습니다. 실행 시간은 Prometheus·Grafana로 관측하고 p95·5xx·DB pending 알림 규칙을 적용했습니다.",
+  ],
+});

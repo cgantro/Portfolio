@@ -1,49 +1,46 @@
+import { useMemo, useState } from "react";
 import SectionLabel from "../../ui/SectionLabel";
 import styles from "./TechStack.module.css";
 
 function SkillIcon({ icon, name }) {
-  if (!icon) {
-    return (
-      <span className={styles.iconPh} title={name}>
-        {name[0]}
-      </span>
-    );
-  }
-  return (
-    <img
-      className={styles.icon}
-      src={`https://skillicons.dev/icons?i=${icon}&theme=dark`}
-      alt={name}
-      width={20}
-      height={20}
-      loading="lazy"
-    />
-  );
+  if (!icon) return <span className={styles.iconPh}>{name.slice(0, 2)}</span>;
+  return <img className={styles.icon} src={`https://skillicons.dev/icons?i=${icon}&theme=light`} alt="" loading="lazy" />;
 }
 
 export default function TechStack({ stack }) {
-  return (
-    <>
-      <SectionLabel>기술 스택</SectionLabel>
+  const [active, setActive] = useState(stack[0]?.category ?? "");
+  const selected = useMemo(() => stack.find((group) => group.category === active) ?? stack[0], [active, stack]);
 
-      <div className={styles.grid}>
+  return (
+    <div className={styles.wrap}>
+      <SectionLabel>기술 스택 및 도구</SectionLabel>
+      <p className={styles.lead}>C++ 응용 소프트웨어와 실시간 통신 구현에 사용하는 기술입니다.</p>
+      <div className={styles.tabs} role="tablist" aria-label="기술 스택 분류">
         {stack.map((group) => (
-          <div key={group.category} className={styles.group}>
-            <div className={styles.groupHeader}>
-              <span className={styles.groupIcon}>{group.icon}</span>
-              <span className={styles.groupName}>{group.category}</span>
-            </div>
-            <ul className={styles.items}>
-              {group.items.map((item) => (
-                <li key={item.name} className={styles.item}>
-                  <SkillIcon icon={item.skillicon} name={item.name} />
-                  <span className={styles.itemName}>{item.name}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <button
+            key={group.category}
+            className={active === group.category ? styles.activeTab : styles.tab}
+            onClick={() => setActive(group.category)}
+            role="tab"
+            aria-selected={active === group.category}
+          >
+            {group.category}
+          </button>
         ))}
       </div>
-    </>
+      {selected ? (
+        <div className={styles.skillPanel}>
+          <p className={styles.groupTitle}>{selected.category}</p>
+          <ul className={styles.items}>
+            {selected.items.map((item) => (
+              <li key={item.name} className={styles.item}>
+                <SkillIcon icon={item.skillicon} name={item.name} />
+                <span>{item.name}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
   );
 }
