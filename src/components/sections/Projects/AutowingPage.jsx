@@ -50,10 +50,10 @@ export default function AutowingPage({ project, detailPage, links }) {
         </div>
       </ProjectSection>
 
-      <ProjectSection id="architecture" label="시스템 구성" title="시스템 구성">
+      <ProjectSection id="architecture" label="아키텍처" title="아키텍처">
         <div className={styles.stackLayout}>
           <div className={styles.splitBoard}>
-            <ArchitectureBlock notes={detailPage.architectureNotes} />
+        <ArchitectureBlock notes={detailPage.architectureNotes} image={detailPage.architectureImage} />
             <FactPanel title="설계 판단" facts={architectureFacts} />
           </div>
           <article className={styles.surfaceCard}>

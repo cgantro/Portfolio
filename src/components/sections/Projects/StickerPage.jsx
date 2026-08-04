@@ -38,8 +38,8 @@ export default function StickerPage({ project, detailPage, links }) {
         </div>
       </ProjectSection>
 
-      <ProjectSection id="architecture" label="시스템 구성" title="시스템 구성">
-        <ArchitectureBlock notes={detailPage.architectureNotes} />
+      <ProjectSection id="architecture" label="아키텍처" title="아키텍처">
+        <ArchitectureBlock notes={detailPage.architectureNotes} image={detailPage.architectureImage} />
       </ProjectSection>
 
       <ProjectSection id="retrospective" label="한계와 추가 검증" title="한계와 추가 검증">

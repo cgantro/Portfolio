@@ -1,12 +1,16 @@
 import robotpalHero from "../../asset/로봇팔 시연.webp";
+import robotpalArchitecture from "../../asset/robotpal-system-architecture.svg?raw";
 import mausoleumHero from "../../asset/영묘.png";
+import mausoleumArchitecture from "../../asset/mausoleum-system-architecture.svg?raw";
 import autowingHero from "../../asset/오토잉카_실물.png";
+import autowingArchitecture from "../../asset/autowing-system-architecture.svg?raw";
 import stickerHero from "../../asset/Sticker.png";
+import stickerArchitecture from "../../asset/sticker-system-architecture.svg?raw";
 
 const FORMAL_SECTIONS = [
   { id: "implementation", label: "구현 내용" },
   { id: "troubleshooting", label: "문제 해결" },
-  { id: "architecture", label: "시스템 구성" },
+  { id: "architecture", label: "아키텍처" },
   { id: "retrospective", label: "한계와 추가 검증" },
 ];
 
@@ -15,29 +19,27 @@ export const projectDetailPages = {
     theme: { accent: "#7dd3fc", accentSoft: "rgba(125, 211, 252, 0.16)", surface: "linear-gradient(160deg, rgba(56, 189, 248, 0.18), rgba(14, 116, 144, 0.03))", glow: "rgba(56, 189, 248, 0.28)" },
     hero: {
       eyebrow: "Simulation · Streaming · Web Build", title: "RobotPal", subtitle: "",
-      description: "카메라 스트리밍에서 JPEG 인코딩과 네트워크 전송이 렌더링 루프를 지연시킨 문제를 측정하고 분리했습니다.",
+      description: "AGV와 로봇팔의 이동·조작을 가상 환경에서 시험하고, 카메라 스트리밍의 실제 종단 간 경로를 계측해 GPU Readback과 JPEG 인코딩 병목을 개선하고 검증했습니다.",
       media: { src: robotpalHero, alt: "RobotPal AGV 시뮬레이터와 카메라 프레임 스트리밍 화면", caption: "RobotPal AGV 시뮬레이터와 카메라 프레임 스트리밍 화면" },
     },
     spotlight: [
-      { label: "문제", value: "readback 대기와 JPEG 인코딩이 렌더링 루프를 지연" },
-      { label: "역할", value: "프레임 스트리밍 · 네트워크 모듈 · 병목 개선" },
-      { label: "결과", value: "Frame Drop Rate 17.6% → 0.8%" },
+      { label: "문제", value: "동기 Readback 병목과 PBO 적용 후 JPEG 처리 적체" },
+      { label: "역할", value: "스트리밍 · 통신 · 로봇 제어 · 성능 검증" },
+      { label: "결과", value: "최종 처리량 34.857 → 37.328fps · 지연 증가 확인" },
     ],
     context: { body: [] },
     architectureNotes: [
-      "Render Thread → PBO Readback → Bounded Frame Queue → JPEG Worker Pool → NetworkTransport",
-      "JPEG 워커가 프레임을 인코딩한 뒤 NetworkEngine을 호출했습니다. 네이티브 TCP는 내부 송신 큐와 송신 스레드로, WebAssembly는 WebSocket 구현체로 보냈습니다.",
+      "네이티브 TCP와 WebAssembly WebSocket은 동일한 메시지 구조를 사용합니다. 수신한 네트워크 명령은 AGV 제어 계층에 연결했고, frame_id와 생성 시각으로 C++ 송신 로그와 Python 수신 로그를 연결했습니다.",
     ],
+    architectureImage: { markup: robotpalArchitecture, alt: "RobotPal 카메라 스트리밍, 멀티플랫폼 통신과 AGV 제어 시스템 아키텍처 구조도" },
     benchmarkTable: {
-      title: "프레임 드랍 개선 결과", headers: ["항목", "값", "설명"],
+      title: "실제 종단 간 스트리밍 측정 결과", headers: ["조건", "최종 처리량", "Readback p50", "큐 대기 p50", "큐 폐기율", "종단 간 p50"],
       rows: [
-        ["비교", "단일 인코딩 워커 → 멀티 인코딩 워커", "워커 전략만 변경"],
-        ["공통 조건", "1632×1232 · 60 FPS · 30초 · JPEG 품질 70 · 큐 크기 6", "총 1,800프레임"],
-        ["빌드", "C++17 · -O2 · libjpeg", "벤치마크 문서의 재현 명령 기준"],
-        ["전송", "JPEG 인코딩 벤치마크", "TCP·WebSocket 실제 전송은 비교에 포함하지 않음"],
-        ["Frame Drop Rate", "17.6% → 0.8%", "생성 프레임 중 원본 프레임 큐가 포화되어 폐기된 비율"],
+        ["동기 + worker1", "34.857fps", "24.459ms", "0.165ms", "0%", "73.382ms"],
+        ["PBO + worker1", "32.889fps", "20.728ms", "141.157ms", "15.33%", "240.824ms"],
+        ["PBO + worker4", "37.328fps", "20.680ms", "0.073ms", "0%", "101.802ms"],
       ],
-      note: "PBO 적용 효과는 최종 드랍률과 같은 수치로 연결하지 않았습니다. PBO는 CPU가 현재 프레임의 GPU 작업 완료를 기다리는 구간을 줄이고, readback과 인코딩 시간을 별도로 측정하기 위한 변경이었습니다.",
+      note: "x64 Release · 1232×832 RGBA · JPEG 품질 70 · 큐 크기 6 · localhost TCP · 약 60초 실행(최초 10초 제외) 조건입니다. 조건별 1회 탐색 측정이므로 확정 개선률이 아니라 병목의 위치와 변화 방향을 보여주는 값입니다.",
     },
     links: [{ label: "Repository", href: "https://github.com/cgantro/RobotPal" }],
     sections: FORMAL_SECTIONS,
@@ -45,33 +47,34 @@ export const projectDetailPages = {
   mausoleum: {
     theme: { accent: "#f59e0b", accentSoft: "rgba(245, 158, 11, 0.15)", surface: "linear-gradient(160deg, rgba(245, 158, 11, 0.16), rgba(120, 53, 15, 0.04))", glow: "rgba(245, 158, 11, 0.24)" },
     hero: {
-      eyebrow: "UE5 Multiplayer · Real-time Voice", title: "UE5 Multiplayer Voice Communication", subtitle: "",
-      description: "UE5 클라이언트에서 캡처·화자별 Opus 코덱·UDP 전송·재생을 분리하고, VoiceServer는 RoomCode 해시로 패킷을 워커 큐에 분배하도록 구현했습니다.",
+      eyebrow: "UE5 Multiplayer · Game Server · Real-time Voice", title: "영묘", subtitle: "",
+      description: "UE5 멀티플레이 환경에서 음성 클라이언트와 UDP 서버, 크로스플랫폼 네트워크 계층, Room Code 기반 방별 게임 진행 로직을 구현했습니다.",
       media: { src: mausoleumHero, alt: "UE5 멀티플레이 음성 통신 프로젝트 실행 화면", caption: "UE5 멀티플레이 음성 통신 프로젝트 실행 화면" },
     },
     spotlight: [
-      { label: "문제", value: "포커스 복귀 후 오래된 PCM 재생과 방별 패킷의 단일 큐 집중" },
-      { label: "역할", value: "보이스 모듈 · 화자별 Opus 코덱 · UDP VoiceServer 샤딩" },
-      { label: "결과", value: "RoomCode 해시 2개 워커 큐 · 8KB stale PCM hard drop" },
+      { label: "문제", value: "실시간 음성 처리와 여러 방의 게임 상태·네트워크 경계 분리" },
+      { label: "역할", value: "음성 클라이언트·UDP 서버 · 네트워크 계층 · 방별 게임 로직" },
+      { label: "결과", value: "3개 서버 역할 분리 · RoomCode 기반 2개 음성 워커" },
     ],
     context: { body: [] },
     architectureNotes: [
-      "Capture → Per-speaker Opus Codec → UDP → VoiceServer → RoomCode Hash → 2 Worker Queues → Room Peers",
-      "클라이언트는 UPrivateVoiceChatComponent 아래에서 캡처·코덱·네트워크·재생을 분리했습니다. 서버는 같은 방의 송신자 외 사용자에게 공유 페이로드를 중계했습니다.",
+      "Room Code는 로비 요청, 음성 중계와 Dedicated Server의 방별 인스턴스를 연결하는 공통 경계입니다. 게임 진행, 로비와 음성 경로는 각각 독립된 서버 역할로 분리했습니다.",
     ],
+    architectureImage: { markup: mausoleumArchitecture, alt: "영묘 UE5 클라이언트, 로비 서버, UDP 음성 서버와 Dedicated 게임 서버 아키텍처 구조도" },
     sections: FORMAL_SECTIONS,
   },
   autowing: {
     theme: { accent: "#4ade80", accentSoft: "rgba(74, 222, 128, 0.15)", surface: "linear-gradient(160deg, rgba(16, 185, 129, 0.18), rgba(20, 83, 45, 0.03))", glow: "rgba(16, 185, 129, 0.26)" },
     hero: {
       eyebrow: "Control Backend · State Transition · Route Guidance", title: "오토윙카", subtitle: "",
-      description: "공항 견인차의 텔레메트리와 관제 명령을 처리하고, 실제 장비 상태와 요청 상태를 분리해 고빈도 이벤트 환경에서 검증했습니다.",
+      description: "공항 토잉카의 위치·상태를 MQTT로 수집하고 관제 명령과 경로 정보를 전달하며, 장비 결과 이벤트 기반 상태 전이와 그래프 경로 정책을 구현했습니다.",
       media: { src: autowingHero, alt: "Autowing 견인차" },
     },
-    spotlight: [{ label: "문제", value: "상태 전이와 MQTT 이벤트 순서 충돌" }, { label: "역할", value: "상태 전이 · 채널 분리 · 경로 추천 · 부하 테스트" }, { label: "결과", value: "8,935 msg/s · E2E 지연 14 → 8ms" }],
+    spotlight: [{ label: "문제", value: "명령 상태와 실제 장비 결과의 불일치 가능성" }, { label: "역할", value: "상태 전이 · 실시간 메시지 처리 · 경로 정책" }, { label: "결과", value: "8,935msg/s · E2E 지연 14~28ms" }],
     context: { body: [] },
-    architectureNotes: ["관제 명령 → DB 트랜잭션 → MQTT·WebSocket 메시지 발행", "장비가 보낸 상태 이벤트를 기준으로 최종 상태를 반영했고, 제어·영상·보조 데이터를 다른 채널로 분리했습니다."],
-    designMetrics: { title: "부하 테스트 결과", headers: ["항목", "값", "이유"], rows: [["부하 환경", "500개 모의 차량 · 각 10Hz", "텔레메트리 동시 전송"], ["E2E 지연", "14 → 8ms", "명령·상태 반영 경로 측정"], ["최대 처리량", "8,935 msg/s", "서버 처리량"], ["안정성", "5분 · 132만 메시지 · 유실 0건", "동일 부하 환경"]], note: "500개 모의 차량 클라이언트가 각각 10Hz로 텔레메트리를 전송하는 조건에서 측정했습니다." },
+    architectureNotes: ["관제 명령은 요청 상태로 관리하고 장비 결과 이벤트를 기준으로 최종 상태를 반영했습니다. 제어·영상·보조 데이터는 목적별 채널로 분리했습니다."],
+    architectureImage: { markup: autowingArchitecture, alt: "오토잉카 사용자, AWS 클라우드와 로봇 엣지 사이의 관제·텔레메트리·영상 아키텍처 구조도" },
+    designMetrics: { title: "부하 테스트 결과", headers: ["항목", "값", "측정 조건"], rows: [["부하 환경", "500대 장비 · 각 10Hz", "텔레메트리 동시 전송"], ["E2E 지연", "14~28ms", "동일 부하 조건"], ["최대 처리량", "8,935 msg/s", "서버 처리량"]], note: "500대 장비가 각각 초당 10회 텔레메트리를 전송하는 조건에서 측정했습니다." },
     sections: FORMAL_SECTIONS,
   },
   sticker: {
@@ -100,11 +103,16 @@ export const projectDetailPages = {
 Object.assign(projectDetailPages.sticker, {
   hero: {
     ...projectDetailPages.sticker.hero,
-    eyebrow: "Backend · Infrastructure · Observability",
-    description: "추천 비동기 파이프라인을 SQS로 분리하고, Virtual Thread long-poll·계층별 캐시·메트릭과 알림으로 응답성 및 운영 관측성을 설계했습니다.",
+    eyebrow: "Backend API · Security · Performance · Observability",
+    description: "이메일·JWT 인증과 날씨·AI 추천 API를 개발하고, Redis 캐시·DB 인덱스·계층별 메트릭·GitLab CI로 성능과 변경 검증 환경을 구축했습니다.",
   },
-  architectureNotes: [
-    "API → SQS → AI Recommendation Worker → Result Store → Virtual Thread Long-poll",
-    "목록·상세 조회는 Redis로, S3 presigned URL은 인스턴스 로컬 Caffeine으로 캐시했습니다. 실행 시간은 Prometheus·Grafana로 관측하고 p95·5xx·DB pending 알림 규칙을 적용했습니다.",
+  spotlight: [
+    { label: "범위", value: "API · 인증 · 성능 개선 · 모니터링" },
+    { label: "역할", value: "백엔드 API와 인증 · 캐시·인덱스 · 관측·CI" },
+    { label: "결과", value: "평균·p95·p99 관측 · MR 빌드·테스트·AI 리뷰" },
   ],
+  architectureNotes: [
+    "Actuator·Micrometer 메트릭은 Prometheus가 수집하고 Grafana에서 API·서비스·DB 지연과 오류율을 확인했습니다. GitLab MR에서는 빌드·테스트와 AI 코드 리뷰를 실행했습니다.",
+  ],
+  architectureImage: { markup: stickerArchitecture, alt: "STICKER 인증, API, 데이터, AI 추천, 모니터링과 CI 시스템 아키텍처 구조도" },
 });
