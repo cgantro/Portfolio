@@ -27,7 +27,7 @@
 
 ## 수치 표기 기준
 
-- RobotPal: 생성 프레임 중 큐 적체로 폐기된 프레임 비율을 Frame Drop Rate로 표기한다.
+- RobotPal: 최종 처리량은 워밍업을 제외한 구간의 Python 최종 소비 프레임 수를 측정시간으로 나눈 값으로 표기한다. 큐 폐기율은 `encode_queue_dropped / encode_queued`로 별도 표기한다.
 - UE5 음성: 16-bit PCM 원본과 Opus 애플리케이션 페이로드를 비교한다. 네트워크 사용량 절감으로 표현하지 않는다.
 - AUTOWINGCAR: 실제 차량이 아닌 500개 모의 차량 클라이언트가 각 10Hz로 전송한 조건임을 함께 표기한다.
 

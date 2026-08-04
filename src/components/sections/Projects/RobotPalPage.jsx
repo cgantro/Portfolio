@@ -26,7 +26,7 @@ export default function RobotPalPage({ project, detailPage, links }) {
               rows={detailPage.benchmarkTable.rows}
             />
             <p className={styles.tableNote}>{detailPage.benchmarkTable.note}</p>
-            <code className={styles.formula}>drop_rate = dropped / produced × 100</code>
+            <code className={styles.formula}>final_throughput = consumed / measured_seconds</code>
           </article>
         </div>
       </ProjectSection>
@@ -39,8 +39,8 @@ export default function RobotPalPage({ project, detailPage, links }) {
         </div>
       </ProjectSection>
 
-      <ProjectSection id="architecture" label="시스템 구성" title="시스템 구성">
-        <ArchitectureBlock notes={detailPage.architectureNotes} />
+      <ProjectSection id="architecture" label="아키텍처" title="아키텍처">
+        <ArchitectureBlock notes={detailPage.architectureNotes} image={detailPage.architectureImage} />
       </ProjectSection>
 
       <ProjectSection id="retrospective" label="한계와 추가 검증" title="한계와 추가 검증">

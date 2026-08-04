@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="760" viewBox="0 0 1400 760" role="img" aria-labelledby="title desc">
+  <title id="title">오토잉카 아키텍처</title>
+  <desc id="desc">사용자, AWS 클라우드 인프라와 로봇 엣지 영역 사이의 관제, 텔레메트리, 명령과 영상 흐름</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#475569"/></marker>
+    <marker id="videoArrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#c2410c"/></marker>
+    <style>
+      .zone{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}.cloud{fill:#eff6ff;stroke:#60a5fa;stroke-width:2}.docker{fill:#fff;stroke:#94a3b8;stroke-width:2;stroke-dasharray:7 6}.node{fill:#fff;stroke:#94a3b8;stroke-width:1.7}.robotNode{fill:#f0fdf4;stroke:#4ade80;stroke-width:2}.title{font:700 29px Arial,'Noto Sans KR',sans-serif;fill:#0f172a}.zoneTitle{font:700 18px Arial,'Noto Sans KR',sans-serif;fill:#334155}.label{font:700 17px Arial,'Noto Sans KR',sans-serif;fill:#0f172a;text-anchor:middle}.small{font:600 13px Arial,'Noto Sans KR',sans-serif;fill:#475569;text-anchor:middle}.flow{fill:none;stroke:#475569;stroke-width:2.4;marker-end:url(#arrow)}.video{fill:none;stroke:#c2410c;stroke-width:2.8;marker-end:url(#videoArrow)}.flowLabel{font:700 13px Arial,'Noto Sans KR',sans-serif;fill:#334155;text-anchor:middle}.videoLabel{font:700 14px Arial,'Noto Sans KR',sans-serif;fill:#9a3412;text-anchor:middle}
+    </style>
+  </defs>
+  <rect width="1400" height="760" fill="#fff"/>
+  <text class="title" x="55" y="52">Autowing Architecture</text>
+
+  <rect class="zone" x="45" y="90" width="240" height="570" rx="22"/>
+  <text class="zoneTitle" x="72" y="126">User Zone</text>
+  <rect class="node" x="80" y="285" width="170" height="130" rx="16"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" x="145" y="302" width="40" height="40"/>
+  <text class="label" x="165" y="371">Pilot · Controller</text>
+  <text class="small" x="165" y="394">Control Client</text>
+
+  <rect class="cloud" x="335" y="90" width="720" height="570" rx="22"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/amazonwebservices/amazonwebservices-original-wordmark.svg" x="365" y="105" width="52" height="40"/>
+  <text class="zoneTitle" x="435" y="130">AWS Cloud Infrastructure</text>
+  <rect class="zone" x="375" y="155" width="640" height="460" rx="18"/>
+  <text class="zoneTitle" x="405" y="190">AWS EC2</text>
+  <rect class="docker" x="405" y="215" width="580" height="360" rx="16"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/docker/docker-original.svg" x="430" y="229" width="32" height="32"/>
+  <text class="zoneTitle" x="475" y="252">Docker Network</text>
+
+  <rect class="node" x="445" y="305" width="150" height="100" rx="14"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nginx/nginx-original.svg" x="503" y="315" width="34" height="34"/>
+  <text class="label" x="520" y="376">Nginx</text><text class="small" x="520" y="395">Gateway</text>
+
+  <rect class="node" x="630" y="285" width="170" height="120" rx="14"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/spring/spring-original.svg" x="698" y="298" width="34" height="34"/>
+  <text class="label" x="715" y="359">Spring Boot</text><text class="small" x="715" y="381">Backend</text>
+
+  <rect class="node" x="835" y="305" width="115" height="100" rx="14"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/redis/redis-original.svg" x="876" y="315" width="34" height="34"/>
+  <text class="label" x="892" y="378">Redis</text>
+
+  <rect class="node" x="445" y="450" width="150" height="95" rx="14"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" x="503" y="459" width="34" height="34"/>
+  <text class="label" x="520" y="521">Frontend</text>
+
+  <rect class="node" x="640" y="450" width="150" height="95" rx="14"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postgresql/postgresql-original.svg" x="698" y="459" width="34" height="34"/>
+  <text class="label" x="715" y="521">PostgreSQL</text>
+
+  <rect class="node" x="835" y="450" width="115" height="95" rx="14"/>
+  <image href="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/mqtt.svg" x="875" y="459" width="34" height="34"/>
+  <text class="label" x="892" y="521">MQTT</text>
+
+  <rect class="zone" x="1105" y="90" width="250" height="570" rx="22"/>
+  <text class="zoneTitle" x="1132" y="126">Robot Edge Zone</text>
+  <rect class="robotNode" x="1140" y="245" width="180" height="190" rx="18"/>
+  <image href="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/nvidia.svg" x="1210" y="267" width="40" height="40"/>
+  <text class="label" x="1230" y="337">NVIDIA Orin</text><text class="small" x="1230" y="359">AI · ROS2</text>
+  <path d="M1176 391h108l-9 23h-90Z" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/><circle cx="1200" cy="416" r="9" fill="#334155"/><circle cx="1260" cy="416" r="9" fill="#334155"/>
+  <rect class="robotNode" x="1170" y="490" width="120" height="80" rx="14"/>
+  <circle cx="1230" cy="525" r="16" fill="none" stroke="#16a34a" stroke-width="3"/><circle cx="1230" cy="525" r="6" fill="#16a34a"/>
+  <text class="small" x="1230" y="557">Camera</text>
+
+  <path class="flow" d="M250 325H445"/><text class="flowLabel" x="347" y="313">HTTPS · WSS</text>
+  <path class="flow" d="M595 355H630"/><path class="flow" d="M800 330H835"/>
+  <path class="flow" d="M715 405V450"/><path class="flow" d="M630 375H610V498H595"/>
+  <path class="flow" d="M800 375H815V498H835"/>
+
+  <path class="flow" d="M1055 300H1105"/><text class="flowLabel" x="1080" y="286">Signaling</text>
+  <path class="flow" d="M1105 350H950"/><text class="flowLabel" x="1027" y="338">Telemetry</text>
+  <path class="flow" d="M950 395H1105"/><text class="flowLabel" x="1027" y="423">Command</text>
+  <path class="video" d="M1170 530H1065V625H165V415"/><text class="videoLabel" x="710" y="648">WebRTC Video Stream</text>
+</svg>

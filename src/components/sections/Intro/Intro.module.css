@@ -11,9 +11,10 @@
 .strengthSection > h2 { color: var(--accent); font-size: clamp(28px, 3.6vw, 40px); letter-spacing: -.04em; }
 .strengthSection > p { margin-top: 8px; color: var(--fg-dim); font-size: 15px; }
 .strengthGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 42px; text-align: left; }
+.collaborationGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .strengthCard { min-height: 220px; padding: 26px; border: 1px solid var(--border); border-radius: 18px; background: var(--bg2); box-shadow: 0 10px 25px rgba(15,23,42,.045); transition: transform .2s, box-shadow .2s; }
 .strengthCard:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(37,99,235,.12); }
 .strengthIcon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; background: var(--accent-bg); color: var(--accent); font-size: 25px; }
 .strengthCard h3 { margin-top: 20px; color: var(--fg-bright); font-size: 19px; letter-spacing: -.03em; }
 .strengthCard p { margin-top: 10px; color: var(--fg-dim); font-size: 14px; line-height: 1.75; word-break: keep-all; }
-@media (max-width: 720px) { .intro { padding-top: 86px; } .strengthGrid { grid-template-columns: 1fr; } .strengthCard { min-height: 0; } .role { letter-spacing: -.045em; } }
+@media (max-width: 720px) { .intro { padding-top: 86px; } .strengthGrid, .collaborationGrid { grid-template-columns: 1fr; } .strengthCard { min-height: 0; } .role { letter-spacing: -.045em; } }

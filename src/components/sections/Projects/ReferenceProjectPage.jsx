@@ -76,9 +76,21 @@ export default function ReferenceProjectPage({ project, detailPage, previousProj
         </DetailSection>
       ) : null}
 
-      <DetailSection eyebrow="System" title="시스템 구성">
-        <p className={styles.flow}>{detailPage.architectureNotes?.[0]}</p>
-        {detailPage.architectureNotes?.slice(1).map((note) => <p key={note} className={styles.description}>{note}</p>)}
+      <DetailSection eyebrow="Architecture" title="아키텍처">
+        {detailPage.architectureImage ? (
+          <figure className={styles.architectureFigure}>
+            {detailPage.architectureImage.markup ? (
+              <div
+                className={styles.architectureSvg}
+                role="img"
+                aria-label={detailPage.architectureImage.alt}
+                dangerouslySetInnerHTML={{ __html: detailPage.architectureImage.markup }}
+              />
+            ) : (
+              <img src={detailPage.architectureImage.src} alt={detailPage.architectureImage.alt} />
+            )}
+          </figure>
+        ) : null}
       </DetailSection>
 
       <DetailSection eyebrow="Review" title="한계와 추가 검증">

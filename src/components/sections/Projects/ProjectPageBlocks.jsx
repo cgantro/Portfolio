@@ -509,16 +509,23 @@ export function TimelinePanel({ title, items }) {
   );
 }
 
-export function ArchitectureBlock({ notes }) {
+export function ArchitectureBlock({ image }) {
   return (
     <article className={styles.architectureBlock}>
-      {notes.map((note) =>
-        note.includes("→") ? (
-          <div key={note} className={styles.architectureFlow}>{note}</div>
-        ) : (
-          <p key={note} className={styles.architectureCopy}>{note}</p>
-        ),
-      )}
+      {image ? (
+        <figure className={styles.architectureFigure}>
+          {image.markup ? (
+            <div
+              className={styles.architectureImage}
+              role="img"
+              aria-label={image.alt}
+              dangerouslySetInnerHTML={{ __html: image.markup }}
+            />
+          ) : (
+            <img className={styles.architectureImage} src={image.src} alt={image.alt} />
+          )}
+        </figure>
+      ) : null}
     </article>
   );
 }

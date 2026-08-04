@@ -126,6 +126,10 @@
   color: var(--fg-dim);
 }
 
+.architectureFigure { display: flex; flex-direction: column; gap: 10px; margin: 0; }
+.architectureImage { display: block; width: 100%; height: auto; border: 1px solid var(--border); border-radius: 12px; background: #071421; }
+.architectureImage svg { display: block; width: 100%; height: auto; }
+
 .heroBody {
   position: relative;
   overflow: hidden;

@@ -37,5 +37,9 @@ th { color: var(--fg-bright); background: var(--bg3); font-size: 12px; }
 tbody tr:last-child td { border-bottom: 0; }
 .note { margin-top: 14px; color: var(--fg-dim); font-size: 13px; line-height: 1.75; }
 .flow { margin-top: 24px; padding: 18px; overflow-x: auto; border-radius: 12px; background: var(--bg3); color: var(--accent-dim); font-size: 14px; font-weight: 700; white-space: nowrap; }
+.architectureFigure { margin: 28px 0 0; overflow: hidden; border: 1px solid var(--border); border-radius: 18px; background: #fff; }
+.architectureFigure img { display: block; width: 100%; height: auto; }
+.architectureSvg { line-height: 0; }
+.architectureSvg svg { display: block; width: 100%; height: auto; }
 .pager { display: flex; justify-content: space-between; margin-top: 90px; padding-top: 24px; border-top: 1px solid var(--border); }
 @media (max-width: 640px) { .page { padding-top: 48px; } .meta { grid-template-columns: 1fr; } .meta div { border-right: 0; border-bottom: 1px solid var(--border); } .meta div:last-child { border-bottom: 0; } .section { margin-top: 76px; } .entry { grid-template-columns: 34px 1fr; gap: 10px; } }

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">영묘 아키텍처</title>
+  <desc id="desc">UE5 클라이언트와 로비, 음성, 게임 서버의 통신 구조</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748b"/></marker>
+    <symbol id="device" viewBox="0 0 32 32"><g fill="none" stroke="#16a34a" stroke-width="2"><rect x="4" y="5" width="24" height="18" rx="2"/><path d="M10 28h12M16 23v5"/></g></symbol>
+    <symbol id="mic" viewBox="0 0 32 32"><g fill="none" stroke="#16a34a" stroke-width="2"><rect x="11" y="4" width="10" height="17" rx="5"/><path d="M7 16a9 9 0 0 0 18 0M16 25v4"/></g></symbol>
+    <symbol id="serverIcon" viewBox="0 0 32 32"><g fill="none" stroke="#2563eb" stroke-width="2"><rect x="4" y="4" width="24" height="10" rx="2"/><rect x="4" y="18" width="24" height="10" rx="2"/><path d="M8 9h.1M8 23h.1M13 9h11M13 23h11"/></g></symbol>
+    <symbol id="route" viewBox="0 0 32 32"><g fill="none" stroke="#ca8a04" stroke-width="2"><circle cx="7" cy="7" r="3"/><circle cx="25" cy="7" r="3"/><circle cx="16" cy="25" r="3"/><path d="M10 7h12M9 9l5 13M23 9l-5 13"/></g></symbol>
+    <style>
+      .zone{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}.client{fill:#f0fdf4;stroke:#4ade80;stroke-width:2}.server{fill:#eff6ff;stroke:#60a5fa;stroke-width:2}.game{fill:#fefce8;stroke:#facc15;stroke-width:2}.label{font:700 20px Arial,'Noto Sans KR',sans-serif;fill:#0f172a;text-anchor:middle}.small{font:600 15px Arial,'Noto Sans KR',sans-serif;fill:#475569;text-anchor:middle}.zoneTitle{font:700 17px Arial,'Noto Sans KR',sans-serif;fill:#334155}.line{fill:none;stroke:#64748b;stroke-width:2.5;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="680" fill="#fff"/>
+  <text x="60" y="55" style="font:700 28px Arial,'Noto Sans KR',sans-serif;fill:#0f172a">Mausoleum Architecture</text>
+
+  <rect class="zone" x="50" y="95" width="310" height="500" rx="22"/><text class="zoneTitle" x="78" y="130">UE5 Client</text>
+  <rect class="client" x="90" y="180" width="230" height="90" rx="14"/><image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/unrealengine/unrealengine-original.svg" x="191" y="188" width="28" height="28"/><text class="label" x="205" y="239">Lobby Client</text><text class="small" x="205" y="260">Room · Chat</text>
+  <rect class="client" x="90" y="315" width="230" height="90" rx="14"/><image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/unrealengine/unrealengine-original.svg" x="191" y="323" width="28" height="28"/><text class="label" x="205" y="374">Voice Client</text><text class="small" x="205" y="395">Opus</text>
+  <rect class="client" x="90" y="450" width="230" height="90" rx="14"/><image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/unrealengine/unrealengine-original.svg" x="191" y="458" width="28" height="28"/><text class="label" x="205" y="509">Game Client</text><text class="small" x="205" y="530">Gameplay</text>
+
+  <rect class="zone" x="445" y="95" width="310" height="500" rx="22"/><text class="zoneTitle" x="473" y="130">C++ Network Servers</text>
+  <rect class="server" x="485" y="180" width="230" height="90" rx="14"/><use href="#serverIcon" x="586" y="188" width="28" height="28"/><text class="label" x="600" y="239">Lobby Server</text><text class="small" x="600" y="260">WebSocket</text>
+  <rect class="server" x="485" y="315" width="230" height="90" rx="14"/><use href="#mic" x="586" y="323" width="28" height="28"/><text class="label" x="600" y="374">Voice Server</text><text class="small" x="600" y="395">UDP</text>
+  <rect class="server" x="485" y="450" width="230" height="90" rx="14"/><use href="#route" x="586" y="458" width="28" height="28"/><text class="label" x="600" y="509">Room Routing</text><text class="small" x="600" y="530">Room Code</text>
+
+  <rect class="zone" x="840" y="95" width="310" height="500" rx="22"/><text class="zoneTitle" x="868" y="130">UE Dedicated Server</text>
+  <rect class="game" x="880" y="220" width="230" height="90" rx="14"/><image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/unrealengine/unrealengine-original.svg" x="981" y="228" width="28" height="28"/><text class="label" x="995" y="279">Game Session</text><text class="small" x="995" y="300">Replication</text>
+  <rect class="game" x="880" y="390" width="230" height="90" rx="14"/><image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/unrealengine/unrealengine-original.svg" x="981" y="398" width="28" height="28"/><text class="label" x="995" y="449">Game Flow</text><text class="small" x="995" y="470">Phase · Spawn</text>
+
+  <path class="line" d="M320 225H485"/><path class="line" d="M320 360H485"/><path class="line" d="M320 495H485"/>
+  <path class="line" d="M715 225H800V265H880"/><path class="line" d="M715 495H800V435H880"/>
+  <path class="line" d="M880 330H780V550H320V505"/>
+  <text class="small" x="402" y="211">Lobby</text><text class="small" x="402" y="346">Voice</text><text class="small" x="402" y="481">Game</text>
+</svg>

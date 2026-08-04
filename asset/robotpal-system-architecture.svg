@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">RobotPal 아키텍처</title>
+  <desc id="desc">시뮬레이터의 렌더링, 프레임 처리, 네트워크 전송과 제어 흐름</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748b"/></marker>
+    <symbol id="device" viewBox="0 0 32 32"><g fill="none" stroke="#2563eb" stroke-width="2"><rect x="4" y="5" width="24" height="18" rx="2"/><path d="M10 28h12M16 23v5"/></g></symbol>
+    <symbol id="robot" viewBox="0 0 32 32"><g fill="none" stroke="#2563eb" stroke-width="2"><rect x="6" y="9" width="20" height="16" rx="4"/><path d="M16 4v5M11 16h.1M21 16h.1M11 21h10"/></g></symbol>
+    <symbol id="stack" viewBox="0 0 32 32"><g fill="none" stroke="#2563eb" stroke-width="2"><rect x="4" y="5" width="24" height="6" rx="2"/><rect x="4" y="13" width="24" height="6" rx="2"/><rect x="4" y="21" width="24" height="6" rx="2"/></g></symbol>
+    <symbol id="network" viewBox="0 0 32 32"><g fill="none" stroke="#2563eb" stroke-width="2"><circle cx="16" cy="16" r="12"/><path d="M4 16h24M16 4c4 4 4 20 0 24M16 4c-4 4-4 20 0 24"/></g></symbol>
+    <symbol id="photo" viewBox="0 0 32 32"><g fill="none" stroke="#2563eb" stroke-width="2"><rect x="3" y="4" width="26" height="24" rx="3"/><circle cx="11" cy="12" r="3"/><path d="m6 24 7-7 5 5 3-3 5 5"/></g></symbol>
+    <symbol id="camera" viewBox="0 0 32 32"><g fill="none" stroke="#16a34a" stroke-width="2"><path d="M4 10h6l2-4h8l2 4h6v17H4Z"/><circle cx="16" cy="18" r="6"/></g></symbol>
+    <style>
+      .zone{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}.core{fill:#eff6ff;stroke:#60a5fa;stroke-width:2}.process{fill:#fff;stroke:#94a3b8;stroke-width:2}.edge{fill:#f0fdf4;stroke:#4ade80;stroke-width:2}.label{font:700 20px Arial,'Noto Sans KR',sans-serif;fill:#0f172a;text-anchor:middle}.small{font:600 15px Arial,'Noto Sans KR',sans-serif;fill:#475569;text-anchor:middle}.zoneTitle{font:700 17px Arial,'Noto Sans KR',sans-serif;fill:#334155}.line{fill:none;stroke:#64748b;stroke-width:2.5;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1200" height="680" fill="#fff"/>
+  <text x="60" y="55" style="font:700 28px Arial,'Noto Sans KR',sans-serif;fill:#0f172a">RobotPal Architecture</text>
+
+  <rect class="zone" x="50" y="95" width="790" height="500" rx="22"/>
+  <text class="zoneTitle" x="78" y="130">C++ Simulator</text>
+  <rect class="core" x="100" y="185" width="190" height="90" rx="14"/>
+  <use href="#robot" x="181" y="193" width="28" height="28"/>
+  <text class="label" x="195" y="244">Simulation</text><text class="small" x="195" y="265">AGV · Robot Arm</text>
+  <rect class="process" x="350" y="185" width="190" height="90" rx="14"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opengl/opengl-original.svg" x="431" y="195" width="28" height="28"/>
+  <text class="label" x="445" y="252">OpenGL Renderer</text>
+  <rect class="process" x="600" y="185" width="190" height="90" rx="14"/>
+  <image href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/opengl/opengl-original.svg" x="681" y="193" width="28" height="28"/>
+  <text class="label" x="695" y="244">PBO Readback</text><text class="small" x="695" y="265">Double Buffer</text>
+
+  <rect class="process" x="225" y="405" width="190" height="90" rx="14"/>
+  <use href="#stack" x="306" y="413" width="28" height="28"/>
+  <text class="label" x="320" y="464">Frame Queue</text><text class="small" x="320" y="485">Drop Oldest</text>
+  <rect class="process" x="475" y="405" width="190" height="90" rx="14"/>
+  <use href="#photo" x="556" y="413" width="28" height="28"/>
+  <text class="label" x="570" y="464">JPEG Workers</text><text class="small" x="570" y="485">libjpeg-turbo</text>
+  <rect class="core" x="700" y="405" width="110" height="90" rx="14"/>
+  <use href="#network" x="741" y="413" width="28" height="28"/>
+  <text class="label" x="755" y="464">Transport</text><text class="small" x="755" y="485">TCP · WS</text>
+
+  <rect class="zone" x="900" y="95" width="250" height="500" rx="22"/>
+  <text class="zoneTitle" x="928" y="130">Client</text>
+  <rect class="edge" x="930" y="205" width="190" height="90" rx="14"/>
+  <use href="#camera" x="1011" y="213" width="28" height="28"/>
+  <text class="label" x="1025" y="264">Python Client</text><text class="small" x="1025" y="285">Video Stream</text>
+  <rect class="edge" x="930" y="405" width="190" height="90" rx="14"/>
+  <image href="https://skillicons.dev/icons?i=wasm&amp;theme=light" x="1011" y="413" width="28" height="28"/>
+  <text class="label" x="1025" y="464">Web Client</text><text class="small" x="1025" y="485">WebAssembly</text>
+
+  <path class="line" d="M290 230H350"/><path class="line" d="M540 230H600"/>
+  <path class="line" d="M695 275V335H320V405"/><path class="line" d="M415 450H475"/><path class="line" d="M665 450H700"/>
+  <path class="line" d="M810 435H870V250H930"/><path class="line" d="M810 465H930"/>
+  <path class="line" d="M930 520H860V550H195V275"/>
+  <text class="small" x="858" y="235">Frames</text><text class="small" x="825" y="574">Commands</text>
+</svg>
