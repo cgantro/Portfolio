@@ -2,6 +2,22 @@
  * 서브 프로젝트 — 작은 카드 (어떤 프로젝트인지 + 기술 스택)
  */
 export const subProjects = [
+  {
+    id: "media-workbench",
+    title: "Media Workbench",
+    subtitle: "MP4 변환과 음성 인식을 하나로 묶은 Windows 네이티브 데스크톱 도구",
+    period: "2026.06",
+    team: "개인 프로젝트",
+    role: "설계 및 구현",
+    stack: ["C++17", "Win32 API", "FFmpeg", "whisper.cpp", "CUDA", "CMake", "Inno Setup"],
+    summary:
+      "FFmpeg로 MP4를 MP3로 변환하고, whisper.cpp 기반 음성 인식 결과를 텍스트 파일로 저장하는 Windows 데스크톱 애플리케이션입니다. 변환과 인식 기능을 각각의 UI와 컨트롤러로 분리하고, CUDA 런타임을 포함한 패키징 경로를 구성했습니다.",
+    cover: null,
+    links: {
+      github: "https://github.com/cgantro/MP3-Extractor---STT",
+    },
+  },
+
   // ── 부트캠프 ──
   {
     id: "snackshop",
