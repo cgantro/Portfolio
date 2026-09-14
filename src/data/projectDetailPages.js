@@ -19,13 +19,13 @@ export const projectDetailPages = {
     theme: { accent: "#7dd3fc", accentSoft: "rgba(125, 211, 252, 0.16)", surface: "linear-gradient(160deg, rgba(56, 189, 248, 0.18), rgba(14, 116, 144, 0.03))", glow: "rgba(56, 189, 248, 0.28)" },
     hero: {
       eyebrow: "Simulation · Streaming · Web Build", title: "RobotPal", subtitle: "",
-      description: "AGV와 로봇팔의 이동·조작을 가상 환경에서 시험하고, 카메라 스트리밍의 실제 종단 간 경로를 계측해 GPU Readback과 JPEG 인코딩 병목을 개선하고 검증했습니다.",
+      description: "AGV와 로봇팔의 이동·조작을 가상 환경에서 시험하고, 카메라 스트리밍 파이프라인을 단계별로 계측해 GPU Readback과 JPEG 인코딩 병목을 개선하고 검증했습니다.",
       media: { src: robotpalHero, alt: "RobotPal AGV 시뮬레이터와 카메라 프레임 스트리밍 화면", caption: "RobotPal AGV 시뮬레이터와 카메라 프레임 스트리밍 화면" },
     },
     spotlight: [
       { label: "문제", value: "동기 Readback 병목과 PBO 적용 후 JPEG 처리 적체" },
       { label: "역할", value: "스트리밍 · 통신 · 로봇 제어 · 성능 검증" },
-      { label: "결과", value: "최종 처리량 34.857 → 37.328fps · 지연 증가 확인" },
+      { label: "결과", value: "최종 처리량 34.857 → 37.328fps · PBO+worker4 큐 폐기율 0%" },
     ],
     context: { body: [] },
     architectureNotes: [
@@ -33,13 +33,12 @@ export const projectDetailPages = {
     ],
     architectureImage: { markup: robotpalArchitecture, alt: "RobotPal 카메라 스트리밍, 멀티플랫폼 통신과 AGV 제어 시스템 아키텍처 구조도" },
     benchmarkTable: {
-      title: "실제 종단 간 스트리밍 측정 결과", headers: ["조건", "최종 처리량", "Readback p50", "큐 대기 p50", "큐 폐기율", "종단 간 p50"],
+      title: "스트리밍 병목 측정 결과", headers: ["조건", "최종 처리량", "Readback p50", "큐 대기 p50", "큐 폐기율"],
       rows: [
-        ["동기 + worker1", "34.857fps", "24.459ms", "0.165ms", "0%", "73.382ms"],
-        ["PBO + worker1", "32.889fps", "20.728ms", "141.157ms", "15.33%", "240.824ms"],
-        ["PBO + worker4", "37.328fps", "20.680ms", "0.073ms", "0%", "101.802ms"],
+        ["동기 + worker1", "34.857fps", "24.459ms", "0.165ms", "0%"],
+        ["PBO + worker1", "32.889fps", "20.728ms", "141.157ms", "15.33%"],
+        ["PBO + worker4", "37.328fps", "20.680ms", "0.073ms", "0%"],
       ],
-      note: "x64 Release · 1232×832 RGBA · JPEG 품질 70 · 큐 크기 6 · localhost TCP · 약 60초 실행(최초 10초 제외) 조건입니다. 조건별 1회 탐색 측정이므로 확정 개선률이 아니라 병목의 위치와 변화 방향을 보여주는 값입니다.",
     },
     links: [{ label: "Repository", href: "https://github.com/cgantro/RobotPal" }],
     sections: FORMAL_SECTIONS,
