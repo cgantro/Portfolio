@@ -25,8 +25,6 @@ export default function RobotPalPage({ project, detailPage, links }) {
               headers={detailPage.benchmarkTable.headers}
               rows={detailPage.benchmarkTable.rows}
             />
-            <p className={styles.tableNote}>{detailPage.benchmarkTable.note}</p>
-            <code className={styles.formula}>final_throughput = consumed / measured_seconds</code>
           </article>
         </div>
       </ProjectSection>
