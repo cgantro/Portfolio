@@ -20,21 +20,20 @@ ECS(Entity-Component-System) 구조로 씬 관리 기틀 잡기. GLTF 모델 로
 
 **[중간] 스트리밍 파이프라인 구축**
 
-TCP + WebSocket 이중 스트리밍 레이어 설계. Python 브릿지(`RobotPal-python`)로 PC↔로봇팔 명령 전달. JPEG 인코딩을 싱글 스레드로 구현 → 렌더 루프 FPS 저하 문제 발생.
+AI 학습·추론에 사용할 가상 카메라 영상을 외부로 전달하는 스트리밍 경로를 구축했다. 최신 성능 검증에서는 번호판 인식에 필요한 **1232×832** 해상도를 유지하고, Camera Send FPS와 Streaming ON Simulation FPS를 함께 개선 대상으로 삼았다.
 
 ↓
 
 **[후반] 성능 최적화 + 그리퍼 시스템**
 
-멀티 스레드 인코딩 워커 풀 + PBO(Pixel Buffer Object) 이중 버퍼 비동기 readback 구조로 병목 해소. 집게 잡기/놓기 로직을 ECS 시스템으로 통합.
+초기에는 GPU Readback을 주요 병목으로 예상해 Non-blocking PBO + Fence를 적용했지만 PBO-only는 전체 성능을 개선하지 못했다. Tracy 재계측에서 JPEG가 더 큰 Main Thread 병목임을 확인한 뒤 JPEG 작업을 4 Worker로 분리해 Simulation critical path에서 제거했다. 집게 잡기/놓기 로직은 ECS 시스템으로 통합했다.
 
-**내 역할 및 세부 구현 방식 (추정 근거: yoonpyo, pyo8470 등 다중 Git 별칭 전체 커밋 분석)**
-- **제어 시스템 다형성 설계 (`IRobotController`)**: `Init()`, `Move(v, w)`, `Update(dt)` 순수 가상 함수를 가진 인터페이스를 정의하여 제어 논리를 추상화했습니다.
-  - `RealController`: `Move()` 호출 시 `"CMD:%.2f,%.2f"` 포맷의 문자열을 생성하여 TCP 패킷으로 `control_bridge.py`에 전송합니다. 패킷 유실 시 `Dead Reckoning`(추측 항법)으로 움직임을 보간하는 방어 로직을 작성했습니다.
-  - `SimController`: 물리 엔진 대신 GLM을 활용한 `MovementMath::CalculateNextStep()`으로 Entity의 회전(Quaternion)과 위치(Vec3)를 틱마다 계산하여 ECS 컴포넌트에 직접 업데이트합니다.
-- **논블로킹 네트워크 엔진 (`TcpNetworkTransport`)**: C++ 소켓 통신을 멀티스레드로 래핑했습니다. 메인 렌더 루프가 `Send()`를 호출하면 `ConcurrentQueue`에 패킷만 넣고 즉시 반환(Main Thread Blocking 원천 차단)하며, 백그라운드 `SendWorker`와 `RecvWorker` 스레드가 각각 `send()`와 `recv()` 블로킹 호출을 전담하도록 구현했습니다.
-- **스트리밍 시스템 및 JPEG 멀티 스레드 인코딩**: libjpeg-turbo를 도입하고 `ROBOTPAL_ENCODE_WORKERS` 환경변수로 스레드 풀 크기를 조절할 수 있도록 설계했습니다.
-- **PBO 비동기 readback**: `Texture::GetAsyncData` ping-pong 구조를 설계하여 GPU `glReadPixels` 스톨 현상을 방지했습니다.
+**내 역할 및 세부 구현 방식**
+- **제어 시스템 다형성 설계 (`IRobotController`)**: 상위 제어 논리와 실제/가상 제어 구현을 분리.
+- **논블로킹 네트워크 엔진 (`TcpNetworkTransport`)**: 메인 렌더 루프와 송수신 처리를 분리.
+- **카메라 스트리밍 성능 검증**: Sync / PBO / PBO+4Worker 구조를 비교하고 Tracy로 Readback·JPEG·Main-thread enqueue를 계측.
+- **가설 수정과 구조 개선**: PBO-only가 개선되지 않자 GPU Readback 중심 가설을 폐기하고 JPEG Main Thread 병목을 기준으로 4 Worker 구조를 적용.
+- **PBO 비동기 readback**: Non-blocking PBO + Fence 구조를 성능 가설 검증에 사용. 현재 workload에서는 PBO-only 개선 효과가 관측되지 않았음을 함께 기록.
 - **그리퍼 잡기/놓기 ECS 통합 (`TryGrip()`)**: 
   - 잡기(Grab): `flecs::world().query<Grabbable>()`을 통해 모든 객체를 순회하고 `glm::distance2`로 최단 거리 객체를 판별한 뒤, 대상을 그리퍼 Entity의 자식(`SetParent`)으로 만들고 로컬 좌표를 (0,0,0)으로 초기화하여 정확히 달라붙게 구현했습니다.
   - 놓기(Release): 부모 관계를 끊을 때, 강제로 월드 행렬을 재계산(`glm::decompose`)하여 월드 좌표계 기준의 위치/회전값을 다시 로컬 좌표로 덮어씌워 오브젝트가 엉뚱한 곳으로 텔레포트하지 않도록 처리했습니다.
@@ -43,95 +42,84 @@ TCP + WebSocket 이중 스트리밍 레이어 설계. Python 브릿지(`RobotPal
 
 ## 3. 문제 해결 과정
 
-**Day ~14 (2025-11-26 전후)**
+### 웹 실행 환경 대응
 
-문제: Emscripten 빌드에서 WebSocket 링크 오류
+Emscripten/WebAssembly 환경에서는 Desktop TCP와 다른 WebSocket 전송 경로 및 pthread 실행 조건을 고려했다. SharedArrayBuffer 등 브라우저 제약을 확인하고 웹 실행 조건을 별도 경계에서 처리했다.
 
-원인: Emscripten은 시스템 소켓 대신 `-lwebsocket.js` 링크 필요 → CMakeLists.txt 누락
+### 카메라 스트리밍 성능 최적화 — 최신 기준
 
-시도: 링크 옵션 추가 실패 반복
+#### 목표
 
-최종 해결: `-lwebsocket.js` 명시 링크 + COI Service Worker(`SharedArrayBuffer` 허용) 추가
+JETANK 번호판 인식에 필요한 영상 품질을 유지하기 위해 해상도를 **1232×832**로 고정하고 스트리밍 상한을 **60 FPS**로 설정했다. 해상도를 낮추지 않고 다음 두 지표를 개선 대상으로 삼았다.
 
-결과: 웹 빌드 및 배포 파이프라인 정상 작동
+- Camera Streaming Send FPS
+- Streaming ON Simulation FPS
 
----
+수신·디코딩은 최신 측정 범위에서 제외했다.
 
-**Day ~22 (2025-12-05 전후)**
+#### 측정 구성
 
-문제: TCP 스트리밍에서 프레임 밀림(지연 누적) 현상
+| 단계 | GPU Readback | JPEG |
+|---|---|---|
+| Sync | 동기 `glReadPixels` | Main Thread |
+| PBO | Non-blocking PBO + Fence | Main Thread |
+| PBO + MT | Non-blocking PBO + Fence | 4 Worker Threads |
 
-원인: 싱글 스레드 소켓 전송이 JPEG 인코딩과 같은 스레드에서 실행 → 큰 프레임 처리 시 다음 프레임 전송이 밀림
+Streaming OFF/ON을 각각 5회 측정해 median을 사용했다. Streaming-OFF FPS 브랜치 간 차이는 **0.557%**로 sanity gate 5%를 통과했다.
 
-시도:
-- sleep 간격 조정 → 효과 없음
-- 버퍼 사이즈 조정 → 일시적 완화, 근본 해결 안됨
+#### 초기 가설 실패
 
-최종 해결: 네트워크 구조 전면 분리 (인코딩 스레드 ↔ 전송 스레드 분리), 큐 기반 파이프라인 도입
+처음에는 GPU Readback이 주요 병목이라고 예상했다. 그러나 PBO-only는 Simulation FPS ON **66.70 → 65.60**, Camera Send FPS **26.95 → 25.49**로 개선되지 않았다.
 
-결과: 프레임 밀림 해소, 스트리밍 FPS 안정화
+Tracy로 다시 계측한 결과 Sync에서 Readback p50은 **1.144ms**, JPEG p50은 **16.406ms**였다. 초기 가설과 달리 JPEG 압축이 훨씬 큰 Main Thread 병목이었다.
 
----
+#### 구조 개선
 
-**Day ~33 (2025-12-15 전후)**
+JPEG 알고리즘 자체의 단일 작업 시간을 줄이기보다 압축을 Simulation critical path에서 제거했다. PBO+MT에서는 Main Thread가 JPEG 완료를 기다리지 않고 **p50 0.017ms**의 enqueue 후 다음 Simulation frame으로 진행한다.
 
-문제: 고해상도(816×616) 렌더 시 `glReadPixels` 호출이 메인 렌더 루프를 블로킹
+JPEG Worker의 개별 p50은 **27.075ms**로 오히려 증가했다. 따라서 성능 향상을 “JPEG가 빨라졌다”로 해석하지 않는다. 여러 worker가 병렬 처리하며 Main Thread 대기를 제거한 것이 핵심이다.
 
-원인: `glReadPixels`는 GPU 렌더 완료까지 CPU를 대기시키는 동기 호출. 해상도가 높을수록 GPU 레이턴시 증가
+#### 최종 결과
 
-시도:
-- 직접 포인터 readback → CPU 스톨 빈번
+| 단계 | Simulation FPS OFF | Simulation FPS ON | Camera Send FPS | Streaming Penalty |
+|---|---:|---:|---:|---:|
+| Sync | 102.38 | 66.70 | 26.95 | 34.84% |
+| PBO | 102.52 | 65.60 | 25.49 | 36.02% |
+| PBO + MT | 102.95 | **96.01** | **40.05** | **6.74%** |
 
-최종 해결: PBO(Pixel Buffer Object) 더블 버퍼 ping-pong
-- 프레임 N: `PBO[writeIndex]`에 `glReadPixels` 발행 (GPU 비동기 쓰기)
-- 프레임 N: `PBO[readIndex]` CPU 매핑 (이전 프레임 데이터 읽기)
-- 매 프레임 인덱스 교체
+Sync 대비 PBO+MT:
+- Streaming ON Simulation FPS **+43.9%**
+- Camera Send FPS **+48.6%**
+- Streaming Penalty **34.84% → 6.74%(-28.1%p)**
 
-결과: CPU-GPU 동기화 압력 감소, 렌더 루프 스톨 빈도 저하
+#### PBO-only가 개선되지 않은 이유
 
----
+1232×832 RGB 한 프레임은 약 **2.93MiB**다. PBO를 사용해도 JPEG 입력으로 사용하려면 map 이후 CPU 메모리 복사가 필요하다.
 
-**Day ~150 (2026-04-09)**
+```text
+GPU Render Target → PBO → map → 약 2.93 MiB memcpy → CPU JPEG
+```
 
-문제: 멀티 스레드 인코딩 도입 후 "워커 몇 개가 최적인가" 불명확
-
-원인: 워커가 너무 많으면 스케줄링/락 경쟁/캐시 간섭 오버헤드 발생, 너무 적으면 병렬화 이득 없음
-
-시도:
-- 224×224 해상도: 싱글(1) vs 멀티(19) 비교 → APP FPS 55.94 → 59.41 (+6.2%)
-- 816×616 해상도: 1~19 워커 스윕 측정 (10가지 조건)
-
-측정 결과 (816×616, 3회 반복 평균):
-
-| workers | APP FPS | SINK FPS |
-|---------|---------|---------|
-| 6 | 84.91 | 29.40 |
-| 12 | **85.72** | **29.43** |
-| 19 | 83.45 | 28.45 |
-
-최종 해결: **권장 워커 수 12로 고정** (메인 렌더 + 네트워크 + OS 스레드에 여유 코어 남김)
-
-결과: 싱글(67 FPS) 대비 멀티 12 워커(85+ FPS), **+27% APP FPS 향상**; iGPU 강제 환경에서 SINK FPS +19.69%
+현재 workload에서는 PBO만으로 제거할 수 있는 병목 비중이 작았고, CPU JPEG 처리와 메모리 복사가 더 중요했다. iGPU에서 관측한 결과를 다른 GPU 환경에 일반화하지 않으며 dGPU에서는 별도 측정이 필요하다.
 
 ---
 
 ## 4. 배운 점
 
-- GPU readback 병목은 "GPU가 느리다"가 아니라 **동기 호출 구조** 자체가 문제. PBO로 비동기화하면 동일 GPU에서 전혀 다른 처리량이 나온다.
-- 멀티 스레드 최적 워커 수는 "코어 수 = 워커 수"가 아님. 시스템 전체 스레드 예산을 고려해야 함. 수치로 검증하지 않으면 오히려 역효과.
-- Emscripten 크로스 플랫폼은 CMake 레벨에서 분기를 명시적으로 관리해야 함. 런타임 환경 차이(WebSocket, SharedArrayBuffer, stack size 등)를 초기에 정리해두지 않으면 매 기능마다 막힘.
+- 최적화 기법을 먼저 정답으로 두지 않는다. 초기 가설이 틀리면 실제 계측값을 기준으로 원인을 다시 정의한다.
+- 개별 작업 latency와 전체 시스템 처리량은 다르다. JPEG Worker 한 건의 시간은 늘었지만 critical path 분리로 전체 Simulation FPS와 Send FPS는 향상됐다.
+- PBO-only 실패를 “PBO는 느리다”로 일반화하지 않고 현재 workload의 메모리 복사·CPU 처리 구조와 연결해 해석한다.
+- 성능 수치는 반복 횟수, 대표값, 비교 조건, 목표 미달 여부까지 함께 기록해야 한다.
 
 ---
 
 ## 5. 회고
 
-**잘한 점**: 직관이 아닌 실측 데이터로 병목을 분석하고, 해상도·워커 수 조합을 체계적으로 스윕한 것. 결과물이 문서(`카메라스트리밍 병목분석.md`)로 남아있다.
+**잘한 점**: 초기 GPU Readback 가설과 다른 결과를 숨기지 않고 Tracy로 재프로파일링해 실제 JPEG Main Thread 병목을 찾은 것.
 
-**아쉬운 점**: Debug 빌드 기준 측정이라 Release 빌드 결과와 절대 수치 차이가 있음. 씬 복잡도에 따른 변화도 미측정.
+**아쉬운 점**: 최종 Camera Send FPS는 **40.05**로 60 FPS 목표에 도달하지 못했다.
 
-**다시 만든다면**: 인코딩 워커를 정적 고정이 아닌, 렌더 루프 FPS 피드백을 받아 동적으로 조절하는 구조로 설계.
-
-**추가하고 싶은 것**: 물리 엔진 연동, 로봇팔 역기구학(IK) 자동화, 실물 JETANK와의 TCP 레이턴시 비교 측정
+**다음 우선순위**: JPEG 인코더 처리량, 불필요한 CPU 메모리 복사, 4 Worker 처리 구조를 추가로 검증한다.
 
 ---
 
@@ -140,7 +128,7 @@ TCP + WebSocket 이중 스트리밍 레이어 설계. Python 브릿지(`RobotPal
 - 기간: 2025-11-12 ~ 2026-04-09 (약 5개월)
 - 팀 구성: 2인
 - 역할: 스트리밍 시스템 / 성능 최적화 / 그리퍼 제어 시스템
-- 기술 스택: C++17, OpenGL, Emscripten, libjpeg-turbo, TCP/WebSocket, ImGui, CMake, Python
+- 기술 스택: C++17, OpenGL, PBO/Fence, JPEG, Tracy, Emscripten, TCP/WebSocket, ImGui, CMake, Python
 - 레포: https://github.com/Junwoo-Seo-1998/RobotPal
 
 ---
@@ -168,37 +156,31 @@ TCP + WebSocket 이중 스트리밍 레이어 설계. Python 브릿지(`RobotPal
 
 ---
 
-## 7. 심층 분석 리포트 (Subagent Analysis)
+## 7. 심층 분석 리포트
 
-사용자(yoonpyo)의 기여도를 중심으로, 소스 코드와 `git log`, `git diff`를 심층 추적한 5개의 서브 에이전트 관점 리포트입니다.
+### 성능 최적화 판단 흐름
 
-### 🤖 [Agent 1] Git Timeline (문제 해결 시계열 추적)
-`git log`를 바탕으로 한 핵심 개발 타임라인입니다.
-1. **스트리밍 파이프라인 기반 (Commit: `6fc5ca4`, `79a6d71`)**
-   - TCP 소켓 전송과 JPEG 인코딩이 싱글 스레드에서 돌아가는 구조를 분리. `ConcurrentQueue` 기반의 네트워크 워커와 메모리 풀링 도입. Python 브릿지(`SCSCtrl`, `server.py`) 최적화 병행.
-2. **그리퍼 시스템 ECS 통합 (Commit: `e9330dd`, `3a378fe`, `aca0a9d`)**
-   - 하드코딩된 기구학적 잡기 로직을 Entity-Component-System(ECS) 구조로 통합. `SimController`와 `RealController` 추상화 도입.
-3. **인코딩 병목 측정 및 해소 (Commit: `9c12e25`, `9e340c8`, `eecedc9`)**
-   - libjpeg-turbo 도입 및 벤치마크 테스트 코드(`streaming_frame_drop_benchmark.cpp`) 작성. 이후 스레드 풀 기반 멀티스레드 인코딩 최적화 달성.
+1. **가설 수립**: Streaming ON에서 Simulation FPS가 크게 떨어지는 원인을 GPU Readback으로 예상.
+2. **첫 구조 변경**: Non-blocking PBO + Fence 적용.
+3. **실패 확인**: PBO-only가 Sync보다 Simulation FPS ON과 Camera Send FPS를 개선하지 못함.
+4. **재계측**: Tracy에서 Sync Readback p50 **1.144ms**, JPEG p50 **16.406ms** 확인.
+5. **원인 수정**: 실제 Main Thread 병목을 JPEG 압축으로 재정의.
+6. **구조 개선**: JPEG를 4 Worker로 분리해 Simulation critical path에서 제거.
+7. **반복 검증**: OFF/ON 각 5회, median 기준으로 최종 성능 비교.
 
-### 🤖 [Agent 2] Architecture (기술 및 아키텍처 분석)
-- **렌더링과 통신의 완벽한 비동기 분리**: `TcpNetworkTransport` 클래스에서 확인할 수 있듯, 메인 렌더 루프(OpenGL)와 네트워크 루프(스트리밍) 간의 간섭이 전혀 없습니다. 메인 스레드는 `ConcurrentQueue`에 패킷을 Push하기만 하고, 백그라운드의 12개 JPEG 워커와 `Send/Recv Worker` 스레드가 무거운 압축과 소켓 I/O를 비동기로 소화하는 견고한 아키텍처입니다. PBO(Pixel Buffer Object) 더블 버퍼링을 사용해 GPU의 `glReadPixels` 블로킹마저 피했습니다.
-- **제어 계층의 다형성 추상화**: `IRobotController` 인터페이스를 두어 상위 계층(UI 및 조작 로직)은 로봇이 가상인지 실제인지 모르게 설계했습니다. 구체적인 동작은 하위의 `SimController`(ECS 변환)와 `RealController`(TCP 패킷 생성)가 책임지는 완벽한 전략 패턴(Strategy Pattern) 및 의존성 역전(DIP)이 적용되어 있습니다.
+### 최종 성능
 
-### 🤖 [Agent 3] Role & Code (내 역할 / 팀원 역할 검증)
-- **사용자 기여도 심층 재분석 (pyo8470, yoonpyo, yoonpyo hong 통합)**:
-  - **핵심 컨트롤러 다형성 설계**: `SimController`, `RealController`, `HybridController` 클래스를 독자적으로 설계하여 가상 환경과 실제 하드웨어 제어를 완벽히 분리 및 통합했습니다.
-  - **초기 네트워크 뼈대부터 스트리밍 최적화까지 전담**: `TcpServer`, `NetworkManager` 등 초기 C++ TCP 소켓 통신을 밑바닥부터 설계했고, 이를 바탕으로 `TcpNetworkTransport`와 `Middle-Server/control_bridge.py` 브릿지 서버까지 확장했습니다. 단순히 성능만 최적화한 것이 아니라, 통신 계층 전체의 아키텍트 역할을 수행했습니다.
-  - **웹 레이아웃 및 ECS 그리퍼**: `RobotPal-web/template.html` 레이아웃 구성부터 ECS 기반 그리퍼 시스템 통합까지 엔진 내외곽을 넘나드는 기여를 보였습니다.
-- **Junwoo (엔진 아키텍처 및 렌더링 전담)**:
-  - `EditorLayer`, `RenderCommand`, `Picking.glsl` 등 엔진 뼈대와 마우스 상호작용 로직 전담.
+- Simulation FPS ON: **66.70 → 96.01 (+43.9%)**
+- Camera Send FPS: **26.95 → 40.05 (+48.6%)**
+- Streaming Penalty: **34.84% → 6.74% (-28.1%p)**
+- Main-thread enqueue p50: **0.017ms**
+- 최종 Camera Send FPS는 목표 60 FPS에 미달.
 
-### 🤖 [Agent 4] Retrospective (회고 - 배운 점 및 아쉬운 점)
-- **배운 점 (Learned)**: "스레드는 많다고 무조건 좋은 것이 아니다." 816x616 해상도 벤치마크(`카메라스트리밍 병목분석.md`)에서 19개 워커보다 **12개 워커가 오히려 더 높은 APP FPS(85.72)와 SINK FPS(29.43)를 기록**했습니다. OS 코어와 렌더 스레드에 여유를 주어야 스케줄링 오버헤드가 줄어든다는 점을 실측 데이터를 통해 체득했습니다.
-- **아쉬운 점 (Regrets)**: PBO와 멀티스레딩으로 CPU-GPU 간 동기화 이슈는 해결했지만, 네트워크 대역폭(TCP)의 한계는 여전히 남아있습니다. UDP 기반의 RTP 전송이나 H.264 하드웨어 인코딩(NVENC)을 연동하지 못해 CPU 의존도가 여전히 높은 점이 아쉽습니다.
+### 해석 원칙
 
-### 🤖 [Agent 5] Quantitative (수치 분석)
-- **압도적인 성능 개선율**: 
-  - `ROBOTPAL_ENCODE_WORKERS=1` (싱글) 대비 `12` (멀티) 설정 시 816x616 고해상도 환경에서 **APP FPS가 67.44 → 85.72로 약 +27% 향상**되었습니다.
-- **코드 베이스 규모**: 
-  - 벤치마크 스크립트 작성에 약 300+ 라인(`streaming_frame_drop_benchmark.cpp`)이 투입되었으며, 10개 이상의 환경 조건 변인 통제를 문서(`카메라스트리밍 병목분석.md`, 총 241라인)로 꼼꼼히 정리하여 데이터 기반 최적화의 표본을 보여주었습니다.
+- PBO를 적용했다는 사실 자체를 성과로 쓰지 않는다.
+- JPEG Worker 개별 latency가 **27.075ms**로 증가했으므로 JPEG 알고리즘이 빨라졌다고 표현하지 않는다.
+- 최종 개선은 JPEG 압축을 Main Thread critical path에서 분리한 구조적 효과로 설명한다.
+- 수신·디코딩은 이번 최신 성능 측정 범위에 포함하지 않는다.
+- 과거 224×224/816×616 worker sweep 및 32.9→37.3fps 계열 탐색 수치는 최신 성과 수치로 사용하지 않는다.
+
