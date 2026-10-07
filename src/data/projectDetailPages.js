@@ -19,13 +19,13 @@ export const projectDetailPages = {
     theme: { accent: "#7dd3fc", accentSoft: "rgba(125, 211, 252, 0.16)", surface: "linear-gradient(160deg, rgba(56, 189, 248, 0.18), rgba(14, 116, 144, 0.03))", glow: "rgba(56, 189, 248, 0.28)" },
     hero: {
       eyebrow: "Simulation · Streaming · Web Build", title: "RobotPal", subtitle: "",
-      description: "AGV와 로봇팔의 이동·조작을 가상 환경에서 시험하고, 카메라 스트리밍 파이프라인을 단계별로 계측해 GPU Readback과 JPEG 인코딩 병목을 개선하고 검증했습니다.",
+      description: "AGV와 로봇팔의 이동·조작을 가상 환경에서 시험하고, 1232×832 카메라 스트리밍의 병목 가설을 Tracy 계측으로 검증해 JPEG를 Simulation critical path에서 분리했습니다.",
       media: { src: robotpalHero, alt: "RobotPal AGV 시뮬레이터와 카메라 프레임 스트리밍 화면", caption: "RobotPal AGV 시뮬레이터와 카메라 프레임 스트리밍 화면" },
     },
     spotlight: [
-      { label: "문제", value: "동기 Readback 병목과 PBO 적용 후 JPEG 처리 적체" },
+      { label: "문제", value: "GPU Readback 가설과 달리 JPEG가 실제 Main Thread 병목" },
       { label: "역할", value: "스트리밍 · 통신 · 로봇 제어 · 성능 검증" },
-      { label: "결과", value: "최종 처리량 34.857 → 37.328fps · PBO+worker4 큐 폐기율 0%" },
+      { label: "결과", value: "Simulation FPS ON 66.70 → 96.01 · Camera Send 26.95 → 40.05" },
     ],
     context: { body: [] },
     architectureNotes: [
@@ -33,11 +33,12 @@ export const projectDetailPages = {
     ],
     architectureImage: { markup: robotpalArchitecture, alt: "RobotPal 카메라 스트리밍, 멀티플랫폼 통신과 AGV 제어 시스템 아키텍처 구조도" },
     benchmarkTable: {
-      title: "스트리밍 병목 측정 결과", headers: ["조건", "최종 처리량", "Readback p50", "큐 대기 p50", "큐 폐기율"],
+      title: "1232×832 스트리밍 최종 측정 결과 · OFF/ON 각 5회 median",
+      headers: ["조건", "Simulation OFF", "Simulation ON", "Camera Send FPS", "Streaming Penalty"],
       rows: [
-        ["동기 + worker1", "34.857fps", "24.459ms", "0.165ms", "0%"],
-        ["PBO + worker1", "32.889fps", "20.728ms", "141.157ms", "15.33%"],
-        ["PBO + worker4", "37.328fps", "20.680ms", "0.073ms", "0%"],
+        ["Sync", "102.38", "66.70", "26.95", "34.84%"],
+        ["PBO", "102.52", "65.60", "25.49", "36.02%"],
+        ["PBO + MT", "102.95", "96.01", "40.05", "6.74%"],
       ],
     },
     links: [{ label: "Repository", href: "https://github.com/cgantro/RobotPal" }],
