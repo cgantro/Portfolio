@@ -5,194 +5,122 @@ const baseProjects = [
     id: "robotpal",
     num: "01",
     title: "RobotPal",
-    subtitle: "실제 카메라 스트리밍의 종단 간 경로를 계측해 GPU Readback 병목과 JPEG 처리 적체를 구분한 C++ 시뮬레이터 프로젝트",
+    subtitle: "1232×832 영상 품질을 유지한 채 실제 병목을 재측정해 JPEG를 Simulation critical path에서 분리한 C++ 로봇 시뮬레이터",
     period: "2025.11 – 2025.12",
     team: "4인",
     role: "C++ 시뮬레이터의 스트리밍·통신·로봇 제어 기능 및 성능 검증",
-    roleItems: ["카메라 프레임 스트리밍 파이프라인 개발", "종단 간 성능 계측 및 병목 분석", "TCP·WebSocket 전송 계층 분리", "네트워크 명령 기반 AGV 제어 연동"],
-    metric: "34.857 → 37.328 fps",
-    metricLabel: "Final Throughput",
-    benchmark: "1232×832 · x64 Release · localhost TCP · 조건별 1회",
+    roleItems: ["카메라 프레임 스트리밍 파이프라인 개발", "Tracy 기반 구간별 병목 프로파일링", "PBO·JPEG 4 Worker 구조 비교 및 반복 검증", "TCP·WebSocket 전송 계층 분리", "네트워크 명령 기반 AGV 제어 연동"],
+    metric: "66.70 → 96.01 FPS",
+    metricLabel: "Streaming ON Simulation FPS",
+    benchmark: "1232×832 · Sync/PBO/PBO+MT · OFF/ON 각 5회 · median",
     summary: [
-      "카메라 프레임을 캡처해 JPEG로 인코딩하고 외부 클라이언트로 전송했습니다.",
-      "동기 Readback이 입력률을 제한했고, PBO 적용 후 단일 JPEG 워커의 병목이 드러났습니다.",
-      "프레임 단위 종단 간 계측으로 병목 이동과 처리량·지연·CPU 사용량의 절충 관계를 확인했습니다.",
-      "JPEG 워커를 4개로 늘려 PBO 적용 후 발생한 큐 폐기 297건을 0건으로 줄였습니다.",
+      "JETANK 번호판 인식에 필요한 1232×832 해상도를 유지한 채 카메라 스트리밍 성능을 최적화했습니다.",
+      "초기에는 GPU Readback을 주요 병목으로 예상했지만, Tracy 계측에서 Sync Readback p50 1.144ms보다 JPEG p50 16.406ms가 훨씬 큰 Main Thread 병목임을 확인했습니다.",
+      "PBO-only가 성능을 높이지 못하자 가설을 수정하고 JPEG를 4 Worker로 분리해 Simulation critical path에서 제거했습니다.",
+      "그 결과 Streaming ON Simulation FPS 66.70→96.01(+43.9%), Camera Send FPS 26.95→40.05(+48.6%), Streaming Penalty 34.84%→6.74%(-28.1%p)를 기록했습니다.",
     ],
-    stack: ["C++17", "CMake", "Ninja", "OpenGL", "PBO", "libjpeg-turbo", "TCP Socket", "WebSocket", "Multithreading", "WebAssembly", "Emscripten", "Python", "OpenCV", "Git", "GitHub", "GitHub Actions"],
+    stack: ["C++17", "CMake", "OpenGL", "PBO", "JPEG", "Tracy", "TCP Socket", "WebSocket", "Multithreading", "WebAssembly", "Emscripten", "Python", "Git", "GitHub"],
     cover: "/project-robotpal-cover.png",
     highlights: [
-      "동기+worker1 대비 PBO+worker4의 최종 처리량이 34.857fps에서 37.328fps로 증가했습니다.",
-      "같은 C++ 코어를 데스크톱과 WebAssembly 실행 경로로 확장했습니다.",
-      "워커 수 실험으로 처리량 변화가 실제로 어떻게 달라지는지 비교했습니다.",
+      "가설과 달리 PBO-only가 개선되지 않은 결과를 그대로 받아들이고 Tracy로 병목을 다시 찾았습니다.",
+      "JPEG 작업을 Main Thread에서 4 Worker로 분리해 Simulation FPS와 Camera Send FPS를 동시에 높였습니다.",
+      "60 FPS 송신 목표에는 아직 도달하지 못했으며 JPEG 처리량·CPU 메모리 복사·Worker 구조를 다음 과제로 남겼습니다.",
     ],
     implementations: [
       {
-        title: "시뮬레이션 제어 런타임 구성",
-        summary: "입력 처리, 제어 계산, 렌더링 결과를 같은 런타임 안에서 추적할 수 있도록 C++ 루프를 먼저 정리했습니다.",
+        title: "AI 학습·추론용 가상 카메라 스트리밍",
+        summary: "OpenGL로 생성한 1232×832 카메라 영상을 외부 AI가 사용할 수 있도록 JPEG 압축과 네트워크 전송 경로에 연결했습니다.",
         details: [
-          "실물 장비 없이도 상위 제어 로직이 어떻게 반응하는지 확인할 수 있도록 시뮬레이션 루프와 제어 계층을 분리했습니다.",
-          "Controller Layer를 두어 상위 조작 로직과 렌더링 루프의 호출 경로를 분리했습니다.",
-          "이 구조 덕분에 데스크톱 경로와 WebAssembly 경로가 같은 코어 로직을 공유하면서도 실행 환경별 차이는 별도 계층에서 다룰 수 있었습니다.",
+          "번호판 인식에 필요한 영상 품질을 유지하기 위해 해상도를 1232×832로 고정했습니다.",
+          "Camera Streaming Send FPS와 Streaming ON Simulation FPS를 별도 지표로 두어 영상 전달과 시뮬레이션 성능을 함께 확인했습니다.",
+          "수신·디코딩은 이번 최신 성능 측정 범위에서 제외해 주장 범위를 명확히 구분했습니다.",
         ],
-        snippet: {
-          type: "visual",
-          label: "Runtime Flow",
-          content: [
-            { id: "sim", name: "Simulation Loop", desc: "입력과 상태 계산" },
-            { id: "ctrl", name: "Controller Layer", desc: "제어 책임 분리" },
-            { id: "delivery", name: "Desktop / Web", desc: "같은 코어를 다른 실행 경로로 연결" },
-          ],
-        },
       },
       {
-        title: "실시간 스트리밍 파이프라인",
-        summary: "렌더링 이후 프레임 전달 경로를 readback, JPEG 인코딩, 전달 단계로 나눠 각 단계의 점유 시간을 확인했습니다.",
+        title: "가설 검증형 성능 프로파일링",
+        summary: "GPU Readback을 첫 병목으로 예상했지만 PBO-only 결과가 개선되지 않아 Tracy로 처리 구간을 다시 측정했습니다.",
         details: [
-          "프레임을 만든 직후 바로 보내는 구조 대신, 어느 단계가 메인 루프를 오래 점유하는지 볼 수 있도록 readback, 인코딩, 전달 단계를 명시적으로 분리했습니다.",
-          "이 구조에서는 프레임 생산 속도와 인코딩 소비 속도가 맞지 않을 때 어디에서 큐가 쌓이는지 바로 확인할 수 있어 벤치마크 결과를 해석하기 쉬웠습니다.",
-          "핵심은 함수 하나의 미세 최적화보다 단계 간 결합을 줄여 병목을 드러내는 것이었고, 이후 실험도 같은 파이프라인 기준으로 비교할 수 있었습니다.",
+          "Sync에서 Readback p50 1.144ms, JPEG p50 16.406ms를 확인해 초기 가설과 실제 병목이 다르다는 점을 확인했습니다.",
+          "PBO-only는 Simulation FPS ON 65.60, Camera Send FPS 25.49로 기준보다 개선되지 않았습니다.",
+          "특정 최적화 기법을 정답으로 두지 않고 측정값에 따라 원인과 우선순위를 다시 정했습니다.",
         ],
-        snippet: {
-          type: "visual",
-          label: "Render -> Encode Queue -> Delivery",
-          content: [
-            { id: "render", name: "Render", desc: "프레임 생성" },
-            { id: "encode", name: "JPEG Encode", desc: "큐 기반 인코딩 처리" },
-            { id: "send", name: "Delivery", desc: "분리된 전달 단계" },
-          ],
-        },
       },
       {
-        title: "웹 빌드와 실행 환경 대응",
-        summary: "같은 C++ 코어를 브라우저에서도 검증할 수 있도록 WebAssembly 실행 경로와 스레드 조건을 정리했습니다.",
+        title: "JPEG 4 Worker와 critical path 분리",
+        summary: "JPEG 알고리즘 자체를 빠르게 만드는 대신 압축 작업을 Simulation Main Thread에서 분리했습니다.",
         details: [
-          "데스크톱과 별도로 웹 빌드 경로를 두고, 같은 C++ 코어가 브라우저에서 어떻게 실행되는지 확인할 수 있게 구성했습니다.",
-          "Emscripten pthreads는 SharedArrayBuffer, COOP/COEP 같은 브라우저 실행 조건이 맞아야 동작하므로, 코드뿐 아니라 배포 조건까지 함께 정리했습니다.",
-          "정적 배포 환경에서도 실행 조건을 맞출 수 있도록 COI Service Worker를 포함해 웹 멀티스레드 경로를 직접 검증했습니다.",
+          "PBO-MT에서 Main-thread enqueue p50은 0.017ms로 측정됐습니다.",
+          "JPEG Worker 개별 p50은 27.075ms로 오히려 증가했으므로 'JPEG가 빨라졌다'고 해석하지 않았습니다.",
+          "여러 worker가 병렬 처리하면서 Main Thread가 압축 완료를 기다리지 않게 된 것이 전체 성능 향상의 핵심이었습니다.",
         ],
-        snippet: {
-          type: "visual",
-          label: "Web Thread Enablement",
-          content: [
-            { id: "pthreads", name: "Emscripten pthreads", desc: "웹 멀티스레드 실행" },
-            { id: "sab", name: "SharedArrayBuffer", desc: "공유 메모리 조건" },
-            { id: "coi", name: "COI Service Worker", desc: "정적 배포에서 실행 조건 보완" },
-          ],
-        },
+      },
+      {
+        title: "반복 측정과 sanity gate",
+        summary: "Sync / PBO / PBO+MT를 같은 환경에서 비교하고 Streaming OFF/ON을 각각 5회 측정해 median을 사용했습니다.",
+        details: [
+          "Streaming-OFF FPS의 브랜치 간 차이는 0.557%로 sanity gate 5%를 통과했습니다.",
+          "해상도를 낮추지 않고 같은 품질 조건에서 구조 차이만 비교했습니다.",
+        ],
+      },
+      {
+        title: "Desktop·Web 전송 계층 분리",
+        summary: "Desktop TCP와 WebAssembly WebSocket 차이를 상위 시뮬레이션·제어 로직에 노출하지 않도록 전송 경계를 분리했습니다.",
       },
     ],
     problems: [
       {
-        title: "glReadPixels 기반 readback 구간이 렌더 루프를 멈추게 하는 문제",
-        problem:
-          "처음에는 GPU 렌더링 자체가 느린 줄 알았지만, 실제 병목은 프레임을 읽어오는 순간 CPU가 GPU 완료를 기다리는 구조에 있었습니다. 프레임 수가 올라갈수록 이 대기 시간이 메인 루프를 직접 흔들었습니다.",
-        unexpected:
-          "문제는 렌더 계산량보다 glReadPixels 호출 시점에 더 분명하게 보였습니다. 그 지점에서 프레임 밀림이 먼저 누적됐습니다.",
-        background:
-          "동기식 readback은 GPU가 해당 프레임 작업을 마칠 때까지 CPU를 기다리게 만듭니다. 이 구간이 길어지면 이후 인코딩과 전달 단계도 같은 프레임 지연을 따라가게 됩니다.",
+        title: "GPU Readback을 병목으로 본 초기 가설이 틀린 문제",
+        problem: "카메라 스트리밍 시 Simulation FPS가 크게 떨어져 처음에는 GPU Readback을 주요 원인으로 예상했습니다.",
         process: [
-          "프레임 생성 시간과 readback 시간을 따로 관찰해 보니 렌더 계산보다 readback 지점에서 메인 루프 정지가 먼저 커졌습니다.",
-          "문제는 GPU가 아직 다 쓰지 않은 프레임을 CPU가 바로 읽으려는 구조라고 판단했습니다.",
-          "그래서 GPU는 현재 프레임을 쓰고 CPU는 이전 프레임을 읽는 방향으로 버퍼를 나누기로 했습니다.",
+          "동기 glReadPixels 기준과 Non-blocking PBO + Fence 구조를 같은 조건에서 비교했습니다.",
+          "PBO-only에서도 Simulation FPS ON과 Camera Send FPS가 좋아지지 않는 것을 확인했습니다.",
+          "Tracy로 Readback과 JPEG 압축을 다시 분리 계측했습니다.",
         ],
-        solution:
-          "PBO ping-pong 구조를 적용해 GPU는 현재 프레임을 비동기로 기록하고 CPU는 이전 프레임 버퍼를 읽도록 바꿨습니다.",
-        decision:
-          "readback 시점을 구조적으로 분리해야 다음 단계 병목도 따로 볼 수 있었기 때문에, 함수 최적화보다 GPU-CPU 경계 재구성이 더 직접적인 해결이라고 판단했습니다.",
-        result:
-          "readback 대기 구간이 줄어들면서 이후 JPEG 인코딩과 전달 단계 병목을 별도로 확인할 수 있는 상태가 됐습니다.",
-        snippet: {
-          type: "visual",
-          label: "PBO Ping-Pong Readback",
-          content: [
-            { id: "gpu-write", name: "GPU Write", desc: "현재 프레임 기록" },
-            { id: "cpu-read", name: "CPU Read", desc: "이전 프레임 읽기" },
-            { id: "swap", name: "Swap", desc: "버퍼 교체" },
-          ],
-        },
+        solution: "Sync Readback p50 1.144ms에 비해 JPEG p50 16.406ms가 훨씬 크다는 데이터를 근거로 병목 가설을 JPEG Main Thread 처리로 수정했습니다.",
+        result: "PBO를 성능 개선의 원인으로 포장하지 않고 실제 병목을 다시 정의했습니다.",
       },
       {
-        title: "인코딩과 전달 단계가 같은 흐름에 묶여 전체 처리량이 밀리는 문제",
-        problem:
-          "프레임을 만들자마자 JPEG 인코딩과 전달 단계까지 한 번에 처리하자, 한 프레임이 늦어질 때 다음 프레임도 연쇄적으로 밀렸습니다. 메인 루프는 인코딩이 끝날 때까지 오래 점유됐습니다.",
-        unexpected:
-          "처음에는 전달 단계 비용이 더 클 것으로 봤지만, 실제로는 인코딩 완료를 기다리는 시간이 전체 처리량을 더 많이 흔들었습니다.",
-        background:
-          "생산 속도와 소비 속도가 다른 단계를 같은 루프에 묶으면 가장 느린 단계가 전체 속도를 결정합니다. 실시간 스트리밍에서는 이 결합이 곧 프레임 밀림으로 이어집니다.",
-        process: [
-          "지연이 커지는 시점을 따라가 보니 전달 단계보다 먼저 JPEG 인코딩이 메인 루프를 오래 점유하고 있었습니다.",
-          "병목은 특정 전송 함수보다 인코딩과 전달 단계가 같은 소비 흐름에 묶여 있는 구조에 있다고 판단했습니다.",
-          "그래서 인코딩 결과를 큐에 적재하고, 전달 단계는 별도 워커가 소비하도록 바꾸기로 했습니다.",
-        ],
-        solution:
-          "프레임 작업을 큐에 넣고, JPEG 워커가 인코딩한 결과를 전송 경로에서 처리하도록 분리했습니다.",
-        decision:
-          "압축과 전달 단계를 따로 조정할 수 있어야 워커 수 변화와 처리량 차이를 실험으로 비교할 수 있었기 때문에, 큐 기반 분리가 가장 적합했습니다.",
-        result:
-          "단일 워커를 멀티 워커 풀로 변경한 뒤, 같은 조건에서 프레임 폐기율을 별도로 비교했습니다.",
-        snippet: {
-          type: "visual",
-          label: "Queue-based Separation",
-          content: [
-            { id: "enc", name: "Encode Worker", desc: "인코딩만 담당" },
-            { id: "queue", name: "Concurrent Queue", desc: "생산/소비 속도 차이 흡수" },
-            { id: "tx", name: "Delivery Worker", desc: "전달 단계 소비" },
-          ],
-        },
+        title: "JPEG가 Simulation critical path를 점유한 문제",
+        problem: "Main Thread가 매 프레임 JPEG 압축을 기다리면서 Streaming ON Simulation FPS가 66.70 FPS까지 떨어졌습니다.",
+        decision: "개별 JPEG 연산을 미세 최적화하기보다 압축 완료 대기를 Simulation critical path에서 제거하는 것이 우선이라고 판단했습니다.",
+        solution: "JPEG 작업을 4 Worker로 분리하고 Main Thread에서는 작업을 큐에 넣은 뒤 다음 Simulation frame으로 진행하도록 변경했습니다.",
+        result: "Simulation FPS ON 96.01, Camera Send FPS 40.05로 증가했고 Streaming Penalty는 6.74%까지 낮아졌습니다.",
+      },
+      {
+        title: "PBO-only의 제한과 남은 메모리 복사",
+        problem: "PBO로 Readback을 비동기화해도 완료된 데이터를 CPU JPEG 입력으로 사용하려면 1232×832 RGB 기준 약 2.93MiB를 CPU 메모리로 복사해야 했습니다.",
+        result: "현재 iGPU workload에서는 PBO-only 이점이 관측되지 않았으며, 이를 다른 GPU 환경에 일반화하지 않고 별도 측정이 필요하다고 정리했습니다.",
       },
       {
         title: "브라우저에서 pthreads 경로가 바로 실행되지 않는 문제",
-        problem:
-          "Emscripten pthreads 설정만 맞추면 될 것 같았지만, 실제로는 브라우저가 SharedArrayBuffer 조건을 만족하지 않아 멀티스레드 경로가 막혀 있었습니다. 문제는 코드보다 배포 환경에 있었습니다.",
-        background:
-          "Emscripten pthreads는 SharedArrayBuffer가 필요하고, 이 조건은 COOP/COEP 헤더가 맞지 않으면 성립하지 않습니다.",
-        process: [
-          "브라우저 보안 헤더 조건이 맞지 않아 스레드 경로가 열리지 않는 점을 먼저 확인했습니다.",
-          "정적 배포 환경에서는 서버 헤더를 직접 제어하기 어렵기 때문에 배포 경로 보완이 먼저 필요하다고 판단했습니다.",
-          "그래서 COI Service Worker로 실행 조건을 맞추는 방향으로 정리했습니다.",
-        ],
-        solution:
-          "COI Service Worker를 포함해 SharedArrayBuffer 실행 조건을 보완하고, 웹 멀티스레드 경로를 직접 검증할 수 있게 만들었습니다.",
-        result:
-          "웹 빌드에서도 스레드 기반 실행 경로를 확인할 수 있는 배포 조건을 마련했습니다.",
-        snippet: {
-          type: "visual",
-          label: "Web Thread Enablement",
-          content: [
-            { id: "static", name: "Static Assets", desc: "기본 파일 제공" },
-            { id: "coi", name: "COI Service Worker", desc: "브라우저 실행 조건 보완" },
-            { id: "wasm", name: "WASM Threads", desc: "멀티스레드 실행" },
-          ],
-        },
+        problem: "WebAssembly pthreads는 SharedArrayBuffer와 교차 출처 격리 조건이 필요해 정적 배포 환경의 제약을 함께 해결해야 했습니다.",
+        solution: "브라우저 실행 조건을 확인하고 COI Service Worker 등을 이용해 멀티스레드 실행 경로를 검증했습니다.",
       },
     ],
     techChoice: [
       {
-        tech: "JPEG",
-        feature: "네트워크 대역폭 절감을 위해 선택함",
-        decision:
-          "비디오 파이프라인 완성보다 인코딩 단계 병목을 먼저 분리해 확인하는 것이 목표여서 JPEG을 선택했습니다.",
-        advantage: "워커 수 변화에 따라 인코딩 처리량이 어떻게 달라지는지 비교하기 좋았습니다.",
-        comparison: "H.264/WebRTC 같은 비디오 파이프라인보다 구현하기 쉬웠습니다.",
+        tech: "PBO + Fence",
+        feature: "GPU pixel transfer 비동기화",
+        decision: "GPU Readback 병목 가설을 검증하기 위해 적용했지만, PBO-only 결과가 개선되지 않아 최종 성능 향상의 주원인으로 해석하지 않았습니다.",
+        advantage: "GPU·CPU 작업 중첩 가능성을 실험할 수 있습니다.",
+        comparison: "현재 workload에서는 PBO 관리·CPU 복사·JPEG 비용 때문에 단독 개선 효과가 관측되지 않았습니다.",
       },
       {
-        tech: "Emscripten",
-        feature: "같은 C++ 코어를 웹에서도 검증하는 빌드 경로",
-        decision:
-          "같은 C++ 코어를 데스크톱과 WebAssembly 실행 경로로 확장해 검증하기 위해 사용했습니다.",
-        advantage: "데스크톱 전용 코드를 따로 만들지 않고 같은 코어 로직을 검증할 수 있었습니다.",
-        comparison: "웹 전용 구현을 새로 만드는 방식보다 데스크톱과 웹의 실행 차이를 비교하기 쉬웠습니다.",
+        tech: "JPEG 4 Worker",
+        feature: "압축 작업을 Simulation Main Thread에서 분리",
+        decision: "Tracy에서 JPEG가 실제 Main Thread 병목임을 확인한 뒤 적용했습니다.",
+        advantage: "Main Thread enqueue p50 0.017ms로 압축 대기를 critical path에서 제거했습니다.",
+        comparison: "개별 JPEG p50은 27.075ms로 증가했으므로 단일 job 자체가 빨라진 것은 아닙니다.",
       },
     ],
     retrospective: [
       {
         point: "배운 점",
-        detail: "실시간 화면 전송에서는 오래된 프레임을 폐기하고 최신 프레임을 유지하는 방식을 적용했습니다.",
+        detail: "처음 세운 병목 가설이 틀릴 수 있다는 전제에서 실제 데이터를 다시 측정하고, 결과가 예상과 다르면 원인과 해결 방향을 바꾸는 것이 성능 최적화의 핵심이라고 배웠습니다.",
       },
       {
-        point: "아쉬운 점",
-        detail: "Release 빌드와 해상도·JPEG 품질별 CPU 사용량을 반복 측정하지 못했습니다.",
+        point: "남은 목표",
+        detail: "Camera Send FPS는 40.05로 60 FPS 목표에 도달하지 못했습니다. 다음 우선순위는 JPEG 인코더 처리량, 불필요한 CPU 메모리 복사, 4 Worker 처리 구조입니다.",
       },
     ],
     links: {
@@ -726,83 +654,82 @@ const baseProjects = [
 // Sticker는 보조 프로젝트로 유지하며, 주력 3개 뒤에 배치한다.
 const portfolioContent = {
   robotpal: {
-    subtitle: "실제 카메라 스트리밍의 종단 간 경로를 계측해 GPU Readback 병목과 JPEG 처리 적체를 구분한 C++ 시뮬레이터 프로젝트",
-    roleItems: ["OpenGL FBO 기반 카메라 스트리밍 파이프라인 개발", "C++·Python 종단 간 성능 계측 및 병목 분석", "PBO Readback·용량 제한 큐·JPEG 멀티워커 구성", "네이티브 TCP·WebAssembly WebSocket 전송 계층 분리", "네트워크 명령 기반 AGV 이동 제어 연동"],
-    metric: "34.857 → 37.328 fps",
-    metricLabel: "Final Throughput",
-    metricDefinition: "워밍업 10초를 제외한 구간에서 Python 수신부가 최종 소비한 프레임 수 / 측정시간",
-    benchmark: "1232×832 · x64 Release · localhost TCP · 조건별 1회",
+    subtitle: "1232×832 영상 품질을 유지하면서 초기 가설을 계측으로 수정하고 JPEG를 Simulation critical path에서 분리한 C++ 시뮬레이터 프로젝트",
+    roleItems: ["OpenGL 기반 카메라 스트리밍 파이프라인 개발", "Tracy 기반 Readback·JPEG 병목 분석", "PBO/Fence 및 JPEG 4 Worker 구조 비교", "네이티브 TCP·WebAssembly WebSocket 전송 계층 분리", "네트워크 명령 기반 AGV 제어 연동"],
+    metric: "66.70 → 96.01 FPS",
+    metricLabel: "Streaming ON Simulation FPS",
+    metricDefinition: "1232×832 · Streaming OFF/ON 각 5회 측정 후 median · Sync 대비 PBO+4Worker",
+    benchmark: "1232×832 · Sync/PBO/PBO+MT · 5 runs each · median · 60 FPS cap",
     summary: [
-      "AGV와 로봇팔의 이동·조작을 가상 환경에서 시험하고, 시뮬레이터의 카메라 영상을 외부 클라이언트로 전송하는 C++ 기반 프로젝트입니다.",
-      "1232×832 카메라 프레임 생성부터 GPU Readback, JPEG 압축, TCP 송신, Python 수신·디코딩까지 실제 종단 간 경로를 계측했습니다.",
-      "PBO로 readback p50을 24.5ms에서 20.7ms로 줄였고, JPEG 워커를 추가해 최종 처리량을 32.9fps에서 37.3fps로 높이며 큐 폐기 297건을 0건으로 줄였습니다.",
+      "AI 학습·추론에 사용할 가상 카메라 영상을 1232×832 해상도로 생성·전송하는 스트리밍 기능을 개발했습니다.",
+      "초기 GPU Readback 병목 가설과 달리 Tracy에서 Sync Readback p50 1.144ms, JPEG p50 16.406ms를 확인해 실제 병목을 JPEG Main Thread 처리로 수정했습니다.",
+      "JPEG를 4 Worker로 분리해 Simulation FPS ON 66.70→96.01(+43.9%), Camera Send FPS 26.95→40.05(+48.6%), Streaming Penalty 34.84%→6.74%(-28.1%p)를 기록했습니다.",
     ],
     outcomes: [
-      { label: "Final Throughput", value: "34.857 → 37.328 fps", detail: "동기+worker1 대비 PBO+worker4 · 7.09% 증가" },
-      { label: "Readback p50", value: "24.459 → 20.680 ms", detail: "15.45% 감소 · PBO map 대기는 남음" },
-      { label: "Trade-off", value: "73.382 → 101.802 ms", detail: "종단 간 지연 p50 38.73% 증가" },
+      { label: "Simulation FPS ON", value: "66.70 → 96.01", detail: "Sync 대비 PBO+4Worker · 약 43.9% 향상" },
+      { label: "Camera Send FPS", value: "26.95 → 40.05", detail: "약 48.6% 향상 · 60 FPS 목표는 미달" },
+      { label: "Streaming Penalty", value: "34.84% → 6.74%", detail: "28.1%p 감소" },
     ],
-    highlights: ["종단 간 경로를 프레임 ID로 연결해 병목 이동을 확인했습니다.", "PBO 적용 후 단일 JPEG 워커에서 15.33%의 큐 폐기율을 확인했습니다.", "JPEG 워커를 4개로 늘려 처리 적체를 해소하고 처리량·지연·CPU 사용량의 절충 관계를 함께 기록했습니다."],
+    highlights: [
+      "PBO-only가 개선되지 않은 결과를 근거로 GPU Readback 중심 가설을 폐기하고 Tracy로 다시 프로파일링했습니다.",
+      "JPEG 작업을 Simulation critical path에서 분리해 Main-thread enqueue p50 0.017ms로 줄였습니다.",
+      "개별 JPEG Worker p50은 27.075ms로 늘었기 때문에 JPEG 자체가 빨라졌다고 표현하지 않습니다.",
+    ],
     implementations: [
       {
-        title: "실시간 카메라 스트리밍 파이프라인",
-        summary: "OpenGL FBO의 1232×832 RGBA 프레임을 GPU에서 읽어 libjpeg-turbo로 압축하고 외부 클라이언트까지 전송하는 전체 파이프라인을 개발했습니다. 프레임 생성, readback, 인코딩과 전송 단계를 분리해 각 구간을 독립적으로 변경하고 측정할 수 있게 구성했습니다.",
+        title: "1232×832 카메라 스트리밍 파이프라인",
+        summary: "번호판 인식에 필요한 영상 품질을 유지한 채 가상 카메라 프레임을 JPEG로 처리해 외부 클라이언트로 전달하는 경로를 구현했습니다.",
       },
       {
-        title: "PBO 기반 비동기 GPU Readback",
-        summary: "두 개의 PBO를 ping-pong으로 사용해 현재 프레임의 glReadPixels를 제출하고 이전 프레임 버퍼를 CPU에서 회수하도록 구현했습니다. submit·map·copy를 별도로 계측해 readback p50 개선뿐 아니라 glMapBufferRange에 남은 GPU 대기까지 확인했습니다.",
+        title: "PBO + Fence 비교 실험",
+        summary: "GPU Readback 병목 가설을 검증하기 위해 Non-blocking PBO + Fence를 적용했지만, PBO-only는 Simulation FPS ON 65.60, Camera Send FPS 25.49로 전체 성능을 개선하지 못했습니다.",
       },
       {
-        title: "Bounded Queue와 JPEG 멀티워커",
-        summary: "프레임 생산과 JPEG 인코딩의 속도 차이를 흡수하도록 용량 6의 bounded queue를 구성했습니다. 큐가 가득 차면 가장 오래된 프레임을 폐기하는 drop-oldest 정책을 적용하고, libjpeg-turbo 워커를 1개에서 4개로 확장해 큐 폐기 297건을 0건으로 줄였습니다.",
+        title: "Tracy 기반 실제 병목 특정",
+        summary: "Sync에서 Readback p50 1.144ms와 JPEG p50 16.406ms를 비교해 실제 Main Thread 병목이 JPEG 압축임을 확인했습니다.",
       },
       {
-        title: "프레임 단위 종단 간 성능 계측",
-        summary: "각 프레임에 frame_id와 생성 시각을 부여하고 JPEG 앞에 메타데이터를 추가했습니다. C++ JSONL 로그와 Python 수신·OpenCV 디코딩 로그를 연결해 GPU readback, 큐 대기, JPEG 압축, TCP 송신, 수신과 최종 소비의 처리량 및 p50·p95·p99 지연을 분석했습니다.",
+        title: "JPEG 4 Worker와 critical path 분리",
+        summary: "Main Thread는 압축 완료를 기다리지 않고 p50 0.017ms의 enqueue 후 다음 Simulation frame으로 진행하도록 변경했습니다. JPEG Worker 개별 p50은 27.075ms로 증가했지만 병렬 처리로 전체 처리량을 높였습니다.",
+      },
+      {
+        title: "반복 측정과 sanity gate",
+        summary: "세 구조에서 Streaming OFF/ON을 각각 5회 측정해 median을 사용했고, OFF FPS 브랜치 간 차이 0.557%로 5% sanity gate를 통과했습니다.",
       },
       {
         title: "TCP·WebSocket 전송 계층 분리",
-        summary: "네이티브 환경의 TCP Socket과 WebAssembly 환경의 WebSocket이 동일한 메시지 구조와 상위 인터페이스를 사용하도록 전송 구현을 분리했습니다. 스트리밍 프레임과 제어 메시지를 실행 환경에 맞는 소켓 구현으로 전달하도록 구성했습니다.",
-      },
-      {
-        title: "WebAssembly 멀티스레드 실행 환경",
-        summary: "C++ 코어를 Emscripten으로 WebAssembly 빌드하고 pthreads 기반 JPEG 워커가 브라우저에서도 동작하도록 구성했습니다. SharedArrayBuffer에 필요한 교차 출처 격리 조건을 COI Service Worker로 보완해 정적 배포 환경에서 멀티스레드 실행 경로를 검증했습니다.",
-      },
-      {
-        title: "네트워크 명령과 AGV 제어 연동",
-        summary: "외부 클라이언트에서 수신한 이동 명령을 시뮬레이터의 AGV 제어 계층에 연결했습니다. 통신 메시지를 시뮬레이션 상태와 이동 동작으로 변환해 원격 명령에 따른 AGV 제어 흐름을 가상 환경에서 검증했습니다.",
+        summary: "Desktop TCP와 WebAssembly WebSocket의 차이를 상위 기능에서 분리해 같은 제어·스트리밍 흐름을 유지했습니다.",
       },
     ],
     problems: [
-      { title: "동기 readback이 입력률을 제한한 문제", problem: "동기 glReadPixels의 대기로 생성률이 34.857fps에 머물렀습니다.", background: "동기 조건의 glReadPixels 내부 p50은 22.718ms, readback 전체 p50은 24.459ms였습니다.", solution: "두 PBO를 번갈아 사용하는 readback을 적용하고 submit·map·copy 구간을 따로 계측했습니다.", result: "readback p50은 20.728ms로 15.26% 줄고 생성률은 38.892fps로 늘었습니다. 다만 map p50 17.937ms가 남아 GPU 대기가 완전히 제거된 것은 아니었습니다." },
-      { title: "PBO 적용 뒤 JPEG 병목이 드러난 문제", problem: "높아진 생성률을 단일 JPEG 워커가 따라가지 못해 큐 대기와 프레임 폐기가 발생했습니다.", background: "PBO+worker1에서 큐 대기 p50은 141.157ms였고 1,936건 중 297건이 폐기되어 폐기율은 15.33%였습니다.", solution: "동일 PBO 조건에서 JPEG 워커를 1개에서 4개로 늘려 여러 프레임을 병렬 처리했습니다.", result: "큐 대기 p50은 0.073ms, 폐기는 0건이 됐고 최종 처리량은 32.889fps에서 37.328fps로 13.50% 증가했습니다. 개별 JPEG p50은 줄지 않아 처리 용량을 높인 변화로 해석했습니다." },
-      { title: "처리량과 지연의 절충", problem: "최종 처리량만 보면 PBO+worker4 구성이 유리하지만, 지연 시간까지 개선됐다고 판단할 수는 없었습니다.", background: "동기+worker1 대비 최종 구성의 종단 간 지연 p50은 73.382ms에서 101.802ms로, 평균 CPU 사용률은 187.99%에서 233.59%로 증가했습니다.", solution: "생성률과 최종 처리량뿐 아니라 Readback, 큐 대기, 종단 간 지연과 CPU 사용률을 같은 결과표에서 비교했습니다.", result: "멀티워커는 최초 Readback 병목의 근본적인 해결책이 아니라, PBO 적용 후 발생한 JPEG 처리 적체를 완화하는 보완책이라고 판단했습니다." },
       {
-        title: "정적 배포 환경에서 WebAssembly pthreads가 실행되지 않은 문제",
-        problem: "데스크톱에서 동작하던 JPEG 멀티워커를 Emscripten pthreads로 빌드했지만, 정적 배포한 브라우저에서는 SharedArrayBuffer를 생성하지 못해 워커 초기화 단계에서 실행이 중단됐습니다.",
-        background: "WebAssembly pthreads는 공유 메모리를 위해 SharedArrayBuffer를 사용합니다. 브라우저는 보안상 COOP·COEP 헤더로 교차 출처 격리된 문서에서만 이를 허용하지만, GitHub Pages에서는 필요한 응답 헤더를 직접 설정할 수 없었습니다.",
-        unexpected: "컴파일 옵션과 pthread 코드는 정상이었지만 실패 원인은 C++ 코드가 아니라 브라우저의 보안 정책과 정적 호스팅 환경에 있었습니다.",
-        process: [
-          "브라우저 콘솔과 feature detection으로 SharedArrayBuffer가 노출되지 않는 것을 확인했습니다.",
-          "Emscripten pthreads의 실행 조건을 추적해 crossOriginIsolated 상태와 COOP·COEP 응답 헤더가 필요하다는 점을 확인했습니다.",
-          "로컬 서버에서 헤더를 설정해 같은 WASM 빌드가 정상적으로 워커를 생성하는지 검증해 코드 문제와 배포 문제를 분리했습니다.",
-          "GitHub Pages에서는 응답 헤더를 직접 제어할 수 없어 COI Service Worker가 문서 요청을 가로채 필요한 격리 헤더를 부여하도록 구성했습니다.",
-          "서비스 워커 등록 후 페이지를 재로딩하고 crossOriginIsolated, SharedArrayBuffer, pthread 워커 생성과 JPEG 처리 경로를 순서대로 확인했습니다.",
-        ],
-        solution: "COI Service Worker를 배포 파일에 포함하고 초기 등록·재로딩 흐름을 구성해 정적 호스팅에서도 교차 출처 격리 조건을 만족시켰습니다. 브라우저 전송은 WebSocket 구현체를 연결해 네이티브 TCP와 상위 메시지 구조를 공유하도록 유지했습니다.",
-        decision: "웹 전용 싱글스레드 구현으로 기능을 축소하지 않고 동일한 C++ 코어와 멀티워커 구조를 검증하는 것이 목표였습니다. 별도 서버로 배포 환경을 바꾸는 대신 기존 정적 배포를 유지할 수 있는 COI Service Worker를 선택했습니다.",
-        result: "GitHub Pages 기반 정적 배포에서도 SharedArrayBuffer와 Emscripten pthreads 실행 조건을 확보하고, JPEG 멀티워커와 WebSocket 전송 경로가 함께 동작하는 것을 검증했습니다.",
+        title: "초기 GPU Readback 가설이 실제 결과와 맞지 않았던 문제",
+        problem: "Simulation 성능 저하의 주원인을 GPU Readback으로 예상했지만 PBO-only가 전체 성능을 높이지 못했습니다.",
+        background: "PBO 경로에서도 완료된 데이터를 CPU JPEG 입력으로 사용하려면 map과 약 2.93MiB의 CPU 메모리 복사가 필요했습니다.",
+        solution: "Tracy로 Readback과 JPEG 시간을 분리해 다시 측정하고, 실제 비용이 더 큰 JPEG Main Thread 처리를 병목으로 재정의했습니다.",
+        result: "특정 기술을 적용한 사실보다 가설을 측정으로 반박하고 원인을 바꾼 과정을 성능 개선의 기준으로 삼았습니다.",
+      },
+      {
+        title: "JPEG가 Simulation critical path를 점유한 문제",
+        problem: "Sync 조건에서 JPEG p50 16.406ms가 Main Thread에서 수행돼 다음 Simulation frame을 지연시켰습니다.",
+        solution: "JPEG를 4 Worker로 분리하고 Main Thread는 enqueue만 수행하도록 구조를 변경했습니다.",
+        result: "Simulation FPS ON 96.01, Camera Send FPS 40.05, Streaming Penalty 6.74%를 기록했습니다.",
+      },
+      {
+        title: "60 FPS 송신 목표 미달",
+        problem: "최종 Camera Send FPS는 40.05로 목표 60 FPS에 도달하지 못했습니다.",
+        solution: "다음 최적화 순위를 JPEG 인코더 처리량, 불필요한 CPU 메모리 복사, 4 Worker 처리 구조로 정리했습니다.",
+        result: "달성하지 못한 목표와 남은 병목을 성과와 함께 명시했습니다.",
       },
     ],
     techChoice: [
-      { tech: "libjpeg-turbo", feature: "프레임 단위 JPEG 인코딩", decision: "프레임마다 독립적으로 압축하고 데스크톱과 WebAssembly 빌드에서 같은 처리 방식을 사용하기 위해 선택했습니다.", advantage: "카메라 프레임 압축과 TCP·WebSocket 전송에 적용했습니다.", comparison: "연속 영상 코덱보다 대역폭 효율이 낮고, 고해상도에서는 CPU 인코딩 비용이 증가합니다." },
-      { tech: "Emscripten", feature: "C++ 코어의 WebAssembly 빌드", decision: "데스크톱과 브라우저에서 같은 C++ 코어를 실행하기 위해 사용했습니다.", advantage: "브라우저 빌드에는 WebSocket 구현체를 연결했습니다.", comparison: "pthreads를 사용하려면 SharedArrayBuffer와 교차 출처 격리 조건이 필요합니다." },
+      { tech: "PBO + Fence", feature: "비동기 pixel transfer 실험", decision: "GPU Readback 병목 가설을 검증하기 위해 적용했습니다.", advantage: "GPU/CPU 작업 중첩 가능성을 확인할 수 있습니다.", comparison: "현재 workload에서는 단독 개선 효과가 관측되지 않았습니다." },
+      { tech: "4 JPEG Workers", feature: "Main Thread 압축 대기 제거", decision: "Tracy에서 JPEG가 실제 병목임을 확인한 뒤 적용했습니다.", advantage: "Simulation critical path에서 JPEG를 분리했습니다.", comparison: "개별 JPEG latency는 증가했으므로 알고리즘 자체가 빨라진 것은 아닙니다." },
     ],
     retrospective: [
-      { point: "협업과 검증 기준 공유", detail: "팀원이 같은 결과를 확인할 수 있도록 빌드, 해상도, JPEG 품질, 큐 크기, 워밍업과 측정시간을 문서화했습니다. 프레임 ID 기반 로그와 분석 지표를 공유해 문제를 감각이 아닌 동일한 근거로 논의했습니다." },
-      { point: "측정 한계", detail: "조건별 1회, localhost TCP, 카메라 1대의 탐색 측정입니다. 수치는 현재 환경의 병목 위치와 변화 방향을 판단하는 값이며 확정 개선률이 아닙니다." },
-      { point: "PBO 한계", detail: "다음 프레임에서 이전 PBO를 바로 map해 GPU 복사가 끝나지 않으면 블로킹됩니다. 3개 이상의 ring과 glFenceSync로 완료된 버퍼만 회수하는 검증이 필요합니다." },
-      { point: "추가 검증", detail: "조건별 반복 측정\n실제 네트워크 지연·손실 조건\n1·2·4대 카메라별 처리량과 폐기율\nPBO 깊이별 처리량·지연 비교\n하드웨어 인코더 직접 전달 경로" },
+      { point: "검증 방식", detail: "Streaming OFF/ON을 각각 5회 측정하고 median을 사용했으며 OFF FPS 차이 0.557%로 branch sanity gate를 확인했습니다." },
+      { point: "측정 범위", detail: "수신·디코딩은 이번 최신 성능 측정 범위에서 제외했습니다." },
+      { point: "남은 과제", detail: "60 FPS 목표 달성을 위해 JPEG encoder throughput, CPU memory copy, worker 구조를 추가로 검증해야 합니다." },
     ],
   },
   mausoleum: {
