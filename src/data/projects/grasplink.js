@@ -4,7 +4,7 @@ export default {
   id: "grasplink",
   title: "GraspLink",
   category: "C++ 로봇 시뮬레이션",
-  period: null,
+  period: "2026.08 – 진행 중",
   team: "개인 프로젝트",
   role: "개인 프로젝트로 설계·구현",
   summary:
