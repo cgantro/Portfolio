@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
 import { getProjectSections } from "../../../data/projectSections";
+import demoVideo from "../../../../asset/GraspLink.webm";
 import CodeBlock from "../../ui/CodeBlock";
 import styles from "./ProjectPageContent.module.css";
 
@@ -14,13 +14,13 @@ function Section({ id, title, children }) {
 }
 
 function CopyPoints({ value, className }) {
-  if (Array.isArray(value)) return <ul className={`${className} ${styles.contentPoints}`}>{value.map((point, index) => <li key={`${index}-${point}`}>{point}</li>)}</ul>;
+  if (Array.isArray(value) && value.length) return <ul className={`${className} ${styles.contentPoints}`}>{value.map((point, index) => <li key={`${index}-${point}`}>{point}</li>)}</ul>;
   return value ? <p className={className}>{value}</p> : null;
 }
 
 function DataTable({ title, headers = [], rows = [], note }) {
   if (!rows.length) return null;
-  return <div className={styles.analysisTableWrap}>
+  return <div className={styles.analysisTableWrap} role="region" tabIndex={0} aria-label={`${title}, 좌우로 움직여 표의 나머지 항목 확인`}>
     <table className={styles.analysisTable}>
       <caption>{title}</caption>
       <thead><tr>{headers.map((column) => <th scope="col" key={column}>{column}</th>)}</tr></thead>
@@ -46,7 +46,6 @@ function Results({ project }) {
         </article>)}
       </div> : null}
       {project.benchmarkTable ? <DataTable {...project.benchmarkTable} /> : null}
-      {project.tracyDiagnostics ? <DataTable {...project.tracyDiagnostics} /> : null}
       {performanceRows.length ? <DataTable title={project.performanceCaption ?? "구성별 측정 결과"} headers={project.performanceColumns} rows={performanceRows} note={project.performanceNote} /> : null}
       {project.diagnosticRows?.length ? <DataTable title={project.diagnosticCaption ?? "구간별 계측 결과"} headers={project.diagnosticColumns} rows={project.diagnosticRows} note={project.diagnosticNote} /> : null}
     </>
@@ -54,22 +53,25 @@ function Results({ project }) {
 }
 
 function DemoEmbed({ url, title, preview }) {
-  const [started, setStarted] = useState(false);
   return (
     <div className={styles.demoSection}>
       <div className={styles.demoHeading}>
-        <div><p className={styles.cardLabel}>브라우저에서 실행</p><h3>{title} 시뮬레이터</h3></div>
+        <div><p className={styles.cardLabel}>직접 조작</p><h3>{title} 웹 시뮬레이터</h3></div>
         <div className={styles.demoLinks}>
-          <a href={url} target="_blank" rel="noreferrer">새 탭에서 열기 ↗</a>
+          <a href={url} target="_blank" rel="noreferrer">시뮬레이터 새 탭에서 열기 ↗</a>
         </div>
       </div>
       <div className={styles.demoFrame}>
-        {started ? <iframe src={url} title={`${title} 인터랙티브 시뮬레이터`} allow="fullscreen; cross-origin-isolated" allowFullScreen loading="lazy" /> : <div className={styles.demoPreview}>
-          {preview ? <img src={preview} alt={`${title} 시뮬레이터 미리보기`} loading="lazy" /> : null}
-          <div className={styles.demoLaunchCard}><strong>시뮬레이터 실행</strong><span>실행하면 약 22.38MB의 WebAssembly 파일을 불러옵니다.</span><button type="button" onClick={() => setStarted(true)}>이 페이지에서 실행</button></div>
-        </div>}
+        <iframe src={url} title={`${title} 웹 시뮬레이터`} allow="fullscreen; cross-origin-isolated" allowFullScreen loading="lazy" />
       </div>
-      <p className={styles.demoNote}>시뮬레이션 화면입니다. 실제 로봇을 제어하지 않습니다.</p>
+      <p className={styles.demoNote}>페이지 가까이 이동하면 시뮬레이터를 불러옵니다. 첫 실행에는 시간이 걸릴 수 있습니다.</p>
+      <div className={styles.demoHeading}>
+        <div><p className={styles.cardLabel}>시연 영상</p><h3>{title} 조작 시연</h3></div>
+      </div>
+      <video className={styles.demoVideo} controls preload="none" poster={preview} playsInline>
+        <source src={demoVideo} type="video/webm" />
+        이 브라우저는 WebM 영상을 지원하지 않습니다.
+      </video>
     </div>
   );
 }
@@ -90,7 +92,6 @@ function SectionContent({ id, project }) {
     <CopyPoints value={architecture?.summary} className={styles.architectureSummary} />
   </div>;
   if (id === "implementation") return <>
-    {project.id === "grasplink" && links.demo ? <DemoEmbed url={links.demo} title={project.title} preview={project.cover} /> : null}
     <div className={styles.implementationList}>
       {implementations.map((item, index) => <article key={item.title}><span>0{index + 1}</span><div><h3>{item.title}</h3><CopyPoints value={item.body} className={styles.implementationBody} /></div></article>)}
     </div>
@@ -106,9 +107,6 @@ function SectionContent({ id, project }) {
       <ul className={styles.caseNarrative}>
         {(study.narrative ?? [study.situation, study.analysis, study.decision, study.implementation, study.verification, study.limitations]).filter(Boolean).map((paragraph, paragraphIndex) => <li key={paragraphIndex}>{paragraph}</li>)}
       </ul>
-      {study.sourceLinks?.length ? <div className={styles.caseSourceLinks} aria-label={`${study.title} 코드와 테스트`}>
-        {study.sourceLinks.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}
-      </div> : null}
       {study.pseudocode ? <div className={styles.caseCode}>
         <CodeBlock code={study.pseudocode} lang="pseudo" label={study.pseudocodeLabel ?? "의사 코드"} />
       </div> : null}
@@ -135,6 +133,7 @@ function SectionContent({ id, project }) {
         {links.demo && project.id !== "grasplink" ? <a href={links.demo} target="_blank" rel="noreferrer">데모 열기 ↗</a> : null}
       </div>
     </div>
+    {project.id === "grasplink" && links.demo ? <DemoEmbed url={links.demo} title={project.title} preview={project.cover} /> : null}
   </>;
   return null;
 }
@@ -148,7 +147,7 @@ export default function ProjectPageContent({ project, previousProject, nextProje
           <Link className={styles.backLink} to="/#projects">← 전체 프로젝트</Link>
           <p className={styles.kicker}>{project.category}</p><h1>{project.title}</h1>
           <CopyPoints value={project.summary} className={styles.summary} />
-          <dl className={styles.meta}>{project.period ? <div><dt>기간</dt><dd>{project.period}</dd></div> : null}{project.team ? <div><dt>팀</dt><dd>{project.team}</dd></div> : null}<div><dt>담당</dt><dd>{project.role}</dd></div></dl>
+          <dl className={styles.meta}>{project.period ? <div><dt>기간</dt><dd>{project.period}</dd></div> : null}{project.team ? <div><dt>팀</dt><dd>{project.team}</dd></div> : null}{project.id !== "robotpal" ? <div><dt>담당 역할</dt><dd>{Array.isArray(project.role) ? <ul className={styles.rolePoints}>{project.role.map((item) => <li key={item}>{item}</li>)}</ul> : project.role}</dd></div> : null}</dl>
           <div className={styles.tags}>{project.stack.map((skill) => <span key={skill}>{skill}</span>)}</div>
         </div>
         {project.cover ? <figure className={styles.heroImage}><img src={project.cover} alt={`${project.title} 프로젝트 화면`} /></figure> : null}

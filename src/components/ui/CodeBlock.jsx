@@ -10,13 +10,13 @@ const PATTERNS = [
   // 어노테이션
   { cls: "annotation", re: /@\w+/ },
   // 키워드 (Java + C++ 통합)
-  { cls: "keyword",    re: /\b(?:public|private|protected|class|interface|new|return|void|static|final|import|extends|implements|throws|try|catch|finally|if|else|for|while|do|switch|case|break|null|true|false|this|super|abstract|default|enum|instanceof|package|synchronized|auto|const|constexpr|nullptr|override|explicit|using|typedef|template|typename|inline|virtual|mutable|struct|namespace|measure|observe|discard|reset|afterCommit|clear|save|publish|rejectPlan|executeSimulationPlan)\b/ },
+  { cls: "keyword",    re: /\b(?:public|private|protected|class|interface|new|return|void|static|final|import|extends|implements|throws|try|catch|finally|if|else|for|while|do|switch|case|break|null|true|false|this|super|abstract|default|enum|instanceof|package|synchronized|auto|const|constexpr|nullptr|override|explicit|using|typedef|template|typename|inline|virtual|mutable|struct|namespace|measure|observe|discard|reset|afterCommit|clear|save|publish|rejectPlan|executeSimulationPlan|and|or|not|in|exists|missing)\b/ },
   // 타입 / 빌트인
   { cls: "type",       re: /\b(?:String|Integer|Long|Boolean|List|Map|Set|Optional|Duration|Runnable|Object|int|float|double|bool|char|long|short|unsigned|signed|size_t|uint8_t)\b/ },
   // 숫자
   { cls: "number",     re: /\b\d+(?:\.\d+)?\b/ },
   // 함수 호출
-  { cls: "func",       re: /\b([A-Za-z_]\w*)(?=\s*\()/ },
+  { cls: "func",       re: /\b([A-Za-z_]\w*)(?=\s*(?:\(|:))/ },
 ];
 
 function escapeHtml(s) {

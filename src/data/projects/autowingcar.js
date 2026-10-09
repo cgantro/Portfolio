@@ -5,79 +5,115 @@ export default {
   id: "autowingcar",
   sectionOrder: ["architecture", "implementation", "case-studies", "verification", "sources"],
   title: "오토잉카 (AutoWing Car)",
-  category: "Java · MQTT 기반 이동체 관제",
+  category: "Java 기반 공항 차량 관제 서버",
   period: "2026.01 – 2026.02",
   team: "6인",
-  role: "백엔드 단독 개발: 서버 통신, 차량 상태 관리, 관제 경로 추천",
-  cardRole: "백엔드 단독 개발 · 통신·상태·경로",
+  role: [
+    "6인 팀에서 Java 서버 개발 도구인 Spring Boot로 서버 전반을 단독 구현하고 장비와 관제 서비스를 연결",
+    "차량에 보내는 명령과 수신 확인, 실시간 관제 화면 갱신, 차량 상태 변경 흐름 구현",
+    "이동 비용이 낮은 길을 찾는 A*와 다른 경로를 찾는 Yen 탐색, 경로 모양을 유지하며 점을 줄이는 RDP 구현",
+    "데이터베이스와 임시 상태 저장, 로그인 확인 토큰, 배포 환경과 k6 부하 검증 구성",
+  ],
+  cardRole: "백엔드 단독 개발, 상태 정합성과 경로 탐색",
   summary: [
-    "공항 토잉카 관제용 Spring Boot 백엔드입니다.",
-    "MQTT 장비 상태 수신, WebSocket 관제 화면 갱신, 차량 상태 전이와 지도 경로 탐색을 구현했습니다.",
+    "공항 토잉카 관제 서버입니다. Spring Boot는 Java로 서버 프로그램을 만드는 개발 도구입니다.",
+    "MQTT는 차량 장치와 상태, 명령을 주고받는 메시지 방식입니다. WebSocket은 브라우저와 서버가 연결을 유지하며 양방향으로 정보를 주고받는 통신 방식입니다. 차량 상태가 순서에 맞게 바뀌도록 처리하고 지도 경로 탐색도 구현했습니다.",
   ],
   cover: coverImage,
-  stack: ["Java 17", "Spring Boot 3.5", "MQTT", "WebSocket/STOMP", "PostgreSQL", "Redis", "Docker", "GitLab CI", "k6"],
+  stack: ["Java 17", "Spring Boot 서버 개발 도구", "MQTT 장비 메시지 통신", "WebSocket 실시간 연결과 STOMP 메시지 규칙", "PostgreSQL 관계형 데이터베이스", "Redis 빠른 임시 저장소", "Docker 실행 환경 포장", "GitLab CI 자동 빌드와 배포", "k6 부하 측정 도구"],
   architecture: {
     image: architectureImage,
-    alt: "이동체·AI 서비스가 MQTT와 HTTP를 통해 Spring Boot 관제 백엔드에 연결되고 관제 UI는 WebSocket STOMP를 이용하는 구성도",
+    alt: "차량과 인공지능 서비스가 장비 메시지와 웹 요청으로 Java 서버에 연결되고 관제 화면은 실시간 연결로 갱신되는 구성도",
     mobileFlows: [
       { title: "차량 상태 수신과 저장", steps: [
-        { title: "이동체", detail: "위치 · 속도 · 배터리 · 상태 전송" },
-        { title: "MQTT", detail: "장비 메시지를 백엔드로 전달" },
-        { title: "Spring Boot", detail: "상태 전이와 주행 이력 처리" },
-        { title: "PostgreSQL · Redis", detail: "운행 기록과 토큰 저장" },
+        { title: "이동체", detail: "위치, 속도, 배터리, 상태 전송" },
+        { title: "차량 메시지 통신", detail: "상태와 명령을 서버로 전달" },
+        { title: "Java 서버", detail: "차량 상태 변경과 주행 이력 처리" },
+        { title: "데이터베이스와 임시 저장소", detail: "운행 기록과 로그인 확인 정보 저장" },
       ] },
       { title: "관제 화면 갱신", steps: [
-        { title: "백엔드 이벤트", detail: "차량 · 비행 편 · 비상 알림" },
-        { title: "WebSocket / STOMP", detail: "관제 채널로 변경 전달" },
-        { title: "관제 UI", detail: "차량과 공항 상황 표시" },
+        { title: "서버 알림", detail: "차량, 항공편, 비상 상황 변경" },
+        { title: "실시간 웹 연결", detail: "바뀐 정보를 관제 화면에 바로 전달" },
+        { title: "관제 화면", detail: "차량과 공항 상황 표시" },
       ] },
     ],
     summary: [
-      "백엔드: MQTT로 장비 상태·결과 수신, WebSocket STOMP로 관제 화면 갱신.",
-      "시스템 구성: AI·임베디드 장비·관제 UI. 담당 범위는 백엔드입니다.",
+      "차량 메시지 통신으로 장비 상태와 결과를 받고, 열린 웹 연결로 관제 화면을 갱신했습니다.",
+      "인공지능과 차량 장치, 관제 화면을 연결하는 서버 전반을 맡았습니다.",
     ],
   },
   implementations: [
-    { title: "MQTT 상태 수신과 관제 이벤트 전달", body: ["차량 모니터링 메시지를 파싱해 위치·속도·배터리·운행 상태를 갱신하고, DrivingLog에 위치·상태·배터리·미션 이력을 저장했습니다.", "차량·비행 편·비상 알림으로 나눈 STOMP/WebSocket 채널로 관제 화면을 갱신했습니다."] },
-    { title: "A*: 차량 조건을 반영한 기본 경로", body: ["입력: 시작·도착 노드와 지도 그래프.", "차단되거나 UsageManager에서 다른 차량이 점유한 노드·간선은 제외합니다.", "비용: 간선 이동 시간, 값이 없으면 거리/10. 휴리스틱: 유클리드 거리/최고 속도.", "출력: 조건을 반영한 기본 경로."] },
-    { title: "Yen: 대안 경로 최대 3개", body: ["입력: A* 기본 경로와 그래프의 우회 후보.", "Yen 알고리즘으로 최대 3개 경로를 계산해 PathOptionDto 목록으로 반환합니다.", "역할: 차량 배정과 관제에서 비교할 경로 선택지를 제공합니다."] },
-    { title: "RDP: MQTT 경유지 수 줄이기", body: ["입력: 순서가 있는 경로 점과 허용 오차 epsilon.", "Ramer–Douglas–Peucker 알고리즘으로 양 끝점과 선분에서 허용 오차를 넘는 점을 남겨 단순화 경로를 만듭니다.", "단순화 경로를 MQTT 경유지 payload에 사용해 전송 점 수를 줄였습니다.", "저장 구성: 운영 PostgreSQL·개발 H2, 모니터링별 주행 이력은 DrivingLog, Refresh Token은 Redis."] },
-    { title: "데이터베이스 커밋 후 MQTT 발행", body: ["TxUtil.executeAfterCommit으로 MQTT 발행을 DB 트랜잭션 커밋 뒤 콜백에서 실행합니다."] },
+    { title: "차량 상태를 저장하고 관제 화면에 전달", body: ["차량 메시지에서 위치와 속도, 배터리, 운행 상태를 읽어 주행 이력에 저장했습니다.", "관제 화면의 차량, 항공편, 비상 알림은 실시간 연결을 통해 바뀐 내용만 전달했습니다. STOMP는 이 연결 위에서 메시지 종류와 목적지를 정하는 규칙입니다."] },
+    { title: "차량 명령과 수신 확인 처리", body: ["차량으로 명령을 보내고 장비가 명령을 받았다는 확인 응답을 받아 처리 상태에 반영했습니다.", "서버가 보낸 명령과 장비가 보고한 실제 주행 상태를 분리해 관리했습니다."] },
+    { title: "A* 탐색으로 차량 조건을 반영한 기본 경로 계산", body: ["A*는 지금까지 이동한 비용과 목적지까지의 예상 비용을 더해 유리한 경로부터 살펴보는 탐색 방법입니다. 시작 지점부터 목적지까지 그래프를 살피며 통제 구간과 다른 차량이 차지한 지점이나 연결선은 후보에서 제외했습니다.", "연결선 이동 시간을 비용으로 사용하고 값이 없을 때는 거리 나누기 10으로 보정했습니다. 목적지까지의 예상 비용은 직선 거리와 최고 속도를 이용해 계산했습니다."] },
+    { title: "Yen 탐색으로 대안 경로 최대 3개 계산", body: ["Yen 알고리즘은 가장 나은 경로를 먼저 찾은 뒤 다른 경로 후보를 차례로 찾는 방법입니다. A*가 찾은 기본 경로를 바탕으로 우회 경로를 최대 3개까지 계산했습니다.", "경로 후보 목록으로 돌려줘 차량 배정과 관제 화면에서 이동 경로를 비교할 수 있게 했습니다."] },
+    { title: "RDP 경로 단순화로 차량에 보낼 점 줄이기", body: ["경로의 모든 점을 차량에 보내면 메시지가 커집니다. Ramer–Douglas–Peucker(RDP)는 경로 모양에 영향이 적은 점을 줄이는 방법입니다.", "허용 오차를 넘는 꺾임은 남기고 나머지 점을 줄여 원래 경로 모양을 유지한 채 차량에 전달했습니다."] },
+    { title: "주행 기록과 지도, 차량 상태 저장", body: ["운영 데이터는 서로 연결된 항목을 표로 관리하는 PostgreSQL 데이터베이스에 저장하고, 개발과 테스트에는 H2 임시 데이터베이스를 사용했습니다.", "주행 이력에는 위치와 상태, 배터리, 임무 기록을 저장했습니다. 지도와 차량이 차지한 구간도 별도로 관리했습니다.", "Redis 빠른 저장소에는 최신 차량 상태와 만료 시간이 있는 로그인 갱신 정보를 저장했습니다."] },
+    { title: "데이터베이스 저장이 끝난 뒤 차량 명령 전송", body: ["데이터베이스 변경이 확정된 뒤 명령 메시지를 보내도록 저장 완료 뒤 실행할 작업을 등록했습니다. 저장이 취소됐는데 차량이 먼저 움직이는 상황을 막기 위한 순서입니다."] },
+    { title: "로그인 확인과 자동 배포 구성", body: ["JWT는 로그인 정보를 담고 서버 서명을 붙여 위조 여부를 확인하는 토큰입니다. 이를 이용해 요청자를 확인하고, Redis에는 로그인 갱신 토큰을 저장해 만료 여부를 관리했습니다.", "Docker에 서버 실행 환경을 담고 GitLab CI가 코드를 자동으로 빌드하고 배포하도록 구성했습니다. API는 서버 기능 요청 창구를 뜻하며, 예외 응답과 요청 처리 기록을 정리했습니다."] },
   ],
   caseStudies: [
     {
       title: "명령 상태와 장비 상태가 되돌아가는 문제",
       flow: [
-        { title: "오래된 MQTT 상태", detail: "이전 payload에 MOVING_TO_GATE가 남음" },
-        { title: "자동 액션", detail: "게이트 도착 처리로 DB 상태가 DOCKING으로 변경" },
-        { title: "상태 덮어쓰기", detail: "후속 저장이 payload의 MOVING_TO_GATE를 기록" },
-        { title: "순서 변경 시도", detail: "자동 액션 호출 순서만 바꿔도 stale payload 저장은 남음" },
-        { title: "최종 처리", detail: "DOCKING 가드와 전후 상태 비교로 자동 액션 결과를 우선" },
+        { title: "이전 차량 상태 메시지", detail: "메시지에는 아직 출입구로 이동 중이라고 기록" },
+        { title: "자동 처리", detail: "도착 처리로 데이터베이스 상태가 도킹 완료로 변경" },
+        { title: "상태 덮어쓰기", detail: "후속 저장이 이전 이동 상태를 다시 기록" },
+        { title: "순서 변경 시도", detail: "자동 처리 순서만 바꿔도 오래된 상태가 다시 저장됨" },
+        { title: "최종 처리", detail: "현재와 처리 뒤 상태를 비교해 도킹 결과를 유지" },
       ],
       narrative: [
-        "게이트 도착 처리에서 서버 상태를 DOCKING으로 바꾼 직후, 이전 monitoring 메시지의 MOVING_TO_GATE가 저장돼 상태가 되돌아갔습니다. 다음 메시지에서도 게이트 도착 동작이 반복됐습니다.",
-        "기록상 CONNECT 자동 액션이 DB 상태를 DOCKING으로 바꾼 뒤, 같은 처리 흐름의 후속 저장이 현재 메시지 payload의 오래된 MOVING_TO_GATE를 다시 기록했습니다. 자동 액션 호출 순서를 바꿔도 stale payload를 저장하는 단계가 남아 있어 해결되지 않았습니다. 대신 이미 DOCKING일 때 MOVING_TO_GATE 입력을 거르는 가드를 두고, 자동 액션 전 상태를 저장한 뒤 실행 후 DB 상태가 달라졌는지 비교해 바뀐 현재 상태를 최종 저장값으로 우선했습니다.",
-        "프로젝트 기록에는 상태가 되돌아가는 문제를 막았다고 적혀 있습니다. MQTT 재전송·중복·역순 입력에 대한 자동화 시험 결과는 없습니다.",
+        "출입구 도착 처리로 데이터베이스 상태를 도킹 완료로 바꾼 직후, 같은 차량 메시지를 저장하는 단계가 이전의 이동 중 상태를 다시 기록했습니다. 다음 상태 확인에서 도착 처리가 반복됐습니다.",
+        "자동 처리 순서만 바꿔서는 해결되지 않았습니다. 받은 상태를 현재 값과 대조하고, 자동 처리 전후 데이터베이스 값이 바뀌었다면 그 결과를 우선 저장하도록 정리했습니다.",
       ],
+      pseudocode: `onMonitoringMessage(message):
+  // 차량 메시지보다 데이터베이스에 저장된 최신 상태를 기준으로 판단합니다
+  dbStatus = vehicle.status
+  // 이미 도착 상태라면 이전 주행 상태를 되돌려 쓰지 않습니다
+  if dbStatus == "도킹 완료" and message.status == "출입구로 이동 중":
+    reject(message)
+    return
+
+  acceptedMonitoringStatus = message.status
+  statusBeforeAction = dbStatus
+  // 자동 처리로 데이터베이스에 저장된 상태가 바뀌었는지 확인합니다
+  checkAndTriggerAutoActions(vehicle, message)
+  dbStatus = vehicle.status
+
+  if dbStatus != statusBeforeAction:
+    // 자동 액션이 상태를 바꿨으면 그 결과를 유지합니다
+    persist dbStatus
+  else:
+    // 상태 전이가 없을 때만 수신한 모니터링 상태를 저장합니다
+    persist accepted monitoring status`,
+      pseudocodeLabel: "의사 코드, 이전 차량 상태보다 자동 처리 결과 우선",
     },
     {
-      title: "데이터베이스 저장 전에 메시지가 발행되는 문제",
+      title: "차량 상태 저장이 끝나기 전에 명령이 전송되는 문제",
       flow: [
-        { title: "트랜잭션 내부 발행", detail: "DB 커밋 전에 MQTT가 먼저 전달될 수 있음" },
-        { title: "순서 변경 시도", detail: "서비스 메서드 끝으로 이동해도 프록시 트랜잭션 뒤 실행은 보장되지 않음" },
-        { title: "커밋 후 콜백", detail: "TxUtil.executeAfterCommit에서 MQTT 발행" },
+        { title: "저장 중 메시지 전송", detail: "데이터베이스 확정 전에 명령이 장비에 먼저 도착할 수 있음" },
+        { title: "순서 변경 시도", detail: "함수 마지막으로 옮겨도 저장 완료 뒤 실행된다는 보장은 없음" },
+        { title: "저장 완료 뒤 전송", detail: "변경이 확정된 뒤에만 장비에 명령 전달" },
       ],
       narrative: [
-        "트랜잭션 안에서 MQTT 메시지를 바로 발행해 DB 커밋보다 외부 전달이 먼저 일어날 수 있었습니다. 롤백되면 수신자는 데이터베이스에 반영되지 않은 변경을 받게 됩니다. 서비스 메서드 끝으로 발행을 옮기는 시도도 프록시 트랜잭션의 실행 순서를 보장하지 못했습니다.",
-        "TxUtil.executeAfterCommit을 만들어 dispatch, connect, disconnect, emergencyStop의 MQTT 발행을 커밋 후 콜백에서 실행하도록 바꿨습니다. 이 변경은 순서만 정리하며 DB와 브로커의 원자적 전달을 보장하지 않습니다. 커밋 직후 프로세스가 종료될 때의 outbox나 재발행도 구현하지 않았습니다.",
+        "데이터베이스 변경 중에 메시지를 바로 보내면 저장이 취소돼도 명령은 장비에 먼저 전달될 수 있었습니다. 단순히 함수 마지막으로 옮기는 것만으로는 저장 완료 뒤 실행된다고 보장할 수 없었습니다.",
+        "데이터베이스 저장이 끝난 뒤 실행할 작업에 메시지 전송을 등록해 변경이 확정된 뒤에만 장비 명령을 보내도록 순서를 맞췄습니다.",
       ],
+      pseudocode: `updateVehicle(command):
+  begin transaction
+  persistVehicleChange(command)
+  // 저장이 확정된 뒤에만 차량에 명령을 전달합니다
+  afterSave(() => sendVehicleCommand(command))
+  commit transaction
+      `,
+      pseudocodeLabel: "의사 코드, 데이터베이스 저장 뒤 차량 명령 전달",
     },
   ],
   verification: {
-    summary: "k6 모의 차량 클라이언트 부하 검증",
+    summary: "k6 부하 측정 도구로 가상 차량 연결 확인",
     items: [
-      "모의 차량 500개 · 각 10Hz · 최대 처리량 8,935 msg/s · E2E 지연 14–28ms",
-      "원본 부하 보고서가 없어 지연 통계 기준과 반복 횟수는 확인할 수 없습니다.",
+      "가상 차량 500대가 초당 10회씩 상태를 보내도록 했을 때 초당 최대 8,935개 메시지를 처리했고, 요청부터 응답까지 걸린 시간은 14–28ms였습니다.",
+      "원본 부하 보고서가 없어 응답 시간 통계 기준과 반복 횟수는 확인할 수 없습니다.",
     ],
   },
   links: { github: null, demo: null },

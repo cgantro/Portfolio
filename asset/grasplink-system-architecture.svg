@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 430" role="img" aria-labelledby="title desc">
   <title id="title">GraspLink 시뮬레이터 구조</title>
-  <desc id="desc">명령과 관절 상태를 기구학에서 계산하고, 같은 링크 변환을 화면과 물리 충돌 형상에 반영합니다. 양쪽 손끝 접촉은 고정 제약 파지로 연결됩니다.</desc>
+  <desc id="desc">명령과 관절 각도를 계산해 3D 화면과 충돌 검사에 같은 팔 자세를 반영합니다. 집게 양쪽 손끝이 물체에 닿으면 집게와 물체를 연결해 함께 움직입니다.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
       <path d="M0 0L10 5L0 10Z" fill="#3b82f6" />
@@ -21,19 +21,19 @@
     </style>
   </defs>
   <rect width="1120" height="430" rx="12" fill="#f8fafc" />
-  <text x="36" y="42" class="tag">공통 관절 계산 · 화면과 물리의 자세 일치</text>
+  <text x="36" y="42" class="tag">공통 관절 계산으로 화면과 물리의 자세 일치</text>
 
   <rect x="36" y="110" width="212" height="104" rx="10" class="box" />
   <text x="58" y="149" class="title">제어 명령</text>
-  <text x="58" y="178" class="detail">관절 목표 · TCP 목표</text>
+  <text x="58" y="178" class="detail">관절 각도와 도구 끝 목표 입력</text>
 
   <rect x="310" y="110" width="224" height="104" rx="10" class="box focus" />
-  <text x="333" y="149" class="title">경로·IK 계획</text>
-  <text x="333" y="178" class="detail">MovePose · MoveLinear · UI RRT</text>
+  <text x="333" y="149" class="title">관절 각도와 경로 계획</text>
+  <text x="333" y="178" class="detail">목표로 이동, 직선 이동, 장애물 우회</text>
 
   <rect x="596" y="110" width="224" height="104" rx="10" class="box focus" />
-  <text x="618" y="149" class="title">RobotKinematics</text>
-  <text x="618" y="178" class="detail">관절각 → 링크별 변환</text>
+  <text x="618" y="149" class="title">로봇 자세 계산</text>
+  <text x="618" y="178" class="detail">관절 각도에서 각 팔 부분 계산</text>
 
   <path d="M248 162H301" class="line" />
   <path d="M534 162H587" class="line" />
@@ -42,15 +42,15 @@
   <path d="M875 162V362H592" class="split" />
 
   <rect x="900" y="72" width="184" height="88" rx="10" class="box" />
-  <text x="924" y="108" class="title">OpenGL</text>
-  <text x="924" y="135" class="detail">GLB 관절 렌더링</text>
+  <text x="924" y="108" class="title">3D 화면 그리기</text>
+  <text x="924" y="135" class="detail">관절 각도를 적용한 로봇 모델</text>
 
   <rect x="900" y="241" width="184" height="88" rx="10" class="box" />
-  <text x="924" y="277" class="title">Jolt Physics</text>
-  <text x="924" y="304" class="detail">Kinematic 충돌 형상</text>
+  <text x="924" y="277" class="title">물리와 충돌 계산</text>
+  <text x="924" y="304" class="detail">제어된 관절 자세의 충돌 형상</text>
 
   <rect x="342" y="326" width="478" height="76" rx="10" class="box" />
   <text x="366" y="357" class="title">양쪽 손끝 접촉</text>
-  <text x="366" y="382" class="detail">같은 물체를 끼우면 고정 제약을 만들어 함께 이동</text>
+  <text x="366" y="382" class="detail">양쪽 손끝이 닿은 물체를 고정해 함께 이동</text>
   <path d="M900 285H864V364H829" class="line" />
 </svg>

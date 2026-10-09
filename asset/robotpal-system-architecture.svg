@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="780" viewBox="0 0 1400 780" role="img" aria-label="RobotPal Architecture">
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="780" viewBox="0 0 1400 780" role="img" aria-label="실물 로봇과 가상 시뮬레이터가 같은 Python 제어 명령을 쓰는 구조">
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748b"/></marker>
     <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
@@ -10,72 +10,72 @@
     </style>
   </defs>
   <rect width="1400" height="780" fill="#fff"/>
-  <text class="title" x="55" y="52">RobotPal Architecture</text>
+  <text class="title" x="55" y="52">RobotPal 제어와 영상 흐름</text>
 
   <rect class="zone" x="45" y="90" width="500" height="620" rx="22"/>
-  <text class="zoneTitle" x="75" y="128">JETANK Python API</text>
+  <text class="zoneTitle" x="75" y="128">Python 제어 명령</text>
 
   <rect class="amber" x="145" y="155" width="300" height="82" rx="14"/>
-  <text class="label" x="295" y="190">User Code / Notebook</text>
-  <text class="small" x="295" y="214">Robot · Motor · Camera API 사용</text>
+  <text class="label" x="295" y="190">사용자 제어 프로그램</text>
+  <text class="small" x="295" y="214">이동 로봇, 모터, 카메라 명령</text>
 
   <rect class="green" x="80" y="305" width="190" height="110" rx="16"/>
-  <text class="label" x="175" y="347">Real Module</text>
-  <text class="small" x="175" y="372">Original API / Structure</text>
-  <text class="small" x="175" y="394">Hardware implementation</text>
+  <text class="label" x="175" y="347">실물 제어</text>
+  <text class="small" x="175" y="372">같은 명령 형식</text>
+  <text class="small" x="175" y="394">실제 장비 조작</text>
 
   <rect class="blue" x="320" y="305" width="190" height="110" rx="16"/>
-  <text class="label" x="415" y="347">Simulator Module</text>
-  <text class="small" x="415" y="372">Same API / Similar Structure</text>
-  <text class="small" x="415" y="394">Network-backed implementation</text>
+  <text class="label" x="415" y="347">가상 시뮬레이터</text>
+  <text class="small" x="415" y="372">실물과 같은 명령 형식</text>
+  <text class="small" x="415" y="394">가상 장비에 명령 전달</text>
 
   <path class="flow" d="M240 237V280H175V305"/>
   <path class="flow" d="M350 237V280H415V305"/>
-  <text class="note" x="295" y="270">Import target만 변경</text>
+  <text class="note" x="295" y="270">제어 대상을 선택</text>
 
   <path class="dash" d="M270 360H320"/>
-  <text class="note" x="295" y="347">API/구조 호환</text>
+  <text class="note" x="295" y="347">명령 형식이 같아 교체 가능</text>
 
   <rect class="node" x="80" y="500" width="190" height="105" rx="16"/>
-  <text class="label" x="175" y="542">JETANK</text>
-  <text class="small" x="175" y="568">Motor · Servo · Camera</text>
+  <text class="label" x="175" y="542">JETANK 이동 로봇</text>
+  <text class="small" x="175" y="568">모터, 관절, 카메라 장치</text>
   <path class="flowGreen" d="M175 415V500"/>
-  <text class="flowLabelGreen" x="120" y="462">Direct control</text>
+  <text class="flowLabelGreen" x="120" y="462">실물 직접 조작</text>
 
   <rect class="zone" x="640" y="90" width="715" height="620" rx="22"/>
-  <text class="zoneTitle" x="670" y="128">C++ Simulator</text>
+  <text class="zoneTitle" x="670" y="128">C++ 가상 로봇 시뮬레이터</text>
 
   <rect class="blue" x="690" y="175" width="185" height="100" rx="15"/>
-  <text class="label" x="782" y="217">Controller</text>
-  <text class="small" x="782" y="242">Drive · Servo · Grip</text>
+  <text class="label" x="782" y="217">로봇 제어</text>
+  <text class="small" x="782" y="242">이동, 관절, 집게</text>
 
   <rect class="blue" x="945" y="175" width="185" height="100" rx="15"/>
-  <text class="label" x="1037" y="217">Renderer</text>
-  <text class="small" x="1037" y="242">OpenGL</text>
+  <text class="label" x="1037" y="217">화면 그리기</text>
+  <text class="small" x="1037" y="242">3D 카메라 화면 생성</text>
 
   <rect class="node" x="945" y="335" width="185" height="100" rx="15"/>
-  <text class="label" x="1037" y="377">PBO Readback</text>
-  <text class="small" x="1037" y="402">Double Buffer</text>
+  <text class="label" x="1037" y="377">화면 픽셀 복사</text>
+  <text class="small" x="1037" y="402">임시 저장 공간 두 개</text>
 
   <rect class="node" x="945" y="495" width="185" height="100" rx="15"/>
-  <text class="label" x="1037" y="537">JPEG Workers</text>
-  <text class="small" x="1037" y="562">Bounded Queue</text>
+  <text class="label" x="1037" y="537">이미지 압축 작업</text>
+  <text class="small" x="1037" y="562">대기열로 작업 분배</text>
 
   <rect class="blue" x="690" y="495" width="185" height="100" rx="15"/>
-  <text class="label" x="782" y="537">Transport</text>
-  <text class="small" x="782" y="562">TCP · WebSocket</text>
+  <text class="label" x="782" y="537">명령과 영상 전달</text>
+  <text class="small" x="782" y="562">실시간 통신 연결</text>
 
   <path class="flow" d="M1037 275V335"/>
-  <text class="flowLabel" x="1092" y="310">Render Frame</text>
+  <text class="flowLabel" x="1092" y="310">그린 화면</text>
   <path class="flow" d="M1037 435V495"/>
-  <text class="flowLabel" x="1095" y="470">RGBA Frame</text>
+  <text class="flowLabel" x="1095" y="470">픽셀 이미지</text>
   <path class="flow" d="M945 545H875"/>
-  <text class="flowLabel" x="910" y="532">JPEG</text>
+  <text class="flowLabel" x="910" y="532">압축 이미지</text>
   <path class="flowBlue" d="M782 495V275"/>
-  <text class="flowLabelBlue" x="720" y="395">Command</text>
+  <text class="flowLabelBlue" x="720" y="395">조작 명령</text>
 
   <path class="flowBlue" d="M510 340H600V225H690"/>
-  <text class="flowLabelBlue" x="600" y="211">Drive / Servo Command</text>
+  <text class="flowLabelBlue" x="600" y="211">이동과 관절 명령</text>
   <path class="flowGreen" d="M690 565H600V390H510"/>
-  <text class="flowLabelGreen" x="600" y="586">JPEG Frame / State</text>
+  <text class="flowLabelGreen" x="600" y="586">카메라 이미지와 장비 상태</text>
 </svg>
