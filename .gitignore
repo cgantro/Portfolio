@@ -1,2 +1,11 @@
 node_modules
 dist
+career-db/
+PRIVATE_NOT_FOR_GITHUB/
+portfolio_plan.md
+portfolio/build_semics_wanted_format.mjs
+portfolio/assets/skill-icons.svg
+portfolio/rendered-semics-wanted-*/
+portfolio/*.pdf
+portfolio/*.pptx
+asset/autowing-system-architecture.png

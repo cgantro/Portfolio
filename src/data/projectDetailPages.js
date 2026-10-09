@@ -59,7 +59,7 @@ export const projectDetailPages = {
     context: { body: [] },
     architectureNotes: ["CMake는 Emscripten browser target에 GLFW web port와 pthread flags를 설정합니다. 런타임은 canvas에서 입력·시뮬레이션·렌더링을 프레임 단위로 처리합니다."],
     sections: FORMAL_SECTIONS,
-    links: [{ label: "Repository", href: "https://github.com/cgantro/MiniBCG" }],
+    links: [{ label: "Repository", href: "https://github.com/cgantro/GraspLink" }],
   },
   mausoleum: {
     theme: { accent: "#f59e0b", accentSoft: "rgba(245, 158, 11, 0.15)", surface: "linear-gradient(160deg, rgba(245, 158, 11, 0.16), rgba(120, 53, 15, 0.04))", glow: "rgba(245, 158, 11, 0.24)" },

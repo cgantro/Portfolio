@@ -685,7 +685,7 @@ const baseProjects = [
       { point: "브라우저 검증", detail: "배포 후 crossOriginIsolated, SharedArrayBuffer, pthread worker 생성, 렌더링과 조작 입력을 브라우저에서 확인합니다." },
       { point: "정적 리소스 호환성", detail: "COEP 적용 뒤 포트폴리오에서 사용하는 글꼴과 외부 이미지가 정상적으로 불러와지는지 확인합니다." },
     ],
-    links: { github: "https://github.com/cgantro/MiniBCG" },
+    links: { github: "https://github.com/cgantro/GraspLink" },
   },
 ];
 
