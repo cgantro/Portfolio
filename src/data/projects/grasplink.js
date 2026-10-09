@@ -2,6 +2,8 @@ import coverImage from "../../../asset/GraspLink.gif";
 
 export default {
   id: "grasplink",
+  sectionOrder: ["implementation", "architecture", "case-studies", "verification", "sources"],
+  homeHighlight: "FK · IK · MoveJ · MoveLinear · 충돌 검사",
   title: "GraspLink",
   category: "C++ 로봇 시뮬레이션",
   period: "2026.08 – 진행 중",
@@ -21,26 +23,6 @@ export default {
     "CMake",
     "Emscripten",
     "WebAssembly",
-  ],
-  metrics: [
-    {
-      label: "GLB 좌표 변환 최대 정점 차이",
-      value: "1.192e-7 m",
-      context:
-        "개발 기록에 남은 좌표 변환 전후의 최대 정점 위치 차이입니다. 모델 자산 변환을 확인한 값이며 실제 로봇의 위치 정확도와는 다릅니다.",
-    },
-    {
-      label: "IK 실패 사례의 유효 초기값 탐색",
-      value: "136개 중 38개 수렴",
-      context:
-        "특정 실패 사례를 재현해 기록한 결과입니다. 전체 목표의 성공률을 뜻하지 않습니다.",
-    },
-    {
-      label: "경로 스트레스 샘플",
-      value: "64개 중 51개 통과",
-      context:
-        "개발 기록에 남은 결과입니다. 충돌 검사 함수가 항상 '충돌 없음'을 반환하도록 둔 조건에서 얻었으므로, 실제 충돌 회피 성능을 보여주는 수치가 아닙니다.",
-    },
   ],
   architecture: {
     image: null,
@@ -82,15 +64,15 @@ export default {
       situation:
         "일부 TCP 목표에서 현재 IK 탐색이 해를 찾지 못했습니다. 실패만으로 목표 자체가 도달 불가능하다고 단정할 수는 없었습니다.",
       analysis:
-        "특정 실패 사례에서 유효한 초기 관절값 136개를 시도해 38개가 해를 찾았습니다. 초기값에 따라 결과가 달라질 수 있음을 보여주는 사례지만, 전체 목표에 대한 성공률은 아닙니다.",
+        "특정 실패 사례에서 초기 관절값을 바꾸자 IK 결과가 달라졌습니다. 초기값에 따라 수렴 여부가 달라질 수 있음을 확인했습니다.",
       decision:
         "현재 관절값으로 해를 찾지 못하면 유효한 초기 관절값을 더 시도하고, 찾은 해마다 관절 한계와 경로 충돌 여부를 확인하도록 했습니다.",
       implementation:
         "목표 자세의 IK 해를 찾는 과정과 관절 경로 검증을 분리합니다. 이동 작업은 비동기로 경로를 계산하고, TCP가 연속해서 움직일 때는 앞선 경로 지점에서 구한 IK 해를 다음 지점의 초기값으로 이어 씁니다.",
       verification:
-        "실패 사례에서 초기값별로 IK가 해를 찾았는지 비교했습니다. 136개 중 38개라는 값은 이 사례에만 해당합니다.",
+        "실패 사례에서 초기값에 따라 IK 결과가 달라지는 점을 확인했습니다.",
       limitations:
-        "이 수치만으로 모든 목표에 도달할 수 있는지, 전체 성공률이 얼마인지 판단할 수 없습니다. 현재 공개 문서에는 이 초기값 탐색 집계가 없습니다.",
+        "특정 실패 사례에서 얻은 값이므로 전체 목표의 성공률로 해석할 수 없습니다.",
     },
     {
       title: "관절 경로와 TCP 직선 경로를 구분",
@@ -108,50 +90,13 @@ export default {
         "계획한 경로는 시뮬레이션용입니다. 토크·질량·관성을 바탕으로 한 동역학은 계산하지 않으며, 실제 로봇의 이동 정확도나 안전성을 보장하지 않습니다.",
     },
   ],
-  decisionVisual: {
-    title: "IK가 실패했을 때 다시 확인하는 순서",
-    code: `// 판단 흐름을 설명하기 위한 의사 코드입니다. 실제 구현 코드가 아닙니다.
-result = solveIK(targetPose, seed = currentJointAngles)
-
-if (!result.converged) {
-  candidates = retryWithOtherSeeds(targetPose)
-  result = chooseCandidateWithinJointLimits(candidates)
-}
-
-if (result.exists && isCollisionFree(result.path)) {
-  simulate(result.path)
-} else {
-  rejectPlan()
-}`,
-    steps: [
-      {
-        label: "현재 자세로 시도",
-        detail: "현재 관절값을 초기값으로 삼아 목표 TCP의 IK 해를 찾습니다.",
-      },
-      {
-        label: "다른 초기값으로 재시도",
-        detail: "해를 찾지 못하면 유효한 다른 초기 관절값을 시도해 결과가 달라지는지 확인합니다.",
-      },
-      {
-        label: "관절 조건 확인",
-        detail: "해를 찾은 후보 가운데 관절 한계를 지키고 경로에 충돌이 없는 자세만 남깁니다.",
-      },
-      {
-        label: "시뮬레이션 경로 결정",
-        detail: "조건을 통과한 후보만 시뮬레이션 경로로 넘기고, 나머지는 거부합니다.",
-      },
-    ],
-    note:
-      "의사 코드와 단계 설명은 IK 실패 사례의 판단 과정을 쉽게 보여주기 위한 요약입니다. 실제 소스 코드나 전체 구현 절차를 그대로 옮긴 것이 아닙니다. 136개 중 38개가 해를 찾았다는 결과도 특정 사례에 한정됩니다.",
-  },
   verification: {
     summary:
-      "공개 저장소의 README와 아키텍처 문서를 바탕으로 시뮬레이션 범위와 이동·물리 동작을 정리했습니다. 초기값 탐색과 스트레스 테스트 수치는 제공된 설계안에 기록된 특정 사례로 한정해 적었습니다.",
+      "시뮬레이션은 로봇 기구학, 경로 계획, 충돌 검사까지 다룹니다.",
     items: [
-      "공개 README: C++17, Hanwha HCR-12A, Robotiq 2F-85, FK·IK, 충돌 검사, Pick-and-Place 및 Windows/Web 실행을 명시",
-      "공개 아키텍처 문서: 공통 로봇 기구학, MoveJ·MoveLinear의 차이, 제한된 RRT-Connect, 고정 주기 충돌 검사 설명",
+      "실행 환경: Windows와 WebAssembly 브라우저 데모",
+      "이동 방식: MoveJ 관절 경로와 MoveLinear TCP 직선 경로를 구분",
       "실제 장치 제어, 토크·질량·관성 기반 동역학, 하드웨어 그리퍼 연결부는 구현 범위에서 제외",
-      "GLB 정점 오차·초기값 탐색·스트레스 테스트 수치는 제공된 기록의 제한 조건과 함께 표기",
     ],
   },
   links: {

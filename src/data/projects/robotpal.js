@@ -3,14 +3,16 @@ import architectureImage from "../../../asset/robotpal-system-architecture.svg";
 
 export default {
   id: "robotpal",
+  sectionOrder: ["results", "architecture", "implementation", "case-studies", "verification", "sources"],
+  homeHighlight: "시뮬레이션 FPS +43.9% · 카메라 송신 FPS +48.6%",
   title: "RobotPal",
   category: "C++ 시뮬레이터 · 실시간 스트리밍",
   period: "2025.11 – 2025.12",
   team: "4인 팀",
   role: "Qt 기반 제어 화면, 실장비 측정·보정, AGV·로봇팔·그리퍼 제어, Python 모듈 연동, 카메라 스트리밍·성능 검증",
   summary:
-    "4인 팀으로 JETANK AGV와 로봇팔의 움직임을 가상 환경에서 시험하는 C++ 시뮬레이터를 개발했습니다. Qt 기반 제어 화면과 Python 명령 연동, 실물 측정값을 반영한 이동 보정, 가상 카메라 스트리밍과 성능 검증을 맡았습니다.",
-  resultsIntro: "아래 수치는 공식 프로젝트 기간(2025.11–2025.12)이 끝난 뒤인 2026.10에 별도로 재측정한 결과입니다.",
+    "4인 팀이 JETANK AGV와 로봇팔의 움직임을 가상 환경에서 시험할 수 있도록 만든 C++ 시뮬레이터입니다. 실제 장비 상태와 시뮬레이션을 연결하고 카메라 화면을 전송합니다.",
+  resultSummary: "2026년 10월 후속 측정입니다. 1232×832 해상도에서 스트리밍 OFF·ON을 각각 5회 측정해 중앙값을 비교했습니다.",
   cover: coverImage,
   stack: [
     "C++17",
@@ -29,33 +31,18 @@ export default {
     {
       label: "스트리밍 중 시뮬레이션 FPS",
       value: "66.70 → 96.01 (+43.9%)",
-      context:
-        "1232×832에서 동기 방식과 PBO·작업 스레드 4개 구성을 비교한 결과. 스트리밍 OFF/ON 각각 5회 측정한 중앙값.",
     },
     {
       label: "카메라 송신 FPS",
       value: "26.95 → 40.05 (+48.6%)",
-      context:
-        "같은 조건에서 동기 방식과 PBO·작업 스레드 4개 구성을 비교한 중앙값.",
+      context: "목표 60 FPS 미달",
     },
-    {
-      label: "스트리밍에 따른 FPS 감소율",
-      value: "34.84% → 6.74% (−28.1%p)",
-      context:
-        "각 구성의 시뮬레이션 FPS를 스트리밍 OFF/ON 상태로 비교. OFF FPS의 구성 간 차이는 0.557%로, 허용 기준인 5% 이내였습니다.",
-    },
-    {
-      label: "동기 방식 구간 p50",
-      value: "픽셀 읽기 1.144ms · JPEG 16.406ms",
-      context:
-        "Tracy 계측 결과. JPEG 압축 시간이 픽셀 읽기보다 길어 병목 가설을 다시 검토했습니다.",
-    },
-    {
-      label: "PBO + 작업 스레드 4개 구간 p50",
-      value: "주 스레드 큐 등록 0.017ms · 작업 스레드 JPEG 27.075ms",
-      context:
-        "작업 스레드별 JPEG 처리 시간은 오히려 늘었습니다. 알고리즘이 빨라진 것이 아니라 주 스레드가 압축을 기다리지 않도록 구조를 바꾼 결과입니다.",
-    },
+  ],
+  performanceRows: [
+    { label: "동기 GPU Readback", before: "1.144 ms", after: "—" },
+    { label: "동기 JPEG 인코딩", before: "16.406 ms", after: "—" },
+    { label: "주 스레드 큐 등록", before: "—", after: "0.017 ms" },
+    { label: "작업 스레드 JPEG 인코딩", before: "—", after: "27.075 ms" },
   ],
   architecture: {
     image: architectureImage,
@@ -67,7 +54,7 @@ export default {
     {
       title: "Qt 제어 화면과 실장비 측정·시뮬레이터 보정",
       body:
-        "Qt 기반 제어 화면에서 실물 로봇의 상태를 확인하고, JETANK의 직진·회전 속도를 측정해 시뮬레이터 이동 계수를 보정했습니다. 실측 속도는 아래 상세 사례에 정리했습니다.",
+        "Qt 제어 화면에서 실물 로봇 상태를 확인하고, JETANK의 직진·회전 속도를 측정해 시뮬레이터 이동 계수를 보정했습니다.",
     },
     {
       title: "AGV·로봇팔·그리퍼 제어와 Python 연동",
@@ -82,7 +69,7 @@ export default {
     {
       title: "Tracy 계측과 스트리밍 성능 개선",
       body:
-        "동기 방식, PBO, PBO와 작업 스레드 4개 구성을 비교했습니다. PBO만 적용한 결과가 개선되지 않자 Tracy로 구간을 다시 측정해 JPEG 압축이 주 스레드 병목임을 확인했습니다. JPEG 작업을 작업 스레드로 보내고 주 스레드가 압축 완료를 기다리지 않도록 바꿨습니다. 측정 조건과 결과는 검증 섹션에 정리했습니다.",
+        "동기 방식, PBO, PBO와 작업 스레드 4개 구성을 비교했습니다. PBO만 적용한 결과가 개선되지 않자 Tracy로 구간을 계측해 JPEG 압축 대기를 주 스레드에서 분리했습니다.",
     },
   ],
   caseStudies: [
@@ -112,54 +99,16 @@ export default {
       implementation:
         "PBO와 Fence 경로에 작업 스레드 4개를 붙였습니다. 주 스레드는 JPEG 작업을 큐에 등록한 뒤 압축 완료를 기다리지 않고 시뮬레이션을 이어가도록 했습니다.",
       verification:
-        "후속 재측정에서 1232×832 해상도로 스트리밍 OFF·ON을 각각 5회 측정해 중앙값을 비교했습니다. 수치 결과는 위 핵심 결과에 정리했습니다.",
+        "동일 해상도와 반복 조건에서 동기 방식과 작업 스레드 구성을 비교했습니다. 시뮬레이션과 카메라 송신의 중앙값 모두 개선됐습니다.",
       limitations:
-        "작업 스레드의 개별 JPEG 압축 시간은 더 길어져 인코더 자체가 빨라진 것은 아닙니다. 카메라 송신은 목표 60 FPS에 미달했고, 수신·디코딩은 측정에 포함하지 않았습니다.",
+        "작업 스레드의 개별 JPEG 압축 시간은 더 길어졌습니다. 인코더 자체의 처리 속도 개선이 아니라 주 스레드의 대기를 줄인 결과입니다.",
     },
   ],
-  decisionVisual: {
-    title: "병목 가설을 다시 세운 과정",
-    code: `// 판단 흐름을 설명하는 의사 코드입니다. 실제 구현 코드가 아닙니다.
-if (!improvedWithPboOnly) {
-  readbackTime = measureWithTracy("readback");
-  jpegTime = measureWithTracy("jpeg");
-
-  if (jpegTime > readbackTime) {
-    enqueueJpegJobs(workerCount = 4);
-    continueSimulationWithoutWaiting();
-  }
-}
-
-compareMedianFps(runCount = 5);`,
-    steps: [
-      {
-        label: "초기 가설",
-        detail: "스트리밍 FPS 저하의 원인을 동기 GPU 픽셀 읽기로 예상",
-      },
-      {
-        label: "계측으로 재검토",
-        detail: "PBO 단독으로는 개선되지 않았습니다. Tracy 재계측에서 JPEG 압축이 픽셀 읽기보다 오래 걸렸습니다.",
-      },
-      {
-        label: "구조 변경",
-        detail: "JPEG 작업은 작업 스레드 4개로 분산하고 주 스레드는 큐 등록 후 진행",
-      },
-      {
-        label: "전체 경로로 확인",
-        detail: "주 스레드는 작업을 큐에 넣고 시뮬레이션을 이어갔습니다. 성과는 인코딩 가속이 아니라 주 스레드 대기 감소였습니다.",
-      },
-    ],
-    note:
-      "의사 코드는 Tracy 계측을 바탕으로 한 판단 요약이며 실제 구현 코드는 아닙니다. JPEG 처리 시간이 늘더라도 주 스레드 대기를 줄이는 선택을 설명합니다.",
-  },
   verification: {
-    summary:
-      "재측정 조건과 계측 범위를 함께 기록했습니다. 프로젝트 수행 기간과 별도인 측정 시점은 핵심 결과 위에 표시했습니다.",
+    summary: "카메라 수신·디코딩 시간은 측정하지 않았습니다.",
     items: [
-      "1232×832 해상도에서 동기 방식, PBO, PBO와 작업 스레드 4개 구성을 비교",
-      "스트리밍 OFF/ON을 각각 5회 측정해 중앙값을 사용했고, OFF FPS 구성 간 차이 0.557%는 5% 허용 기준 이내였습니다.",
-      "Tracy로 픽셀 읽기, JPEG 압축, 주 스레드 큐 등록, 작업 스레드 압축 구간을 측정했습니다.",
-      "카메라 송신은 목표 60 FPS에 미달했습니다. 수신·디코딩은 측정에서 제외했습니다.",
+      "스트리밍 OFF FPS의 두 구성 간 차이는 0.557%로, 5% 허용 기준 이내였습니다.",
+      "Tracy 구간 계측: GPU Readback·JPEG·주 스레드 큐 등록·작업 스레드 JPEG 처리.",
     ],
   },
   links: {
