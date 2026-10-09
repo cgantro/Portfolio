@@ -22,11 +22,11 @@
   border: 1px solid rgba(130, 170, 255, .38);
   border-radius: 4px;
   color: #a9c2ff;
-  font: 700 9px/1 var(--font-mono);
+  font: 700 12px/1 var(--font-mono);
   letter-spacing: .04em;
 }
 
-.labelText { color: #b8c4d8; font-size: 10px; font-weight: 650; }
+.labelText { color: #b8c4d8; font-size: 12px; font-weight: 650; }
 .pre { max-width: 100%; margin: 0; padding: 15px 16px; overflow-x: auto; background: #111a29; line-height: 1.8; tab-size: 2; }
 .pre code { display: block; color: #d5deed; font: 12px/1.8 "Cascadia Code", Consolas, "Noto Sans Mono CJK KR", monospace; white-space: pre; }
 
@@ -40,5 +40,5 @@
 
 @media (max-width: 560px) {
   .pre { padding: 13px; }
-  .pre code { font-size: 11px; }
+  .pre code { font-size: 12px; }
 }

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import { getProjectSections } from "../../../data/projectSections";
 import CodeBlock from "../../ui/CodeBlock";
@@ -13,6 +12,23 @@ function Section({ id, title, children }) {
   );
 }
 
+function DataTable({ title, headers = [], rows = [], note }) {
+  if (!rows.length) return null;
+  return <div className={styles.analysisTableWrap}>
+    <table className={styles.analysisTable}>
+      <caption>{title}</caption>
+      <thead><tr>{headers.map((column) => <th scope="col" key={column}>{column}</th>)}</tr></thead>
+      <tbody>{rows.map((row, index) => {
+        const cells = Array.isArray(row) ? row : row.cells;
+        return <tr key={row.label ?? index}>{cells.map((cell, cellIndex) => cellIndex === 0
+        ? <th scope="row" key={`${cellIndex}-${cell}`}>{cell}</th>
+        : <td key={`${cellIndex}-${cell}`}>{cell}</td>)}</tr>;
+      })}</tbody>
+    </table>
+    {note ? <p className={styles.tableNote}>{note}</p> : null}
+  </div>;
+}
+
 function Results({ project }) {
   const { metrics = [], performanceRows = [] } = project;
   return (
@@ -23,27 +39,27 @@ function Results({ project }) {
           <p>{metric.label}</p><strong>{metric.value}</strong>{metric.context ? <span>{metric.context}</span> : null}
         </article>)}
       </div> : null}
-      {performanceRows.length ? <div className={styles.analysisTableWrap}>
-        <table className={styles.analysisTable}>
-          <caption>구간별 처리 시간 중앙값 (p50)</caption>
-          <thead><tr><th scope="col">구간</th><th scope="col">동기 방식</th><th scope="col">PBO · 작업 스레드 4개</th></tr></thead>
-          <tbody>{performanceRows.map((row) => <tr key={row.label}><th scope="row">{row.label}</th><td>{row.before}</td><td>{row.after}</td></tr>)}</tbody>
-        </table>
-      </div> : null}
+      {project.benchmarkTable ? <DataTable {...project.benchmarkTable} /> : null}
+      {project.tracyDiagnostics ? <DataTable {...project.tracyDiagnostics} /> : null}
+      {performanceRows.length ? <DataTable title={project.performanceCaption ?? "구성별 측정 결과"} headers={project.performanceColumns} rows={performanceRows} note={project.performanceNote} /> : null}
+      {project.diagnosticRows?.length ? <DataTable title={project.diagnosticCaption ?? "구간별 계측 결과"} headers={project.diagnosticColumns} rows={project.diagnosticRows} note={project.diagnosticNote} /> : null}
     </>
   );
 }
 
 function DemoEmbed({ url, title }) {
-  const [started, setStarted] = useState(false);
-  return started ? (
-    <div className={styles.demoFrame}>
-      <iframe src={url} title={`${title} 인터랙티브 시뮬레이터`} allow="fullscreen; cross-origin-isolated" allowFullScreen />
-    </div>
-  ) : (
-    <div className={styles.demoLaunch}>
-      <div><h3>페이지 안에서 시뮬레이터 실행</h3><p>실제 로봇 동작을 확인할 수 있는 인터랙티브 데모입니다.</p></div>
-      <button type="button" onClick={() => setStarted(true)}>시뮬레이터 실행</button>
+  return (
+    <div className={styles.demoSection}>
+      <div className={styles.demoHeading}>
+        <div><p className={styles.cardLabel}>브라우저에서 실행</p><h3>{title} 시뮬레이터</h3></div>
+        <div className={styles.demoLinks}>
+          <a href={url} target="_blank" rel="noreferrer">새 탭에서 열기 ↗</a>
+        </div>
+      </div>
+      <div className={styles.demoFrame}>
+        <iframe src={url} title={`${title} 인터랙티브 시뮬레이터`} allow="fullscreen; cross-origin-isolated" allowFullScreen loading="eager" />
+      </div>
+      <p className={styles.demoNote}>시뮬레이션 화면입니다. 실제 로봇을 제어하지 않습니다.</p>
     </div>
   );
 }
@@ -65,9 +81,15 @@ function SectionContent({ id, project }) {
   if (id === "case-studies") return <div className={styles.caseList}>
     {caseStudies.map((study, index) => <article className={styles.caseCard} key={study.title}>
       <div className={styles.caseTitle}><span>사례 0{index + 1}</span><h3>{study.title}</h3></div>
-      <dl>{[["상황", study.situation], ["원인", study.analysis], ["판단", study.decision], ["적용", study.implementation], ["확인", study.verification], ["범위", study.limitations]]
-        .filter(([, value]) => value).map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
-      {study.code ? <div className={styles.caseCode}><CodeBlock code={study.code} lang={study.codeLanguage ?? "cpp"} label={study.codeLabel ?? "실제 구현 발췌"} /></div> : null}
+      {study.situation ? <p className={styles.caseSituation}>{study.situation}</p> : null}
+      <div className={styles.caseDetails}>
+        {[["원인", study.analysis], ["판단", study.decision], ["수정", study.implementation], ["결과", study.verification], ["범위", study.limitations]]
+          .filter(([, value]) => value).map(([label, value]) => <p key={label}><strong>{label}</strong><span>{value}</span></p>)}
+      </div>
+      {study.code ? <div className={styles.caseCode}>
+        <CodeBlock code={study.code} lang={study.codeLanguage ?? "cpp"} label={study.codeLabel ?? "구현 발췌"} />
+        {study.codeSource ? <a className={styles.codeSource} href={study.codeSource} target="_blank" rel="noreferrer">코드 원문 보기 ↗</a> : null}
+      </div> : null}
     </article>)}
   </div>;
   if (id === "verification") return <div>
@@ -76,9 +98,10 @@ function SectionContent({ id, project }) {
   </div>;
   if (id === "sources") return <>
     <div className={styles.sourceCard}>
-      <div><p className={styles.cardLabel}>관련 자료</p><h3>{project.title}</h3><p>구현 내용과 실행 화면을 확인할 수 있는 자료입니다.</p></div>
+      <div><p className={styles.cardLabel}>프로젝트 링크</p><h3>{project.title}</h3><p>저장소와 실행 가능한 자료를 열어볼 수 있습니다.</p></div>
       <div className={styles.sourceActions}>
         {links.github ? <a href={links.github} target="_blank" rel="noreferrer">GitHub 저장소 ↗</a> : null}
+        {links.report ? <a href={links.report} target="_blank" rel="noreferrer">벤치마크 보고서 ↗</a> : null}
         {links.demo && project.id !== "grasplink" ? <a href={links.demo} target="_blank" rel="noreferrer">데모 열기 ↗</a> : null}
       </div>
     </div>
@@ -95,7 +118,7 @@ export default function ProjectPageContent({ project, previousProject, nextProje
           <Link className={styles.backLink} to="/#projects">← 전체 프로젝트</Link>
           <p className={styles.kicker}>{project.category}</p><h1>{project.title}</h1>
           <p className={styles.summary}>{project.summary}</p>
-          <dl className={styles.meta}>{project.period ? <div><dt>기간</dt><dd>{project.period}</dd></div> : null}<div><dt>팀</dt><dd>{project.team}</dd></div><div><dt>담당</dt><dd>{project.role}</dd></div></dl>
+          <dl className={styles.meta}>{project.period ? <div><dt>기간</dt><dd>{project.period}</dd></div> : null}{project.team ? <div><dt>팀</dt><dd>{project.team}</dd></div> : null}<div><dt>담당</dt><dd>{project.role}</dd></div></dl>
           <div className={styles.tags}>{project.stack.map((skill) => <span key={skill}>{skill}</span>)}</div>
         </div>
         {project.cover ? <figure className={styles.heroImage}><img src={project.cover} alt={`${project.title} 프로젝트 화면`} /></figure> : null}

@@ -25,11 +25,11 @@ export default function HomePage() {
     <AppShell meta={meta} sections={SECTIONS} activeSection={activeSection}>
       <section id="intro" className={styles.hero}>
         <div className={styles.heroText}>
-          <p className={styles.kicker}>C++ 응용 소프트웨어 개발자</p>
-          <h1>C++ 기반 로봇 시뮬레이션과<br />실시간 통신 소프트웨어를 개발합니다.</h1>
+          <p className={styles.kicker}>C++ 소프트웨어 개발자</p>
+          <h1>로봇 시뮬레이터와<br />실시간 시스템을 만듭니다.</h1>
           <p className={styles.lede}>
-            6축 로봇팔의 기구학과 경로 계획부터 실시간 영상·음성 전송까지 구현해 왔습니다.
-            성능이 떨어지면 처리 시간을 재고, 실제 병목을 찾아 고칩니다.
+            6축 로봇의 기구학과 이동 경로를 구현하고, 영상·음성 전송 흐름을 다뤘습니다.
+            성능 문제는 구간별로 측정해 병목을 찾아 개선합니다.
           </p>
           <div className={styles.heroActions}>
             <a className={styles.primaryAction} href="#projects">대표 프로젝트 보기 <span aria-hidden="true">↓</span></a>
@@ -40,8 +40,8 @@ export default function HomePage() {
           <p className={styles.noteLabel}>주요 개발 분야</p>
           <ul>
             <li><span>01</span> 로봇 시뮬레이션</li>
-            <li><span>02</span> 실시간 데이터 처리</li>
-            <li><span>03</span> 성능 측정과 검증</li>
+            <li><span>02</span> C++ 시스템·그래픽스</li>
+            <li><span>03</span> 영상·음성 전송</li>
           </ul>
           <p className={styles.location}>{meta.location} <span>·</span> {meta.email}</p>
         </aside>
@@ -49,9 +49,9 @@ export default function HomePage() {
 
       <section id="projects" className={`section ${styles.section}`}>
         <div className={styles.sectionHeading}>
-          <p className={styles.kicker}>주요 프로젝트 · 2024–2026</p>
+          <p className={styles.kicker}>주요 프로젝트 · 2025–2026</p>
           <h2>대표 프로젝트</h2>
-          <p>구현한 시스템과 맡은 역할, 검증 근거를 프로젝트별로 정리했습니다.</p>
+          <p>직접 맡은 기능과 그 과정에서 내린 기술적 판단을 담았습니다.</p>
         </div>
         <div className={styles.projectGrid}>
           {featuredProjects.map((project, index) => {
@@ -69,6 +69,7 @@ export default function HomePage() {
                   <div className={styles.projectMeta}><span>{project.category}</span><span>{project.period}</span></div>
                   <h3>{project.title}<span aria-hidden="true"> ↗</span></h3>
                   <p>{project.summary}</p>
+                  {project.cardRole ? <div className={styles.cardRole}><span>담당</span><strong>{project.cardRole}</strong></div> : null}
                   {project.homeHighlight ? <div className={styles.projectMetric}><strong>{project.homeHighlight}</strong></div> : null}
                   <div className={styles.tags}>{project.stack.slice(0, 5).map((skill) => <span key={skill}>{skill}</span>)}</div>
                 </div>
@@ -81,7 +82,7 @@ export default function HomePage() {
       <section id="expertise" className={`section ${styles.section} ${styles.expertiseSection}`}>
         <div className={styles.sectionHeading}>
           <p className={styles.kicker}>기술 역량</p>
-          <h2>프로젝트로 확인할 수 있는 역량</h2>
+          <h2>기술 역량</h2>
         </div>
         <div className={styles.expertiseGrid}>
           {techStack.map((item, index) => (
@@ -96,7 +97,7 @@ export default function HomePage() {
         <div className={styles.supportingTech}>
           <strong>{supportingTechnologies.label}</strong>
           <div className={styles.tags}>{supportingTechnologies.items.map((skill) => <span key={skill}>{skill}</span>)}</div>
-          <small>{supportingTechnologies.evidence} 프로젝트에서 사용했습니다.</small>
+          <small>{supportingTechnologies.evidence}에서 사용했습니다.</small>
         </div>
         <div className={styles.supporting}>
           <div>
@@ -122,7 +123,7 @@ export default function HomePage() {
           <h2>교육과 활동</h2>
         </div>
         <Timeline items={timeline} />
-        {activities.length ? <div className={styles.activityStrip}>{activities.map((activity) => <p key={activity.id}><strong>{activity.title}</strong><span>{activity.period} · {activity.items?.[1]}</span></p>)}</div> : null}
+        {activities.length ? <div className={styles.activityStrip}>{activities.map((activity) => <p key={activity.id}><strong>{activity.title}</strong><span>{activity.period} · {activity.subtitle}</span>{activity.items?.[1] ? <span>{activity.items[1]}</span> : null}</p>)}</div> : null}
       </section>
 
       <section id="contact" className={`section ${styles.contactSection}`}>
