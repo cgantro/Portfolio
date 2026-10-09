@@ -31,6 +31,7 @@
 .metricCard > p { color: var(--fg-dim); font-size: 11px; }
 .metricCard strong { color: var(--fg-bright); font: 700 clamp(18px, 2.2vw, 24px)/1.3 var(--font-mono); letter-spacing: -.04em; overflow-wrap: anywhere; }
 .metricCard > span { color: var(--fg-dim); font-size: 11px; line-height: 1.75; }
+.resultSummary { margin-top: 28px; padding: 18px; border: 1px solid var(--border); background: var(--bg2); color: var(--fg); font-size: 13px; line-height: 1.8; }
 .architectureCard { margin-top: 28px; padding: clamp(14px, 3vw, 25px); border: 1px solid var(--border); background: var(--bg2); }
 .architectureCard img { width: 100%; height: auto; }
 .architectureCard > p { margin-top: 16px; color: var(--fg-dim); font-size: 13px; line-height: 1.8; }

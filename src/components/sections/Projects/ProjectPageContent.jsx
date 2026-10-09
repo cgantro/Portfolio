@@ -77,11 +77,16 @@ export default function ProjectPageContent({ project, previousProject, nextProje
         {SECTIONS.map(([id, label], index) => <a key={id} href={`#${id}`}><span>0{index + 1}</span>{label}</a>)}
       </nav>
 
-      <Section id="results" index="02" label="핵심 결과" title="무엇을 확인했나" intro="측정값에는 조건과 해석 범위를 함께 적었습니다.">
-        <div className={styles.metricGrid}>
-          {metrics.map((metric) => <article className={styles.metricCard} key={metric.label}><p>{metric.label}</p><strong>{metric.value}</strong><span>{metric.context}</span></article>)}
-        </div>
-      </Section>
+      {metrics.length || project.resultSummary ? (
+        <Section id="results" index="02" label="핵심 결과" title="무엇을 확인했나" intro={project.resultsIntro ?? "구현 결과와 측정 조건을 구분해 정리했습니다."}>
+          {project.resultSummary ? <p className={styles.resultSummary}>{project.resultSummary}</p> : null}
+          {metrics.length ? (
+            <div className={styles.metricGrid}>
+              {metrics.map((metric) => <article className={styles.metricCard} key={metric.label}><p>{metric.label}</p><strong>{metric.value}</strong><span>{metric.context}</span></article>)}
+            </div>
+          ) : null}
+        </Section>
+      ) : null}
 
       <Section id="architecture" index="03" label="시스템 구조" title="시스템은 어떻게 움직이나" intro="전체 처리 흐름과 제가 맡은 부분을 구분했습니다.">
         <div className={styles.architectureCard}>
