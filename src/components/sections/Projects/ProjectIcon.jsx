@@ -26,6 +26,12 @@ const iconPaths = {
       <path d="M5 20h14" />
     </>
   ),
+  minibcg: (
+    <>
+      <path d="M4 7.5 12 4l8 3.5v9L12 20l-8-3.5v-9Z" />
+      <path d="m4.5 7.7 7.5 3.4 7.5-3.4M12 11.3V20" />
+    </>
+  ),
 };
 
 export default function ProjectIcon({ id, className }) {

@@ -26,7 +26,7 @@ export default function ReferenceProjectPage({ project, detailPage, previousProj
         <p className={styles.subtitle}>{project.subtitle}</p>
         <dl className={styles.meta}>
           <div><dt>기간</dt><dd>{project.period}</dd></div>
-          <div><dt>팀 구성</dt><dd>{project.team} 팀 프로젝트</dd></div>
+          <div><dt>팀 구성</dt><dd>{project.teamLabel ?? `${project.team} 팀 프로젝트`}</dd></div>
           <div><dt>역할</dt><dd>{project.roleItems?.[0] ?? project.role}</dd></div>
         </dl>
       </header>
@@ -44,6 +44,23 @@ export default function ReferenceProjectPage({ project, detailPage, previousProj
         <div className={styles.skills}>{project.stack.map((skill) => <span key={skill}>{skill}</span>)}</div>
         {links.length ? <div className={styles.links}>{links.map((link) => <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer">{link.label} ↗</a>)}</div> : null}
       </DetailSection>
+
+      {detailPage.demo?.src ? (
+        <DetailSection eyebrow="Live Demo" title="브라우저에서 실행">
+          <div className={styles.demoFrame}>
+            <iframe
+              src={detailPage.demo.src}
+              title={detailPage.demo.title}
+              allow="cross-origin-isolated; fullscreen"
+              allowFullScreen
+              loading="lazy"
+            />
+          </div>
+          <p className={styles.note}>
+            실행이 시작되지 않으면 <a href={detailPage.demo.src} target="_blank" rel="noopener noreferrer">새 탭에서 데모 열기 ↗</a>
+          </p>
+        </DetailSection>
+      ) : null}
 
       <DetailSection eyebrow="Implementation" title="주요 구현">
         <div className={styles.entryList}>

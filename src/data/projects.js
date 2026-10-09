@@ -649,6 +649,44 @@ const baseProjects = [
     ],
     links: {},
   },
+  {
+    id: "minibcg",
+    num: "05",
+    title: "MiniBCG",
+    subtitle: "C++17 기반 로봇 시뮬레이터를 Emscripten과 WebAssembly pthreads로 브라우저에 제공하는 개인 프로젝트",
+    period: "진행 중",
+    team: "개인",
+    teamLabel: "개인 프로젝트",
+    role: "CMake 웹 빌드, WebGL 호환 렌더링과 정적 배포 구성",
+    roleItems: ["Emscripten 기반 WebAssembly 빌드", "WebGL 2 렌더링과 브라우저 입력 연결", "pthreads와 Jolt Physics worker 구성", "COI Service Worker를 사용하는 정적 배포"],
+    metric: "C++17 · WebAssembly · pthreads",
+    metricLabel: "Browser Build",
+    benchmark: "WebGL 2 · GitHub Pages · COI Service Worker",
+    summary: [
+      "기존 C++ 로봇 시뮬레이터를 브라우저에서 실행하도록 Emscripten 빌드 경로를 추가했습니다.",
+      "Jolt 물리 작업과 비동기 Logger가 WebAssembly pthreads를 사용하도록 구성했습니다.",
+      "포트폴리오 정적 배포 안에 데모를 포함하고, SharedArrayBuffer 실행 조건을 COI Service Worker로 맞춥니다.",
+    ],
+    stack: ["C++17", "CMake", "Emscripten", "WebAssembly", "WebGL 2", "pthreads", "Jolt Physics", "GitHub Actions"],
+    highlights: [
+      "데스크톱과 브라우저가 같은 시뮬레이션 코어를 사용합니다.",
+      "브라우저의 WebGL 2 경로는 GLES 3 shader와 기본 canvas framebuffer를 사용합니다.",
+      "정적 호스팅의 격리 헤더 문제를 COI Service Worker 방식으로 처리합니다.",
+    ],
+    implementations: [
+      { title: "Emscripten CMake 빌드", summary: "브라우저 타깃 preset에서 테스트·벤치마크·Tracy를 제외하고 GLFW 브라우저 포트와 pthread 컴파일·링크 옵션을 설정합니다." },
+      { title: "WebGL 2 렌더링", summary: "브라우저에서는 GLES 3 context와 GLSL ES shader를 사용하고, 기본 canvas에 직접 렌더링합니다." },
+      { title: "정적 배포와 포트폴리오 임베드", summary: "MiniBCG 저장소에서 빌드한 단일 HTML 번들을 정적 자산으로 포함하고 프로젝트 상세 페이지의 iframe으로 제공합니다." },
+    ],
+    problems: [
+      { title: "정적 호스팅에서 pthreads 실행 조건 확보", problem: "WebAssembly pthreads가 사용하는 SharedArrayBuffer는 교차 출처 격리된 문서에서만 사용할 수 있습니다.", solution: "포트폴리오의 전체 문서 체인에 COI Service Worker를 적용하고 iframe에 격리 권한을 선언합니다.", result: "정적 배포 환경에서 부모 페이지와 데모 iframe이 모두 격리 조건을 갖추도록 구성합니다." },
+    ],
+    retrospective: [
+      { point: "브라우저 검증", detail: "배포 후 crossOriginIsolated, SharedArrayBuffer, pthread worker 생성, 렌더링과 조작 입력을 브라우저에서 확인합니다." },
+      { point: "정적 리소스 호환성", detail: "COEP 적용 뒤 포트폴리오에서 사용하는 글꼴과 외부 이미지가 정상적으로 불러와지는지 확인합니다." },
+    ],
+    links: { github: "https://github.com/cgantro/MiniBCG" },
+  },
 ];
 
 // Sticker는 보조 프로젝트로 유지하며, 주력 3개 뒤에 배치한다.
@@ -903,7 +941,7 @@ const stickerAccurateContent = {
   ],
 };
 
-const projectOrder = ["robotpal", "mausoleum", "autowing", "sticker"];
+const projectOrder = ["robotpal", "mausoleum", "autowing", "sticker", "minibcg"];
 
 export const projects = projectOrder.map((id) => {
   const project = baseProjects.find((item) => item.id === id);

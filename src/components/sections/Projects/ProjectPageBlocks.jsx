@@ -37,7 +37,7 @@ export function HeroCard({ project, detailPage, links }) {
         <div className={styles.heroMeta}>
           <span>{project.period}</span>
           <span className={styles.metaDivider}>/</span>
-          <span>{project.team} 팀 프로젝트</span>
+          <span>{project.teamLabel ?? `${project.team} 팀 프로젝트`}</span>
           <span className={styles.metaDivider}>/</span>
           <span>{project.stack.slice(0, 2).join(" · ")}</span>
         </div>

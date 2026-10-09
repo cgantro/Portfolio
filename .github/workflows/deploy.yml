@@ -22,6 +22,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Verify MiniBCG browser bundle
+        run: test -s asset/minibcg/index.html
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
