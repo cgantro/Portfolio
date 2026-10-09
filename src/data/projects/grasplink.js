@@ -1,16 +1,16 @@
-import coverImage from "../../../asset/GraspLink.gif";
+import coverImage from "../../../asset/GraspLink-preview.webp";
 
 export default {
   id: "grasplink",
   sectionOrder: ["implementation", "architecture", "case-studies", "verification", "sources"],
-  homeHighlight: "FK · IK · MoveJ · MoveLinear · 충돌 검사",
   title: "GraspLink",
   category: "C++ 로봇 시뮬레이션",
   period: "2026.08 – 진행 중",
   team: "개인 프로젝트",
   role: "개인 프로젝트로 설계·구현",
+  cardRole: "C++ 로봇 시뮬레이터와 기구학·이동·파지 기능 설계 및 구현",
   summary:
-    "C++17로 Hanwha HCR-12A 6축 로봇 팔과 Robotiq 2F-85 그리퍼의 시뮬레이션을 구현했습니다. OpenGL 뷰어와 Flecs ECS, Jolt Physics를 연결하고 FK·DLS IK, MoveJ·MoveLinear, 충돌 검사와 Pick-and-Place 흐름을 구성했습니다. 실제 로봇 하드웨어를 구동하는 제어기는 아닙니다.",
+    "Hanwha HCR-12A 로봇 팔과 Robotiq 2F-85 그리퍼의 Pick-and-Place 작업을 재현하는 C++17 시뮬레이터입니다. OpenGL·Flecs ECS·Jolt Physics를 연결해 로봇 기구학, 관절 및 TCP 경로 계획, 충돌 검사와 접촉 기반 파지를 구현했습니다. 실제 로봇 하드웨어를 제어하는 시스템은 아닙니다.",
   cover: coverImage,
   stack: [
     "C++17",
@@ -45,12 +45,12 @@ export default {
     {
       title: "목표 자세와 TCP 직선 이동 분리",
       body:
-        "Damped Least Squares IK로 TCP 목표에 도달할 관절각을 구합니다. MoveJ는 관절 경로를 검사하고, 직접 경로를 찾지 못하면 제한된 RRT-Connect를 시도합니다. 이 경로는 TCP가 직선으로 움직인다는 보장은 없습니다. MoveLinear는 TCP가 직선으로 이동하고 최단 회전 경로를 따르도록 경로를 나눠 계산하며, 직전 IK 해를 다음 계산의 초기값으로 사용합니다.",
+        "MovePose는 목표 TCP 자세를 IK로 관절 목표로 바꿔 관절 경로로 이동합니다(MoveJ 방식). 현재 자세를 먼저 해 탐색에 사용하고, 직접 경로가 충돌하면 제한된 RRT-Connect를 시도합니다. TCP 직선 이동은 보장하지 않습니다. UI 미션은 같은 관절 경로 계획을 `BeginPosePlanning`으로 여러 프레임에 나눠 처리합니다. MoveLinear는 TCP 위치의 직선과 최단 회전을 표본별로 미리 계획하고 충돌을 확인한 뒤, 저장한 관절 자세를 보간해 실행합니다. 직전 표본의 IK 해를 다음 표본의 초기값으로 쓰며, 연속 해를 찾지 못하면 다른 경로 방식으로 바꾸지 않고 실패합니다.",
     },
     {
       title: "고정 주기 물리와 안전 자세 복원",
       body:
-        "정해진 제어 주기마다 로봇·그리퍼 상태와 충돌 형상을 갱신한 뒤 Jolt 물리를 진행합니다. 새 자세가 환경이나 허용되지 않은 로봇 자체의 충돌을 일으키면 직전의 안전한 관절 자세로 되돌리고 제어기를 대기 상태(Idle)로 둡니다.",
+        "정해진 제어 주기마다 로봇·그리퍼 상태와 충돌 형상을 갱신한 뒤 Jolt 물리를 진행합니다. 다음 검사 자세가 환경이나 허용되지 않은 로봇 자체의 충돌과 겹치면 직전 관절 자세로 되돌리고 제어기를 대기 상태(Idle)로 둡니다. 이는 검사 지점에서 자세를 복원하는 보호 동작으로, 이동 구간 전체의 연속 충돌 검사나 장애물을 우회하는 경로 계획은 아닙니다.",
     },
     {
       title: "그리퍼 상태와 접촉 기반 파지",
@@ -60,48 +60,46 @@ export default {
   ],
   caseStudies: [
     {
-      title: "IK 실패가 목표 문제인지 초기값 문제인지 확인",
+      title: "J6 영점 복귀가 −360° 목표로 바뀌던 문제",
       situation:
-        "일부 TCP 목표에서 현재 IK 탐색이 해를 찾지 못했습니다. 실패만으로 목표 자체가 도달 불가능하다고 단정할 수는 없었습니다.",
+        "J6이 −314.5°인 상태에서 임무가 0° 복귀를 요청했지만, 짧은 회전을 우선하는 등가각 정렬이 목표를 −360°로 바꿀 수 있었습니다. 명령은 수락돼도 중앙 위치로 돌아오지 않는 문제였습니다.",
       analysis:
-        "특정 실패 사례에서 초기 관절값을 바꾸자 IK 결과가 달라졌습니다. 초기값에 따라 수렴 여부가 달라질 수 있음을 확인했습니다.",
+        "일반 관절 이동에서는 현재 자세와 가까운 등가각을 선택하는 것이 효율적이지만, 임무의 J6 언와인드는 실제 0° 회전 표현을 요구합니다. 두 동작에 같은 각도 정렬 규칙을 적용한 것이 원인이었습니다.",
       decision:
-        "현재 관절값으로 해를 찾지 못하면 유효한 초기 관절값을 더 시도하고, 찾은 해마다 관절 한계와 경로 충돌 여부를 확인하도록 했습니다.",
+        "일반 이동의 짧은 회전 선택은 유지하고, J6을 지정된 영점으로 복귀시키는 명령에서만 회전수를 보존하도록 분리했습니다.",
       implementation:
-        "목표 자세의 IK 해를 찾는 과정과 관절 경로 검증을 분리합니다. 이동 작업은 비동기로 경로를 계산하고, TCP가 연속해서 움직일 때는 앞선 경로 지점에서 구한 IK 해를 다음 지점의 초기값으로 이어 씁니다.",
+        "Pick-and-Place 임무가 J6 목표를 0°로 지정하고 `preserveJointTurns`를 켜도록 수정했습니다. 언와인드 뒤 관절각이 ±1° 안에 있는지 확인한 뒤에만 픽업을 시작하며, 임무 완료도 같은 조건을 통과해야 인정합니다.",
       verification:
-        "실패 사례에서 초기값에 따라 IK 결과가 달라지는 점을 확인했습니다.",
+        "회귀 테스트에서 J6이 −314.5°일 때 언와인드를 요청하고, 최종 관절각이 −360°가 아닌 0°인지 확인합니다.",
       limitations:
-        "특정 실패 사례에서 얻은 값이므로 전체 목표의 성공률로 해석할 수 없습니다.",
-    },
-    {
-      title: "관절 경로와 TCP 직선 경로를 구분",
-      situation:
-        "관절 공간에서 문제가 없는 MoveJ 경로라도 TCP가 직선으로 움직이지는 않습니다. TCP 직선 이동 중에는 한 IK 해의 다음 지점 해를 이어 찾지 못하는 경우도 있습니다.",
-      analysis:
-        "MoveJ는 관절 경로를 계획하고, 직접 갈 수 없으면 제한된 RRT-Connect를 시도합니다. MoveLinear는 TCP 위치를 직선으로 옮기고 최단 회전 경로를 따르므로 각 경로 지점에서 IK 해를 이어서 찾아야 합니다.",
-      decision:
-        "요청한 이동 방식에 맞는 계획기를 사용합니다. MoveLinear는 앞 지점의 IK 해를 우선 이어가고, 이어갈 수 없을 때만 다른 IK 해를 탐색합니다.",
-      implementation:
-        "시뮬레이션 제어기에서 관절 경로와 TCP 경로를 따로 계산하고, 두 경로 모두 관절 자세마다 충돌 여부를 확인합니다.",
-      verification:
-        "공개된 이동 명세에서 MoveJ가 TCP 직선 이동을 보장하지 않는 점, MoveLinear가 TCP 직선과 최단 회전을 따르는 점, 다음 경로 지점에 이전 IK 해를 사용하는 규칙을 확인했습니다.",
-      limitations:
-        "계획한 경로는 시뮬레이션용입니다. 토크·질량·관성을 바탕으로 한 동역학은 계산하지 않으며, 실제 로봇의 이동 정확도나 안전성을 보장하지 않습니다.",
+        "검증은 시뮬레이션 제어기와 자동 회귀 테스트 범위입니다. 실제 로봇에서 언와인드나 Pick-and-Place를 실행한 결과는 아닙니다.",
+      code: `JointMoveCommand unwind;
+unwind.targetPositionRadians = controller.GetState().jointPositionRadians;
+unwind.targetPositionRadians.back() = 0.0;
+unwind.preserveJointTurns = true;
+ASSERT_TRUE((static_cast<bool>(controller.MoveJoint(unwind)))) << "explicit J6 unwind request is accepted";
+ASSERT_TRUE(AdvanceUntilIdle(controller, 0.01)) << "motion reaches target within bounded updates";
+ASSERT_NEAR(controller.GetState().jointPositionRadians.back(), 0.0, 1e-8) << "J6 returns to the central zero degree representation instead of the nearby negative 360 degree turn";`,
+      codeLanguage: "cpp",
+      codeLabel: "J6 언와인드 회귀 테스트 발췌",
+      codeSource:
+        "https://github.com/cgantro/GraspLink/blob/master/tests/RobotMotionTests.cpp#L219-L238",
     },
   ],
   verification: {
     summary:
       "시뮬레이션은 로봇 기구학, 경로 계획, 충돌 검사까지 다룹니다.",
     items: [
-      "실행 환경: Windows와 WebAssembly 브라우저 데모",
-      "이동 방식: MoveJ 관절 경로와 MoveLinear TCP 직선 경로를 구분",
+      "지원 빌드: Windows 네이티브와 WebAssembly 타깃",
+      "MovePose는 TCP 목표를 관절 공간 경로로 실행하며 직선 TCP 이동을 보장하지 않음",
+      "MoveLinear는 TCP 직선·최단 회전 경로를 표본별로 계획하고 검사한 뒤 실행함. 표본 사이의 모든 자세를 수학적으로 보장하지는 않음",
+      "J6 영점 복귀 정책은 자동 회귀 테스트로 확인. 실제 로봇에서 실행한 제어 결과는 없음",
       "실제 장치 제어, 토크·질량·관성 기반 동역학, 하드웨어 그리퍼 연결부는 구현 범위에서 제외",
     ],
   },
   links: {
     github: "https://github.com/cgantro/GraspLink",
-    demo: "https://cgantro.github.io/Portfolio/minibcg/index.html",
+    demo: "/Portfolio/minibcg/index.html",
   },
   theme: { accent: "#67e8f9" },
 };

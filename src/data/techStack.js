@@ -7,17 +7,17 @@ export const techStack = [
   {
     category: "시뮬레이션 · 그래픽스",
     evidence: "GraspLink · RobotPal",
-    items: ["OpenGL", "Flecs ECS", "Jolt Physics", "Unreal Engine 5"],
+    items: ["OpenGL", "Flecs ECS", "Jolt Physics"],
   },
   {
     category: "실시간 통신 · 스트리밍",
     evidence: "RobotPal · 영묘",
-    items: ["TCP", "UDP", "WebSocket", "Opus", "JPEG"],
+    items: ["TCP · WebSocket · JPEG (RobotPal)", "UDP · Opus · Unreal Engine 5 (영묘)"],
   },
   {
     category: "성능 분석 · 검증",
     evidence: "RobotPal · GraspLink · 오토윙카",
-    items: ["Tracy", "Google Benchmark", "CTest", "k6"],
+    items: ["Tracy (RobotPal)", "Google Benchmark · CTest (GraspLink)", "k6 (오토윙카)"],
   },
 ];
 

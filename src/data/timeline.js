@@ -18,7 +18,7 @@ export const timeline = [
     title: "OPIc IH 취득",
     detail: "영어",
     period: "2026.02",
-    tags: ["멀티캠퍼스"],
+    tags: [],
   },
   {
     id: "samsung-sw-pro",
