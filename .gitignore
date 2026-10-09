@@ -10,3 +10,9 @@ portfolio/*.pdf
 portfolio/*.pptx
 asset/autowing-system-architecture.png
 .github/workflows/career-db.yml
+
+# Local Codex instructions and private portfolio review records
+/AGENTS.md
+/docs/PORTFOLIO_OVERHAUL_WORK_ORDER.md
+/docs/content-audit.md
+/docs/claim-evidence-matrix.md
