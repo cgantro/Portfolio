@@ -3,18 +3,21 @@ import architectureImage from "../../../asset/robotpal-system-architecture.svg";
 
 export default {
   id: "robotpal",
-  sectionOrder: ["results", "architecture", "implementation", "case-studies", "verification", "sources"],
+  sectionOrder: ["results", "architecture", "implementation", "case-studies", "sources"],
   homeHighlight: "시뮬레이션 FPS +43.9% · 카메라 송신 FPS +48.6%",
+  homeHighlightNote: "2026.10 후속 측정",
   title: "RobotPal",
   category: "C++ 시뮬레이터 · 실시간 스트리밍",
   period: "2025.11 – 2025.12",
   team: "4인 팀",
-  role: "Qt 기반 제어 화면, 실장비 측정·보정, AGV·로봇팔·그리퍼 제어, Python 모듈 연동, 카메라 스트리밍·성능 검증",
-  cardRole: "Qt·실장비 보정·AGV/로봇 제어·스트리밍",
-  summary:
-    "4인 팀으로 개발한 JETANK용 C++ 가상 시뮬레이터입니다. 실물 장비에서 확인한 주행 속도를 가상 이동 계수에 반영하고, 제어 명령과 카메라 영상을 연결했습니다.",
+  role: "Qt 제어 화면, 실장비 주행 계수 보정, AGV·로봇팔·그리퍼 제어, Python 연동, 카메라 스트리밍·성능 검증",
+  cardRole: "Qt·실장비 보정·로봇 제어",
+  summary: [
+    "JETANK용 C++ 가상 시뮬레이터",
+    "Python AI 모듈에 가상 카메라 영상을 공급하고 AGV·로봇팔 제어 명령을 연결",
+  ],
   resultSummary:
-    "성능 수치는 프로젝트 기간과 구분한 2026년 10월 8일 후속 벤치마크 결과입니다.",
+    "후속 성능 측정 · 2026년 10월 8일",
   cover: coverImage,
   stack: [
     "C++17",
@@ -28,16 +31,6 @@ export default {
     "WebAssembly",
     "Python",
     "CMake",
-  ],
-  metrics: [
-    {
-      label: "스트리밍 중 시뮬레이션 FPS",
-      value: "66.70 → 96.01 (+43.9%)",
-    },
-    {
-      label: "카메라 송신 FPS",
-      value: "26.95 → 40.05 (+48.6%)",
-    },
   ],
   benchmarkTable: {
     title: "스트리밍 구성별 성능 비교",
@@ -56,7 +49,7 @@ export default {
       ["PBO + 작업 스레드 4개", "비동기 PBO + Fence", "작업 스레드 4개", "102.95", "96.01", "40.05", "6.74%"],
     ],
     note:
-      "모든 구성에서 해상도는 1232×832로 유지했습니다. 스트리밍 OFF/ON을 각각 5회 측정해 중앙값을 사용했으며, OFF FPS 구성 간 차이 0.557%는 5% 허용 기준 이내였습니다. 수신·디코딩은 측정 범위에서 제외했고, 카메라 송신 목표 60 FPS에는 미달했습니다.",
+      "해상도 1232×832 · 스트리밍 OFF/ON 각 5회 측정 중앙값 · OFF FPS 구성 간 편차 0.557% (허용선 5% 이내) · 수신·디코딩 측정 제외 · 카메라 송신 목표 60 FPS 미달",
   },
   tracyDiagnostics: {
     title: "Tracy 구간별 p50 계측",
@@ -68,77 +61,100 @@ export default {
       ["PBO + 작업 스레드 4개", "작업 스레드 JPEG 인코딩", "27.075 ms"],
     ],
     note:
-      "큐 등록 시간과 JPEG 인코딩 시간은 서로 다른 구간입니다. Worker별 JPEG 시간은 오히려 늘었으므로 인코더가 빨라졌다고 해석하지 않습니다. 개선의 핵심은 주 스레드가 압축 완료를 기다리지 않게 한 구조 변경입니다.",
+      "큐 등록과 JPEG 인코딩은 별도 구간 · 작업 스레드별 JPEG p50은 더 길었음 · 개선 요인: 주 스레드의 압축 대기를 없앤 구조 변경",
   },
   architecture: {
     image: architectureImage,
     alt: "RobotPal의 ECS 렌더링·스트리밍·제어 시스템과 TCP/WebSocket 클라이언트 경로",
-    summary:
-      "OpenGL 카메라 프레임은 스트리밍 시스템을 거쳐 TCP 또는 WebSocket으로 전송됩니다. 네트워크 명령은 제어기 계층으로 전달되며, 데스크톱의 TCP 경로와 WebAssembly의 WebSocket 경로를 구분합니다.",
+    summary: [
+      "영상: OpenGL 가상 카메라 → JPEG 인코딩 → Python AI 학습·추론 모듈",
+      "제어: Python 입력 → 데스크톱 TCP 또는 WebAssembly WebSocket → NetworkEngine → 제어기",
+    ],
   },
   implementations: [
     {
-      title: "Qt 제어 화면과 실장비 측정·시뮬레이터 보정",
-      body:
-        "Qt 제어 화면에서 실물 로봇 상태를 확인하고, JETANK의 직진·회전 속도를 측정해 시뮬레이터 이동 계수를 보정했습니다.",
+      title: "Qt 제어 화면과 실장비 측정·보정",
+      body: [
+        "Qt 화면에서 JETANK 상태와 제어 입력을 확인",
+        "실장비 직진·회전 속도를 측정해 가상 주행 계수에 반영",
+      ],
     },
     {
       title: "AGV·로봇팔·그리퍼 제어와 Python 연동",
-      body:
-        "AGV 이동, 로봇팔 관절과 그리퍼 제어를 구현하고 외부 Python 모듈에서 보낸 명령을 시뮬레이터 제어 계층에 연결했습니다. 상위 명령 처리와 제어기 구현은 IRobotController 경계로 분리했습니다.",
+      body: [
+        "명령 흐름: Python → TCP/WebSocket → NetworkEngine → 주행·서보 제어",
+        "서보 ID 1–3: 로봇팔 베이스·어깨·팔꿈치 · ID 4: 그리퍼 · ID 5: 카메라 기울기",
+        "`IRobotController` 인터페이스로 상위 제어 로직과 제어기 구현을 분리",
+      ],
     },
     {
       title: "통신·가상 카메라 스트리밍",
-      body:
-        "외부 명령은 TCP·WebSocket으로 전달하고, OpenGL 가상 카메라 영상은 JPEG로 압축해 전송합니다. 현재 확인 가능한 소스의 인코더는 libjpeg API를 사용하며, 네이티브 빌드는 libjpeg-turbo에 연결하고 WebAssembly 빌드는 Emscripten 내장 libjpeg를 사용합니다. 데스크톱과 WebAssembly의 전송 경로도 구분했습니다.",
-    },
-    {
-      title: "Tracy 계측과 스트리밍 성능 개선",
-      body:
-        "동기 방식, PBO, PBO와 작업 스레드 4개 구성을 비교했습니다. PBO만 적용한 결과가 개선되지 않자 Tracy로 구간을 계측해 JPEG 압축 대기를 주 스레드에서 분리했습니다.",
+      body: [
+        "OpenGL 가상 카메라 JPEG 영상을 Python AI 학습·추론 입력으로 전달",
+        "인코딩: `libjpeg` API · 네이티브: libjpeg-turbo · WebAssembly: Emscripten 내장 libjpeg",
+      ],
     },
   ],
   caseStudies: [
     {
-      title: "실장비 주행값을 시뮬레이터 이동 계수에 반영",
-      situation:
-        "시뮬레이터의 JETANK 이동이 실물 장비의 움직임을 반영하도록 직진·회전 계수를 보정할 기준이 필요했습니다.",
-      analysis:
-        "실물 JETANK에서 직진 속도 약 2.4cm/s, 회전 속도 약 24°/s를 측정해 가상 이동 계수의 기준으로 삼았습니다.",
-      decision:
-        "두 실측값을 가상 시뮬레이터의 직진·회전 이동 계수를 보정하는 기준으로 사용했습니다.",
-      implementation:
-        "직진·회전 속도를 각각 반영해 JETANK 시뮬레이터의 이동 계수를 조정했습니다.",
-      verification:
-        "실측값을 시뮬레이터의 선속도·각속도 계수에 반영했습니다. 보정 전후 오차나 반복 측정 분산은 확인되지 않았습니다.",
-      limitations:
-        "당시 입력 조건과 반복 횟수, 보정 뒤 오차값은 남아 있지 않습니다. 2.4cm/s와 24°/s는 측정 당시 결과로만 제시합니다.",
+      title: "실물 주행 기준을 가상 AGV 계수에 반영",
+      narrative: [
+        "실물 JETANK에서 모터 입력 0.3일 때 직진 약 2.4cm/s와 회전 약 24°/s를 측정해 가상 주행 계수의 기준으로 삼았습니다.",
+        "`ControllerSystemModule.cpp`는 좌우 모터 입력의 평균으로 선속도, 입력 차이의 절반으로 각속도를 계산합니다.",
+        "가속도 완화를 적용한 뒤 가상 위치와 회전을 갱신합니다.",
+        "보정 후 오차와 반복 측정 횟수는 기록에 남아 있지 않습니다.",
+      ],
+      equations: [
+        { label: "목표 선속도 · m/s", expression: "v = 0.08 × ((L + R) / 2)" },
+        { label: "목표 각속도 · rad/s", expression: "ω = 1.3963 × ((R − L) / 2)" },
+      ],
+      equationNote: "L: 좌측 모터 입력 · R: 우측 모터 입력",
+      references: [
+        {
+          label: "좌우 입력 환산과 가상 주행 갱신 (ControllerSystemModule.cpp, 1218–1252행)",
+          url: "https://github.com/cgantro/RobotPal/blob/main/RobotPal/src/Systems/ControllerSystemModule.cpp#L1218-L1252",
+        },
+      ],
     },
     {
       title: "PBO 가설을 재검토하고 JPEG 병목을 주 스레드에서 분리",
-      situation:
-        "카메라 스트리밍을 켜면 시뮬레이션 FPS가 낮아져 GPU 픽셀 읽기가 주된 원인이라고 예상했습니다.",
-      analysis:
-        "PBO만 적용했을 때 스트리밍 중 시뮬레이션과 카메라 송신 성능은 동기 방식보다 개선되지 않았습니다. Tracy 계측에서는 동기 GPU Readback보다 JPEG 압축 구간이 더 길었습니다. 구간별 p50은 별도 표에 정리했습니다.",
-      decision:
-        "PBO 단독으로 병목이 해소되지 않아 JPEG 압축을 시뮬레이션 주 스레드의 대기 경로에서 분리했습니다.",
-      implementation:
-        "비동기 PBO + Fence 경로와 작업 스레드 4개 구성을 적용했습니다. 주 스레드는 JPEG 작업을 큐에 등록한 뒤 압축 완료를 기다리지 않고 시뮬레이션을 이어갑니다.",
-      verification:
-        "세 구성의 결과와 측정 조건은 성능 비교표에 정리했습니다.",
-      limitations:
-        "Worker별 JPEG 인코딩 시간은 동기 JPEG 구간보다 늘었습니다. 인코더 처리 속도 향상이 아니라 주 스레드의 압축 대기를 제거한 구조 변경으로 설명해야 합니다. 수신·디코딩은 측정하지 않았습니다.",
+      narrative: [
+        "카메라 스트리밍을 켜면 시뮬레이션 FPS가 떨어졌습니다. 가상 카메라 영상은 Python AI 모듈의 입력으로 보내고 있었습니다.",
+        "처음에는 동기 `glReadPixels`의 GPU Readback 대기를 의심해 PBO와 Fence를 적용했습니다. PBO 단독 구성에서는 스트리밍 중 시뮬레이션 FPS와 카메라 송신 FPS가 Sync보다 낮았습니다.",
+        "Tracy로 처리 구간을 나눠 보니 주 스레드 JPEG 인코딩의 p50이 GPU Readback보다 길었습니다. 가장 오래 걸리는 대기가 압축 쪽이라는 점에 맞춰 병목 가설을 바꿨습니다.",
+        "JPEG를 작업 스레드 4개에 맡기고, 주 스레드는 큐에 작업을 등록한 뒤 시뮬레이션을 이어가도록 바꿨습니다.",
+        "2026년 10월 후속 측정에서는 시뮬레이션과 카메라 송신 FPS가 모두 높아졌습니다. 작업 스레드별 JPEG 시간은 더 길어졌으며, 개선은 인코더 속도보다 주 스레드 대기 구조를 바꾼 결과였습니다.",
+      ],
+      flow: [
+        { title: "현상", detail: "스트리밍 중 시뮬레이션 FPS 하락" },
+        { title: "초기 가설", detail: "GPU Readback 대기 · PBO 단독 구성은 성능 개선으로 이어지지 않음" },
+        { title: "재계측", detail: "Tracy로 Readback과 JPEG 처리 구간 비교" },
+        { title: "조치", detail: "JPEG를 작업 스레드 4개로 이동하고 주 스레드 대기 제거" },
+        { title: "후속 측정", detail: "성능 비교표에서 세 구성의 FPS 결과 확인" },
+      ],
+      references: [
+        {
+          label: "기준 벤치마크 조건·비교 결과 (streaming-performance-result.md, 193–231행)",
+          url: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md#L193-L231",
+        },
+        {
+          label: "Tracy 계측과 병목 판단 (streaming-performance-result.md, 234–248행)",
+          url: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md#L234-L248",
+        },
+        {
+          label: "PBO 단독 구성 측정 결과 (streaming-performance-result.md, 251–283행)",
+          url: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md#L251-L283",
+        },
+        {
+          label: "작업 스레드별 JPEG 시간과 주 스레드 대기 분리 (streaming-performance-result.md, 286–337행)",
+          url: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md#L286-L337",
+        },
+      ],
     },
   ],
-  verification: {
-    summary:
-      "이 결과는 iGPU에서 해당 작업 조건으로 측정했습니다. 다른 GPU의 성능으로 일반화할 수 없습니다.",
-    items: [
-      "PBO 단독 구성은 이 테스트에서 개선되지 않았습니다. 이를 PBO의 일반 성능으로 해석하지 않았습니다.",
-    ],
-  },
   links: {
     github: "https://github.com/cgantro/RobotPal",
+    code: "https://github.com/cgantro/RobotPal/blob/main/RobotPal/src/Systems/ControllerSystemModule.cpp#L1218-L1252",
     report: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md",
     demo: null,
   },
