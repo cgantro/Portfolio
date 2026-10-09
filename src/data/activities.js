@@ -5,7 +5,7 @@ export const activities = [
   {
     id: "band",
     title: "교내 밴드 동아리 마스터",
-    subtitle: "14FRET · 베이스 · 악기 부장",
+    subtitle: "14FRET 베이스, 악기 부장",
     period: "2019 – 2025",
     category: "동아리",
     items: [

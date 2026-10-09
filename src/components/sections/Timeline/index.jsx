@@ -6,7 +6,7 @@ export default function Timeline({ items }) {
     <div className={styles.sectionWrap}>
       <SectionLabel>교육과 자격</SectionLabel>
       <p className={styles.lead}>전공과 교육 과정에서 쌓은 소프트웨어 개발 기초입니다.</p>
-      <div className={styles.divider}><span>학력 · 교육 · 자격</span></div>
+      <div className={styles.divider}><span>학력과 교육, 자격</span></div>
       <div className={styles.list}>
         {items.map((item) => (
           <article key={item.id} className={styles.item}>

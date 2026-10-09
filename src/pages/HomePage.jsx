@@ -28,8 +28,8 @@ export default function HomePage() {
           <p className={styles.kicker}>C++ 소프트웨어 개발자</p>
           <h1>로봇 시뮬레이터와<br />실시간 시스템을 만듭니다.</h1>
           <p className={styles.lede}>
-            6축 로봇의 기구학과 이동 경로를 구현하고, 영상·음성 전송 흐름을 다뤘습니다.
-            성능 문제는 구간별로 측정해 병목을 찾아 개선합니다.
+            로봇 팔 관절의 움직임과 이동 경로를 계산하고, 영상과 음성 전송 기능을 구현했습니다.
+            느린 구간은 직접 측정해 원인을 찾고 개선합니다.
           </p>
           <div className={styles.heroActions}>
             <a className={styles.primaryAction} href="#projects">대표 프로젝트 보기 <span aria-hidden="true">↓</span></a>
@@ -40,16 +40,16 @@ export default function HomePage() {
           <p className={styles.noteLabel}>주요 개발 분야</p>
           <ul>
             <li><span>01</span> 로봇 시뮬레이션</li>
-            <li><span>02</span> C++ 시스템·그래픽스</li>
-            <li><span>03</span> 영상·음성 전송</li>
+            <li><span>02</span> C++ 시스템과 그래픽스</li>
+            <li><span>03</span> 영상과 음성 전송</li>
           </ul>
-          <p className={styles.location}>{meta.location} <span>·</span> {meta.email}</p>
+          <p className={styles.location}>{meta.location}, {meta.email}</p>
         </aside>
       </section>
 
       <section id="projects" className={`section ${styles.section}`}>
         <div className={styles.sectionHeading}>
-          <p className={styles.kicker}>주요 프로젝트 · 2025–2026</p>
+          <p className={styles.kicker}>주요 프로젝트 (2025–2026)</p>
           <h2>대표 프로젝트</h2>
           <p>직접 맡은 기능과 그 과정에서 내린 기술적 판단을 담았습니다.</p>
         </div>
@@ -60,7 +60,7 @@ export default function HomePage() {
                 <div className={styles.projectImage}>
                   {project.cover ? <img src={project.cover} alt={`${project.title} 프로젝트 화면`} loading={index > 1 ? "lazy" : "eager"} /> : project.id === "grasplink" ? (
                     <div className={styles.projectFlowCover} aria-label="GraspLink 로봇 시뮬레이터 구성 요약">
-                      <span>로봇 시뮬레이션 흐름</span><strong>HCR-12A</strong><small>기구학 계산 <i>→</i> 경로 계획 <i>→</i> 충돌 검사</small>
+                      <span>로봇 시뮬레이션 흐름</span><strong>HCR-12A</strong><small>팔 자세 계산 <i>→</i> 이동 경로 계획 <i>→</i> 충돌 검사</small>
                     </div>
                   ) : <span>{project.title}</span>}
                   <span className={styles.projectNumber}>0{index + 1}</span>
@@ -89,13 +89,13 @@ export default function HomePage() {
               <span className={styles.expertiseIndex}>0{index + 1}</span>
               <h3>{item.category}</h3>
               <p>{item.evidence}</p>
-              <div className={styles.tags}>{item.items.map((skill) => <span key={skill}>{skill}</span>)}</div>
+              <div className={styles.tags}>{item.items.map((skill) => <span key={skill.name}>{skill.name} ({skill.detail})</span>)}</div>
             </article>
           ))}
         </div>
         <div className={styles.supportingTech}>
           <strong>{supportingTechnologies.label}</strong>
-          <div className={styles.tags}>{supportingTechnologies.items.map((skill) => <span key={skill}>{skill}</span>)}</div>
+          <div className={styles.tags}>{supportingTechnologies.items.map((skill) => <span key={skill.name}>{skill.name} ({skill.detail})</span>)}</div>
           <small>{supportingTechnologies.evidence}에서 사용했습니다.</small>
         </div>
         <div className={styles.supporting}>
@@ -122,7 +122,7 @@ export default function HomePage() {
           <h2>교육과 활동</h2>
         </div>
         <Timeline items={timeline} />
-        {activities.length ? <div className={styles.activityStrip}>{activities.map((activity) => <p key={activity.id}><strong>{activity.title}</strong><span>{activity.period} · {activity.subtitle}</span>{activity.items?.[1] ? <span>{activity.items[1]}</span> : null}</p>)}</div> : null}
+        {activities.length ? <div className={styles.activityStrip}>{activities.map((activity) => <p key={activity.id}><strong>{activity.title}</strong><span>{activity.period}, {activity.subtitle}</span>{activity.items?.[1] ? <span>{activity.items[1]}</span> : null}</p>)}</div> : null}
       </section>
 
       <section id="contact" className={`section ${styles.contactSection}`}>

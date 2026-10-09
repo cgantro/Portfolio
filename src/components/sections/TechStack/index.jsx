@@ -36,6 +36,7 @@ export default function TechStack({ stack }) {
               <li key={item.name} className={styles.item}>
                 <SkillIcon icon={item.skillicon} name={item.name} />
                 <span>{item.name}</span>
+                <small>{item.detail}</small>
               </li>
             ))}
           </ul>

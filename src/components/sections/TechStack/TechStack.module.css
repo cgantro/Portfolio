@@ -5,9 +5,10 @@
 .activeTab { background: #fff; color: var(--accent); box-shadow: 0 2px 8px rgba(15,23,42,.12); }
 .skillPanel { margin-top: 28px; padding: 24px; border: 1px solid var(--border); border-radius: 20px; background: #fff; box-shadow: 0 12px 30px rgba(15,23,42,.045); }
 .groupTitle { color: var(--fg-dim); font: 700 11px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; }
-.items { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin-top: 20px; }
-.item { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; width: 94px; min-height: 94px; padding: 12px 8px; border: 1px solid var(--border); border-radius: 15px; background: #fff; color: var(--fg); font-size: 11px; font-weight: 700; transition: transform .18s, border-color .18s, box-shadow .18s; }
+.items { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 20px auto 0; max-width: 700px; }
+.item { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 7px; min-height: 130px; padding: 14px 10px; border: 1px solid var(--border); border-radius: 15px; background: #fff; color: var(--fg); font-size: 12px; font-weight: 700; transition: transform .18s, border-color .18s, box-shadow .18s; }
+.item small { color: var(--fg-dim); font-size: 11px; font-weight: 500; line-height: 1.45; }
 .item:hover { transform: translateY(-3px); border-color: #93c5fd; box-shadow: 0 10px 20px rgba(37,99,235,.12); }
 .icon, .iconPh { width: 34px; height: 34px; object-fit: contain; }
 .iconPh { display: grid; place-items: center; padding: 4px; border-radius: 10px; background: var(--accent-bg); color: var(--accent); font: 700 9px var(--font-mono); }
-@media (max-width: 640px) { .tabs { justify-content: flex-start; width: 100%; } .tab, .activeTab { padding: 8px 12px; font-size: 11px; } .skillPanel { padding: 18px 12px; } .items { gap: 10px; } .item { width: 82px; min-height: 82px; } }
+@media (max-width: 640px) { .tabs { justify-content: flex-start; width: 100%; } .tab, .activeTab { padding: 8px 12px; font-size: 11px; } .skillPanel { padding: 18px 12px; } .items { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; } .item { min-height: 120px; } }

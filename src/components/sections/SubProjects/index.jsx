@@ -13,7 +13,7 @@ export default function SubProjects({ projects }) {
             <span className={styles.logo}>{String(index + 1).padStart(2, "0")}</span>
             <h3>{project.title}</h3>
             <p className={styles.subtitle}>{project.subtitle}</p>
-            <p className={styles.team}>{project.team} · {project.period}</p>
+            <p className={styles.team}>{project.team} 팀, {project.period}</p>
             <ul className={styles.tags}>{project.stack.map((tag) => <li key={tag}>{tag}</li>)}</ul>
             {project.links?.github ? <a className={styles.link} href={project.links.github} target="_blank" rel="noopener noreferrer">Repository ↗</a> : null}
           </article>
