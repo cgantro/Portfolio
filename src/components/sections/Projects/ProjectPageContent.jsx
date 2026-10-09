@@ -106,6 +106,9 @@ function SectionContent({ id, project }) {
       <ul className={styles.caseNarrative}>
         {(study.narrative ?? [study.situation, study.analysis, study.decision, study.implementation, study.verification, study.limitations]).filter(Boolean).map((paragraph, paragraphIndex) => <li key={paragraphIndex}>{paragraph}</li>)}
       </ul>
+      {study.sourceLinks?.length ? <div className={styles.caseSourceLinks} aria-label={`${study.title} 코드와 테스트`}>
+        {study.sourceLinks.map((source) => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.label} ↗</a>)}
+      </div> : null}
       {study.pseudocode ? <div className={styles.caseCode}>
         <CodeBlock code={study.pseudocode} lang="pseudo" label={study.pseudocodeLabel ?? "의사 코드"} />
       </div> : null}

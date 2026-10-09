@@ -108,57 +108,40 @@ export default {
   ],
   caseStudies: [
     {
-      title: "J6 영점 복귀가 −360° 목표로 바뀌던 문제",
+      title: "도달 가능한 목표인데 직선 TCP 경로가 중간에서 끊기던 문제",
       flow: [
-        { label: "증상", detail: "−314.5°에서 요청한 0°로 복귀하지 못함" },
-        { label: "가설 확인", detail: "관절 한계는 ±360°였고 명령은 수락됨" },
-        { label: "원인", detail: "등가각 정렬이 목표를 −360°로 변경" },
-        { label: "판단", detail: "일반 이동 영향 방지를 위해 요청별 `preserveJointTurns` 적용" },
-        { label: "검증", detail: "±1° 미션 게이트와 영점 복귀 회귀 테스트" },
+        { label: "증상", detail: "도달 가능한 끝점인데 경로 중간의 IK 표본에서 계획 거절" },
+        { label: "원인 분리", detail: "동일 표본에 136개 합법 seed를 시험해 38개 수렴 확인" },
+        { label: "수정", detail: "기존 자세와 관절 분기 탐색 뒤 결정적 seed 재시작" },
+        { label: "절충", detail: "속도 기반 후보 선택의 지연 회귀를 확인하고 거리 점수 유지" },
+        { label: "검증", detail: "특이 자세의 FK 목표와 controller 경로 회귀 테스트" },
       ],
       narrative: [
-        "Pick-and-Place 임무가 J6을 0°로 돌려놓지 못했습니다. 처음에는 관절 한계를 의심했지만, 범위는 ±360°였고 명령도 수락됐습니다.",
-        "J6이 −314.5°일 때 가까운 등가각 정렬이 요청한 0°를 −360°로 바꿀 수 있었습니다. 모든 명령에서 정렬을 끄면 일반 이동의 짧은 회전 선택도 달라져, 정책을 요청별로 나눴습니다.",
-        "`preserveJointTurns`는 기본적으로 끄고 J6 영점 복귀에서만 켭니다. 언와인드 후 실제 J6이 0° ±1°일 때만 픽업을 시작하고, 임무 완료 조건도 같은 방식으로 확인합니다.",
-        "회귀 테스트는 −314.5°에서 0° 복귀를 1e−8 rad 허용 오차로 확인합니다. 이 검증은 제어기 동작을 다루며 Viewer 전체 임무나 실제 로봇 제어 결과를 포함하지 않습니다.",
+        "FK로 확인한 TCP 끝점에 도달할 수 있는데도, 그 끝점까지 직선으로 보간한 TCP 경로는 중간 표본에서 IK가 실패해 거절됐습니다. 끝점 하나의 도달 가능성과 경로 전체의 도달 가능성은 서로 다른 문제였습니다.",
+        "먼저 같은 실패 표본에 관절 한계 안의 seed 136개를 넣었습니다. 그중 38개가 수렴했습니다. 이 결과는 목표 자체에 해가 없는 것이 아니라 기존 시작 자세 주변의 제한된 탐색이 해를 놓칠 수 있음을 보여줬습니다.",
+        "기존 자세의 DLS 풀이로 표본 간 관절 연속성을 먼저 유지합니다. 대표 관절 분기 seed도 실패하면, 관절 범위에 고르게 퍼지는 결정적 Halton seed를 제한된 수만큼 시도합니다. 후보는 관절 범위로 정규화한 이동량과 한계 근접 페널티로 비교하고, 선택 전에 관절 경로와 충돌 조건을 검사합니다.",
+        "후보를 최대 관절 속도 기준 예상 시간으로 고르는 대안은 제한된 계획 tick 안에 끝나지 않는 경로를 만들었습니다. 이 점수 변경은 제외하고, 기존 관절 범위 정규화 거리 기준을 유지했습니다.",
+        "회귀 테스트는 특이한 영점 자세에서 FK로 만든 도달 가능 목표를 대상으로 합니다. 단일 seed 풀이 실패하는 것을 확인한 뒤 제한된 대체 seed가 목표를 복원하는지, TCP 위치·방향 오차와 반복 수가 기준 안에 드는지 검사합니다. controller 테스트는 실제 계획 결과가 완료되고 관절 한계와 TCP 오차 기준을 만족하는지 확인합니다.",
+        "재시작은 정해진 수의 후보만 검사하므로 모든 목표에 대한 해 존재나 전역 최적 경로를 보장하지 않습니다.",
       ],
-      pseudocode: `// 일반 관절 이동은 가까운 등가각을 선택
-MovePose(target):
-  q = nearestEquivalentAngle(current, target)
-  executeIfJointPathClear(q)
-
-// 임무 시작·종료 때만 J6의 실제 영점 복귀
-UnwindJ6():
-  target.J6 = 0°
-  move(target, preserveTurns=true)
-  if abs(actual.J6) <= 1°:
-    startPickAndPlace()
-  else:
-    stopMission()`,
-      pseudocodeLabel: "의사 코드 · 일반 이동과 J6 영점 복귀 정책",
-    },
-    {
-      title: "pthreads 빌드가 로컬 파일에서 멈추던 문제",
-      flow: [
-        { title: "로컬 파일 실행", detail: "file:// 페이지의 origin은 null" },
-        { title: "Worker 생성 실패", detail: "브라우저 보안 정책이 pthread Worker를 차단" },
-        { title: "실행 조건 확인", detail: "HTTPS와 crossOriginIsolated 필요" },
-        { title: "배포 경로 구성", detail: "단일 HTML 자산과 COI Service Worker를 Pages에 배포" },
-        { title: "브라우저 확인", detail: "배포 후 Worker 생성과 격리 상태를 실제 확인해야 함" },
+      sourceLinks: [
+        {
+          label: "선형 경로 계획기",
+          url: "https://github.com/cgantro/GraspLink/blob/master/modules/robotics/src/planning/LinearPathPlanner.cpp",
+        },
+        {
+          label: "IK 재시작 seed 생성",
+          url: "https://github.com/cgantro/GraspLink/blob/master/modules/robotics/include/robotics/kinematics/detail/AlternativeIkSeeds.h",
+        },
+        {
+          label: "특이 자세 및 경로 회귀 테스트",
+          url: "https://github.com/cgantro/GraspLink/blob/master/tests/RobotMotionTests.cpp#L1240",
+        },
+        {
+          label: "단일 seed 국소 수렴 테스트",
+          url: "https://github.com/cgantro/GraspLink/blob/master/tests/RobotInverseKinematicsTests.cpp#L227",
+        },
       ],
-      narrative: [
-        "Emscripten pthreads 빌드를 `file://`로 열자 Worker 생성은 origin `null`에서 차단됐고, 별도 파일로 생성된 자산을 가져오는 요청도 CORS에 막혔습니다. HTML에 자산을 합치는 것만으로는 브라우저의 스레드 보안 조건이 해결되지 않았습니다.",
-        "원인은 파일 묶음과 실행 환경을 같은 문제로 본 데 있었습니다. pthreads는 `SharedArrayBuffer`를 쓰므로 페이지가 HTTPS 같은 보안 출처에서 실행되고 `crossOriginIsolated` 상태여야 합니다. COI Service Worker도 `file://`에서는 등록할 수 없습니다.",
-        "로컬 파일 실행을 스레드 요구사항의 우회 경로로 삼지 않고, Emscripten pthread 플래그와 단일 HTML 자산 묶음을 유지한 채 GitHub Pages용 HTTPS 산출물을 별도로 배포하도록 구성했습니다. 페이지와 Worker 요청에 COOP·COEP 응답 헤더를 적용할 COI Service Worker도 배포 루트에 포함했습니다.",
-        "이 구성은 브라우저의 실행 조건을 맞추기 위한 배포 경로입니다. GitHub Pages 배포와 실제 브라우저의 `crossOriginIsolated`, Worker 생성 검증은 아직 남아 있습니다.",
-      ],
-      pseudocode: `if pthreadsEnabled:
-  require(HTTPS)
-  require(COOP && COEP)
-  assert(crossOriginIsolated)
-  loadWorkerAssets()
-  startWorkers()`,
-      pseudocodeLabel: "의사 코드 · 브라우저 pthreads 실행 조건",
     },
   ],
   links: {
