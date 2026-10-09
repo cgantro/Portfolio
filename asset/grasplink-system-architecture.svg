@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 430" role="img" aria-labelledby="title desc">
+  <title id="title">GraspLink 시뮬레이터 구조</title>
+  <desc id="desc">명령과 관절 상태를 기구학에서 계산하고, 같은 링크 변환을 화면과 물리 충돌 형상에 반영합니다. 양쪽 손끝 접촉은 고정 제약 파지로 연결됩니다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#3b82f6" />
+    </marker>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fff" />
+      <stop offset="1" stop-color="#f3f7ff" />
+    </linearGradient>
+    <style>
+      text { font-family: "Segoe UI", "Malgun Gothic", sans-serif; fill: #172033; }
+      .box { fill: url(#panel); stroke: #cbd5e1; stroke-width: 2; }
+      .focus { fill: #eff6ff; stroke: #3b82f6; }
+      .title { font-size: 19px; font-weight: 700; }
+      .detail { font-size: 14px; fill: #526176; }
+      .tag { font-size: 12px; font-weight: 700; letter-spacing: 1px; fill: #2563eb; }
+      .line { fill: none; stroke: #3b82f6; stroke-width: 3; marker-end: url(#arrow); }
+      .split { fill: none; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 6 6; }
+    </style>
+  </defs>
+  <rect width="1120" height="430" rx="12" fill="#f8fafc" />
+  <text x="36" y="42" class="tag">공통 관절 계산 · 화면과 물리의 자세 일치</text>
+
+  <rect x="36" y="110" width="212" height="104" rx="10" class="box" />
+  <text x="58" y="149" class="title">제어 명령</text>
+  <text x="58" y="178" class="detail">관절 목표 · TCP 목표</text>
+
+  <rect x="310" y="110" width="224" height="104" rx="10" class="box focus" />
+  <text x="333" y="149" class="title">경로·IK 계획</text>
+  <text x="333" y="178" class="detail">MovePose · MoveLinear · UI RRT</text>
+
+  <rect x="596" y="110" width="224" height="104" rx="10" class="box focus" />
+  <text x="618" y="149" class="title">RobotKinematics</text>
+  <text x="618" y="178" class="detail">관절각 → 링크별 변환</text>
+
+  <path d="M248 162H301" class="line" />
+  <path d="M534 162H587" class="line" />
+  <path d="M820 162H875V116H892" class="line" />
+  <path d="M875 162V285H892" class="line" />
+  <path d="M875 162V362H592" class="split" />
+
+  <rect x="900" y="72" width="184" height="88" rx="10" class="box" />
+  <text x="924" y="108" class="title">OpenGL</text>
+  <text x="924" y="135" class="detail">GLB 관절 렌더링</text>
+
+  <rect x="900" y="241" width="184" height="88" rx="10" class="box" />
+  <text x="924" y="277" class="title">Jolt Physics</text>
+  <text x="924" y="304" class="detail">Kinematic 충돌 형상</text>
+
+  <rect x="342" y="326" width="478" height="76" rx="10" class="box" />
+  <text x="366" y="357" class="title">양쪽 손끝 접촉</text>
+  <text x="366" y="382" class="detail">같은 물체를 끼우면 고정 제약을 만들어 함께 이동</text>
+  <path d="M900 285H864V364H829" class="line" />
+</svg>
