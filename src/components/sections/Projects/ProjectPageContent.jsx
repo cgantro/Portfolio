@@ -138,14 +138,15 @@ export default function ProjectPageContent({ project, previousProject, nextProje
             {links.demo ? <a href={links.demo} target="_blank" rel="noreferrer">데모 새 탭에서 열기 ↗</a> : null}
           </div>
         </div>
-        {project.video ? (
-          <figure className={styles.demoVideo}>
-            <video controls playsInline preload="metadata" poster={project.cover} aria-label={`${project.title} 시연 영상`}>
-              <source src={project.video} type="video/webm" />
-              브라우저에서 이 형식의 영상을 재생할 수 없습니다.
-            </video>
-            <figcaption>{project.title} 실제 시연 영상</figcaption>
-          </figure>
+        {links.demo && project.id === "grasplink" ? (
+          <div className={styles.demoFrame}>
+            <iframe
+              src={links.demo}
+              title="GraspLink 인터랙티브 시뮬레이터"
+              allow="fullscreen; cross-origin-isolated"
+              allowFullScreen
+            />
+          </div>
         ) : null}
       </Section>
 

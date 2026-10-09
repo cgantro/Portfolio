@@ -1,5 +1,4 @@
 import coverImage from "../../../asset/GraspLink.gif";
-import demoVideo from "../../../asset/GraspLink.webm";
 
 export default {
   id: "grasplink",
@@ -11,7 +10,6 @@ export default {
   summary:
     "C++17로 Hanwha HCR-12A 6축 로봇 팔과 Robotiq 2F-85 그리퍼의 시뮬레이션을 구현했습니다. OpenGL 뷰어와 Flecs ECS, Jolt Physics를 연결하고 FK·DLS IK, MoveJ·MoveLinear, 충돌 검사와 Pick-and-Place 흐름을 구성했습니다. 실제 로봇 하드웨어를 구동하는 제어기는 아닙니다.",
   cover: coverImage,
-  video: demoVideo,
   stack: [
     "C++17",
     "OpenGL",
@@ -158,7 +156,7 @@ if (result.exists && isCollisionFree(result.path)) {
   },
   links: {
     github: "https://github.com/cgantro/GraspLink",
-    demo: "https://cgantro.github.io/GraspLink/",
+    demo: "https://cgantro.github.io/Portfolio/minibcg/index.html",
   },
   theme: { accent: "#67e8f9" },
 };
