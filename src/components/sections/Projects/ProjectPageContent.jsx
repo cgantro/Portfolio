@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import CodeBlock from "../../ui/CodeBlock";
 import styles from "./ProjectPageContent.module.css";
@@ -52,7 +51,6 @@ function DecisionVisual({ visual }) {
 }
 
 export default function ProjectPageContent({ project, previousProject, nextProject }) {
-  const [demoStarted, setDemoStarted] = useState(false);
   const { caseStudies = [], metrics = [], implementations = [], verification, architecture, links = {} } = project;
   const mainCase = caseStudies[0];
   const limitations = [...new Set(caseStudies.map(({ limitations: item }) => item).filter(Boolean))];
@@ -72,14 +70,7 @@ export default function ProjectPageContent({ project, previousProject, nextProje
           </dl>
           <div className={styles.tags}>{project.stack.map((skill) => <span key={skill}>{skill}</span>)}</div>
         </div>
-        {project.video ? (
-          <figure className={`${styles.heroImage} ${styles.heroVideo}`}>
-            <video controls playsInline preload="metadata" poster={project.cover} aria-label={`${project.title} 시연 영상`}>
-              <source src={project.video} type="video/webm" />
-              브라우저에서 이 형식의 영상을 재생할 수 없습니다.
-            </video>
-          </figure>
-        ) : project.cover ? <figure className={styles.heroImage}><img src={project.cover} alt={`${project.title} 프로젝트 화면`} /></figure> : null}
+        {project.cover ? <figure className={styles.heroImage}><img src={project.cover} alt={`${project.title} 프로젝트 화면`} /></figure> : null}
       </header>
 
       <nav className={styles.contents} aria-label="프로젝트 페이지 목차">
@@ -145,10 +136,17 @@ export default function ProjectPageContent({ project, previousProject, nextProje
           <div className={styles.sourceActions}>
             {links.github ? <a href={links.github} target="_blank" rel="noreferrer">GitHub 저장소 ↗</a> : <span>공개된 저장소 주소 없음</span>}
             {links.demo ? <a href={links.demo} target="_blank" rel="noreferrer">데모 새 탭에서 열기 ↗</a> : null}
-            {links.demo && project.id === "grasplink" ? <button type="button" onClick={() => setDemoStarted(true)}>이 페이지에서 데모 실행</button> : null}
           </div>
         </div>
-        {links.demo && project.id === "grasplink" && demoStarted ? <div className={styles.demoFrame}><iframe src={links.demo} title="GraspLink 브라우저 데모" loading="lazy" allow="cross-origin-isolated; fullscreen" allowFullScreen /></div> : null}
+        {project.video ? (
+          <figure className={styles.demoVideo}>
+            <video controls playsInline preload="metadata" poster={project.cover} aria-label={`${project.title} 시연 영상`}>
+              <source src={project.video} type="video/webm" />
+              브라우저에서 이 형식의 영상을 재생할 수 없습니다.
+            </video>
+            <figcaption>{project.title} 실제 시연 영상</figcaption>
+          </figure>
+        ) : null}
       </Section>
 
       <nav className={styles.pager} aria-label="다른 프로젝트">
