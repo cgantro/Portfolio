@@ -20,6 +20,20 @@ export default {
   architecture: {
     image: architectureImage,
     alt: "UE5 클라이언트가 WebSocket 로비·게임 서버와 UDP 음성 서버에 각각 연결되는 구성도",
+    mobileFlows: [
+      { title: "로비 연결", steps: [
+        { title: "UE5 로비 클라이언트", detail: "방 생성 · 참가 · 세션 조회" },
+        { title: "WebSocket 로비 서버", detail: "RoomCode와 참가자 목록 관리" },
+      ] },
+      { title: "음성 연결", steps: [
+        { title: "UE5 음성 클라이언트", detail: "캡처 · Opus · 재생" },
+        { title: "C++ UDP 음성 서버", detail: "RoomCode별 패킷 중계와 워커 분배" },
+      ] },
+      { title: "게임 진행", steps: [
+        { title: "게임 클라이언트", detail: "Dedicated Server 접속" },
+        { title: "UE Dedicated Server", detail: "게임 세션 · 페이즈 · 아이템 스폰" },
+      ] },
+    ],
     summary: [
       "WebSocket 로비 서버: 방 생성·입장과 세션 정보 관리.",
       "Unreal Dedicated Server: 게임 월드와 진행 상태 처리.",
@@ -48,11 +62,7 @@ export default {
         "포커스 복귀 뒤에는 8KB 초과 데이터를 전부 버리고 코덱을 초기화합니다. 4096B 초과 8KB 이하이면 오래된 초과분을 버리고 최대 4096B를 읽습니다.",
       ],
       codeLanguage: "cpp",
-      codeLabel: "ProcessCapture() 포커스 분기 · 함수 내부 발췌 (142–149행)",
-      codeSource: "https://github.com/cgantro/Mausoleum/blob/main/A302/Source/A302Client/Voice/Capture/VoiceCaptureProcessor.cpp#L142-L149",
-      references: [
-        { label: "후속 캡처 버퍼 임계값 처리 (151–179행)", url: "https://github.com/cgantro/Mausoleum/blob/main/A302/Source/A302Client/Voice/Capture/VoiceCaptureProcessor.cpp#L151-L179" },
-      ],
+      codeLabel: "ProcessCapture() 포커스 분기",
       code: `    // 백그라운드 동안 쌓인 음성을 복귀 직후 전송하면 지연/지지직의 원인이 됩니다.
     // 포커스가 없을 때는 캡처 버퍼를 비우고 코덱 상태를 리셋하여 실시간성만 유지합니다.
     if (!FApp::HasFocus())

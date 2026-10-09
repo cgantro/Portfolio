@@ -19,6 +19,19 @@ export default {
   architecture: {
     image: architectureImage,
     alt: "이동체·AI 서비스가 MQTT와 HTTP를 통해 Spring Boot 관제 백엔드에 연결되고 관제 UI는 WebSocket STOMP를 이용하는 구성도",
+    mobileFlows: [
+      { title: "차량 상태 수신과 저장", steps: [
+        { title: "이동체", detail: "위치 · 속도 · 배터리 · 상태 전송" },
+        { title: "MQTT", detail: "장비 메시지를 백엔드로 전달" },
+        { title: "Spring Boot", detail: "상태 전이와 주행 이력 처리" },
+        { title: "PostgreSQL · Redis", detail: "운행 기록과 토큰 저장" },
+      ] },
+      { title: "관제 화면 갱신", steps: [
+        { title: "백엔드 이벤트", detail: "차량 · 비행 편 · 비상 알림" },
+        { title: "WebSocket / STOMP", detail: "관제 채널로 변경 전달" },
+        { title: "관제 UI", detail: "차량과 공항 상황 표시" },
+      ] },
+    ],
     summary: [
       "백엔드: MQTT로 장비 상태·결과 수신, WebSocket STOMP로 관제 화면 갱신.",
       "시스템 구성: AI·임베디드 장비·관제 UI. 담당 범위는 백엔드입니다.",

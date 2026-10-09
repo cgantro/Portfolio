@@ -32,15 +32,21 @@ export default {
     image: architectureImage,
     alt: "로봇 상태를 공통 기구학으로 계산해 화면의 관절과 충돌 형상에 함께 반영하는 구조",
     summary: [
-      "제어기 상태를 RobotKinematics에서 계산하고, 결과를 GLB 관절과 Jolt 충돌 형상에 함께 반영합니다.",
       "시뮬레이션·로보틱스·뷰어·물리 기능을 모듈로 나눴습니다.",
       "물리 모듈이 Flecs나 렌더러에 직접 의존하지 않도록 구성했습니다.",
     ],
-    flow: [
-      { title: "제어기", detail: "관절 목표와 이동 명령" },
-      { title: "기구학 계산", detail: "FK · IK · 경로 표본" },
-      { title: "공통 자세", detail: "관절 변환 · 충돌 형상" },
-      { title: "화면 · 물리", detail: "OpenGL · Jolt Physics" },
+    mobileFlows: [
+      { title: "이동 계획과 공통 자세", steps: [
+        { title: "제어 명령", detail: "관절 또는 TCP 목표" },
+        { title: "IK · 경로 계획", detail: "MovePose · MoveLinear · UI RRT" },
+        { title: "RobotKinematics", detail: "공통 링크 변환 계산" },
+        { title: "화면과 충돌 형상", detail: "OpenGL GLB · Jolt Physics" },
+      ] },
+      { title: "접촉 기반 파지", steps: [
+        { title: "양쪽 손끝 접촉", detail: "같은 동적 물체의 서로 반대쪽 면" },
+        { title: "고정 제약 생성", detail: "그리퍼와 물체의 상대 자세를 고정" },
+        { title: "함께 이동", detail: "물체를 그리퍼와 연결해 시뮬레이션" },
+      ] },
     ],
   },
   implementations: [
@@ -114,62 +120,45 @@ export default {
         "Pick-and-Place 임무가 J6을 0°로 돌려놓지 못했습니다. 처음에는 관절 한계를 의심했지만, 범위는 ±360°였고 명령도 수락됐습니다.",
         "J6이 −314.5°일 때 가까운 등가각 정렬이 요청한 0°를 −360°로 바꿀 수 있었습니다. 모든 명령에서 정렬을 끄면 일반 이동의 짧은 회전 선택도 달라져, 정책을 요청별로 나눴습니다.",
         "`preserveJointTurns`는 기본적으로 끄고 J6 영점 복귀에서만 켭니다. 언와인드 후 실제 J6이 0° ±1°일 때만 픽업을 시작하고, 임무 완료 조건도 같은 방식으로 확인합니다.",
-        "회귀 테스트는 −314.5°에서 0° 복귀를 1e−8 rad 허용 오차로 확인합니다. 개발 일지에는 당시 CTest 20/20 통과가 기록돼 있으며, Viewer 전체 임무와 실제 로봇 제어 결과는 확인하지 않았습니다.",
+        "회귀 테스트는 −314.5°에서 0° 복귀를 1e−8 rad 허용 오차로 확인합니다. 이 검증은 제어기 동작을 다루며 Viewer 전체 임무나 실제 로봇 제어 결과를 포함하지 않습니다.",
       ],
-      pseudocode: `// 일반 이동은 짧은 회전 경로를 유지
-MovePose(request):
-  target = nearest_equivalent_angle(current, request)
-  execute_if_joint_path_is_valid(target)
+      pseudocode: `// 일반 관절 이동은 가까운 등가각을 선택
+MovePose(target):
+  q = nearestEquivalentAngle(current, target)
+  executeIfJointPathClear(q)
 
 // 임무 시작·종료 때만 J6의 실제 영점 복귀
 UnwindJ6():
-  target.J6 = 0 degrees
-  preserveJointTurns = true
-  execute(target)
-  if abs(actual.J6) > 1 degree:
-    stop_mission()
+  target.J6 = 0°
+  move(target, preserveTurns=true)
+  if abs(actual.J6) <= 1°:
+    startPickAndPlace()
   else:
-    continue_pick_and_place()`,
+    stopMission()`,
       pseudocodeLabel: "의사 코드 · 일반 이동과 J6 영점 복귀 정책",
-      code: `void CheckExplicitWristUnwindPreservesZeroRepresentation()
-{
-    SimRobotController controller(models::hanwha::kHcr12a);
-    ASSERT_TRUE((static_cast<bool>(controller.Connect()))) << "wrist unwind controller connects";
-
-    JointMoveCommand nearNegativeLimit;
-    nearNegativeLimit.targetPositionRadians.assign(6, 0.0);
-    nearNegativeLimit.targetPositionRadians.back() = -314.5 * 3.14159265358979323846 / 180.0;
-    nearNegativeLimit.preserveJointTurns = true;
-    ASSERT_TRUE((static_cast<bool>(controller.MoveJoint(nearNegativeLimit)))) << "J6 accepts its explicit negative-turn representation";
-    ASSERT_TRUE(AdvanceUntilIdle(controller, 0.01)) << "motion reaches target within bounded updates";
-    ASSERT_NEAR(controller.GetState().jointPositionRadians.back(), nearNegativeLimit.targetPositionRadians.back(), 1e-8) << "J6 reaches negative 314.5 degrees without changing to an equivalent turn";
-
-    JointMoveCommand unwind;
-    unwind.targetPositionRadians = controller.GetState().jointPositionRadians;
-    unwind.targetPositionRadians.back() = 0.0;
-    unwind.preserveJointTurns = true;
-    ASSERT_TRUE((static_cast<bool>(controller.MoveJoint(unwind)))) << "explicit J6 unwind request is accepted";
-    ASSERT_TRUE(AdvanceUntilIdle(controller, 0.01)) << "motion reaches target within bounded updates";
-    ASSERT_NEAR(controller.GetState().jointPositionRadians.back(), 0.0, 1e-8) << "J6 returns to the central zero degree representation instead of the nearby negative 360 degree turn";
-}`,
-      codeLanguage: "cpp",
-      codeLabel: "J6 −314.5°에서 0° 복귀를 확인하는 회귀 테스트 (219–239행)",
-      codeSource:
-        "https://github.com/cgantro/GraspLink/blob/18ad54b63311e331c927e66ea487af4264d49132/tests/RobotMotionTests.cpp#L219-L239",
-      sourceLinks: [
-        {
-          label: "MovePose 구현",
-          url: "https://github.com/cgantro/GraspLink/blob/18ad54b63311e331c927e66ea487af4264d49132/modules/robotics/src/backends/simulation/SimRobotController.cpp#L430-L456",
-        },
-        {
-          label: "MoveLinear 구현",
-          url: "https://github.com/cgantro/GraspLink/blob/18ad54b63311e331c927e66ea487af4264d49132/modules/robotics/src/backends/simulation/SimRobotController.cpp#L550-L576",
-        },
-        {
-          label: "MoveLinear 경로 및 충돌 검사 조건",
-          url: "https://github.com/cgantro/GraspLink/blob/18ad54b63311e331c927e66ea487af4264d49132/modules/robotics/include/robotics/backends/simulation/SimRobotController.h#L109-L120",
-        },
+    },
+    {
+      title: "pthreads 빌드가 로컬 파일에서 멈추던 문제",
+      flow: [
+        { title: "로컬 파일 실행", detail: "file:// 페이지의 origin은 null" },
+        { title: "Worker 생성 실패", detail: "브라우저 보안 정책이 pthread Worker를 차단" },
+        { title: "실행 조건 확인", detail: "HTTPS와 crossOriginIsolated 필요" },
+        { title: "배포 경로 구성", detail: "단일 HTML 자산과 COI Service Worker를 Pages에 배포" },
+        { title: "브라우저 확인", detail: "배포 후 Worker 생성과 격리 상태를 실제 확인해야 함" },
       ],
+      narrative: [
+        "Emscripten pthreads 빌드를 `file://`로 열자 Worker 생성은 origin `null`에서 차단됐고, 별도 파일로 생성된 자산을 가져오는 요청도 CORS에 막혔습니다. HTML에 자산을 합치는 것만으로는 브라우저의 스레드 보안 조건이 해결되지 않았습니다.",
+        "원인은 파일 묶음과 실행 환경을 같은 문제로 본 데 있었습니다. pthreads는 `SharedArrayBuffer`를 쓰므로 페이지가 HTTPS 같은 보안 출처에서 실행되고 `crossOriginIsolated` 상태여야 합니다. COI Service Worker도 `file://`에서는 등록할 수 없습니다.",
+        "로컬 파일 실행을 스레드 요구사항의 우회 경로로 삼지 않고, Emscripten pthread 플래그와 단일 HTML 자산 묶음을 유지한 채 GitHub Pages용 HTTPS 산출물을 별도로 배포하도록 구성했습니다. 페이지와 Worker 요청에 COOP·COEP 응답 헤더를 적용할 COI Service Worker도 배포 루트에 포함했습니다.",
+        "이 구성은 브라우저의 실행 조건을 맞추기 위한 배포 경로입니다. GitHub Pages 배포와 실제 브라우저의 `crossOriginIsolated`, Worker 생성 검증은 아직 남아 있습니다.",
+      ],
+      pseudocode: `if pthreadsEnabled:
+  require(HTTPS)
+  require(COOP && COEP)
+  assert(crossOriginIsolated)
+  loadWorkerAssets()
+  startWorkers()`,
+      pseudocodeLabel: "의사 코드 · 브라우저 pthreads 실행 조건",
     },
   ],
   links: {

@@ -79,7 +79,14 @@ function SectionContent({ id, project }) {
   if (id === "results") return <Results project={project} />;
   if (id === "architecture") return <div className={styles.architectureCard}>
     {architecture?.image ? <img src={architecture.image} alt={architecture.alt} loading="lazy" /> : null}
-    {architecture?.flow?.length ? <ol className={styles.architectureFlow} aria-label={architecture.alt}>{architecture.flow.map((step, index) => <li key={step.title}><span>0{index + 1}</span><strong>{step.title}</strong><small>{step.detail}</small></li>)}</ol> : null}
+    {architecture?.mobileFlows?.length ? <div className={styles.architectureMobileFlows}>
+      {architecture.mobileFlows.map((flow) => <section key={flow.title} className={styles.architectureMobileFlow}>
+        <h3>{flow.title}</h3>
+        <ol>{flow.steps.map((step, index) => <li key={step.title}>
+          <span>{String(index + 1).padStart(2, "0")}</span><div><strong>{step.title}</strong><small>{step.detail}</small></div>
+        </li>)}</ol>
+      </section>)}
+    </div> : null}
     <CopyPoints value={architecture?.summary} className={styles.architectureSummary} />
   </div>;
   if (id === "implementation") return <>
@@ -91,14 +98,14 @@ function SectionContent({ id, project }) {
   if (id === "case-studies") return <div className={styles.caseList}>
     {caseStudies.map((study, index) => <article className={styles.caseCard} key={study.title}>
       <div className={styles.caseTitle}><span>사례 0{index + 1}</span><h3>{study.title}</h3></div>
-      <ul className={styles.caseNarrative}>
-        {(study.narrative ?? [study.situation, study.analysis, study.decision, study.implementation, study.verification, study.limitations]).filter(Boolean).map((paragraph, paragraphIndex) => <li key={paragraphIndex}>{paragraph}</li>)}
-      </ul>
       {study.flow?.length ? <ol className={styles.caseFlow} aria-label={`${study.title} 판단 흐름`}>
         {study.flow.map((step, stepIndex) => <li key={`${step.title ?? step.label}-${stepIndex}`}>
           <span>{String(stepIndex + 1).padStart(2, "0")}</span><div><strong>{step.title ?? step.label}</strong>{step.detail ? <small>{step.detail}</small> : null}</div>
         </li>)}
       </ol> : null}
+      <ul className={styles.caseNarrative}>
+        {(study.narrative ?? [study.situation, study.analysis, study.decision, study.implementation, study.verification, study.limitations]).filter(Boolean).map((paragraph, paragraphIndex) => <li key={paragraphIndex}>{paragraph}</li>)}
+      </ul>
       {study.pseudocode ? <div className={styles.caseCode}>
         <CodeBlock code={study.pseudocode} lang="pseudo" label={study.pseudocodeLabel ?? "의사 코드"} />
       </div> : null}
@@ -110,10 +117,7 @@ function SectionContent({ id, project }) {
       {study.equationNote ? <p className={styles.caseEquationNote}>{study.equationNote}</p> : null}
       {study.code ? <div className={styles.caseCode}>
         <CodeBlock code={study.code} lang={study.codeLanguage ?? "cpp"} label={study.codeLabel ?? "구현 발췌"} />
-        {study.codeSource ? <a className={styles.codeSource} href={study.codeSource} target="_blank" rel="noreferrer">코드 원문 보기 ↗</a> : null}
       </div> : null}
-      {study.references?.length ? <ul className={styles.caseReferences}>{study.references.map((reference) => <li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.label} ↗</a></li>)}</ul> : null}
-      {study.sourceLinks?.length ? <ul className={styles.caseReferences}>{study.sourceLinks.map((reference) => <li key={reference.url}><a href={reference.url} target="_blank" rel="noreferrer">{reference.label} ↗</a></li>)}</ul> : null}
     </article>)}
   </div>;
   if (id === "verification") return <div>
@@ -125,8 +129,6 @@ function SectionContent({ id, project }) {
       <div><p className={styles.cardLabel}>프로젝트 링크</p><h3>{project.title}</h3><p>저장소와 실행 가능한 자료를 열어볼 수 있습니다.</p></div>
       <div className={styles.sourceActions}>
         {links.github ? <a href={links.github} target="_blank" rel="noreferrer">GitHub 저장소 ↗</a> : null}
-        {links.code ? <a href={links.code} target="_blank" rel="noreferrer">주행 계수 코드 (행 범위) ↗</a> : null}
-        {links.report ? <a href={links.report} target="_blank" rel="noreferrer">벤치마크 보고서 ↗</a> : null}
         {links.demo && project.id !== "grasplink" ? <a href={links.demo} target="_blank" rel="noreferrer">데모 열기 ↗</a> : null}
       </div>
     </div>

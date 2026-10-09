@@ -67,8 +67,21 @@ export default {
     image: architectureImage,
     alt: "RobotPal의 ECS 렌더링·스트리밍·제어 시스템과 TCP/WebSocket 클라이언트 경로",
     summary: [
-      "영상: OpenGL 가상 카메라 → JPEG 인코딩 → Python AI 학습·추론 모듈",
-      "제어: Python 입력 → 데스크톱 TCP 또는 WebAssembly WebSocket → NetworkEngine → 제어기",
+      "데스크톱은 TCP, WebAssembly는 WebSocket 경로를 사용합니다.",
+      "서보 ID 1–3은 로봇팔, ID 4는 그리퍼, ID 5는 카메라 기울기에 대응합니다.",
+    ],
+    mobileFlows: [
+      { title: "가상 카메라 영상", steps: [
+        { title: "OpenGL 카메라", detail: "시뮬레이션 화면 프레임 생성" },
+        { title: "JPEG 인코딩", detail: "libjpeg API로 프레임 압축" },
+        { title: "영상 전송", detail: "Python AI 학습·추론 입력으로 전달" },
+      ] },
+      { title: "외부 제어 명령", steps: [
+        { title: "Python 모듈", detail: "AGV·서보 명령 생성" },
+        { title: "TCP · WebSocket", detail: "데스크톱과 WebAssembly 전송 경로" },
+        { title: "NetworkEngine", detail: "수신한 패킷을 제어 계층으로 전달" },
+        { title: "주행 · 서보", detail: "AGV, 로봇팔, 그리퍼, 카메라 기울기" },
+      ] },
     ],
   },
   implementations: [
@@ -109,12 +122,6 @@ export default {
         { label: "목표 각속도 · rad/s", expression: "ω = 1.3963 × ((R − L) / 2)" },
       ],
       equationNote: "L: 좌측 모터 입력 · R: 우측 모터 입력",
-      references: [
-        {
-          label: "좌우 입력 환산과 가상 주행 갱신 (ControllerSystemModule.cpp, 1218–1252행)",
-          url: "https://github.com/cgantro/RobotPal/blob/main/RobotPal/src/Systems/ControllerSystemModule.cpp#L1218-L1252",
-        },
-      ],
     },
     {
       title: "PBO 가설을 재검토하고 JPEG 병목을 주 스레드에서 분리",
@@ -132,30 +139,10 @@ export default {
         { title: "조치", detail: "JPEG를 작업 스레드 4개로 이동하고 주 스레드 대기 제거" },
         { title: "후속 측정", detail: "성능 비교표에서 세 구성의 FPS 결과 확인" },
       ],
-      references: [
-        {
-          label: "기준 벤치마크 조건·비교 결과 (streaming-performance-result.md, 193–231행)",
-          url: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md#L193-L231",
-        },
-        {
-          label: "Tracy 계측과 병목 판단 (streaming-performance-result.md, 234–248행)",
-          url: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md#L234-L248",
-        },
-        {
-          label: "PBO 단독 구성 측정 결과 (streaming-performance-result.md, 251–283행)",
-          url: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md#L251-L283",
-        },
-        {
-          label: "작업 스레드별 JPEG 시간과 주 스레드 대기 분리 (streaming-performance-result.md, 286–337행)",
-          url: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md#L286-L337",
-        },
-      ],
     },
   ],
   links: {
     github: "https://github.com/cgantro/RobotPal",
-    code: "https://github.com/cgantro/RobotPal/blob/main/RobotPal/src/Systems/ControllerSystemModule.cpp#L1218-L1252",
-    report: "https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md",
     demo: null,
   },
   theme: { accent: "#7dd3fc" },
