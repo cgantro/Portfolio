@@ -69,7 +69,7 @@ export default function HomePage() {
                   <div className={styles.projectMeta}><span>{project.category}</span><span>{project.period}</span></div>
                   <h3>{project.title}<span aria-hidden="true"> ↗</span></h3>
                   <p>{project.summary}</p>
-                  {project.metrics?.[0] ? <div className={styles.projectMetric}><strong>{project.metrics[0].value}</strong><span>{project.metrics[0].label}</span></div> : null}
+                  {project.homeHighlight ? <div className={styles.projectMetric}><strong>{project.homeHighlight}</strong></div> : null}
                   <div className={styles.tags}>{project.stack.slice(0, 5).map((skill) => <span key={skill}>{skill}</span>)}</div>
                 </div>
               </Link>

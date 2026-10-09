@@ -44,7 +44,7 @@
 .projectCopy h3 span { color: var(--accent); font-size: 16px; }
 .projectCopy > p { min-height: 70px; margin-top: 9px; color: var(--fg-dim); font-size: 13px; line-height: 1.75; word-break: keep-all; }
 .projectMetric { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
-.projectMetric strong { color: var(--fg-bright); font: 700 20px var(--font-mono); letter-spacing: -.04em; }
+.projectMetric strong { color: var(--fg-bright); font: 650 13px/1.65 var(--font-sans); letter-spacing: -.01em; word-break: keep-all; }
 .projectMetric span { color: var(--fg-dim); font-size: 11px; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 15px; }
 .tags span { padding: 4px 7px; background: var(--bg3); color: var(--fg-dim); font: 10px var(--font-mono); }
