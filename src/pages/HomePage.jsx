@@ -1,51 +1,131 @@
 import { useMemo } from "react";
+import { Link } from "react-router-dom";
 import AppShell from "../components/layout/AppShell";
-import Timeline from "../components/sections/Timeline";
-import Activities from "../components/sections/Activities";
-import TechStack from "../components/sections/TechStack";
-import Projects from "../components/sections/Projects";
-import SubProjects from "../components/sections/SubProjects";
 import Contact from "../components/sections/Contact";
-import Intro from "../components/sections/Intro";
+import Timeline from "../components/sections/Timeline";
 import useActiveSection from "../hooks/useActiveSection";
-import { meta, projects, subProjects, timeline, activities, techStack } from "../data";
+import { activities, meta, projects, subProjects, supportingTechnologies, techStack, timeline } from "../data";
+import styles from "./HomePage.module.css";
 
 const SECTIONS = [
   { id: "intro", label: "소개" },
-  { id: "techstack", label: "기술" },
-  { id: "experience", label: "경험" },
   { id: "projects", label: "프로젝트" },
-  { id: "education", label: "교육" },
+  { id: "expertise", label: "역량" },
+  { id: "background", label: "배경" },
+  { id: "contact", label: "연락처" },
 ];
 
 export default function HomePage() {
-  const sectionIds = useMemo(() => SECTIONS.map((section) => section.id), []);
+  const sectionIds = useMemo(() => SECTIONS.map(({ id }) => id), []);
   const activeSection = useActiveSection(sectionIds);
+  const featuredProjects = projects.filter((project) => project.featured !== false);
+  const additionalProjects = subProjects.filter((project) => ["media-workbench", "os-lru"].includes(project.id));
 
   return (
     <AppShell meta={meta} sections={SECTIONS} activeSection={activeSection}>
-      <Intro />
-
-      <section id="techstack" className="section">
-        <TechStack stack={techStack} />
+      <section id="intro" className={styles.hero}>
+        <div className={styles.heroText}>
+          <p className={styles.kicker}>C++ 응용 소프트웨어 개발자</p>
+          <h1>C++ 기반 로봇 시뮬레이션과<br />실시간 통신 소프트웨어를 개발합니다.</h1>
+          <p className={styles.lede}>
+            6축 로봇팔의 기구학과 경로 계획부터 실시간 영상·음성 전송까지 구현해 왔습니다.
+            성능이 떨어지면 처리 시간을 재고, 실제 병목을 찾아 고칩니다.
+          </p>
+          <div className={styles.heroActions}>
+            <a className={styles.primaryAction} href="#projects">대표 프로젝트 보기 <span aria-hidden="true">↓</span></a>
+            <a className={styles.secondaryAction} href={meta.github} target="_blank" rel="noreferrer">GitHub ↗</a>
+          </div>
+        </div>
+        <aside className={styles.heroNote} aria-label="핵심 개발 분야">
+          <p className={styles.noteLabel}>주요 개발 분야</p>
+          <ul>
+            <li><span>01</span> 로봇 시뮬레이션</li>
+            <li><span>02</span> 실시간 데이터 처리</li>
+            <li><span>03</span> 성능 측정과 검증</li>
+          </ul>
+          <p className={styles.location}>{meta.location} <span>·</span> {meta.email}</p>
+        </aside>
       </section>
 
-      <section id="projects" className="section">
-        <Projects projects={projects} />
-        <div style={{ marginTop: "80px" }}>
-          <SubProjects projects={subProjects} />
+      <section id="projects" className={`section ${styles.section}`}>
+        <div className={styles.sectionHeading}>
+          <p className={styles.kicker}>주요 프로젝트 · 2024–2026</p>
+          <h2>대표 프로젝트</h2>
+          <p>구현한 시스템과 맡은 역할, 검증 근거를 프로젝트별로 정리했습니다.</p>
+        </div>
+        <div className={styles.projectGrid}>
+          {featuredProjects.map((project, index) => {
+            return (
+              <Link className={styles.projectCard} to={`/projects/${project.id}`} key={project.id}>
+                <div className={styles.projectImage}>
+                  {project.cover ? <img src={project.cover} alt={`${project.title} 프로젝트 화면`} loading={index > 1 ? "lazy" : "eager"} /> : project.id === "grasplink" ? (
+                    <div className={styles.projectFlowCover} aria-label="GraspLink 로봇 시뮬레이터 구성 요약">
+                      <span>로봇 시뮬레이션 흐름</span><strong>HCR-12A</strong><small>기구학 계산 <i>→</i> 경로 계획 <i>→</i> 충돌 검사</small>
+                    </div>
+                  ) : <span>{project.title}</span>}
+                  <span className={styles.projectNumber}>0{index + 1}</span>
+                </div>
+                <div className={styles.projectCopy}>
+                  <div className={styles.projectMeta}><span>{project.category}</span><span>{project.period}</span></div>
+                  <h3>{project.title}<span aria-hidden="true"> ↗</span></h3>
+                  <p>{project.summary}</p>
+                  {project.metrics?.[0] ? <div className={styles.projectMetric}><strong>{project.metrics[0].value}</strong><span>{project.metrics[0].label}</span></div> : null}
+                  <div className={styles.tags}>{project.stack.slice(0, 5).map((skill) => <span key={skill}>{skill}</span>)}</div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 
-      <section id="experience" className="section">
-        <Activities items={activities} />
+      <section id="expertise" className={`section ${styles.section} ${styles.expertiseSection}`}>
+        <div className={styles.sectionHeading}>
+          <p className={styles.kicker}>기술 역량</p>
+          <h2>프로젝트로 확인할 수 있는 역량</h2>
+        </div>
+        <div className={styles.expertiseGrid}>
+          {techStack.map((item, index) => (
+            <article className={styles.expertiseCard} key={item.category}>
+              <span className={styles.expertiseIndex}>0{index + 1}</span>
+              <h3>{item.category}</h3>
+              <p>{item.evidence}</p>
+              <div className={styles.tags}>{item.items.map((skill) => <span key={skill}>{skill}</span>)}</div>
+            </article>
+          ))}
+        </div>
+        <div className={styles.supportingTech}>
+          <strong>{supportingTechnologies.label}</strong>
+          <div className={styles.tags}>{supportingTechnologies.items.map((skill) => <span key={skill}>{skill}</span>)}</div>
+          <small>{supportingTechnologies.evidence} 프로젝트에서 사용했습니다.</small>
+        </div>
+        <div className={styles.supporting}>
+          <div>
+            <h3>보조 프로젝트</h3>
+          </div>
+          <div className={styles.additionalList}>
+            {additionalProjects.map((project) => project.links?.github ? (
+              <a key={project.id} href={project.links.github} target="_blank" rel="noreferrer">
+                <span><strong>{project.title}</strong><small>{project.subtitle}</small></span><span aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              <div className={styles.additionalRow} key={project.id}>
+                <span><strong>{project.title}</strong><small>{project.subtitle}</small></span>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      <section id="education" className="section">
+      <section id="background" className={`section ${styles.section} ${styles.backgroundSection}`}>
+        <div className={styles.sectionHeading}>
+          <p className={styles.kicker}>학력과 활동</p>
+          <h2>교육과 활동</h2>
+        </div>
         <Timeline items={timeline} />
+        {activities.length ? <div className={styles.activityStrip}>{activities.map((activity) => <p key={activity.id}><strong>{activity.title}</strong><span>{activity.period} · {activity.items?.[1]}</span></p>)}</div> : null}
       </section>
 
-      <section id="contact" className="section">
+      <section id="contact" className={`section ${styles.contactSection}`}>
         <Contact meta={meta} />
       </section>
     </AppShell>

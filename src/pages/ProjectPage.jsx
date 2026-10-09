@@ -5,46 +5,36 @@ import ProjectPageContent from "../components/sections/Projects/ProjectPageConte
 import useActiveSection from "../hooks/useActiveSection";
 import { meta, projects } from "../data";
 
+const PROJECT_SECTIONS = [
+  { id: "overview", label: "개요" },
+  { id: "results", label: "결과" },
+  { id: "architecture", label: "구조" },
+  { id: "implementation", label: "구현" },
+  { id: "case-studies", label: "문제 해결" },
+  { id: "verification", label: "검증" },
+  { id: "sources", label: "자료" },
+];
+
 export default function ProjectPage() {
   const { projectId } = useParams();
-  const projectIndex = projects.findIndex((project) => project.id === projectId);
-
-  if (projectIndex === -1) {
-    return <Navigate to="/" replace />;
-  }
-
-  const project = projects[projectIndex];
-  const detailPage = project.detailPage;
-  const sections = detailPage.sections.map((section) => ({
-    id: section.id,
-    label: section.label,
-  }));
-  const sectionIds = useMemo(() => sections.map((section) => section.id), [sections]);
+  const projectIndex = projects.findIndex((item) => item.id === projectId);
+  const project = projectIndex === -1 ? null : projects[projectIndex];
+  const sectionIds = useMemo(() => PROJECT_SECTIONS.map(({ id }) => id), []);
   const activeSection = useActiveSection(sectionIds);
-  const previousProject = projects[projectIndex - 1] ?? null;
-  const nextProject = projects[projectIndex + 1] ?? null;
+
+  if (!project) return <Navigate to="/" replace />;
 
   return (
     <AppShell
       meta={meta}
-      sections={sections}
+      sections={PROJECT_SECTIONS}
       activeSection={activeSection}
-      style={{
-        "--accent": detailPage.theme.accent,
-        "--accent-dim": detailPage.theme.accent,
-        "--accent-bg": detailPage.theme.accentSoft,
-        "--project-accent": detailPage.theme.accent,
-        "--project-accent-soft": detailPage.theme.accentSoft,
-        "--project-surface": detailPage.theme.surface,
-        "--project-glow": detailPage.theme.glow,
-        "--content-max": "1360px",
-        "--main-gutter": "24px",
-      }}
+      style={{ "--accent": project.theme?.accent ?? "#2563eb", "--accent-dim": project.theme?.accent ?? "#1d4ed8", "--accent-bg": "color-mix(in srgb, var(--accent) 13%, white)" }}
     >
       <ProjectPageContent
         project={project}
-        previousProject={previousProject}
-        nextProject={nextProject}
+        previousProject={projects[projectIndex - 1] ?? null}
+        nextProject={projects[projectIndex + 1] ?? null}
       />
     </AppShell>
   );

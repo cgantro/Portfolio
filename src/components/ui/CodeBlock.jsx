@@ -10,7 +10,7 @@ const PATTERNS = [
   // 어노테이션
   { cls: "annotation", re: /@\w+/ },
   // 키워드 (Java + C++ 통합)
-  { cls: "keyword",    re: /\b(?:public|private|protected|class|interface|new|return|void|static|final|import|extends|implements|throws|try|catch|finally|if|else|for|while|do|switch|case|break|null|true|false|this|super|abstract|default|enum|instanceof|package|synchronized|auto|const|constexpr|nullptr|override|explicit|using|typedef|template|typename|inline|virtual|mutable|struct|namespace)\b/ },
+  { cls: "keyword",    re: /\b(?:public|private|protected|class|interface|new|return|void|static|final|import|extends|implements|throws|try|catch|finally|if|else|for|while|do|switch|case|break|null|true|false|this|super|abstract|default|enum|instanceof|package|synchronized|auto|const|constexpr|nullptr|override|explicit|using|typedef|template|typename|inline|virtual|mutable|struct|namespace|measure|observe|discard|reset|afterCommit|clear|save|publish|rejectPlan|executeSimulationPlan)\b/ },
   // 타입 / 빌트인
   { cls: "type",       re: /\b(?:String|Integer|Long|Boolean|List|Map|Set|Optional|Duration|Runnable|Object|int|float|double|bool|char|long|short|unsigned|signed|size_t|uint8_t)\b/ },
   // 숫자
@@ -19,34 +19,39 @@ const PATTERNS = [
   { cls: "func",       re: /\b([A-Za-z_]\w*)(?=\s*\()/ },
 ];
 
-const MASTER_RE = new RegExp(
-  PATTERNS.map((p) => `(${p.re.source})`).join("|"),
-  "gm"
-);
-
 function escapeHtml(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
 function tokenize(code) {
   const result = [];
-  let lastIdx = 0;
-  const re = new RegExp(MASTER_RE.source, "gm");
-  let m;
+  let cursor = 0;
 
-  while ((m = re.exec(code)) !== null) {
-    // 매칭 전 평범한 텍스트
-    if (m.index > lastIdx) {
-      result.push({ cls: "plain", text: code.slice(lastIdx, m.index) });
+  while (cursor < code.length) {
+    let next = null;
+
+    for (const pattern of PATTERNS) {
+      const flags = `${pattern.re.flags.replaceAll("g", "")}g`;
+      const re = new RegExp(pattern.re.source, flags);
+      re.lastIndex = cursor;
+      const match = re.exec(code);
+      if (match && (!next || match.index < next.index)) {
+        next = { index: match.index, text: match[0], cls: pattern.cls };
+      }
     }
-    // 어느 그룹에 매칭됐는지 찾기
-    const groupIdx = m.slice(1).findIndex((g) => g !== undefined);
-    result.push({ cls: PATTERNS[groupIdx]?.cls ?? "plain", text: m[0] });
-    lastIdx = m.index + m[0].length;
+
+    if (!next) {
+      result.push({ cls: "plain", text: code.slice(cursor) });
+      break;
+    }
+
+    if (next.index > cursor) {
+      result.push({ cls: "plain", text: code.slice(cursor, next.index) });
+    }
+    result.push({ cls: next.cls, text: next.text });
+    cursor = next.index + next.text.length;
   }
-  if (lastIdx < code.length) {
-    result.push({ cls: "plain", text: code.slice(lastIdx) });
-  }
+
   return result;
 }
 
