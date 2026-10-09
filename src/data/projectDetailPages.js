@@ -87,11 +87,10 @@ export const projectDetailPages = {
       description: "공항 토잉카의 위치·상태를 MQTT로 수집하고 관제 명령과 경로 정보를 전달하며, 장비 결과 이벤트 기반 상태 전이와 그래프 경로 정책을 구현했습니다.",
       media: { src: autowingHero, alt: "Autowing 견인차" },
     },
-    spotlight: [{ label: "문제", value: "명령 상태와 실제 장비 결과의 불일치 가능성" }, { label: "역할", value: "상태 전이 · 실시간 메시지 처리 · 경로 정책" }, { label: "결과", value: "8,935msg/s · E2E 지연 14~28ms" }],
+    spotlight: [{ label: "문제", value: "명령 상태와 실제 장비 결과의 불일치 가능성" }, { label: "역할", value: "상태 전이 · 실시간 메시지 처리 · 경로 정책" }, { label: "결과", value: "상태 롤백 방지 · MQTT 커밋 후 발행" }],
     context: { body: [] },
     architectureNotes: ["관제 명령은 요청 상태로 관리하고 장비 결과 이벤트를 기준으로 최종 상태를 반영했습니다. 제어·영상·보조 데이터는 목적별 채널로 분리했습니다."],
     architectureImage: { markup: autowingArchitecture, alt: "오토잉카 사용자, AWS 클라우드와 로봇 엣지 사이의 관제·텔레메트리·영상 아키텍처 구조도" },
-    designMetrics: { title: "부하 테스트 결과", headers: ["항목", "값", "측정 조건"], rows: [["부하 환경", "500대 장비 · 각 10Hz", "텔레메트리 동시 전송"], ["E2E 지연", "14~28ms", "동일 부하 조건"], ["최대 처리량", "8,935 msg/s", "서버 처리량"]], note: "500대 장비가 각각 초당 10회 텔레메트리를 전송하는 조건에서 측정했습니다." },
     sections: FORMAL_SECTIONS,
   },
   sticker: {
