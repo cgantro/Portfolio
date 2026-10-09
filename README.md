@@ -21,9 +21,8 @@ npm run build
 - 프로젝트 섹션 정의와 렌더러: `src/data/projectSections.js`, `src/components/sections/Projects/ProjectPageContent.jsx`
 - 홈 화면과 학력·기술·활동: `src/pages/HomePage.jsx`, `src/data/`
 - 이미지와 시연 자료: `asset/`
-- 포트폴리오 콘텐츠 검수 근거: `docs/content-audit.md`, `docs/claim-evidence-matrix.md`
 
-GraspLink의 Emscripten 웹 빌드는 `asset/minibcg/index.html`에 있고 `/Portfolio/minibcg/index.html`에서 실행합니다. 단일 HTML에 실행 파일과 모델 데이터가 들어 있어 파일 크기가 큽니다. GraspLink 페이지는 시뮬레이터를 iframe으로 바로 표시하고, 새 탭 실행과 GitHub 저장소 링크도 제공합니다. 정지 화면 미리보기는 `asset/GraspLink-preview.webp`를 사용합니다. 사이트 루트에는 스레드 빌드용 `coi-serviceworker.min.js`가 있습니다.
+GraspLink의 Emscripten 웹 빌드는 `asset/minibcg/index.html`에 있고 `/Portfolio/minibcg/index.html`에서 실행합니다. 약 22.38MB의 단일 HTML은 프로젝트 페이지에서 미리보기와 실행 버튼을 먼저 보여 주며, 사용자가 실행을 눌렀을 때 불러옵니다. 별도 탭으로 열거나 GitHub 저장소를 확인할 수도 있습니다. 사이트 루트에는 스레드 빌드용 `coi-serviceworker.min.js`가 있습니다.
 
 ## Deployment
 

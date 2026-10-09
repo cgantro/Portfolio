@@ -68,9 +68,9 @@ export default function HomePage() {
                 <div className={styles.projectCopy}>
                   <div className={styles.projectMeta}><span>{project.category}</span><span>{project.period}</span></div>
                   <h3>{project.title}<span aria-hidden="true"> ↗</span></h3>
-                  <p>{project.summary}</p>
+                  {Array.isArray(project.summary) ? <ul className={styles.projectSummaryPoints}>{project.summary.map((point) => <li key={point}>{point}</li>)}</ul> : <p>{project.summary}</p>}
                   {project.cardRole ? <div className={styles.cardRole}><span>담당</span><strong>{project.cardRole}</strong></div> : null}
-                  {project.homeHighlight ? <div className={styles.projectMetric}><strong>{project.homeHighlight}</strong></div> : null}
+                  {project.homeHighlight ? <div className={styles.projectMetric}><strong>{project.homeHighlight}</strong>{project.homeHighlightNote ? <span>{project.homeHighlightNote}</span> : null}</div> : null}
                   <div className={styles.tags}>{project.stack.slice(0, 5).map((skill) => <span key={skill}>{skill}</span>)}</div>
                 </div>
               </Link>
@@ -81,7 +81,6 @@ export default function HomePage() {
 
       <section id="expertise" className={`section ${styles.section} ${styles.expertiseSection}`}>
         <div className={styles.sectionHeading}>
-          <p className={styles.kicker}>기술 역량</p>
           <h2>기술 역량</h2>
         </div>
         <div className={styles.expertiseGrid}>

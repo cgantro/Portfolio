@@ -15,7 +15,7 @@ export function getProjectSections(project) {
       if (id === "implementation") return Boolean(project.implementations?.length);
       if (id === "case-studies") return Boolean(project.caseStudies?.length);
       if (id === "verification") return Boolean(project.verification?.items?.length || project.verification?.summary);
-      if (id === "sources") return Boolean(project.links?.github || project.links?.demo || project.links?.report);
+      if (id === "sources") return Boolean(project.links?.github || project.links?.code || project.links?.demo || project.links?.report);
       return false;
     })
     .map((id) => ({ id, ...SECTION_DEFINITIONS[id] }));
