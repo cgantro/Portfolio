@@ -27,8 +27,8 @@
 }
 
 .labelText { color: #b8c4d8; font-size: 12px; font-weight: 650; }
-.pre { max-width: 100%; margin: 0; padding: 15px 16px; overflow-x: auto; background: #111a29; line-height: 1.8; tab-size: 2; }
-.pre code { display: block; color: #d5deed; font: 12px/1.8 "Cascadia Code", Consolas, "Noto Sans Mono CJK KR", monospace; white-space: pre; }
+.pre { max-width: 100%; margin: 0; padding: 15px 16px; overflow-x: auto; background: #111a29; line-height: 1.8; tab-size: 4; }
+.pre code { display: block; color: #d5deed; font: 13px/1.8 "Cascadia Code", Consolas, "Noto Sans Mono CJK KR", monospace; white-space: pre; }
 
 :global(.tok-comment) { color: #8291a9; font-style: italic; }
 :global(.tok-string) { color: #b8d99c; }

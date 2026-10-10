@@ -1,56 +1,147 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 430" role="img" aria-labelledby="title desc">
-  <title id="title">GraspLink 시뮬레이터 구조</title>
-  <desc id="desc">명령과 관절 각도를 계산해 3D 화면과 충돌 검사에 같은 팔 자세를 반영합니다. 집게 양쪽 손끝이 물체에 닿으면 집게와 물체를 연결해 함께 움직입니다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="850" viewBox="0 0 1280 850" role="img" aria-labelledby="title desc">
+  <title id="title">GraspLink 시스템 아키텍처</title>
+  <desc id="desc">ViewerApp이 GUI, 작업 미션, 로봇 제어, 시뮬레이션, 장면과 렌더링 모듈을 조립합니다. Robotics는 독립적인 기구학과 경로 계획을 제공하고, Simulation 어댑터가 Flecs 장면과 Jolt 물리 세계를 연결합니다.</desc>
   <defs>
-    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
-      <path d="M0 0L10 5L0 10Z" fill="#3b82f6" />
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#3275c6" />
     </marker>
-    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fff" />
-      <stop offset="1" stop-color="#f3f7ff" />
-    </linearGradient>
+    <marker id="arrow-purple" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#7753b6" />
+    </marker>
     <style>
-      text { font-family: "Segoe UI", "Malgun Gothic", sans-serif; fill: #172033; }
-      .box { fill: url(#panel); stroke: #cbd5e1; stroke-width: 2; }
-      .focus { fill: #eff6ff; stroke: #3b82f6; }
-      .title { font-size: 19px; font-weight: 700; }
-      .detail { font-size: 14px; fill: #526176; }
-      .tag { font-size: 12px; font-weight: 700; letter-spacing: 1px; fill: #2563eb; }
-      .line { fill: none; stroke: #3b82f6; stroke-width: 3; marker-end: url(#arrow); }
-      .split { fill: none; stroke: #94a3b8; stroke-width: 2; stroke-dasharray: 6 6; }
+      text { font-family: "Segoe UI", "Malgun Gothic", sans-serif; fill: #17243a; }
+      .canvas { fill: #f7f9fc; }
+      .eyebrow { fill: #64748b; font-size: 12px; font-weight: 700; letter-spacing: 1.4px; }
+      .heading { fill: #15223a; font-size: 27px; font-weight: 750; }
+      .subheading { fill: #56657a; font-size: 14px; }
+      .root { fill: #eef2ff; stroke: #8b78d0; stroke-width: 2; }
+      .module { fill: #fff; stroke: #cbd5e1; stroke-width: 1.5; }
+      .module-blue { fill: #f1f7ff; stroke: #8cb7e9; stroke-width: 1.5; }
+      .module-green { fill: #effaf5; stroke: #86c4a4; stroke-width: 1.5; }
+      .module-amber { fill: #fff8eb; stroke: #dfbb73; stroke-width: 1.5; }
+      .module-title { font-size: 19px; font-weight: 750; }
+      .module-detail { fill: #536277; font-size: 13px; }
+      .module-caption { fill: #728198; font-size: 11px; }
+      .chip { fill: #eaf0f8; }
+      .chip-blue { fill: #e3efff; }
+      .chip-green { fill: #e1f3e9; }
+      .chip-amber { fill: #f8edda; }
+      .chip-text { fill: #38506c; font-size: 11px; font-weight: 650; }
+      .edge { fill: none; stroke: #3275c6; stroke-width: 2.2; marker-end: url(#arrow-blue); }
+      .compose { fill: none; stroke: #7753b6; stroke-width: 1.8; stroke-dasharray: 5 5; marker-end: url(#arrow-purple); }
+      .edge-label { fill: #49617d; font-size: 11px; font-weight: 650; }
+      .legend { fill: #64748b; font-size: 11px; }
     </style>
   </defs>
-  <rect width="1120" height="430" rx="12" fill="#f8fafc" />
-  <text x="36" y="42" class="tag">공통 관절 계산으로 화면과 물리의 자세 일치</text>
 
-  <rect x="36" y="110" width="212" height="104" rx="10" class="box" />
-  <text x="58" y="149" class="title">제어 명령</text>
-  <text x="58" y="178" class="detail">관절 각도와 도구 끝 목표 입력</text>
+  <rect class="canvas" width="1280" height="850" rx="16" />
+  <text class="eyebrow" x="58" y="45">GRASPLINK / SYSTEM ARCHITECTURE</text>
+  <text class="heading" x="58" y="82">GraspLink 시스템 아키텍처</text>
+  <text class="subheading" x="58" y="108">제어, 계획, 물리, 장면, 렌더링 모듈을 나누고 ViewerApp에서 실행 객체를 조립합니다.</text>
 
-  <rect x="310" y="110" width="224" height="104" rx="10" class="box focus" />
-  <text x="333" y="149" class="title">관절 각도와 경로 계획</text>
-  <text x="333" y="178" class="detail">목표로 이동, 직선 이동, 장애물 우회</text>
+  <!-- 앱 구성 루트: 실행 객체의 생성과 수명, 메인 루프를 담당 -->
+  <rect class="root" x="58" y="137" width="1164" height="108" rx="12" />
+  <text class="eyebrow" x="82" y="165">APPLICATION COMPOSITION ROOT</text>
+  <text class="module-title" x="82" y="193">ViewerApp</text>
+  <text class="module-detail" x="82" y="219">Window, Scene, Controller, PhysicsWorld, GuiModule 조립</text>
+  <rect class="chip" x="774" y="163" width="126" height="48" rx="8" />
+  <text class="chip-text" x="837" y="183" text-anchor="middle">입력과 GUI</text>
+  <text class="module-caption" x="837" y="200" text-anchor="middle">프레임 루프</text>
+  <rect class="chip" x="916" y="163" width="126" height="48" rx="8" />
+  <text class="chip-text" x="979" y="183" text-anchor="middle">제어와 물리</text>
+  <text class="module-caption" x="979" y="200" text-anchor="middle">고정 시간 간격</text>
+  <rect class="chip" x="1058" y="163" width="138" height="48" rx="8" />
+  <text class="chip-text" x="1127" y="183" text-anchor="middle">장면 렌더링</text>
+  <text class="module-caption" x="1127" y="200" text-anchor="middle">화면 출력</text>
 
-  <rect x="596" y="110" width="224" height="104" rx="10" class="box focus" />
-  <text x="618" y="149" class="title">로봇 자세 계산</text>
-  <text x="618" y="178" class="detail">관절 각도에서 각 팔 부분 계산</text>
+  <!-- ViewerApp이 실행 모듈을 생성하고 관리 -->
+  <path class="compose" d="M640 245V266H192V286" />
+  <path class="compose" d="M640 245V286" />
+  <path class="compose" d="M640 245V266H788V286" />
+  <path class="compose" d="M640 245V266H1082V286" />
 
-  <path d="M248 162H301" class="line" />
-  <path d="M534 162H587" class="line" />
-  <path d="M820 162H875V116H892" class="line" />
-  <path d="M875 162V285H892" class="line" />
-  <path d="M875 162V362H592" class="split" />
+  <!-- 앱 기능 모듈 -->
+  <rect class="module" x="58" y="286" width="268" height="148" rx="11" />
+  <text class="eyebrow" x="80" y="312">UI</text>
+  <text class="module-title" x="80" y="340">GUI</text>
+  <text class="module-detail" x="80" y="365">로봇과 그리퍼 제어 패널</text>
+  <text class="module-detail" x="80" y="386">물리 디버그와 충돌 형상 표시</text>
+  <rect class="chip" x="80" y="400" width="111" height="23" rx="6" />
+  <text class="chip-text" x="135" y="416" text-anchor="middle">Dear ImGui</text>
+  <text class="module-caption" x="198" y="416">Robotics, Simulation</text>
 
-  <rect x="900" y="72" width="184" height="88" rx="10" class="box" />
-  <text x="924" y="108" class="title">3D 화면 그리기</text>
-  <text x="924" y="135" class="detail">관절 각도를 적용한 로봇 모델</text>
+  <rect class="module-blue" x="356" y="286" width="268" height="148" rx="11" />
+  <text class="eyebrow" x="378" y="312">APPLICATION</text>
+  <text class="module-title" x="378" y="340">PickPlaceMission</text>
+  <text class="module-detail" x="378" y="365">집기와 이동 작업 상태 관리</text>
+  <text class="module-detail" x="378" y="386">작업 시나리오와 배치 생성</text>
+  <rect class="chip-blue" x="378" y="400" width="153" height="23" rx="6" />
+  <text class="chip-text" x="454" y="416" text-anchor="middle">grasplink_application</text>
 
-  <rect x="900" y="241" width="184" height="88" rx="10" class="box" />
-  <text x="924" y="277" class="title">물리와 충돌 계산</text>
-  <text x="924" y="304" class="detail">제어된 관절 자세의 충돌 형상</text>
+  <rect class="module-blue" x="654" y="286" width="268" height="148" rx="11" />
+  <text class="eyebrow" x="676" y="312">ROBOTICS DOMAIN</text>
+  <text class="module-title" x="676" y="340">Robotics</text>
+  <text class="module-detail" x="676" y="365">Controller, FK/IK, Joint Path Planner</text>
+  <text class="module-detail" x="676" y="386">로봇 모델과 관절 제한</text>
+  <rect class="chip-blue" x="676" y="400" width="147" height="23" rx="6" />
+  <text class="chip-text" x="749" y="416" text-anchor="middle">Viewer와 Flecs에 독립</text>
 
-  <rect x="342" y="326" width="478" height="76" rx="10" class="box" />
-  <text x="366" y="357" class="title">양쪽 손끝 접촉</text>
-  <text x="366" y="382" class="detail">양쪽 손끝이 닿은 물체를 고정해 함께 이동</text>
-  <path d="M900 285H864V364H829" class="line" />
+  <rect class="module" x="952" y="286" width="270" height="148" rx="11" />
+  <text class="eyebrow" x="974" y="312">DIAGNOSTICS</text>
+  <text class="module-title" x="974" y="340">로그와 계측</text>
+  <text class="module-detail" x="974" y="365">모듈 공통 로그와 성능 지표</text>
+  <text class="module-detail" x="974" y="386">Tracy 계측은 선택 구성</text>
+  <rect class="chip" x="974" y="400" width="179" height="23" rx="6" />
+  <text class="chip-text" x="1063" y="416" text-anchor="middle">grasplink_diagnostics</text>
+
+  <!-- 핵심 모듈 의존 관계 -->
+  <path class="edge" d="M624 360H654" />
+  <path class="edge" d="M788 434V455H640V487" />
+  <text class="edge-label" x="710" y="448" text-anchor="middle">관절 명령과 자세</text>
+
+  <!-- 시뮬레이션과 기반 모듈 -->
+  <rect class="module" x="58" y="487" width="340" height="168" rx="11" />
+  <text class="eyebrow" x="80" y="514">SCENE &amp; MODEL</text>
+  <text class="module-title" x="80" y="543">Flecs Scene and GLB Model</text>
+  <text class="module-detail" x="80" y="568">Entity, Component, Transform 관리</text>
+  <text class="module-detail" x="80" y="589">TinyGLTF 로딩과 Prefab 구성</text>
+  <rect class="chip" x="80" y="612" width="194" height="24" rx="6" />
+  <text class="chip-text" x="177" y="629" text-anchor="middle">grasplink_scene, grasplink_model</text>
+
+  <rect class="module-green" x="470" y="487" width="340" height="168" rx="11" />
+  <text class="eyebrow" x="492" y="514">INTEGRATION LAYER</text>
+  <text class="module-title" x="492" y="543">Simulation</text>
+  <text class="module-detail" x="492" y="568">Controller 결과를 Scene과 Physics에 연결</text>
+  <text class="module-detail" x="492" y="589">로봇과 그리퍼 어댑터, 충돌 검사</text>
+  <rect class="chip-green" x="492" y="612" width="194" height="24" rx="6" />
+  <text class="chip-text" x="589" y="629" text-anchor="middle">grasplink_simulation</text>
+
+  <rect class="module-amber" x="882" y="487" width="340" height="168" rx="11" />
+  <text class="eyebrow" x="904" y="514">PHYSICS</text>
+  <text class="module-title" x="904" y="543">PhysicsWorld</text>
+  <text class="module-detail" x="904" y="568">강체 상태와 접촉, 충돌 계산</text>
+  <text class="module-detail" x="904" y="589">Scene Entity와 Body 생명 주기 연동</text>
+  <rect class="chip-amber" x="904" y="612" width="131" height="24" rx="6" />
+  <text class="chip-text" x="969" y="629" text-anchor="middle">Jolt Physics</text>
+  <rect class="chip-amber" x="1044" y="612" width="156" height="24" rx="6" />
+  <text class="chip-text" x="1122" y="629" text-anchor="middle">grasplink_physics</text>
+
+  <!-- Simulation 어댑터가 Scene과 Physics를 연결 -->
+  <path class="edge" d="M470 570H398" />
+  <path class="edge" d="M810 606H882" />
+
+  <!-- 렌더링은 Scene/Model을 읽어 화면에 표시 -->
+  <path class="edge" d="M228 655V680H640V704" />
+  <text class="edge-label" x="420" y="666" text-anchor="middle">Scene과 Model 데이터</text>
+  <rect class="module-blue" x="356" y="704" width="568" height="93" rx="11" />
+  <text class="eyebrow" x="380" y="731">PRESENTATION</text>
+  <text class="module-title" x="380" y="761">Rendering</text>
+  <text class="module-detail" x="535" y="752">RenderSystem, AssetManager, Renderer</text>
+  <text class="module-detail" x="535" y="775">OpenGL, GLFW, 카메라와 화면 출력</text>
+
+  <line x1="58" y1="822" x2="95" y2="822" class="edge" />
+  <text class="legend" x="108" y="826">핵심 데이터와 의존 연결</text>
+  <line x1="294" y1="822" x2="331" y2="822" class="compose" />
+  <text class="legend" x="344" y="826">ViewerApp의 실행 객체 조립</text>
+  <text class="legend" x="1222" y="826" text-anchor="end">CMake target과 실행 코드 기준</text>
 </svg>
