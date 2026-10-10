@@ -45,11 +45,18 @@
 .analysisTable tbody td:nth-child(n + 4) { white-space: nowrap; }
 .tableNote { padding: 0 16px 15px; color: var(--fg-dim); font-size: 12px; line-height: 1.75; }
 .architectureCard { margin-top: 28px; padding: clamp(14px, 3vw, 25px); border: 1px solid var(--border); background: var(--bg2); }
-.architectureCard > img { width: 100%; height: auto; }
+.architectureImageViewport { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.architectureImageViewport img { display: block; width: 100%; min-width: 720px; max-width: 1100px; height: auto; }
 .architectureSummary { margin-top: 16px; color: var(--fg-dim); font-size: 13px; line-height: 1.8; }
 .contentPoints { display: grid; gap: 7px; padding-left: 18px; list-style: disc; }
 .contentPoints li::marker { color: var(--local-accent); }
-.architectureMobileFlows { display: none; }
+.architectureMobileFlows, .architectureModuleList { display: none; }
+.architectureModuleGroup { min-width: 0; padding: 15px; border: 1px solid var(--border); background: var(--bg); }
+.architectureModuleGroup h3 { margin-bottom: 9px; color: var(--local-accent); font-size: 14px; }
+.architectureModuleGroup ul { display: grid; gap: 0; }
+.architectureModuleGroup li { display: grid; gap: 3px; padding: 10px 0; border-top: 1px solid var(--border); }
+.architectureModuleGroup li strong { color: var(--fg-bright); font-size: 13px; line-height: 1.5; }
+.architectureModuleGroup li small { color: var(--fg-dim); font-size: 12px; line-height: 1.65; }
 .implementationList { margin-top: 27px; border-top: 1px solid var(--border); }
 .implementationList article { display: grid; grid-template-columns: 44px 1fr; gap: 14px; padding: 22px 0; border-bottom: 1px solid var(--border); }
 .implementationList article > span { padding-top: 3px; color: var(--local-accent); font: 11px var(--font-mono); }
@@ -81,6 +88,9 @@
 .caseReferences { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; padding: 0; list-style: none; }
 .caseReferences a { color: var(--local-accent); font-size: 11px; line-height: 1.7; text-decoration: underline; text-underline-offset: 3px; }
 .caseCode { margin-top: 18px; }
+.caseCodeSamples { display: grid; gap: 16px; margin-top: 18px; }
+.caseCodeSample { min-width: 0; }
+.caseCodeSample h4 { margin-bottom: 8px; color: var(--fg-bright); font-size: 13px; }
 .verificationList { display: grid; gap: 0; margin-top: 26px; border-top: 1px solid var(--border); }
 .verificationList li { display: grid; grid-template-columns: 30px 1fr; gap: 9px; padding: 13px 0; border-bottom: 1px solid var(--border); color: var(--fg-dim); font-size: 12px; line-height: 1.75; }
 .verificationList span { color: var(--local-accent); font: 10px var(--font-mono); }
@@ -102,7 +112,6 @@
 .demoLinks { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
 .demoLinks a { padding: 9px 11px; border: 1px solid var(--border2); color: var(--fg-bright); font-size: 12px; font-weight: 700; }
 .demoLinks a:hover { border-color: var(--local-accent); color: var(--local-accent); }
-.demoVideo { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: contain; background: #111827; }
 .demoFrame { overflow: hidden; aspect-ratio: 16 / 9; border: 1px solid var(--border); background: #111827; }
 .demoFrame iframe { display: block; width: 100%; height: 100%; border: 0; }
 .demoNote { margin-top: 8px; color: var(--fg-dim); font-size: 12px; }
@@ -114,7 +123,7 @@
   .hero { grid-template-columns: 1fr; }
   .heroImage { max-height: 390px; }
   .contents { top: 62px; }
-  .architectureCard > img { display: none; }
+  .architectureModuleList { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px; margin-top: 14px; }
   .architectureMobileFlows { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 12px; }
   .architectureMobileFlow { min-width: 0; padding: 15px; border: 1px solid var(--border); background: var(--bg); }
   .architectureMobileFlow h3 { margin-bottom: 11px; color: var(--local-accent); font-size: 14px; }

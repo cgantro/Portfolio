@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { getProjectSections } from "../../../data/projectSections";
-import demoVideo from "../../../../asset/GraspLink.webm";
 import CodeBlock from "../../ui/CodeBlock";
 import styles from "./ProjectPageContent.module.css";
 
@@ -52,7 +51,7 @@ function Results({ project }) {
   );
 }
 
-function DemoEmbed({ url, title, preview }) {
+function DemoEmbed({ url, title }) {
   return (
     <div className={styles.demoSection}>
       <div className={styles.demoHeading}>
@@ -62,16 +61,9 @@ function DemoEmbed({ url, title, preview }) {
         </div>
       </div>
       <div className={styles.demoFrame}>
-        <iframe src={url} title={`${title} 웹 시뮬레이터`} allow="fullscreen; cross-origin-isolated" allowFullScreen loading="lazy" />
+        <iframe src={url} title={`${title} 웹 시뮬레이터`} allow="fullscreen" allowFullScreen loading="lazy" />
       </div>
       <p className={styles.demoNote}>페이지 가까이 이동하면 시뮬레이터를 불러옵니다. 첫 실행에는 시간이 걸릴 수 있습니다.</p>
-      <div className={styles.demoHeading}>
-        <div><p className={styles.cardLabel}>시연 영상</p><h3>{title} 조작 시연</h3></div>
-      </div>
-      <video className={styles.demoVideo} controls preload="none" poster={preview} playsInline>
-        <source src={demoVideo} type="video/webm" />
-        이 브라우저는 WebM 영상을 지원하지 않습니다.
-      </video>
     </div>
   );
 }
@@ -80,8 +72,18 @@ function SectionContent({ id, project }) {
   const { architecture, implementations = [], caseStudies = [], verification, links = {} } = project;
   if (id === "results") return <Results project={project} />;
   if (id === "architecture") return <div className={styles.architectureCard}>
-    {architecture?.image ? <img src={architecture.image} alt={architecture.alt} loading="lazy" /> : null}
-    {architecture?.mobileFlows?.length ? <div className={styles.architectureMobileFlows}>
+    {architecture?.image ? <div className={styles.architectureImageViewport} role="region" tabIndex={0} aria-label="시스템 구조 그림, 좌우로 움직여 전체를 확인">
+      <img src={architecture.image} alt={architecture.alt} loading="lazy" />
+    </div> : null}
+    {architecture?.modules?.length ? <div className={styles.architectureModuleList}>
+      {architecture.modules.map((group) => <section key={group.title} className={styles.architectureModuleGroup}>
+        <h3>{group.title}</h3>
+        <ul>{group.items.map((item) => <li key={item.title}>
+          <strong>{item.title}</strong><small>{item.detail}</small>
+        </li>)}</ul>
+      </section>)}
+    </div> : null}
+    {!architecture?.modules?.length && architecture?.mobileFlows?.length ? <div className={styles.architectureMobileFlows}>
       {architecture.mobileFlows.map((flow) => <section key={flow.title} className={styles.architectureMobileFlow}>
         <h3>{flow.title}</h3>
         <ol>{flow.steps.map((step, index) => <li key={step.title}>
@@ -107,7 +109,12 @@ function SectionContent({ id, project }) {
       <ul className={styles.caseNarrative}>
         {(study.narrative ?? [study.situation, study.analysis, study.decision, study.implementation, study.verification, study.limitations]).filter(Boolean).map((paragraph, paragraphIndex) => <li key={paragraphIndex}>{paragraph}</li>)}
       </ul>
-      {study.pseudocode ? <div className={styles.caseCode}>
+      {study.codeSamples?.length ? <div className={styles.caseCodeSamples}>
+        {study.codeSamples.map((sample) => <section className={styles.caseCodeSample} key={sample.title}>
+          <h4>{sample.title}</h4>
+          <CodeBlock code={sample.code} lang="pseudo" label={sample.label ?? "의사 코드"} />
+        </section>)}
+      </div> : study.pseudocode ? <div className={styles.caseCode}>
         <CodeBlock code={study.pseudocode} lang="pseudo" label={study.pseudocodeLabel ?? "의사 코드"} />
       </div> : null}
       {study.equations?.length ? <dl className={styles.caseEquations}>
@@ -133,7 +140,7 @@ function SectionContent({ id, project }) {
         {links.demo && project.id !== "grasplink" ? <a href={links.demo} target="_blank" rel="noreferrer">데모 열기 ↗</a> : null}
       </div>
     </div>
-    {project.id === "grasplink" && links.demo ? <DemoEmbed url={links.demo} title={project.title} preview={project.cover} /> : null}
+    {project.id === "grasplink" && links.demo ? <DemoEmbed url={links.demo} title={project.title} /> : null}
   </>;
   return null;
 }

@@ -5,7 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>홍윤표 | C++ 응용 소프트웨어 개발자</title>
     <meta name="description" content="로봇 시뮬레이터와 실시간 C++ 시스템을 구현하고, 측정 결과로 병목을 개선해 온 홍윤표의 포트폴리오입니다." />
-    <script src="/Portfolio/coi-serviceworker.min.js"></script>
+    <script>
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.getRegistration("/Portfolio/").then((registration) => {
+          const worker = navigator.serviceWorker.controller || registration?.active;
+          const migrationKey = "portfolio-coi-worker-removed";
+          if (
+            worker &&
+            new URL(worker.scriptURL).pathname === "/Portfolio/coi-serviceworker.min.js" &&
+            sessionStorage.getItem(migrationKey) !== "done"
+          ) {
+            sessionStorage.setItem(migrationKey, "done");
+            worker.postMessage({ type: "deregister" });
+          }
+        }).catch(() => {});
+      }
+    </script>
     <!-- Pretendard (Korean-friendly sans-serif) -->
     <link
       rel="stylesheet"
