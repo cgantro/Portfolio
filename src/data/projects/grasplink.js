@@ -148,7 +148,7 @@ export default {
     // 현재 자세에서 안전한 해를 못 찾았을 때만 다른 초기 관절 각도를 시도합니다.
     bestSolution = none
 
-    for initialAngles in otherJointAngleStarts(currentAngles):
+    for initialAngles in alternativeJointAngles(currentAngles):
         candidate = inverseKinematics(targetTCP, initialAngles)
         if candidate not found:
             continue
@@ -177,7 +177,8 @@ jointPathIsSafe(start, goal):
           label: "pose planning",
           code: `PlanPoseForGui(targetTCP):
     // 화면 응답을 유지하도록 IK와 경로 탐색을 프레임 예산에 나눕니다.
-    for initialAngles in currentThenAlternativeAngles():
+    // 현재 자세부터 시도하고, 실패하면 대체 관절 각도를 제한 횟수만큼 확인합니다.
+    for initialAngles in currentAndAlternativeJointAngles(currentAngles):
         candidate = solveIKInSteps(targetTCP, initialAngles)
         if candidate not found:
             continue
@@ -186,8 +187,8 @@ jointPathIsSafe(start, goal):
         if directPath is safe:
             return accept(directPath)
 
-        // RRT-Connect는 양 끝에서 경로를 확장해 우회 경로를 찾습니다.
-        detour = RRTConnect(currentAngles, candidate, fixedBudget)
+        // 반복 횟수와 탐색 노드 수를 제한한 RRT-Connect로 우회 경로를 찾습니다.
+        detour = boundedRRTConnect(currentAngles, candidate)
         if detour exists and detour is safe:
             return accept(detour)
 
@@ -197,6 +198,7 @@ jointPathIsSafe(start, goal):
           title: "MoveLinear: TCP 직선 경로 계획",
           label: "MoveLinear",
           code: `MoveLinear(targetTCP):
+    // Quaternion SLERP는 두 회전 사이의 최단 방향을 보간합니다.
     samples = interpolateTCPPath(
         currentTCP,
         targetTCP,
