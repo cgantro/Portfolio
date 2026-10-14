@@ -1,0 +1,12 @@
+{
+  "name": "@portfolio/career-data",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts", "./loader": "./src/loader.ts" },
+  "scripts": {
+    "validate": "tsx src/validate.ts",
+    "test:unit": "node --import tsx --test ../../tests/unit/career-data.test.ts"
+  },
+  "dependencies": { "@portfolio/schema": "workspace:*", "yaml": "^2.7.0" }
+}

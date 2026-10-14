@@ -1,0 +1,43 @@
+---
+import { profile } from '@portfolio/career-data';
+import { localUrl, assetUrl } from '../lib/urls.mjs';
+import '../styles/global.css';
+interface Props { title?: string; description?: string; active?: string; }
+const { title, description = profile.tagline, active = 'home' } = Astro.props;
+const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — C++ & Robotics`;
+const navigation = [{ id: 'home', label: '소개', path: '' }, { id: 'projects', label: '프로젝트', path: 'projects/' }, { id: 'documents', label: '문서', path: 'documents/' }];
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f5f4ef" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:image" content={new URL(assetUrl('GraspLink-preview.webp'), Astro.site).href} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <title>{pageTitle}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 바로가기</a>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a class="wordmark" href={localUrl()} aria-label={`${profile.name} 포트폴리오 홈`}><span class="brand-mark">h.</span><span>{profile.name}<small>C++ SOFTWARE ENGINEER</small></span></a>
+        <nav aria-label="주 메뉴">
+          {navigation.map(item => <a href={localUrl(item.path)} aria-current={active === item.id ? 'page' : undefined}>{item.label}</a>)}
+          <a class="nav-contact" href={`mailto:${profile.email}`}><span class="nav-contact-label">연락하기</span><span aria-hidden="true">↗</span></a>
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer container">
+      <div><strong>{profile.name}</strong><p>{profile.role}</p></div>
+      <div class="footer-links"><a href={`mailto:${profile.email}`}>Email ↗</a><a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href={localUrl('documents/')}>이력서·문서</a></div>
+      <small>© {new Date().getFullYear()} {profile.nameEn}. Built with care.</small>
+    </footer>
+  </body>
+</html>

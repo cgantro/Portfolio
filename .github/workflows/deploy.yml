@@ -16,46 +16,63 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    env:
-      PAGES_ADMIN_TOKEN: ${{ secrets.PAGES_ADMIN_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install uv for RenderCV resume PDFs
+        uses: astral-sh/setup-uv@v10
+        with:
+          version: 0.13.1
+          enable-cache: true
+
+      - name: Install Korean PDF font
+        run: sudo apt-get update && sudo apt-get install --yes fonts-noto-cjk
+
       - name: Verify GraspLink browser simulator
         run: test -s asset/minibcg/index.html
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.1
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version-file: .node-version
+          cache: pnpm
 
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: npm run build
+      - name: Build Portfolio and Web
+        run: pnpm run build
 
-      - name: Configure Pages bootstrap
+      - name: Prepare GitHub Pages files
+        run: |
+          grep -q '페이지를 찾을 수 없습니다' apps/web/dist/404.html
+          touch apps/web/dist/.nojekyll
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./apps/web/dist
+
+  pages-bootstrap:
+    runs-on: ubuntu-latest
+    env:
+      PAGES_ADMIN_TOKEN: ${{ secrets.PAGES_ADMIN_TOKEN }}
+    steps:
+      - name: Enable GitHub Pages when an admin token is configured
         if: ${{ env.PAGES_ADMIN_TOKEN != '' }}
         uses: actions/configure-pages@v5
         with:
           token: ${{ env.PAGES_ADMIN_TOKEN }}
           enablement: true
 
-      - name: Prepare GitHub Pages files
-        run: |
-          cp dist/index.html dist/404.html
-          touch dist/.nojekyll
-
-      - name: Upload Artifact
-        uses: actions/upload-pages-artifact@v4
-        with:
-          path: ./dist
-
   deploy:
-    needs: build
+    needs: [build, pages-bootstrap]
     runs-on: ubuntu-latest
     permissions:
       pages: write

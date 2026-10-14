@@ -1,5 +1,17 @@
 node_modules
 dist
+**/dist/
+**/.astro/
+**/.vite/
+**/.turbo/
+**/.cache/
+**/coverage/
+**/test-results/
+**/playwright-report/
+artifacts/
+_workspace/
+output/
+apps/print/output/
 career-db/
 PRIVATE_NOT_FOR_GITHUB/
 portfolio_plan.md
@@ -11,8 +23,7 @@ portfolio/*.pptx
 asset/autowing-system-architecture.png
 .github/workflows/career-db.yml
 
-# Local Codex instructions and private portfolio review records
-/AGENTS.md
+# Private portfolio review records
 /docs/PORTFOLIO_OVERHAUL_WORK_ORDER.md
 /docs/content-audit.md
 /docs/claim-evidence-matrix.md

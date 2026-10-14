@@ -1,0 +1,24 @@
+{
+  "name": "@portfolio/print",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate": "node --import tsx src/cli.mjs validate",
+    "build": "node --import tsx src/cli.mjs build --all",
+    "build:portfolio": "node --import tsx src/cli.mjs pdf --all",
+    "pdf": "node --import tsx src/cli.mjs pdf --all",
+    "pdf:typst": "node --import tsx src/cli.mjs pdf --all --engine typst",
+    "resume:typst": "node --import tsx src/cli.mjs resume:typst --all",
+    "resume:rendercv": "node --import tsx src/cli.mjs resume:rendercv --all",
+    "validate:pdf": "node --import tsx src/cli.mjs validate:pdf --all",
+    "test": "node --import tsx --test ../../tests/pdf/*.test.mjs",
+    "test:unit": "node --import tsx --test ../../tests/pdf/print.test.mjs"
+  },
+  "dependencies": {
+    "@portfolio/career-data": "workspace:*",
+    "@portfolio/schema": "workspace:*",
+    "@portfolio/resume-adapter": "workspace:*"
+  },
+  "devDependencies": { "@vivliostyle/cli": "11.3.3", "pdfjs-dist": "^5.4.624", "@napi-rs/canvas": "^0.1.80", "tsx": "^4.19.3" }
+}

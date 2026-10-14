@@ -1,0 +1,102 @@
+id: mausoleum
+title: 영묘 (Mausoleum)
+subtitle: UE5 클라이언트와 C++ 서버의 실시간 음성 처리
+category: C++ 실시간 음성과 온라인 게임 서버
+summary:
+- 웹소켓은 로비와 연결을 유지해 방 정보를 주고받는 방식입니다. UDP는 전송 순서를 기다리지 않아 지연을 줄일 수 있어 음성 전달에 사용했습니다. 언리얼 전용 서버가 게임을 진행하는 동안 C++ 음성
+  서버는 방별 음성을 중계합니다.
+- 방 식별 코드를 기준으로 로비, 게임 세션, 음성 서버를 연결하고 마이크 입력부터 음성 전달과 재생까지 구현했습니다.
+period: 2026.02 – 2026.03
+startDate: '2026-02-24'
+endDate: '2026-03-27'
+status: complete
+team: 6인
+role:
+- 언리얼 엔진 5 음성 기능에서 마이크 입력, 화자별 압축, 음성 전송과 재생 구현
+- C++ 음성 서버의 데이터 검사, 방 식별 코드별 작업 분배와 음성 중계 구현
+- 웹소켓 로비와 화면 출력 없이 게임을 진행하는 전용 서버를 연결하고 단계별 아이템 생성 연동
+- Linux와 Windows 네트워크 처리를 구성하고 백그라운드 복귀 뒤 음성 지연 처리
+stack:
+- C++
+- 언리얼 엔진 5 게임 개발 도구
+- UDP 음성 데이터 전송
+- WebSocket 지속 연결
+- uWebSockets 통신 라이브러리
+- Opus 음성 압축
+- Protocol Buffers 메시지 형식
+- CMake 빌드 설정
+- 여러 작업 흐름 동시 실행
+cover:
+  src: /assets/영묘.png
+  alt: 영묘 (Mausoleum) 프로젝트 화면
+architecture:
+  src: /assets/mausoleum-system-architecture.svg
+  alt: 언리얼 엔진 5 게임 클라이언트가 방을 관리하는 로비, 게임 진행 서버, 음성 전달 서버에 각각 연결되는 구성도
+  summary:
+  - 웹소켓 로비 서버는 방 생성과 참가자 정보 동기화를 처리합니다.
+  - 언리얼 전용 서버는 화면을 그리지 않고 게임 공간과 진행 단계를 관리합니다.
+  - C++ 음성 서버는 게임 진행과 별도로 방마다 음성 데이터를 중계합니다.
+  - 게임 화면에서는 마이크 입력을 음성 압축, 송수신, 재생으로 이어지게 구현했습니다.
+links:
+  github: https://github.com/cgantro/Mausoleum
+  demo: null
+contributions:
+- id: mausoleum-contribution-1
+  text: 언리얼 엔진 5 음성 기능에서 마이크 입력, 화자별 압축, 음성 전송과 재생 구현
+  evidenceIds:
+  - mausoleum-public
+  status: reported
+- id: mausoleum-contribution-2
+  text: C++ 음성 서버의 데이터 검사, 방 식별 코드별 작업 분배와 음성 중계 구현
+  evidenceIds:
+  - mausoleum-public
+  status: reported
+- id: mausoleum-contribution-3
+  text: 웹소켓 로비와 화면 출력 없이 게임을 진행하는 전용 서버를 연결하고 단계별 아이템 생성 연동
+  evidenceIds:
+  - mausoleum-public
+  status: reported
+- id: mausoleum-contribution-4
+  text: Linux와 Windows 네트워크 처리를 구성하고 백그라운드 복귀 뒤 음성 지연 처리
+  evidenceIds:
+  - mausoleum-public
+  status: reported
+outcomes:
+- id: mausoleum-outcome-1
+  text: 마이크 입력부터 Opus 압축과 복원, UDP 전송, 스피커 재생까지 한 흐름으로 연결했습니다. Opus는 실시간 음성의 데이터 크기를 줄이는 압축 방식입니다. 화자마다 압축 상태를 따로
+    두고, 한 채널 음성을 초당 16,000번 읽어 0.02초 조각으로 나눈 뒤 초당 24킬로비트로 압축했습니다. FEC는 음성 데이터가 빠졌을 때 복구 정보를 보내는 기능이고, DTX는 말하지 않을
+    때 전송량을 줄이는 기능입니다.
+  evidenceIds:
+  - mausoleum-public
+  status: reported
+- id: mausoleum-outcome-2
+  text: 각 방을 식별하는 코드로 작업 담당자를 정해 같은 방의 음성 데이터는 늘 같은 작업 흐름으로 보냈습니다. 같은 방에서는 먼저 들어온 데이터부터 처리하고, 다른 방은 여러 작업 흐름에 나눠
+    맡깁니다. 한 번 받은 음성 데이터를 여러 참가자에게 보낼 때는 같은 데이터를 공유해 불필요한 복사를 줄였습니다.
+  evidenceIds:
+  - mausoleum-public
+  status: reported
+- id: mausoleum-outcome-3
+  text: Protocol Buffers는 데이터를 정해진 항목과 형식으로 묶어 서로 다른 프로그램이 함께 읽게 하는 메시지 형식입니다. 받은 데이터의 길이와 방, 보낸 사람을 나타내는 표식을 확인하고
+    해당 방의 대기열로 전달합니다. 담당 작업 흐름은 방의 음성 참가자에게 데이터를 중계하고, 여러 명에게 보낼 때 같은 데이터를 공유합니다.
+  evidenceIds:
+  - mausoleum-public
+  status: reported
+metrics: []
+evidence:
+- id: mausoleum-public
+  label: 기존 공개 프로젝트 데이터
+  source: src/data/projects/mausoleum.js
+  kind: public-source
+  status: reported
+  locator: role, implementations, caseStudies
+  note: 구현 설명은 공개 기록의 보고 내용입니다. 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
+- id: mausoleum-notes
+  label: 공개 프로젝트 상세 기록
+  source: data/projects/mausoleum.md
+  kind: public-source
+  status: reported
+limitations:
+- 16kHz, 20ms, 24kbps는 설정값입니다. 실측 음성 지연이나 패킷 손실 개선 수치로 제시하지 않습니다.
+- 방별 작업 분배와 공유 페이로드의 효과에 대한 재현 가능한 벤치마크는 포함되지 않습니다.
+- 공개 요약과 상세 문서에서 Protocol Buffers 사용 범위가 다릅니다. UDP 음성 패킷이 모두 Protobuf라고 단정하지 않습니다.
+- 상세 문서는 Dockerfile과 Jenkinsfile이 미완료라고 기록합니다. CI/CD 완성을 기여나 성과에 포함하지 않습니다.

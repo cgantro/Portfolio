@@ -1,0 +1,77 @@
+name: Portfolio V2 CI
+
+on:
+  push:
+    branches: [main, rebuild/portfolio-v2]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portfolio-v2-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prose-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vale-cli/vale-action@v3
+        with:
+          files: '["packages/career-data/content/projects", "packages/career-data/README.md", "apps/web/DESIGN.md", "README.md"]'
+          fail_on_error: true
+
+  build-and-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: 0.13.1
+          enable-cache: true
+      - run: sudo apt-get update && sudo apt-get install --yes fonts-noto-cjk
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run test:unit
+      - run: pnpm run validate:content
+      - run: pnpm run audit:content
+      - run: pnpm run validate:resume
+      - run: pnpm run build:portfolio
+      - run: pnpm run resume:rendercv
+      - run: pnpm run build:web
+      - run: pnpm run validate:pdf
+
+  web-browser-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v10
+        with:
+          version: 0.13.1
+          enable-cache: true
+      - run: sudo apt-get update && sudo apt-get install --yes fonts-noto-cjk
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.29.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build:portfolio
+      - run: pnpm run resume:rendercv
+      - run: pnpm run build:web
+      - run: pnpm --filter @portfolio/web exec playwright install --with-deps chromium
+      - run: pnpm run test:e2e
+      - run: pnpm run test:visual
+        env:
+          CI: "true"

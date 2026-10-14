@@ -1,23 +1,37 @@
 {
-  "name": "yoonpyo-portfolio",
+  "name": "portfolio-v2",
   "private": true,
-  "version": "0.1.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+  "version": "2.0.0",
+  "packageManager": "pnpm@10.29.1",
+  "engines": {
+    "node": ">=22.13.0"
   },
-  "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-markdown": "^10.1.0",
-    "react-router-dom": "^6.30.4",
-    "remark-gfm": "^4.0.1"
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @portfolio/web dev",
+    "build:web": "pnpm --filter @portfolio/web build",
+    "build:portfolio": "pnpm --filter @portfolio/print build:portfolio",
+    "resume:rendercv": "pnpm --filter @portfolio/print resume:rendercv",
+    "resume:prepare": "pnpm --filter @portfolio/resume-adapter resume:prepare",
+    "resume:export": "pnpm --filter @portfolio/resume-adapter resume:export",
+    "validate:content": "pnpm --filter @portfolio/career-data validate",
+    "audit:content": "node --import tsx tooling/content-validation/check.mjs",
+    "vale:content": "node tooling/content-validation/vale.mjs",
+    "validate:resume": "pnpm --filter @portfolio/resume-adapter validate",
+    "validate:pdf": "pnpm --filter @portfolio/print validate:pdf",
+    "test:unit": "pnpm -r --if-present test:unit",
+    "test:e2e": "pnpm --filter @portfolio/web test:e2e",
+    "test:visual": "pnpm --filter @portfolio/web test:visual",
+    "test:live-simulator": "pnpm --filter @portfolio/web exec playwright test --project=live-simulator",
+    "report:visual": "node tooling/visual-review/report.mjs",
+    "build": "pnpm run validate:content && pnpm run audit:content && pnpm run validate:resume && pnpm run build:portfolio && pnpm run resume:rendercv && pnpm run build:web"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.1",
-    "sharp": "^0.34.5",
-    "vite": "^5.4.0"
+    "tsx": "^4.19.3",
+    "typescript": "^5.9.3"
   }
 }

@@ -1,0 +1,18 @@
+{
+  "name": "@portfolio/resume-adapter",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": "./src/index.mjs",
+  "scripts": {
+    "validate": "node --import tsx ../../apps/print/src/cli.mjs validate",
+    "resume:prepare": "node --import tsx ../../apps/print/src/cli.mjs build --all",
+    "resume:export": "node --import tsx ./src/cli.mjs export",
+    "test:unit": "node --import tsx --test ../../tests/pdf/adapter.test.mjs"
+  },
+  "dependencies": {
+    "@portfolio/schema": "workspace:*",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": { "tsx": "^4.19.3" }
+}

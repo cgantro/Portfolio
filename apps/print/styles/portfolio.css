@@ -1,0 +1,67 @@
+@page {
+  size: A4;
+  margin: 18mm 18mm 18mm;
+  @bottom-left { content: "홍윤표 / PROJECT PORTFOLIO"; font-family: "Malgun Gothic", "Noto Sans KR", sans-serif; font-size: 8pt; color: #64748b; }
+  @bottom-right { content: counter(page) " / " counter(pages); font-family: sans-serif; font-size: 8pt; color: #64748b; }
+}
+* { box-sizing: border-box; }
+html { color: #152033; background: #fff; font-family: "Malgun Gothic", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; font-size: 10pt; line-height: 1.64; word-break: keep-all; overflow-wrap: anywhere; }
+body { margin: 0; }
+.page { break-before: page; }
+.page:first-child { break-before: auto; }
+h1, h2, h3, p, ul, dl, figure { margin: 0; }
+h1 { font-size: 29pt; letter-spacing: -.04em; line-height: 1.24; margin: 4mm 0 3mm; font-weight: 700; }
+h2 { font-size: 13pt; line-height: 1.4; margin: 6mm 0 2mm; break-after: avoid; }
+h3 { font-size: 9pt; margin-bottom: 1.5mm; }
+p { margin-bottom: 2.5mm; }
+a { color: #1d4ed8; text-decoration: none; }
+ul { padding-left: 4.5mm; margin: 1.5mm 0 3mm; }
+li { margin-bottom: 1.5mm; }
+.eyebrow { color: #1d4ed8; font-size: 8pt; letter-spacing: .08em; font-weight: 700; }
+.subtitle { font-size: 12pt; color: #475569; }
+.name-en { font-size: 12pt; color: #475569; }
+.cover h1 { font-size: 48pt; margin-top: 18mm; }
+.cover-title { border-top: 1.4mm solid #1d4ed8; padding-top: 10mm; margin-top: 24mm; margin-bottom: 12mm; }
+.cover-title h2 { font-size: 23pt; margin: 0 0 5mm; }
+.cover-title p { font-size: 14pt; max-width: 140mm; }
+.contacts { display: grid; grid-template-columns: 23mm 1fr; row-gap: 2mm; margin-top: 14mm; }
+.contacts dt { font-size: 8pt; color: #64748b; font-weight: 700; }
+.contacts dd { margin: 0; }
+.cover-edition { margin-top: 20mm; color: #334155; font-size: 11pt; }
+.cover-edition span { font-size: 8pt; color: #64748b; letter-spacing: .04em; }
+.project-index article { border-top: .25mm solid #cbd5e1; padding: 4mm 0; position: relative; padding-left: 12mm; break-inside: avoid; }
+.project-index h2 { margin-top: 0; }
+.index-number { position: absolute; left: 0; top: 5mm; color: #1d4ed8; font-size: 13pt; }
+.muted { color: #64748b; font-size: 9pt; }
+.skill-list { display: grid; grid-template-columns: 38mm 1fr; gap: 3mm; border-top: .25mm solid #cbd5e1; padding-top: 4mm; }
+.skill-list dt { font-weight: 700; }
+.skill-list dd { margin: 0; }
+.metadata { display: flex; gap: 7mm; color: #64748b; font-size: 8.5pt; margin-bottom: 3mm; }
+.stack { display: flex; flex-wrap: wrap; gap: 1.5mm; margin: 3mm 0 4mm; }
+.stack span { padding: .8mm 2mm; border: .2mm solid #bfdbfe; color: #1d4ed8; font-size: 8pt; background: #eff6ff; }
+.project h2 { margin-top: 4mm; font-size: 11pt; }
+.project figure { margin: 4mm 0; break-inside: avoid; }
+.project figure img { width: 100%; max-height: 61mm; object-fit: contain; display: block; }
+figcaption { color: #64748b; font-size: 7pt; margin-top: 1.5mm; text-align: center; }
+.claims { font-size: 9pt; }
+small { font-size: 7pt; color: #64748b; }
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 3mm; }
+.metrics > div { border-left: 1mm solid #1d4ed8; padding-left: 3mm; break-inside: avoid; }
+.metrics strong { font-size: 9pt; display: block; }
+.metrics span { font-size: 8pt; display: block; color: #475569; }
+.metrics p { font-size: 7.5pt; margin: 1mm 0; }
+aside { background: #f1f5f9; padding: 3mm 4mm; margin: 4mm 0; break-inside: avoid; font-size: 8pt; }
+aside ul { margin-bottom: 0; }
+.project-links { font-size: 7.5pt; margin-top: 3mm; }
+.timeline article { padding: 5mm 0; border-top: .25mm solid #cbd5e1; break-inside: avoid; }
+.timeline h2 { margin-top: 1mm; }
+.evidence h1 { font-size: 23pt; }
+.evidence h2 { font-size: 11pt; margin-top: 5mm; }
+.sources { font-size: 7pt; color: #475569; padding-left: 4mm; }
+.sources li { margin-bottom: 2mm; break-inside: avoid; }
+.source-path { font-family: monospace; }
+.status { color: #64748b; font-size: 6.5pt; }
+@media screen {
+  html { background: #e2e8f0; }
+  .page { width: 210mm; min-height: 297mm; padding: 18mm; margin: 10mm auto; background: #fff; box-shadow: 0 3mm 10mm #0f172a15; }
+}

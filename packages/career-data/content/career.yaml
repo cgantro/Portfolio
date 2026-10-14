@@ -1,0 +1,291 @@
+version: 2
+profile:
+  id: hong-yoonpyo
+  name: 홍윤표
+  nameEn: Hong Yoonpyo
+  role: C++ 응용 소프트웨어 개발자
+  tagline: 로봇 시뮬레이션과 실시간 시스템을 구현합니다.
+  summary:
+  - 로봇 시뮬레이터의 제어와 영상 전송, C++ 실시간 음성 서버를 구현했습니다.
+  - 공개 프로젝트 기록에서 구현 내용과 측정 조건을 함께 설명합니다.
+  email: cgantro@gmail.com
+  github: https://github.com/cgantro
+  location: 대한민국
+  portrait:
+    src: /assets/증사.jpg
+    alt: 홍윤표 프로필 사진
+  links:
+  - label: GitHub
+    url: https://github.com/cgantro
+    kind: github
+  - label: 이메일
+    url: mailto:cgantro@gmail.com
+    kind: contact
+  - label: C++ 응용 소프트웨어 이력서
+    url: /resume/cpp-software
+    kind: resume
+  - label: 로봇 시뮬레이션 이력서
+    url: /resume/simulation
+    kind: resume
+  - label: 영상 소프트웨어 이력서
+    url: /resume/video-software
+    kind: resume
+  evidence:
+  - id: profile-public
+    label: 기존 공개 프로필
+    source: src/data/meta.js
+    kind: public-source
+    status: reported
+  limitations:
+  - 학력, 교육, 자격과 활동은 공개 포트폴리오 기록을 옮겼으며 증빙 원본을 포함하지 않습니다.
+timeline:
+- id: kwu
+  type: edu
+  title: 광운대학교 소프트웨어학부
+  detail: 학사 졸업
+  period: 2019.03 – 2025.08
+  tags:
+  - 소프트웨어학부
+  note: 컴퓨터 운영체제와 데이터 저장 방식, 알고리즘 기초 과목을 이수했습니다. 운영체제 수업에서는 최근 사용한 파일 데이터를 메모리에 남기는 기능을 구현했습니다.
+  startDate: 2019-03
+  endDate: 2025-08
+  evidence:
+  - id: timeline-kwu
+    label: 기존 공개 이력
+    source: src/data/timeline.js
+    kind: public-source
+    status: reported
+    locator: kwu
+    note: 공개 포트폴리오 기재 사항이며 증명서 원본은 이 저장소에 포함하지 않습니다.
+- id: opic
+  type: cert
+  title: 영어 말하기 시험 OPIc IH 취득
+  detail: OPIc 시험의 IH 등급
+  period: '2026.02'
+  tags: []
+  startDate: 2026-02
+  endDate: 2026-02
+  evidence:
+  - id: timeline-opic
+    label: 기존 공개 이력
+    source: src/data/timeline.js
+    kind: public-source
+    status: reported
+    locator: opic
+    note: 공개 포트폴리오 기재 사항이며 증명서 원본은 이 저장소에 포함하지 않습니다.
+- id: samsung-sw-pro
+  type: cert
+  title: 삼성 SW 역량테스트 Pro 취득
+  detail: 알고리즘 역량 인증
+  period: '2026.03'
+  tags:
+  - 삼성 SW 역량테스트
+  startDate: 2026-03
+  endDate: 2026-03
+  evidence:
+  - id: timeline-samsung-sw-pro
+    label: 기존 공개 이력
+    source: src/data/timeline.js
+    kind: public-source
+    status: reported
+    locator: samsung-sw-pro
+    note: 공개 포트폴리오 기재 사항이며 증명서 원본은 이 저장소에 포함하지 않습니다.
+- id: jip
+  type: cert
+  title: 정보처리기사 취득
+  detail: 기사
+  period: '2024.12'
+  tags:
+  - 한국산업인력공단
+  startDate: 2024-12
+  endDate: 2024-12
+  evidence:
+  - id: timeline-jip
+    label: 기존 공개 이력
+    source: src/data/timeline.js
+    kind: public-source
+    status: reported
+    locator: jip
+    note: 공개 포트폴리오 기재 사항이며 증명서 원본은 이 저장소에 포함하지 않습니다.
+- id: ssafy
+  type: edu
+  title: 삼성 청년 소프트웨어와 AI 아카데미 14기
+  detail: 1,738시간
+  period: 2025.07 – 2026.06
+  tags: []
+  note: C와 C++ 프로그램 개발, Linux 운영체제와 네트워크 통신, 그래픽 화면 개발을 배웠습니다.
+  startDate: 2025-07
+  endDate: 2026-06
+  evidence:
+  - id: timeline-ssafy
+    label: 기존 공개 이력
+    source: src/data/timeline.js
+    kind: public-source
+    status: reported
+    locator: ssafy
+    note: 공개 포트폴리오 기재 사항이며 증명서 원본은 이 저장소에 포함하지 않습니다.
+skills:
+- category: C++ 시스템 개발
+  evidence: GraspLink, RobotPal, 영묘
+  items:
+  - name: C++17
+    detail: 로봇과 서버 프로그램 구현
+    projectIds:
+    - robotpal
+    - grasplink
+  - name: STL
+    detail: C++ 표준 자료 구조와 알고리즘
+    projectIds:
+    - robotpal
+    - mausoleum
+    - grasplink
+  - name: CMake
+    detail: 프로그램 빌드 설정 관리
+    projectIds:
+    - robotpal
+    - mausoleum
+    - grasplink
+  - name: 멀티스레딩
+    detail: 여러 작업 흐름을 동시에 실행
+    projectIds:
+    - robotpal
+    - mausoleum
+    - grasplink
+- category: 시뮬레이션과 그래픽스
+  evidence: GraspLink, RobotPal
+  items:
+  - name: OpenGL
+    detail: 3D 화면 그리기
+    projectIds:
+    - robotpal
+    - grasplink
+  - name: Flecs
+    detail: 로봇과 물체의 상태, 동작 관리
+    projectIds:
+    - robotpal
+    - grasplink
+  - name: Jolt Physics
+    detail: 물체 움직임과 충돌 계산
+    projectIds:
+    - grasplink
+- category: 실시간 통신과 영상 및 음성 전송
+  evidence: RobotPal, 영묘
+  items:
+  - name: TCP
+    detail: 데이터 순서를 지켜 전달
+    projectIds:
+    - robotpal
+  - name: WebSocket
+    detail: 연결을 유지해 양방향 통신
+    projectIds:
+    - robotpal
+    - mausoleum
+  - name: JPEG
+    detail: 이미지 파일 크기 축소
+    projectIds:
+    - robotpal
+  - name: UDP
+    detail: 지연을 줄이는 음성 전송
+    projectIds:
+    - mausoleum
+  - name: Opus
+    detail: 실시간 음성 압축
+    projectIds:
+    - mausoleum
+  - name: 언리얼 엔진 5
+    detail: 3D 게임 화면과 서버 개발
+    projectIds:
+    - robotpal
+    - mausoleum
+- category: 성능 분석과 검증
+  evidence: RobotPal, GraspLink, 오토윙카
+  items:
+  - name: Tracy
+    detail: 프로그램 구간별 실행 시간 측정
+    projectIds:
+    - robotpal
+  - name: Google Benchmark
+    detail: C++ 기능의 실행 시간 비교
+    projectIds:
+    - grasplink
+  - name: CTest
+    detail: C++ 자동 검사 실행
+    projectIds:
+    - grasplink
+  - name: k6
+    detail: 가상 접속을 만들어 부하 측정
+    projectIds:
+    - autowingcar
+- category: 보조 기술
+  evidence: 오토윙카
+  items:
+  - name: Java 17
+    detail: 서버 프로그램 언어
+    projectIds:
+    - autowingcar
+  - name: Spring Boot
+    detail: Java 서버 개발 도구
+    projectIds:
+    - autowingcar
+  - name: Redis
+    detail: 자주 쓰는 값을 빠르게 임시 저장
+    projectIds:
+    - autowingcar
+  - name: PostgreSQL
+    detail: 관계형 데이터베이스
+    projectIds:
+    - autowingcar
+activities:
+- id: band
+  title: 교내 밴드 동아리 마스터
+  subtitle: 14FRET 베이스, 악기 부장
+  period: 2019 – 2025
+  category: 동아리
+  items:
+  - 밴드 마스터로 활동하며 15회 이상 공연했습니다.
+  - 낙산가요제에서 대상을 받았습니다.
+  evidence:
+  - id: activity-band
+    label: 기존 공개 활동 기록
+    source: src/data/activities.js
+    kind: public-source
+    status: reported
+    locator: band
+    note: 공연 횟수와 수상은 공개 기재 사항이며 증빙 원본은 포함하지 않습니다.
+editions:
+- id: cpp-software
+  label: C++ 응용 소프트웨어
+  headline: C++ 응용 소프트웨어 개발자
+  projectIds:
+  - robotpal
+  - mausoleum
+  - grasplink
+  - autowingcar
+  skillCategories:
+  - C++ 시스템 개발
+  - 실시간 통신과 영상 및 음성 전송
+  - 성능 분석과 검증
+- id: simulation
+  label: 로봇 시뮬레이션
+  headline: 로봇 시뮬레이션과 제어 소프트웨어
+  projectIds:
+  - grasplink
+  - robotpal
+  - autowingcar
+  - mausoleum
+  skillCategories:
+  - 시뮬레이션과 그래픽스
+  - C++ 시스템 개발
+  - 성능 분석과 검증
+- id: video-software
+  label: 영상 소프트웨어
+  headline: 실시간 영상과 음성 처리 소프트웨어
+  projectIds:
+  - robotpal
+  - mausoleum
+  - grasplink
+  - autowingcar
+  skillCategories:
+  - 실시간 통신과 영상 및 음성 전송
+  - C++ 시스템 개발
+  - 성능 분석과 검증

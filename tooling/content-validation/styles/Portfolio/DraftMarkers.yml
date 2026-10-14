@@ -1,0 +1,6 @@
+extends: existence
+message: "Remove the draft marker '%s' before publishing."
+level: error
+ignorecase: true
+tokens:
+  - '\b(?:TODO|TBD|FIXME|lorem ipsum)\b'

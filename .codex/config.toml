@@ -1,0 +1,7 @@
+# Project-local Codex configuration.
+# Leave model selection to the active Codex session/account.
+# Agent role definitions are loaded from .codex/agents/*.toml.
+
+[agents]
+max_threads = 3
+max_depth = 1

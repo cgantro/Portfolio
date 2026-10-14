@@ -1,0 +1,48 @@
+# Public career data
+
+`content/career.yaml` contains shared profile, education, credentials, skill groups,
+activities, and edition ordering. `content/projects/*.yaml` contains project facts,
+claims, metrics, source records, and limitations. Each matching Markdown file holds
+the longer implementation narrative. The loader validates YAML before consumers can
+render or export it. Markdown is content, never executable code.
+
+The package exports `careerData`, `profile`, `projects`, `timeline`, `skills`,
+`activities`, `editions`, `getProject`, `getEdition`, `getProjectsForEdition`,
+`loadCareerData`, `parseFactsYaml`, and `serializeCareerData`.
+
+This is a build-time Node package. Astro and print tools load the same facts.
+Browser UI receives serializable data through rendered props or an export endpoint.
+`@portfolio/schema` exports the runtime Zod schemas and inferred TypeScript types.
+
+## Evidence policy
+
+- `reported`: an existing public portfolio source reports the statement. This is
+  the status of the migrated implementation descriptions and measurements.
+- `verified`: a reproducible public artifact independently supports the statement.
+  No migrated project measurement is assigned this status.
+- `unverified`: the source or interpretation needs confirmation.
+
+Every claim and metric names project-local evidence IDs. Schema validation rejects
+dangling IDs, duplicate evidence, and a verified claim backed by weaker evidence.
+Metric conditions remain attached to the metric. Configuration values such as an
+Opus bitrate are described as configuration, rather than measured improvements.
+
+Only already tracked `src/data/`, `data/projects/`, and public assets were used to
+prepare the migration. No private database is read by this package. Source links
+are recorded as repository paths or public URLs. Private source paths are rejected.
+External repository and demo links are recorded from public sources; their current
+availability has not been verified during the migration.
+
+RobotPal's team size and phase dates conflict between two public source files.
+Its initial development period is retained, the team count is left unresolved,
+and the differing follow-up period is documented in `limitations`. AutoWing Car's
+load figures retain their report caveats and do not claim a response percentile.
+
+## Editing
+
+Edit the YAML facts and corresponding Markdown narrative together when a statement
+changes. Keep evidence locators and uncertainty current. An edition changes the
+order and emphasis of the same projects; it does not create a new factual profile.
+
+Focused schema, loader, evidence, and tracked asset tests live in `tests/unit`.
+Run from the repository root with `pnpm run test:unit`.

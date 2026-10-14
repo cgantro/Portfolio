@@ -1,0 +1,29 @@
+---
+import { projects } from '@portfolio/career-data';
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import EvidenceList from '../../components/EvidenceList.astro';
+import MarkdownContent from '../../components/MarkdownContent';
+import LazyDemo from '../../components/LazyDemo';
+import { assetUrl, localUrl, projectUrl } from '../../lib/urls.mjs';
+import { implementationNarrative } from '../../lib/narrative.mjs';
+interface Props { project: (typeof projects)[number]; }
+export function getStaticPaths() { return projects.map(project => ({ params: { id: project.id }, props: { project } })); }
+const { project } = Astro.props;
+const sections = [{ id: 'overview', label: '개요·담당 역할' }, { id: 'architecture', label: '아키텍처' }, { id: 'implementation', label: '문제·설계·구현' }, { id: 'benchmarks', label: '측정 결과' }, { id: 'verification', label: '검증과 근거' }, { id: 'limitations', label: '한계' }, ...(project.links.demo ? [{ id: 'demo', label: '데모' }] : [])];
+const related = projects.filter(item => item.id !== project.id);
+---
+<SiteLayout title={project.title} description={project.subtitle} active="projects">
+  <header class="container project-heading"><a class="back-link" href={localUrl('projects/')}><span aria-hidden="true">←</span> 전체 프로젝트</a><div class="eyebrow">{project.category}</div><h1>{project.title}<span class="accent">.</span></h1><p class="project-subtitle">{project.subtitle}</p><dl class="project-facts"><div><dt>PERIOD</dt><dd>{project.period}</dd></div><div><dt>TEAM</dt><dd>{project.team}</dd></div><div><dt>STATUS</dt><dd>{project.status === 'ongoing' ? '진행 중' : '완료'}</dd></div><div><dt>SOURCE</dt><dd>{project.links.github ? <a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a> : '공개 자료 참고'}</dd></div></dl><div class="tags">{project.stack.map(tag => <span>{tag}</span>)}</div>
+  </header>
+  <div class="container project-cover-wide"><img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="850" fetchpriority="high" /></div>
+  <div class="container project-reading"><aside class="project-toc"><nav aria-label="프로젝트 목차"><span class="eyebrow">ON THIS PAGE</span>{sections.map((section, index) => <a href={`#${section.id}`}><span>0{index + 1}</span>{section.label}</a>)}</nav></aside><div class="project-content">
+    <section id="overview" class="detail-section"><span class="eyebrow">01 / OVERVIEW</span><h2>프로젝트와 담당 역할</h2>{project.summary.map(text => <p>{text}</p>)}<div class="role-panel"><span class="eyebrow">MY ROLE</span><ul>{project.role.map(text => <li>{text}</li>)}</ul></div>{project.contributions.length > 0 && <div class="contribution-list"><h3>직접 구현한 부분</h3>{project.contributions.map(claim => <p data-evidence-ids={claim.evidenceIds.join(' ')}>{claim.text}</p>)}</div>}</section>
+    <section id="architecture" class="detail-section"><span class="eyebrow">02 / ARCHITECTURE</span><h2>시스템 구조와 데이터 흐름</h2><figure class="architecture-figure"><a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={`${project.title} 아키텍처 원본 이미지 열기`}><img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} loading="lazy" width="1400" height="900" /></a><figcaption>아키텍처 이미지를 누르면 원본 크기로 볼 수 있습니다.</figcaption></figure>{project.architecture.summary.map(text => <p>{text}</p>)}</section>
+    <section id="implementation" class="detail-section"><span class="eyebrow">03 / DESIGN & IMPLEMENTATION</span><h2>문제, 설계 선택, 구현</h2><MarkdownContent content={implementationNarrative(project.narrativeMarkdown)} /></section>
+    <section id="benchmarks" class="detail-section"><span class="eyebrow">04 / MEASUREMENT</span><h2>측정 결과와 조건</h2>{project.metrics.length ? <div class="metric-list">{project.metrics.map(metric => <article class="metric-card" data-evidence-ids={metric.evidenceIds.join(' ')}><div class="metric-label">{metric.label}</div><div class="metric-value">{metric.value.toLocaleString('ko-KR')}<span>{metric.unit}</span></div>{metric.baseline !== undefined && <p>비교 기준: {metric.baseline.toLocaleString('ko-KR')} {metric.unit}</p>}<details><summary>측정 조건 확인</summary><ul>{metric.conditions.map(condition => <li>{condition}</li>)}</ul><p class="metric-status">{metric.status === 'verified' ? '원문과 대조한 값' : metric.status === 'reported' ? '공개 자료에 보고된 값' : '추가 확인이 필요한 값'}</p></details></article>)}</div> : <p class="quiet-panel">공개 근거에서 확인할 수 있는 정량 측정 결과를 별도로 제시하지 않았습니다.</p>}{project.outcomes.length > 0 && <div class="outcomes"><h3>확인한 결과</h3><ul>{project.outcomes.map(claim => <li data-evidence-ids={claim.evidenceIds.join(' ')}>{claim.text}</li>)}</ul></div>}</section>
+    <section id="verification" class="detail-section"><span class="eyebrow">05 / VERIFICATION & SOURCES</span><h2>검증과 공개 근거</h2><p>구현 내용과 수치는 아래 공개 자료의 범위에서 확인했습니다. 측정 조건과 근거 상태를 함께 표시합니다.</p><EvidenceList evidence={project.evidence} /></section>
+    <section id="limitations" class="detail-section"><span class="eyebrow">06 / LIMITATIONS</span><h2>적용 범위와 남은 한계</h2><ul class="limitations-list">{project.limitations.map(text => <li>{text}</li>)}</ul></section>
+    {project.links.demo && <section id="demo" class="detail-section"><span class="eyebrow">07 / DEMO</span><h2>{project.id === 'grasplink' ? '브라우저에서 로봇 조작' : '프로젝트 데모'}</h2>{project.id === 'grasplink' ? <LazyDemo url={project.links.demo} poster={assetUrl(project.cover.src)} title={project.title} client:visible={{ rootMargin: '300px' }} /> : <a class="button" href={project.links.demo} target="_blank" rel="noopener noreferrer">데모 열기 <span aria-hidden="true">↗</span></a>}</section>}
+  </div></div>
+  <section class="container related-section"><div class="section-heading"><h2>다른 프로젝트</h2><a href={localUrl('projects/')}>전체 보기 ↗</a></div><div class="related-grid">{related.map(item => <a href={projectUrl(item.id)}><span>{item.category}</span><strong>{item.title} <span aria-hidden="true">↗</span></strong><p>{item.subtitle}</p></a>)}</div></section>
+</SiteLayout>
