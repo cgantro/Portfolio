@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { getProjectSections } from "../../../data/projectSections";
 import CodeBlock from "../../ui/CodeBlock";
+import GraspLinkCanvas from "../../ui/GraspLinkCanvas";
 import styles from "./ProjectPageContent.module.css";
 
 function Section({ id, title, children }) {
@@ -140,7 +141,11 @@ function SectionContent({ id, project }) {
         {links.demo && project.id !== "grasplink" ? <a href={links.demo} target="_blank" rel="noreferrer">데모 열기 ↗</a> : null}
       </div>
     </div>
-    {project.id === "grasplink" && links.demo ? <DemoEmbed url={links.demo} title={project.title} /> : null}
+    {project.id === "grasplink" && links.demo
+      ? new URLSearchParams(window.location.search).get("embed") === "1"
+        ? <GraspLinkCanvas fallbackUrl={links.demo} title={project.title} />
+        : <DemoEmbed url={links.demo} title={project.title} />
+      : null}
   </>;
   return null;
 }
