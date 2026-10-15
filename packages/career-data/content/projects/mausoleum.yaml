@@ -85,7 +85,7 @@ metrics: []
 evidence:
 - id: mausoleum-public
   label: 기존 공개 프로젝트 데이터
-  source: src/data/projects/mausoleum.js
+  source: data/projects/mausoleum.md
   kind: public-source
   status: reported
   locator: role, implementations, caseStudies

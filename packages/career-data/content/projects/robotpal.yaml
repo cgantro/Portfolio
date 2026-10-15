@@ -147,7 +147,7 @@ metrics:
 evidence:
 - id: robotpal-public
   label: 기존 공개 프로젝트 데이터
-  source: src/data/projects/robotpal.js
+  source: data/projects/robotpal.md
   kind: public-source
   status: reported
   locator: role, implementations, caseStudies
@@ -165,7 +165,7 @@ evidence:
   locator: 3. 카메라 스트리밍 성능 최적화 / 최종 결과
   note: Sync / PBO / PBO+4Worker, OFF/ON 각 5회 median. 원본 로그와 정확한 하드웨어 사양은 미포함.
 limitations:
-- 팀 규모가 src/data/projects/robotpal.js에는 4인, data/projects/robotpal.md에는 2인으로 기록되어 확인이 필요합니다.
+- 이전 요약에는 4인, 상세 문서에는 2인으로 기록되어 팀 규모 확인이 필요합니다.
 - 초기 개발은 2025.11–12로 표시합니다. Markdown 메타에는 2026.04.09까지의 후속 작업 기간이 있어 범위가 다릅니다.
 - 측정값은 공개 문서의 보고값입니다. 원본 로그, 정확한 CPU/GPU 사양, 빌드 설정이 없어 이 저장소만으로 재현하거나 독립 검증할 수 없습니다.
 - 1232×832의 iGPU 환경에서 보고된 결과를 다른 GPU나 해상도로 일반화하지 않습니다.

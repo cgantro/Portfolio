@@ -33,7 +33,7 @@ profile:
   evidence:
   - id: profile-public
     label: 기존 공개 프로필
-    source: src/data/meta.js
+    source: portfolio/member-yoonpyo.html
     kind: public-source
     status: reported
   limitations:
@@ -52,7 +52,7 @@ timeline:
   evidence:
   - id: timeline-kwu
     label: 기존 공개 이력
-    source: src/data/timeline.js
+    source: portfolio/member-yoonpyo.html
     kind: public-source
     status: reported
     locator: kwu
@@ -68,7 +68,7 @@ timeline:
   evidence:
   - id: timeline-opic
     label: 기존 공개 이력
-    source: src/data/timeline.js
+    source: portfolio/member-yoonpyo.html
     kind: public-source
     status: reported
     locator: opic
@@ -85,7 +85,7 @@ timeline:
   evidence:
   - id: timeline-samsung-sw-pro
     label: 기존 공개 이력
-    source: src/data/timeline.js
+    source: portfolio/member-yoonpyo.html
     kind: public-source
     status: reported
     locator: samsung-sw-pro
@@ -102,7 +102,7 @@ timeline:
   evidence:
   - id: timeline-jip
     label: 기존 공개 이력
-    source: src/data/timeline.js
+    source: portfolio/member-yoonpyo.html
     kind: public-source
     status: reported
     locator: jip
@@ -119,7 +119,7 @@ timeline:
   evidence:
   - id: timeline-ssafy
     label: 기존 공개 이력
-    source: src/data/timeline.js
+    source: portfolio/member-yoonpyo.html
     kind: public-source
     status: reported
     locator: ssafy
@@ -247,7 +247,7 @@ activities:
   evidence:
   - id: activity-band
     label: 기존 공개 활동 기록
-    source: src/data/activities.js
+    source: portfolio/member-yoonpyo.html
     kind: public-source
     status: reported
     locator: band

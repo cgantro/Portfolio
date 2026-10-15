@@ -112,7 +112,7 @@ metrics:
 evidence:
 - id: autowingcar-public
   label: 기존 공개 프로젝트 데이터
-  source: src/data/projects/autowingcar.js
+  source: data/projects/agv.md
   kind: public-source
   status: reported
   locator: role, implementations, caseStudies
@@ -124,7 +124,7 @@ evidence:
   status: reported
 - id: autowingcar-load
   label: 기존 공개 부하 검증 요약
-  source: src/data/projects/autowingcar.js
+  source: data/projects/agv.md
   kind: public-source
   status: reported
   locator: verification.items
