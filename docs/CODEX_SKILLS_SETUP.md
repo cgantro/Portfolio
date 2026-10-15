@@ -11,6 +11,14 @@ Run in the repository root (PowerShell):
 
 Then use VS Code Developer: Reload Window, open a new Codex chat, and check /skills.
 
+For browser design QA, install Playwright in the project if it is not already available:
+
+    npm install --save-dev playwright
+    npx playwright install chromium
+    node scripts/visual_audit.mjs http://localhost:5173/ artifacts/design-review
+
+The audit script captures mobile, tablet and desktop screenshots plus a JSON report. Run your real dev server first, and change the port when necessary.
+
 The installer clones the public sources into the local app-data cache and copies their skill directories into .agents/skills. It copies selected reviewer definitions into .codex/agents and removes fixed model IDs and sandbox metadata (actual permissions follow Codex host policy). Existing installed skills are skipped; the -Force switch overwrites them. Review source changes before future updates.
 
 ## Bundled original skills (available by checking out branch)
