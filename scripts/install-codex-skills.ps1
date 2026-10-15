@@ -12,10 +12,10 @@ if (!(Get-Command git -ErrorAction SilentlyContinue)) {throw "Install Git first.
 function Get-Repo([string]$Name,[string]$Url) {
   $Dest=Join-Path $Cache $Name
   if (!(Test-Path $Dest)) {
-    & git clone --depth 1 $Url $Dest
+    & git clone --depth 1 $Url $Dest | Out-Null
     if ($LASTEXITCODE -ne 0) {throw "clone failed: $Name"}
   } elseif (Test-Path (Join-Path $Dest ".git")) {
-    & git -C $Dest pull --ff-only
+    & git -C $Dest pull --ff-only | Out-Null
     if ($LASTEXITCODE -ne 0) {throw "update failed: $Name"}
   } else {throw "Unexpected non-git cache: $Dest"}
   Write-Host "$Name -> $(& git -C $Dest rev-parse HEAD)"
