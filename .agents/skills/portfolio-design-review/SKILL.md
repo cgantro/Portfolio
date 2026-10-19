@@ -1,14 +1,19 @@
 ---
 name: portfolio-design-review
-description: Review the rendered portfolio in Playwright across mobile, tablet, and desktop, then fix concrete visual and interaction defects.
+description: Review a developer portfolio website or PDF using rendered browser evidence, layout, typography, accessibility, and a practical defect list.
 ---
 
 # Portfolio design review
 
-1. Build the production site and start its preview server.
-2. Review the home, project list, each project detail, and document pages at 375px, 768px, and 1440px.
-3. Capture actual browser screenshots with images loaded. Check overflow, hierarchy, typography, spacing, contrast, project imagery, controls, and navigation.
-4. Exercise each visible interaction, including project search/filter, downloads, keyboard navigation, and explicit GraspLink launch/close.
-5. Use automated axe checks and inspect keyboard focus manually.
-6. Fix confirmed defects, re-capture the same states, and keep a report with route, viewport, evidence, impact, repair, and verification.
-7. Never claim a screenshot, accessibility check, interaction, or fix was verified unless it was actually run.
+Do not claim a visual, accessibility, interaction, or PDF check passed unless the real browser or PDF renderer was used.
+
+1. Identify the audience, target recruiting role, core content hierarchy, and primary action.
+2. Build the production site and start its preview server. Capture Playwright screenshots at 375px, 768px, and 1440px, with images loaded. Check browser errors and real WebAssembly demo behavior when present.
+3. Review the home, project list, each project detail, and document pages. Check hierarchy, typography, spacing, contrast, overflow, image captions, content density, interactive states, keyboard support, mobile reading order, and reduced motion behavior.
+4. Exercise visible interactions, including project search/filter, downloads, keyboard navigation, and explicit GraspLink launch/close.
+5. Use automated axe checks and inspect keyboard focus manually. Open every PDF page as an image; check clipping, orphan lines, tables and figures, and page-break continuity.
+6. Report only source-backed defects with route, viewport, screenshot evidence, observed and expected behavior, severity, and a concrete fix. Separate functional blockers and reading/interaction issues from subjective style suggestions.
+7. Fix confirmed defects, recapture the same states, and run functional regression checks. Keep a report with route, viewport, state, evidence, impact, repair, and verification.
+8. Use the anti-ui-slop-reviewer and ui-ux-tester subagents selectively; they do not replace real browser or PDF evidence.
+
+No local LLMs, Figma MCP, or remote design services are required.
