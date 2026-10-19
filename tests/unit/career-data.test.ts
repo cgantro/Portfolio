@@ -16,12 +16,12 @@ test('content discovery supports a relocated Astro module from app and package d
     assert.equal(resolve(discoverContentDirectory(cwd, bundledUrl)), resolve(defaultContentDirectory));
   }
 });
-test('shared facts load all four projects and three required editions', () => {
+test('shared facts load all four projects and one general edition', () => {
   assert.equal(CareerDataSchema.safeParse(careerData).success, true);
   assert.deepEqual(new Set(careerData.projects.map((project) => project.id)), new Set(['robotpal', 'autowingcar', 'mausoleum', 'grasplink']));
-  assert.deepEqual(editions.map((edition) => edition.id), ['cpp-software', 'simulation', 'video-software']);
-  assert.equal(getProjectsForEdition('simulation')[0].id, 'grasplink');
-  assert.equal(getProjectsForEdition('video-software')[0].id, 'robotpal');
+  assert.deepEqual(editions.map((edition) => edition.id), ['general']);
+  assert.equal(getProjectsForEdition('general').length, 4);
+  assert.equal(getProjectsForEdition('general')[0].id, 'robotpal');
   assert.throws(() => getProjectsForEdition('not-an-edition'), /Unknown career edition/);
   assert.deepEqual(JSON.parse(serializeCareerData()), careerData);
 });

@@ -7,7 +7,7 @@ test('all static routes render and internal navigation keeps deployment base', a
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const missingAssets: string[] = [];
   page.on('response', response => { if (response.status() >= 400 && response.url().startsWith('http://127.0.0.1:4321/')) missingAssets.push(response.url()); });
-  for (const route of ['', 'projects/', 'documents/', 'projects/robotpal/', 'projects/mausoleum/', 'projects/autowingcar/', 'projects/grasplink/', 'resume/cpp-software/', 'resume/simulation/', 'resume/video-software/']) {
+  for (const route of ['', 'projects/', 'documents/', 'projects/robotpal/', 'projects/mausoleum/', 'projects/autowingcar/', 'projects/grasplink/', 'resume/general/']) {
     const response = await page.goto(`${base}${route}`);
     expect(response?.status()).toBe(200);
     await expect(page.locator('main h1')).toHaveCount(1);
@@ -29,7 +29,7 @@ test('public simulator assets preserve their deployed paths', async ({ request }
 });
 
 test('every available document download is served from the repository base', async ({ page, request }) => {
-  for (const edition of ['cpp-software', 'simulation', 'video-software']) {
+  for (const edition of ['general']) {
     await page.goto(`${base}resume/${edition}/`);
     const downloads = await page.locator('a[href*="/downloads/"]').evaluateAll(elements => elements.map(element => element.getAttribute('href')!));
     expect(downloads).toContain(`${base}downloads/${edition}/resume.rendercv.pdf`);
@@ -106,7 +106,7 @@ test('mobile navigation keeps contact visible and documents explain all resume f
 
   await page.goto(`${base}documents/`);
   await expect(page.locator('.document-card').first()).toContainText('PDF · HTML · JSON');
-  for (const [edition, headline] of [['cpp-software', 'C++ 응용 소프트웨어 개발자'], ['simulation', '로봇 시뮬레이션과 제어 소프트웨어'], ['video-software', '실시간 영상과 음성 처리 소프트웨어']]) {
+  for (const [edition, headline] of [['general', '소프트웨어 개발자']]) {
     await page.goto(`${base}resume/${edition}/`);
     await expect(page.locator('.page-heading')).toContainText(headline);
     await expect(page.locator('.download-panel')).toContainText('JSON Resume');

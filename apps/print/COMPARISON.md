@@ -1,13 +1,13 @@
 # PDF engine decisions and rendered candidates
 
-Date: 2026-10-15. Content: the same validated Hong Yoonpyo career data, with `cpp-software`, `simulation`, and `video-software` editions.
+Date: 2026-10-15. The comparison below reviewed the renderers using three earlier role-focused drafts. Those drafts have since been consolidated into one general software developer portfolio and resume because their project contents were substantially the same. Standard builds now generate only the general version.
 
 | Path | Actual result | Scope and observations |
 | --- | --- | --- |
 | Reactive Resume v6 | Three private edition drafts were imported and read back; no PDF export was used for these candidates | Optional account editor. REST connector and JSON Resume file-import mapping are implemented. Export requires an existing owned resume ID and environment authentication. |
-| RenderCV 2.8 | Three actual one-page PDFs | Classic theme, Korean system font, selected first summary sentence and two supported project highlights. Dates retain month/day precision. Input is `resume.rendercv.yaml`. |
-| Direct Typst 0.15.1 | Three actual one-page PDFs | Longer project description and roles, compact body text, the same two supported highlights. Input is `resume.typ`. |
-| Vivliostyle CLI 11.3.3 | Three actual 12-page project PDFs | Full role lists, architecture images, supported implementation claims, conditional metrics, limitations, and source appendix. Input is `portfolio.html`. |
+| RenderCV 2.8 | Three historical one-page PDFs; one general PDF per build now | Classic theme, Korean system font, selected first summary sentence and two supported project highlights. Dates retain month/day precision. Input is `resume.rendercv.yaml`. |
+| Direct Typst 0.15.1 | Three historical one-page PDFs; one general PDF per build now | Longer project description and roles, compact body text, the same two supported highlights. Input is `resume.typ`. |
+| Vivliostyle CLI 11.3.3 | Three historical 12-page project PDFs; one general PDF per build now | Full role lists, architecture images, supported implementation claims, conditional metrics, limitations, and source appendix. Input is `portfolio.html`. |
 
 ## Selected outputs
 

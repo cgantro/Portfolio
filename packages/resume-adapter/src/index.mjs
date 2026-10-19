@@ -35,7 +35,7 @@ export const LossReportSchema = z.object({
   })), sources: z.array(z.object({ id: z.string(), label: z.string(), source: z.string(), status: z.string() })) })),
 });
 
-export function selectEdition(input, editionId = 'cpp-software') {
+export function selectEdition(input, editionId = 'general') {
   const data = CareerDataSchema.parse(input);
   const edition = data.editions.find(item => item.id === editionId);
   if (!edition) throw new Error(`Unknown edition: ${editionId}`);
@@ -60,7 +60,7 @@ export function eligibleMetrics(project) {
     metric.evidenceIds.length > 0 && metric.evidenceIds.every(id => evidence.has(id) && evidence.get(id).status !== 'unverified'));
 }
 
-export function toJsonResume(input, editionId = 'cpp-software') {
+export function toJsonResume(input, editionId = 'general') {
   const { data, edition, projects } = selectEdition(input, editionId);
   const report = { version: 1, edition: editionId, omitted: [], flattened: [], evidence: [] };
   const dates = (entry, path) => {
@@ -115,7 +115,7 @@ export function toJsonResume(input, editionId = 'cpp-software') {
 }
 
 /** Prepared API import plan. v6's JSON_RESUME file importer maps this to ResumeData. */
-export function toReactiveResumeImport(input, editionId = 'cpp-software') {
+export function toReactiveResumeImport(input, editionId = 'general') {
   const { data, edition } = selectEdition(input, editionId);
   const { resume, lossReport } = toJsonResume(data, editionId);
   return { editionId, name: `${data.profile.name} · ${edition.label}`, format: 'JSON_RESUME', resume, lossReport };

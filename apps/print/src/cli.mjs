@@ -14,7 +14,7 @@ const root = resolve(appRoot, '../..');
 const require = createRequire(import.meta.url);
 const [command = 'validate', ...args] = process.argv.slice(2);
 function option(name, fallback) { const index = args.indexOf(name); return index < 0 ? fallback : args[index + 1]; }
-const editionIds = args.includes('--all') ? ['cpp-software', 'simulation', 'video-software'] : [option('--edition', 'cpp-software')];
+const editionIds = args.includes('--all') ? careerData.editions.map(edition => edition.id) : [option('--edition', 'general')];
 const outputRoot = resolve(option('--output', resolve(appRoot, 'dist')));
 const engine = option('--engine', 'vivliostyle');
 

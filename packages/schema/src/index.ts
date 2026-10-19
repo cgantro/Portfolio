@@ -107,7 +107,7 @@ export const ActivitySchema = z.object({
   category: NonEmpty, items: z.array(NonEmpty).min(1), evidence: z.array(EvidenceSchema).min(1),
 }).strict();
 export const EditionSchema = z.object({
-  id: z.enum(['cpp-software', 'simulation', 'video-software']), label: NonEmpty, headline: NonEmpty,
+  id: z.enum(['general']), label: NonEmpty, headline: NonEmpty,
   projectIds: z.array(ProjectFields.id).min(1), skillCategories: z.array(NonEmpty),
 }).strict();
 export const CareerFactsSchema = z.object({

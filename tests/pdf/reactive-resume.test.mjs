@@ -40,7 +40,7 @@ test('read timeout is bounded and retries exactly once', async () => {
 
 test('ambiguous import re-fetches resource before any retry and repeated calls reuse it', async () => {
   const state = await mkdtemp(resolve(tmpdir(), 'portfolio-rr-'));
-  const { resume } = toJsonResume(careerData, 'cpp-software');
+  const { resume } = toJsonResume(careerData, 'general');
   const full = resource(resume);
   let imported = false;
   let posts = 0;
@@ -66,7 +66,7 @@ test('ambiguous import re-fetches resource before any retry and repeated calls r
 
 test('definitive import rejection clears the pending journal so a corrected retry can proceed', async () => {
   const state = await mkdtemp(resolve(tmpdir(), 'portfolio-rr-retry-'));
-  const { resume } = toJsonResume(careerData, 'cpp-software');
+  const { resume } = toJsonResume(careerData, 'general');
   const full = resource(resume);
   let posts = 0;
   try {

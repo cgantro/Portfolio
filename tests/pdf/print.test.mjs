@@ -28,13 +28,13 @@ test('print document retains Korean project content, edu/cert entries and eviden
 test('offline prepare maps /assets/ to tracked asset/ and writes honest adapter losses', async () => {
   const output = await mkdtemp(resolve(tmpdir(), 'portfolio-print-'));
   try {
-    await preparePortfolio(careerData, 'video-software', { root, outputDir: output });
-    const selected = selectEdition(careerData, 'video-software');
+    await preparePortfolio(careerData, 'general', { root, outputDir: output });
+    const selected = selectEdition(careerData, 'general');
     for (const project of selected.projects) await access(resolve(output, 'assets', `${project.id}-architecture${project.architecture.src.slice(project.architecture.src.lastIndexOf('.'))}`));
     const html = await readFile(resolve(output, 'portfolio.html'), 'utf8');
     assert.ok(html.includes('assets/robotpal-architecture'));
     const report = JSON.parse(await readFile(resolve(output, 'resume.loss-report.json'), 'utf8'));
-    assert.equal(report.edition, 'video-software');
+    assert.equal(report.edition, 'general');
     assert.ok(report.omitted.length > 0);
   } finally { await rm(output, { recursive: true, force: true }); }
 });

@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import { careerData } from '../../packages/career-data/src/index.ts';
 import { toJsonResume, toReactiveResumeImport, JsonResumeSchema, selectEdition, eligibleClaims } from '../../packages/resume-adapter/src/index.mjs';
 
-test('three job editions produce validated JSON Resume with exact canonical project order', () => {
-  for (const id of ['cpp-software', 'simulation', 'video-software']) {
+test('the general edition produces a validated JSON Resume with canonical project order', () => {
+  for (const id of ['general']) {
     const selected = selectEdition(careerData, id);
     const { resume, lossReport } = toJsonResume(careerData, id);
     assert.ok(JsonResumeSchema.safeParse(resume).success);

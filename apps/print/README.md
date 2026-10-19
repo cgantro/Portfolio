@@ -1,6 +1,6 @@
 # Korean print portfolio
 
-The print application reads Zod-validated `@portfolio/career-data` and supports the `cpp-software`, `simulation`, and `video-software` editions. It uses only tracked project assets and canonical content. Each edition contains a cover, project overview, implementation pages, education and credentials, and a source appendix. Claims with unverified or missing evidence are excluded. A metric is printed only with its conditions and evidence IDs; reported measurements remain described by the canonical limitations.
+The print application reads Zod-validated `@portfolio/career-data` and builds one general software developer portfolio and resume. It uses only tracked project assets and canonical content. The portfolio contains a cover, project overview, implementation pages, education and credentials, and a source appendix. Claims with unverified or missing evidence are excluded. A metric is printed only with its conditions and evidence IDs; reported measurements remain described by the canonical limitations.
 
 From the workspace root after `pnpm install`:
 
@@ -11,7 +11,7 @@ pnpm validate:pdf
 pnpm --filter @portfolio/print pdf:typst
 pnpm --filter @portfolio/print exec node --import tsx src/cli.mjs resume:typst --all
 pnpm --filter @portfolio/print resume:rendercv
-pnpm --filter @portfolio/print exec node --import tsx src/cli.mjs render --edition cpp-software
+pnpm --filter @portfolio/print exec node --import tsx src/cli.mjs render --edition general
 ```
 
 `resume:prepare` is an offline content/HTML/JSON build; it does not imply that a PDF exists. `build:portfolio` invokes the installed Vivliostyle CLI and accepts success only after PDF parsing confirms pages and expected Korean project text. Engine output is temporary until validation succeeds. A failed renderer exits nonzero and does not replace an existing artifact. The optional Typst path produces `portfolio.typst.pdf`; the separate `resume:typst` command produces a real one-page resume candidate or fails if the layout spans more than one page. Set `--edition ID`, `--output DIR`, and, for portfolio PDFs, `--engine typst` as needed. No API credentials are needed.

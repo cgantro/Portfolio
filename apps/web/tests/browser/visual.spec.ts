@@ -9,8 +9,7 @@ const routes = [
   ['', 'home'], ['projects/', 'projects'], ['projects/grasplink/', 'grasplink'],
   ['projects/robotpal/', 'robotpal'], ['projects/mausoleum/', 'mausoleum'],
   ['projects/autowingcar/', 'autowingcar'], ['documents/', 'documents'],
-  ['resume/cpp-software/', 'resume-cpp'], ['resume/simulation/', 'resume-simulation'],
-  ['resume/video-software/', 'resume-video'],
+  ['resume/general/', 'resume-general'],
 ] as const;
 
 for (const [device, width, height] of [['desktop', 1440, 1000], ['tablet', 768, 1024], ['mobile', 375, 812]] as const) {

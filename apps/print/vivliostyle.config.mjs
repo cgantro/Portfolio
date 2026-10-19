@@ -3,6 +3,6 @@ export default {
   author: '홍윤표',
   language: 'ko',
   size: 'A4',
-  entry: 'dist/cpp-software/portfolio.html',
-  output: 'dist/cpp-software/portfolio.pdf',
+  entry: 'dist/general/portfolio.html',
+  output: 'dist/general/portfolio.pdf',
 };

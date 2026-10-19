@@ -12,7 +12,7 @@ const documents = {
       if (!existsSync(source)) return;
       const target = fileURLToPath(new URL('downloads/', dir));
       mkdirSync(target, { recursive: true });
-      for (const edition of ['cpp-software', 'simulation', 'video-software']) {
+      for (const edition of ['general']) {
         const editionSource = `${source}/${edition}`;
         if (!existsSync(editionSource)) continue;
         mkdirSync(`${target}/${edition}`, { recursive: true });
