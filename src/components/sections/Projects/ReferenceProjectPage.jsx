@@ -27,7 +27,7 @@ export default function ReferenceProjectPage({ project, detailPage, previousProj
         <dl className={styles.meta}>
           <div><dt>기간</dt><dd>{project.period}</dd></div>
           <div><dt>팀 구성</dt><dd>{project.teamLabel ?? `${project.team} 팀 프로젝트`}</dd></div>
-          <div><dt>역할</dt><dd>{project.roleItems?.[0] ?? project.role}</dd></div>
+          <div><dt>역할</dt><dd>{project.id === "robotpal" ? project.role : project.roleItems?.[0] ?? project.role}</dd></div>
         </dl>
       </header>
 

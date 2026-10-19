@@ -477,7 +477,7 @@ const baseProjects = [
         detail: "상태 전이 시나리오를 코드 구조로 정리한 만큼, 다음 단계로는 상태 머신과 이벤트 리플레이 검증까지 더 명시적으로 연결하고 싶습니다.",
       },
     ],
-    links: {},
+    links: { github: "https://github.com/cgantro/Autowing_car" },
   },
   {
     id: "sticker",
@@ -941,7 +941,7 @@ const stickerAccurateContent = {
   ],
 };
 
-const projectOrder = ["robotpal", "mausoleum", "autowing", "sticker", "minibcg"];
+const projectOrder = ["minibcg", "robotpal", "mausoleum", "autowing", "sticker"];
 
 export const projects = projectOrder.map((id) => {
   const project = baseProjects.find((item) => item.id === id);
