@@ -159,7 +159,7 @@ export default function ProjectPageContent({ project, previousProject, nextProje
           <Link className={styles.backLink} to="/#projects">← 전체 프로젝트</Link>
           <p className={styles.kicker}>{project.category}</p><h1>{project.title}</h1>
           <CopyPoints value={project.summary} className={styles.summary} />
-          <dl className={styles.meta}>{project.period ? <div><dt>기간</dt><dd>{project.period}</dd></div> : null}{project.team ? <div><dt>팀</dt><dd>{project.team}</dd></div> : null}{project.id !== "robotpal" ? <div><dt>담당 역할</dt><dd>{Array.isArray(project.role) ? <ul className={styles.rolePoints}>{project.role.map((item) => <li key={item}>{item}</li>)}</ul> : project.role}</dd></div> : null}</dl>
+          <dl className={styles.meta}>{project.period ? <div><dt>기간</dt><dd>{project.period}</dd></div> : null}{project.team ? <div><dt>팀</dt><dd>{project.team}</dd></div> : null}{project.role?.length ? <div><dt>담당 역할</dt><dd>{Array.isArray(project.role) ? <ul className={styles.rolePoints}>{project.role.map((item) => <li key={item}>{item}</li>)}</ul> : project.role}</dd></div> : null}</dl>
           <div className={styles.tags}>{project.stack.map((skill) => <span key={skill}>{skill}</span>)}</div>
         </div>
         {project.cover ? <figure className={styles.heroImage}><img src={project.cover} alt={`${project.title} 프로젝트 화면`} /></figure> : null}
