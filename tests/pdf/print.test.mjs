@@ -4,7 +4,6 @@ import { mkdtemp, readFile, rm, access, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
 import { careerData } from '../../packages/career-data/src/index.ts';
 import { selectEdition } from '../../packages/resume-adapter/src/index.mjs';
 import { renderPortfolio, preparePortfolio, escapeHtml } from '../../apps/print/src/render.mjs';
@@ -24,7 +23,6 @@ test('print document retains Korean project content, edu/cert entries and eviden
   }
   assert.equal(escapeHtml('<script>"&'), '&lt;script&gt;&quot;&amp;');
 });
-
 test('offline prepare maps /assets/ to tracked asset/ and writes honest adapter losses', async () => {
   const output = await mkdtemp(resolve(tmpdir(), 'portfolio-print-'));
   try {
@@ -47,14 +45,4 @@ test('PDF validation rejects missing output and renamed HTML instead of claiming
     await writeFile(fake, '<html>not a PDF</html>');
     await assert.rejects(validatePdf(fake), /not a real PDF/);
   } finally { await rm(output, { recursive: true, force: true }); }
-});
-
-test('resume export returns nonzero when there is no configured live resume', () => {
-  const result = spawnSync(process.execPath, ['--import', 'tsx', resolve(root, 'packages/resume-adapter/src/cli.mjs'), 'export'], {
-    cwd: root, encoding: 'utf8', windowsHide: true,
-    env: { ...process.env, REACTIVE_RESUME_ID: '', REACTIVE_RESUME_API_URL: '', REACTIVE_RESUME_API_KEY: '' },
-  });
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /MISSING_RESUME_ID_ENV/);
-  assert.ok(!result.stdout.includes('PDF exists'));
 });

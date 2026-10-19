@@ -17,7 +17,6 @@
     "build:portfolio": "pnpm --filter @portfolio/print build:portfolio",
     "resume:rendercv": "pnpm --filter @portfolio/print resume:rendercv",
     "resume:prepare": "pnpm --filter @portfolio/resume-adapter resume:prepare",
-    "resume:export": "pnpm --filter @portfolio/resume-adapter resume:export",
     "validate:content": "pnpm --filter @portfolio/career-data validate",
     "audit:content": "node --import tsx tooling/content-validation/check.mjs",
     "vale:content": "node tooling/content-validation/vale.mjs",

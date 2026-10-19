@@ -1,8 +1,0 @@
-# Documentation example: choose OAuth in the user's MCP configuration.
-# This file is not loaded automatically and contains no authentication secrets.
-[mcp_servers.reactive_resume]
-url = "https://rxresu.me/mcp"
-
-# For clients with environment header support, enable this map locally only:
-# [mcp_servers.reactive_resume.env_http_headers]
-# "x-api-key" = "REACTIVE_RESUME_API_KEY"

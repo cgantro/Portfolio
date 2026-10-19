@@ -46,7 +46,6 @@ export function selectEdition(input, editionId = 'general') {
   });
   return { data, edition, projects };
 }
-
 export function eligibleClaims(project) {
   const evidence = new Map(project.evidence.map(item => [item.id, item]));
   return [...project.contributions, ...project.outcomes].filter(claim =>
@@ -112,11 +111,4 @@ export function toJsonResume(input, editionId = 'general') {
     meta: { version: '1.0.0' },
   });
   return { resume, lossReport: LossReportSchema.parse(report) };
-}
-
-/** Prepared API import plan. v6's JSON_RESUME file importer maps this to ResumeData. */
-export function toReactiveResumeImport(input, editionId = 'general') {
-  const { data, edition } = selectEdition(input, editionId);
-  const { resume, lossReport } = toJsonResume(data, editionId);
-  return { editionId, name: `${data.profile.name} · ${edition.label}`, format: 'JSON_RESUME', resume, lossReport };
 }

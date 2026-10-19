@@ -7,7 +7,6 @@
   "scripts": {
     "validate": "node --import tsx ../../apps/print/src/cli.mjs validate",
     "resume:prepare": "node --import tsx ../../apps/print/src/cli.mjs build --all",
-    "resume:export": "node --import tsx ./src/cli.mjs export",
     "test:unit": "node --import tsx --test ../../tests/pdf/adapter.test.mjs"
   },
   "dependencies": {

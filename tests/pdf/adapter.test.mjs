@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { careerData } from '../../packages/career-data/src/index.ts';
-import { toJsonResume, toReactiveResumeImport, JsonResumeSchema, selectEdition, eligibleClaims } from '../../packages/resume-adapter/src/index.mjs';
+import { toJsonResume, JsonResumeSchema, selectEdition, eligibleClaims } from '../../packages/resume-adapter/src/index.mjs';
 
 test('the general edition produces a validated JSON Resume with canonical project order', () => {
   for (const id of ['general']) {
@@ -15,7 +15,6 @@ test('the general edition produces a validated JSON Resume with canonical projec
     assert.equal(lossReport.evidence.length, selected.projects.length);
   }
 });
-
 test('KWU and SSAFY education, OPIc and Samsung credentials survive without invented precision', () => {
   const { resume } = toJsonResume(careerData);
   assert.ok(resume.education.some(item => item.institution.includes('광운대학교') && item.startDate === '2019-03'));
@@ -47,15 +46,4 @@ test('missing evidence blocks public claims and invalid editions fail before out
   project.evidence = [];
   assert.deepEqual(eligibleClaims(project), []);
   assert.throws(() => toJsonResume(careerData, '../../escape'), /Unknown edition/);
-});
-
-test('Reactive Resume import plans preserve distinct edition identity and include mapping losses', () => {
-  const plans = careerData.editions.map(edition => toReactiveResumeImport(careerData, edition.id));
-  assert.equal(new Set(plans.map(plan => plan.name)).size, 3);
-  assert.equal(new Set(plans.map(plan => plan.resume.basics.label)).size, 3);
-  for (const plan of plans) {
-    assert.equal(plan.format, 'JSON_RESUME');
-    assert.equal(plan.lossReport.edition, plan.editionId);
-    assert.ok(JsonResumeSchema.safeParse(plan.resume).success);
-  }
 });

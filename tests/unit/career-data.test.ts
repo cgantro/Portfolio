@@ -83,7 +83,7 @@ test('loader rejects mismatch between YAML ID and its selected filename', () => 
 });
 
 test('all public asset references and local evidence sources are tracked files', () => {
-  const tracked = new Set(execFileSync('git', ['-c', 'core.quotepath=false', 'ls-files', '-z', 'asset', 'src/data', 'data/projects', 'portfolio'], { cwd: root, encoding: 'utf8' }).split('\0'));
+  const tracked = new Set(execFileSync('git', ['-c', 'core.quotepath=false', 'ls-files', '-z', 'asset', 'data/projects', 'portfolio'], { cwd: root, encoding: 'utf8' }).split('\0'));
   for (const project of careerData.projects) {
     for (const asset of [project.cover, project.architecture]) {
       const path = `asset/${asset.src.replace(/^\/assets\//, '')}`;

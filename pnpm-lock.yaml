@@ -83,19 +83,6 @@ importers:
         specifier: ^5.8.0
         version: 5.9.3
 
-  integrations/reactive-resume:
-    dependencies:
-      '@portfolio/resume-adapter':
-        specifier: workspace:*
-        version: link:../../packages/resume-adapter
-      zod:
-        specifier: ^3.24.2
-        version: 3.25.76
-    devDependencies:
-      tsx:
-        specifier: ^4.19.3
-        version: 4.23.15
-
   packages/career-data:
     dependencies:
       '@portfolio/schema':

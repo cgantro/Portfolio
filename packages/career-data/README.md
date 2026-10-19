@@ -27,9 +27,15 @@ dangling IDs, duplicate evidence, and a verified claim backed by weaker evidence
 Metric conditions remain attached to the metric. Configuration values such as an
 Opus bitrate are described as configuration, rather than measured improvements.
 
-Only already tracked `src/data/`, `data/projects/`, and public assets were used to
-prepare the migration. No private database is read by this package. Source links
-are recorded as repository paths or public URLs. Private source paths are rejected.
+Canonical facts and narratives live only in this package. Public source records for
+active projects are retained under `data/projects/` and cited by evidence entries;
+they are provenance, not a second runtime content store. Editable architecture
+diagrams live under `data/diagrams/`, while the web site uses separately maintained
+SVG files referenced by project YAML. The Mermaid notes and SVGs are maintained
+separately; no build step keeps them synchronized. Retired, uncited notes live in
+`data/archive/`.
+No private database is read by this package. Source links are recorded as repository
+paths or public URLs. Private source paths are rejected.
 External repository and demo links are recorded from public sources; their current
 availability has not been verified during the migration.
 
