@@ -3,11 +3,12 @@ profile:
   id: hong-yoonpyo
   name: 홍윤표
   nameEn: Hong Yoonpyo
-  role: 소프트웨어 개발자
-  tagline: C++를 중심으로 로봇 시뮬레이션과 실시간 시스템을 구현합니다.
+  role: 시뮬레이션 및 실시간 SW 개발자
+  tagline: C++로 로봇 시뮬레이터와 실시간 영상·음성 시스템을 구현하고, 계측 결과와 검증 범위를 함께 설명합니다.
   summary:
-  - 로봇 시뮬레이터의 제어와 영상 전송, C++ 실시간 음성 서버를 구현했습니다.
-  - 공개 프로젝트 기록에서 구현 내용과 측정 조건을 함께 설명합니다.
+  - GraspLink에서 FK·DLS IK, MoveJ·MoveL, 표본 기반 충돌 검사와 양손끝 접촉 기반 파지를 구현했습니다. 정지 기본 장면에서 10,000틱 동안 계산 최대 1.094ms를 기록했으며, 실제 틱 시작 간격 p99는 4.744ms로 4ms 주기를 보장하지 않습니다.
+  - RobotPal에서 JPEG 압축을 4개 작업자로 분리했습니다. 1232×832 iGPU 보고 측정(OFF·ON 각 5회 중앙값, 수신·디코딩 제외)에서 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS였고 60 FPS 목표에는 미달했습니다.
+  - C++ 음성 서버에서 UDP 방별 중계와 참가자 상태에 따른 청취 규칙을 구현했습니다.
   email: cgantro@gmail.com
   github: https://github.com/cgantro
   location: 대한민국
@@ -248,11 +249,11 @@ activities:
     note: 공연 횟수와 수상은 공개 기재 사항이며 증빙 원본은 포함하지 않습니다.
 editions:
 - id: general
-  label: 소프트웨어 개발
-  headline: 소프트웨어 개발자
+  label: 시뮬레이션 및 실시간 SW
+  headline: 시뮬레이션 및 실시간 SW 개발자
   projectIds:
-  - robotpal
   - grasplink
+  - robotpal
   - mausoleum
   - autowingcar
   skillCategories:
