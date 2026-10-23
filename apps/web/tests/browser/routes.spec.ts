@@ -7,7 +7,7 @@ test('all static routes render and internal navigation keeps deployment base', a
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const missingAssets: string[] = [];
   page.on('response', response => { if (response.status() >= 400 && response.url().startsWith('http://127.0.0.1:4321/')) missingAssets.push(response.url()); });
-  for (const route of ['', 'projects/', 'documents/', 'projects/robotpal/', 'projects/mausoleum/', 'projects/autowingcar/', 'projects/grasplink/', 'resume/general/']) {
+  for (const route of ['', 'projects/', 'documents/', 'projects/robotpal/', 'projects/mausoleum/', 'projects/autowingcar/', 'projects/dronesim/', 'resume/general/']) {
     const response = await page.goto(`${base}${route}`);
     expect(response?.status()).toBe(200);
     await expect(page.locator('main h1')).toHaveCount(1);
@@ -21,8 +21,8 @@ test('all static routes render and internal navigation keeps deployment base', a
   expect(missingAssets).toEqual([]);
 });
 
-test('public simulator assets preserve their deployed paths', async ({ request }) => {
-  for (const asset of ['coi-serviceworker.min.js', 'licenses/coi-serviceworker-LICENSE.txt', 'minibcg/index.html', 'grasplink-system-architecture.svg']) {
+test('DroneSim project assets preserve their deployed paths', async ({ request }) => {
+  for (const asset of ['DroneSim-preview.jpg', 'dronesim-system-architecture.svg']) {
     const response = await request.get(`${base}${asset}`);
     expect(response.status()).toBe(200);
   }
@@ -58,12 +58,12 @@ test('project content and links are readable without client JavaScript', async (
   const page = await context.newPage();
   await page.goto(`http://127.0.0.1:4321${base}projects/`);
   await expect(page.locator('.project-card')).toHaveCount(4);
-  await page.goto(`http://127.0.0.1:4321${base}projects/grasplink/`);
+  await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('#overview')).toBeVisible();
   await expect(page.locator('#architecture img')).toHaveAttribute('alt', /.+/);
   await expect(page.locator('#verification')).toBeVisible();
   await expect(page.locator('#limitations')).toBeVisible();
-  await expect(page.locator('#demo a[target="_blank"]')).toHaveAttribute('href', 'https://cgantro.github.io/GraspLink/');
+  await expect(page.locator('#demo a[target="_blank"]')).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
   await context.close();
 });
 
@@ -72,9 +72,9 @@ test('project search and category filters work with a useful empty state', async
   await expect(page.locator('astro-island[component-url*="ProjectExplorer"]')).not.toHaveAttribute('ssr', '');
   await expect(page.locator('.project-card')).toHaveCount(4);
   const search = page.getByRole('searchbox', { name: '프로젝트 또는 기술 검색' });
-  await search.fill('GraspLink');
+  await search.fill('DroneSim');
   await expect(page.locator('.project-card')).toHaveCount(1);
-  await expect(page.getByRole('heading', { name: 'GraspLink' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'DroneSim' })).toBeVisible();
   await search.fill('there-is-no-project');
   await expect(page.getByRole('heading', { name: '검색 결과가 없습니다.' })).toBeVisible();
   await page.getByRole('button', { name: '필터 초기화' }).click();
@@ -114,19 +114,19 @@ test('mobile navigation keeps contact visible and documents explain all resume f
   }
 });
 
-test('GraspLink stays absent until explicit launch and opens in a separate tab', async ({ page }) => {
+test('DroneSim stays absent until explicit launch and opens in a separate tab', async ({ page }) => {
   let demoRequests = 0;
-  await page.context().route('https://cgantro.github.io/GraspLink/**', route => { demoRequests += 1; return route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>GraspLink simulator fixture</body></html>' }); });
-  await page.goto(`${base}projects/grasplink/`);
+  await page.context().route('https://cgantro.github.io/DroneSim/**', route => { demoRequests += 1; return route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>DroneSim simulator fixture</body></html>' }); });
+  await page.goto(`${base}projects/dronesim/`);
   await expect(page.locator('iframe')).toHaveCount(0);
   expect(demoRequests).toBe(0);
-  const launch = page.getByRole('link', { name: '시뮬레이터 실행' });
+  const launch = page.getByRole('link', { name: '새 탭에서 데모 열기' });
   await expect(launch).toHaveAttribute('target', '_blank');
   await launch.scrollIntoViewIfNeeded();
   const popupPromise = page.waitForEvent('popup');
   await launch.click();
   const popup = await popupPromise;
-  await expect(popup.getByText('GraspLink simulator fixture')).toBeVisible();
+  await expect(popup.getByText('DroneSim simulator fixture')).toBeVisible();
   expect(demoRequests).toBeGreaterThan(0);
   await popup.close();
 });

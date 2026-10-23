@@ -57,7 +57,7 @@ export const ProfileSchema = z.object({
 }).strict();
 
 const ProjectFields = {
-  id: z.enum(['robotpal', 'autowingcar', 'mausoleum', 'grasplink']),
+  id: z.enum(['robotpal', 'autowingcar', 'mausoleum', 'dronesim']),
   title: NonEmpty, subtitle: NonEmpty, category: NonEmpty,
   summary: z.array(NonEmpty).min(1), period: NonEmpty,
   startDate: PartialDateSchema, endDate: PartialDateSchema.nullable(),

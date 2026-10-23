@@ -18,7 +18,7 @@ test('content discovery supports a relocated Astro module from app and package d
 });
 test('shared facts load all four projects and one general edition', () => {
   assert.equal(CareerDataSchema.safeParse(careerData).success, true);
-  assert.deepEqual(new Set(careerData.projects.map((project) => project.id)), new Set(['robotpal', 'autowingcar', 'mausoleum', 'grasplink']));
+  assert.deepEqual(new Set(careerData.projects.map((project) => project.id)), new Set(['robotpal', 'autowingcar', 'mausoleum', 'dronesim']));
   assert.deepEqual(editions.map((edition) => edition.id), ['general']);
   assert.equal(getProjectsForEdition('general').length, 4);
   assert.equal(getProjectsForEdition('general')[0].id, 'robotpal');
@@ -58,7 +58,7 @@ test('schema rejects contradictory dates and unrecognized fields', () => {
   const project = structuredClone(getProject('robotpal')!);
   project.endDate = '2024-01';
   assert.equal(ProjectSchema.safeParse(project).success, false);
-  assert.equal(ProjectSchema.safeParse({ ...getProject('grasplink'), endDate: '2026-09' }).success, false);
+  assert.equal(ProjectSchema.safeParse({ ...getProject('dronesim'), endDate: '2026-09' }).success, false);
   assert.equal(ProjectSchema.safeParse({ ...getProject('robotpal'), secretNotes: 'untracked' }).success, false);
   assert.equal(PartialDateSchema.safeParse('2026-02-31').success, false);
   assert.equal(PartialDateSchema.safeParse('2024-02-29').success, true);
@@ -66,7 +66,7 @@ test('schema rejects contradictory dates and unrecognized fields', () => {
 });
 
 test('parser rejects duplicate keys and YAML aliases', () => {
-  assert.throws(() => parseFactsYaml('id: robotpal\nid: grasplink\n'), /Invalid career YAML/);
+  assert.throws(() => parseFactsYaml('id: robotpal\nid: dronesim\n'), /Invalid career YAML/);
   assert.throws(() => parseFactsYaml('a: &data [1, 2]\nb: *data\n'), /alias/i);
 });
 
@@ -75,7 +75,7 @@ test('loader rejects mismatch between YAML ID and its selected filename', () => 
   try {
     cpSync(defaultContentDirectory, temporary, { recursive: true });
     const filename = join(temporary, 'projects', 'robotpal.yaml');
-    writeFileSync(filename, readFileSync(filename, 'utf8').replace(/^id: robotpal\r?\n/, 'id: grasplink\n'));
+    writeFileSync(filename, readFileSync(filename, 'utf8').replace(/^id: robotpal\r?\n/, 'id: dronesim\n'));
     assert.throws(() => loadCareerData(temporary), /does not match ID/);
   } finally {
     rmSync(temporary, { recursive: true, force: true });

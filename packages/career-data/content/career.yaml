@@ -4,9 +4,9 @@ profile:
   name: 홍윤표
   nameEn: Hong Yoonpyo
   role: 소프트웨어 개발자
-  tagline: C++를 중심으로 로봇 시뮬레이션과 실시간 시스템을 구현합니다.
+  tagline: C++로 로봇·드론 시뮬레이터와 실시간 시스템을 구현하고, 계측 조건과 검증 범위를 함께 설명합니다.
   summary:
-  - 로봇 시뮬레이터의 제어와 영상 전송, C++ 실시간 음성 서버를 구현했습니다.
+  - DroneSim에서 고정 Tick 비행 시뮬레이션, AirSim 강체 물리 연결, UDP 지상통제와 다중 드론 JSON 시나리오를 구현했습니다. 공개 Release 측정에서 64대 분리 배치의 Tick p95는 493.9µs에서 137.7µs로, 밀집 32대 배치의 p95 중앙값은 1,344.3µs에서 665.1µs로 감소했습니다. 두 비교는 각각 전후 3회 측정이며 해당 조건 밖의 성능을 보장하지 않습니다.
   - 공개 프로젝트 기록에서 구현 내용과 측정 조건을 함께 설명합니다.
   email: cgantro@gmail.com
   github: https://github.com/cgantro
@@ -120,48 +120,55 @@ timeline:
     note: 공개 포트폴리오 기재 사항이며 증명서 원본은 이 저장소에 포함하지 않습니다.
 skills:
 - category: C++ 시스템 개발
-  evidence: GraspLink, RobotPal, 영묘
+  evidence: DroneSim, RobotPal, 영묘
   items:
   - name: C++17
-    detail: 로봇과 서버 프로그램 구현
+    detail: 로봇 시뮬레이터와 서버 프로그램 구현
     projectIds:
     - robotpal
-    - grasplink
+  - name: C++20
+    detail: 드론 시뮬레이션 프로그램 구현
+    projectIds:
+    - dronesim
   - name: STL
     detail: C++ 표준 자료 구조와 알고리즘
     projectIds:
     - robotpal
     - mausoleum
-    - grasplink
+    - dronesim
   - name: CMake
     detail: 프로그램 빌드 설정 관리
     projectIds:
     - robotpal
     - mausoleum
-    - grasplink
+    - dronesim
   - name: 멀티스레딩
     detail: 여러 작업 흐름을 동시에 실행
     projectIds:
     - robotpal
     - mausoleum
-    - grasplink
+    - dronesim
 - category: 시뮬레이션과 그래픽스
-  evidence: GraspLink, RobotPal
+  evidence: DroneSim, RobotPal
   items:
   - name: OpenGL
     detail: 3D 화면 그리기
     projectIds:
     - robotpal
-    - grasplink
+    - dronesim
   - name: Flecs
-    detail: 로봇과 물체의 상태, 동작 관리
+    detail: 드론 상태와 비행 시스템 관리
     projectIds:
     - robotpal
-    - grasplink
-  - name: Jolt Physics
-    detail: 물체 움직임과 충돌 계산
+    - dronesim
+  - name: AirSim
+    detail: 네이티브 강체 비행 물리 계산
     projectIds:
-    - grasplink
+    - dronesim
+  - name: OpenCV
+    detail: 카메라 프레임 품질 지표 계산
+    projectIds:
+    - dronesim
 - category: 실시간 통신과 영상 및 음성 전송
   evidence: RobotPal, 영묘
   items:
@@ -192,7 +199,7 @@ skills:
     - robotpal
     - mausoleum
 - category: 성능 분석과 검증
-  evidence: RobotPal, GraspLink, 오토윙카
+  evidence: RobotPal, DroneSim, 오토윙카
   items:
   - name: Tracy
     detail: 프로그램 구간별 실행 시간 측정
@@ -201,11 +208,11 @@ skills:
   - name: Google Benchmark
     detail: C++ 기능의 실행 시간 비교
     projectIds:
-    - grasplink
+    - dronesim
   - name: CTest
     detail: C++ 자동 검사 실행
     projectIds:
-    - grasplink
+    - dronesim
   - name: k6
     detail: 가상 접속을 만들어 부하 측정
     projectIds:
@@ -252,7 +259,7 @@ editions:
   headline: 소프트웨어 개발자
   projectIds:
   - robotpal
-  - grasplink
+  - dronesim
   - mausoleum
   - autowingcar
   skillCategories:

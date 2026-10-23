@@ -5,7 +5,7 @@
 - Public career facts live in `packages/career-data/content/`; validate them with the workspace Zod schema before using them in the site, resume, or PDFs.
 - Keep project facts, evidence status, dates, units, and measurement conditions faithful to real source code, project logs, benchmark records, and user-confirmed career experience. Do not upgrade reported or unverified claims to verified claims, or invent roles, timelines, measured values, technical methods, or results.
 - Keep private research under `career-db/` or `PRIVATE_NOT_FOR_GITHUB/`. Never copy private career data, credentials, contact details, or private paths into public content, generated pages, or screenshots.
-- The V2 portfolio shell is Astro; React islands provide project search/filter. GraspLink is a separate deployed Emscripten/WebAssembly app. Open it in a new tab only after the visitor launches it; the live app renders in a top-level page but stays blank in an iframe. Verify WebAssembly, SharedArrayBuffer, and COI worker behavior before changing embedding.
+- The V2 portfolio shell is Astro; React islands provide project search/filter. DroneSim is a separate deployed Emscripten/WebAssembly app. Open it in a new tab only after the visitor launches it. Its WebAssembly build uses the kinematic baseline; native AirSim rigid-body physics is a separate Windows execution path. Do not import the simulator runtime into the portfolio.
 
 ## Design and writing
 

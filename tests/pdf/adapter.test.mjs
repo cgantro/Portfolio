@@ -26,8 +26,8 @@ test('KWU and SSAFY education, OPIc and Samsung credentials survive without inve
 
 test('ongoing project does not invent an end date and no metric loses its conditions into highlights', () => {
   const { resume } = toJsonResume(careerData);
-  const grasp = resume.projects.find(project => project.name === careerData.projects.find(project => project.id === 'grasplink').title);
-  assert.equal(grasp.endDate, undefined);
+  const droneSim = resume.projects.find(project => project.name === careerData.projects.find(project => project.id === 'dronesim').title);
+  assert.equal(droneSim.endDate, undefined);
   for (const project of resume.projects) assert.equal(project.metrics, undefined);
 });
 

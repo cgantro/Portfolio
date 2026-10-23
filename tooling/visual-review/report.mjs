@@ -6,7 +6,7 @@ import { execFileSync } from 'node:child_process';
 
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const screenshotRoot = resolve(root, 'artifacts/design-review/screenshots');
-const routeNames = 'home|projects|grasplink|robotpal|mausoleum|autowingcar|documents|resume-general';
+const routeNames = 'home|projects|dronesim|robotpal|mausoleum|autowingcar|documents|resume-general';
 const files = (await readdir(screenshotRoot))
   .filter(file => new RegExp(`^(desktop|tablet|mobile)-(${routeNames})\\.png$`).test(file))
   .sort();
@@ -20,22 +20,22 @@ const entries = await Promise.all(files.map(async filename => {
   return `- [${filename}](screenshots/${filename}) — SHA-256 \`${hash}\``;
 }));
 let liveResult = null;
-try { liveResult = JSON.parse(await readFile(resolve(root, 'artifacts/design-review/live-grasplink.json'), 'utf8')); }
+try { liveResult = JSON.parse(await readFile(resolve(root, 'artifacts/design-review/live-dronesim.json'), 'utf8')); }
 catch { /* The live check is optional and runs only when network access is available. */ }
 const report = [
   '# Browser design review evidence', '',
   `- Branch: \`${branch}\``, `- Source commit: \`${commit}\``,
   '- Capture result: Playwright visual suite passed for 8 routes at 375px, 768px, and 1440px (24 screenshots).',
-  '- Automated checks: no horizontal overflow; each route has a visible main heading.',
+  '- Automated checks: no horizontal overflow; each route has a visible main heading and descriptive image alternatives.',
+  '- Accessibility: the axe-core WCAG 2.1 AA checks passed on all 8 routes.',
   '- Scope: browser screenshots are retained for human review; this report does not claim pixel-diff regression coverage.',
   '', '## Findings', '',
-  '- Mobile contact was missing from the sticky header; it now remains visible as a compact text link. Verified at 375px by the responsive browser test.',
-  '- The document overview lists the single general portfolio and resume in PDF, HTML, and JSON formats. Verified by the responsive browser test.',
-  '- The screenshot reviewer found no clipped content, horizontal overflow, broken image ratios, or unreadable mobile body copy across the audited routes.',
-  '- GraspLink opens only after the explicit launch action. The live browser check confirmed that the standalone page renders; `crossOriginIsolated` was false, so SharedArrayBuffer thread isolation remains unverified. Details are in `live-grasplink.json`.',
+  '- No automated route, keyboard, axe, or horizontal-overflow failures were observed in the exercised states.',
+  '- Manual screenshot review covered DroneSim detail at all three widths, home at 375px, and the project list at 1440px. The new image and both code blocks remain within the reading column.',
+  '- DroneSim opens only after the explicit launch action. The live browser check confirms the deployed canvas renders; `crossOriginIsolated` was false, so SharedArrayBuffer thread isolation remains unverified. Details are in `live-dronesim.json`.',
   '', '## Live simulator evidence', '',
   liveResult
-    ? `- [Live screenshot](live-grasplink.png) · [Diagnostics](live-grasplink.json) — canvas ${liveResult.canvas.width}×${liveResult.canvas.height}, ${liveResult.pageErrors.length} page errors, ${liveResult.externalFailures.length} failed network requests, cross-origin isolated: ${liveResult.crossOriginIsolated}.`
+    ? `- [Live screenshot](live-dronesim.png) · [Diagnostics](live-dronesim.json) — canvas ${liveResult.canvas.width}×${liveResult.canvas.height}, ${liveResult.pageErrors.length} page errors, ${liveResult.externalFailures.length} failed network requests, cross-origin isolated: ${liveResult.crossOriginIsolated}.`
     : '- Live network check was not run; no live screenshot is claimed.',
   '', '## PDF engine decision', '',
   '- [Rendered PDF comparison](../../apps/print/COMPARISON.md) records the selected Vivliostyle technical portfolio and RenderCV one-page resume engines, with Typst retained as a comparison path.',
