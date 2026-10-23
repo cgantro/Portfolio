@@ -3,7 +3,7 @@ profile:
   id: hong-yoonpyo
   name: 홍윤표
   nameEn: Hong Yoonpyo
-  role: C++ 시뮬레이션·실시간 통신 SW 개발자
+  role: C++ 시뮬레이션·실시간 통신 소프트웨어 개발자
   tagline: 로봇·드론 시뮬레이터와 실시간 통신 기능을 C++로 구현합니다. 성능 수치에는 측정 조건과 확인 범위를 함께 적습니다.
   summary:
   - 'DroneSim(개인 프로젝트): 고정 Tick C++ 시뮬레이터에 AirSim 강체 물리 모드, UDP 지상통제, JSON 시나리오 입력을 구현했습니다. Windows Release 보고값에서 Tick p95는 64대 분리 배치 493.9→137.7µs, 32대 밀집 배치 중앙값 1,344.3→665.1µs였습니다(전후 각 3회).'
@@ -257,7 +257,7 @@ activities:
 editions:
 - id: general
   label: 시뮬레이션 및 실시간 SW
-  headline: 시뮬레이션 및 실시간 SW 개발자
+  headline: C++ 시뮬레이션·실시간 통신 소프트웨어 개발자
   projectIds:
   - dronesim
   - robotpal
