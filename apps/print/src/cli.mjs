@@ -33,7 +33,7 @@ async function buildPdf(prepared) {
       const binary = typeof manifest.bin === 'string' ? manifest.bin : manifest.bin.vivliostyle;
       const selected = selectEdition(careerData, prepared.editionId);
       const configPath = resolve(prepared.outputDir, 'vivliostyle.config.mjs');
-      await writeFile(configPath, `export default ${JSON.stringify({ title: `${careerData.profile.name} | ${selected.edition.headline}`, author: careerData.profile.name, language: 'ko', size: 'A4', entry: prepared.htmlPath, output: temporary }, null, 2)};\n`);
+      await writeFile(configPath, `export default ${JSON.stringify({ title: `${careerData.profile.name} | ${selected.edition.headline}`, author: careerData.profile.name, language: 'ko', size: 'A4', entry: basename(prepared.htmlPath), entryContext: prepared.outputDir, output: temporary }, null, 2)};\n`);
       run(process.execPath, [resolve(dirname(packagePath), binary), 'build', '-c', configPath, '-o', temporary]);
     } else throw new Error(`Unknown PDF engine: ${engine}`);
     const selected = selectEdition(careerData, prepared.editionId);
