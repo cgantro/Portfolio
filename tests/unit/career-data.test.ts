@@ -21,7 +21,7 @@ test('shared facts load all four projects and one general edition', () => {
   assert.deepEqual(new Set(careerData.projects.map((project) => project.id)), new Set(['robotpal', 'autowingcar', 'mausoleum', 'dronesim']));
   assert.deepEqual(editions.map((edition) => edition.id), ['general']);
   assert.equal(getProjectsForEdition('general').length, 4);
-  assert.equal(getProjectsForEdition('general')[0].id, 'robotpal');
+  assert.equal(getProjectsForEdition('general')[0].id, 'dronesim');
   assert.throws(() => getProjectsForEdition('not-an-edition'), /Unknown career edition/);
   assert.deepEqual(JSON.parse(serializeCareerData()), careerData);
 });
@@ -38,7 +38,8 @@ test('reported benchmark values retain conditions and their original limits', ()
   assert.match(camera.conditions.join(' '), /1232×832/);
   assert.match(camera.conditions.join(' '), /5회/);
   assert.match(robotpal.limitations.join(' '), /60 FPS에 미달/);
-  assert.match(robotpal.limitations.join(' '), /4인.*2인/);
+  assert.match(robotpal.limitations.join(' '), /팀원 수.*서로 다르게 기록/);
+  assert.match(robotpal.limitations.join(' '), /인원 수를 생략/);
   assert.ok(getProject('autowingcar')!.limitations.some((text) => text.includes('p95')));
 });
 

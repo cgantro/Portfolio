@@ -1,10 +1,10 @@
 id: dronesim
 title: DroneSim
-subtitle: 비행·카메라·지상통제와 다중 드론 시나리오를 시험하는 C++ 시뮬레이터
+subtitle: 드론 비행과 카메라, 지상통제 명령을 시험하는 C++ 시뮬레이터
 category: C++ 드론 시뮬레이션
 summary:
-- DroneSim은 가상 드론의 비행 상태와 탑재 카메라, 지상통제 명령을 한 시뮬레이션에서 시험하는 개인 프로젝트입니다. 실행 화면에는 AeroSimLab이라는 제품명이 표시됩니다.
-- 화면이 있는 시뮬레이터와 화면 없는 JSON 시나리오 실행이 같은 SimulationCore를 사용합니다. Windows 네이티브 강체 모드에는 AirSim을 연결하고, WebAssembly에서는 운동학 기준 모델을 사용합니다.
+- DroneSim은 가상 드론의 비행과 탑재 카메라, 지상통제 명령을 한 시뮬레이터에서 시험하는 개인 프로젝트입니다. 실행 화면에는 AeroSimLab이라는 제품명이 표시됩니다.
+- 화면을 띄워 조작하거나 화면 없이 JSON 시나리오를 실행할 때 모두 같은 SimulationCore를 사용합니다. Windows 네이티브 실행에서는 AirSim 강체 물리를 선택할 수 있고, WebAssembly에서는 운동학 모델을 씁니다.
 period: 2026.08 – 진행 중
 startDate: 2026-08
 endDate: null
@@ -12,9 +12,9 @@ status: ongoing
 team: 개인 프로젝트
 role:
 - 고정 시간 간격의 비행 상태 갱신, 드론·카메라 ECS와 네이티브 강체 물리 연결 구현
-- 화면·게임패드·UDP 지상통제·JSON 시나리오가 공통 시뮬레이션 명령을 사용하도록 구성
-- 다중 드론 편대, 통신 장애, 카메라 고장 및 화면 없는 공동 임무 시험 구현
-- Tick 처리와 충돌 계산을 계측하고, 재현 가능한 조건과 한계를 공개 문서에 기록
+- 화면 조작, 게임패드, UDP 지상통제, JSON 시나리오의 입력을 공통 시뮬레이션 명령으로 처리
+- 여러 드론의 편대 비행과 통신·카메라 장애, 화면 없는 공동 임무 시험 구현
+- 시뮬레이션 주기와 충돌 계산 시간을 측정하고, 조건과 한계를 공개 문서에 기록
 stack:
 - C++20
 - CMake, Flecs ECS
@@ -31,25 +31,25 @@ architecture:
   src: /assets/dronesim-system-architecture.svg
   alt: 게임패드, UDP 지상통제와 화면 없는 시나리오가 SimulationCore에 입력되고, 물리·상태가 렌더링과 카메라 분석으로 이어지는 구조
   summary:
-  - 화면과 화면 없는 시나리오는 같은 SimulationCore를 사용해 동일한 비행 명령과 Tick 갱신 경로를 공유합니다.
-  - Flecs가 드론·카메라 상태를 갱신합니다. Windows 네이티브 강체 모드에서만 AirSim 물리 단계를 호출하고, WebAssembly에서는 운동학 모델을 사용합니다.
-  - 렌더링은 장면과 드론 탑재 EO 카메라를 별도 대상으로 그립니다. 지상통제는 UDP로 명령과 상태를 주고받습니다.
+  - 화면 조작과 화면 없는 시나리오 실행은 같은 SimulationCore를 사용하므로 비행 명령과 주기 갱신 방식이 같습니다.
+  - Flecs가 드론과 카메라 상태를 갱신합니다. Windows 네이티브 강체 모드에서만 AirSim 물리를 호출하고, WebAssembly에서는 운동학 모델을 씁니다.
+  - 화면에는 장면과 드론 탑재 EO 카메라 영상을 각각 그립니다. 지상통제 장치와는 UDP로 명령과 상태를 주고받습니다.
 links:
   github: https://github.com/cgantro/DroneSim
   demo: https://cgantro.github.io/DroneSim/
 contributions:
 - id: dronesim-contribution-1
-  text: 화면 렌더링과 독립적인 고정 Tick 시뮬레이션 중심부를 구성하고, 네이티브에서만 AirSim 강체 계산을 연결했습니다.
+  text: 화면 그리기와 분리된 고정 시간 간격의 시뮬레이션 중심부를 만들고, 네이티브 실행에서만 AirSim 강체 물리를 연결했습니다.
   evidenceIds:
   - dronesim-source
   status: reported
 - id: dronesim-contribution-2
-  text: 지상통제 UDP, 게임패드와 JSON 시나리오 입력을 공통 드론 명령으로 처리하고, 통신 지연·손실 및 편대 링크 중단을 재현했습니다.
+  text: UDP 지상통제, 게임패드, JSON 시나리오 입력을 공통 드론 명령으로 처리하고 통신 지연·손실과 편대 통신 단절을 재현했습니다.
   evidenceIds:
   - dronesim-source
   status: reported
 - id: dronesim-contribution-3
-  text: 실제 Tick과 물리 처리 구간을 측정해 밀집 배치의 충돌 후보 계산을 줄이고, 전후 조건과 반복 측정 결과를 공개했습니다.
+  text: 시뮬레이션 주기와 물리 처리 시간을 측정하고, 밀집 배치에서 충돌 후보 계산을 줄인 뒤 수정 전후 조건과 반복 측정 결과를 공개했습니다.
   evidenceIds:
   - dronesim-source
   status: reported
@@ -60,7 +60,7 @@ contributions:
   status: reported
 outcomes:
 - id: dronesim-outcome-1
-  text: 같은 SimulationCore를 화면 실행과 화면 없는 시나리오 시험에 사용해 입력 인터페이스와 렌더링 없이도 비행 규칙 및 최종 상태를 확인할 수 있습니다.
+  text: 화면 조작과 화면 없는 시나리오 시험이 같은 SimulationCore를 사용하므로, 입력 장치와 화면 없이도 비행 규칙과 최종 상태를 확인할 수 있습니다.
   evidenceIds:
   - dronesim-source
   status: reported
@@ -71,28 +71,28 @@ outcomes:
   status: reported
 metrics:
 - id: rigid-body-64-tick-p95
-  label: 강체 모드 64대 Tick p95
+  label: 강체 모드·드론 64대 주기 p95
   value: 137.7
   baseline: 493.9
   unit: µs
   evidenceIds:
   - dronesim-source
   conditions:
-  - Windows Release 빌드, 분리 배치 64대
-  - 개선 전후 각각 3회 측정
-  - 원문 공개 기록의 중앙 측정값이며 다른 PC 성능을 보장하지 않음
+  - Windows Release 빌드에서 드론 64대를 서로 떨어뜨려 배치
+  - 수정 전과 후에 각각 3회 측정
+  - 공개 기록의 중앙값이며 다른 PC에서도 같은 성능이 나온다는 뜻은 아님
   status: reported
 - id: crowded-32-tick-p95
-  label: 밀집 배치 32대 Tick p95 중앙값
+  label: 밀집 배치·드론 32대 주기 p95 중앙값
   value: 665.1
   baseline: 1344.3
   unit: µs
   evidenceIds:
   - dronesim-source
   conditions:
-  - Windows Release 빌드, 서로 가까이 겹치는 충돌 상자 32대
-  - 개선 전후 각각 3회 측정한 결과의 중앙값
-  - 화면 렌더링·통신·영상 분석 전체 비용을 뜻하지 않음
+  - Windows Release 빌드에서 충돌 상자가 서로 가까이 겹치도록 드론 32대를 배치
+  - 수정 전과 후에 각각 3회 측정한 값의 중앙값
+  - 화면 그리기, 통신, 영상 분석을 포함한 전체 처리 시간은 아님
   status: reported
 evidence:
 - id: dronesim-source
@@ -105,6 +105,6 @@ evidence:
 limitations:
 - 물리 계수는 공개 자료를 참고했으며 실제 비행 로그와 대조하지 않았습니다. 디지털 트윈 또는 비행 안전·성능 예측으로 볼 수 없습니다.
 - AirSim 강체 물리는 Windows 네이티브 실행에 한정됩니다. WebAssembly 데모는 운동학 기준 모델을 사용합니다.
-- 충돌 형상은 드론과 장애물을 상자로 근사하며, 한 강체당 Tick마다 접촉 한 건을 처리합니다. 정밀 메시 충돌이나 복수 접촉의 완전한 물리 반응은 지원하지 않습니다.
+- 드론과 장애물의 충돌 형상은 상자로 단순화하며, 강체마다 한 주기에 접촉 한 건만 처리합니다. 세밀한 메시 충돌이나 여러 접촉이 동시에 일어나는 상황은 다루지 않습니다.
 - 지형 높이는 약 30m 간격이며, 건물 자료가 없는 일부 위치의 3m 상자는 시연용입니다.
 - 실제 게임패드 기기별 동작, 장시간 실행 안정성, 영상 분석을 포함한 전체 경로 성능은 공개 측정에서 확인되지 않았습니다.

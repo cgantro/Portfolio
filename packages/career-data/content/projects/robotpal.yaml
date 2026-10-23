@@ -1,18 +1,18 @@
 id: robotpal
 title: RobotPal
-subtitle: 로봇 제어와 카메라 영상 전송을 잇는 C++ 시뮬레이터
+subtitle: 로봇을 제어하고 카메라 영상을 전송하는 C++ 시뮬레이터
 category: C++ 로봇 시뮬레이터와 실시간 영상 전송
 summary:
-- 실물 JETANK의 주행을 재현한 C++ 시뮬레이터입니다. 가상 카메라 영상을 Python 모듈에 전달하고, 로봇과 팔의 제어 명령을 연결했습니다.
+- JETANK의 주행을 가상 환경에서 재현한 C++ 시뮬레이터입니다. 가상 카메라 영상을 Python 모듈로 보내고 이동 로봇과 로봇 팔을 제어합니다.
 period: 2025.11 – 2025.12
 startDate: 2025-11
 endDate: 2025-12
 status: complete
 team: 팀 프로젝트
 role:
-- Tracy로 JPEG 압축이 주 실행 흐름의 병목임을 확인하고, 압축·송신을 4개 작업자로 분리
+- Tracy로 JPEG 압축이 주 실행 흐름을 막는 병목임을 확인해 압축·송신을 작업자 4개로 분리
 - Qt 화면에서 실물 JETANK 이동 로봇의 상태를 확인하고 조작 입력을 보내는 기능 구현
-- 좌우 모터 입력과 실측 주행값으로 가상 이동 로봇의 직진과 회전 속도 보정
+- 좌우 모터 입력과 실제 주행값을 대조해 가상 이동 로봇의 직진·회전 속도를 보정
 - Python 인공지능 명령을 이동 로봇, 로봇 팔, 집게, 카메라 기울기 제어에 연결
 - 가상 카메라 화면을 이미지로 압축해 Python 인공지능 모듈에 전달
 stack:
@@ -32,14 +32,14 @@ cover:
   alt: RobotPal 프로젝트 화면
 architecture:
   src: /assets/robotpal-system-architecture.svg
-  alt: 가상 카메라 이미지가 압축되어 인공지능 모듈로 전달되고, 인공지능 명령이 이동 로봇과 로봇 팔 제어로 이어지는 구조
+  alt: 가상 카메라 영상을 압축해 인공지능 모듈로 보내고, 인공지능 명령으로 이동 로봇과 로봇 팔을 제어하는 구조
   summary: []
 links:
   github: https://github.com/cgantro/RobotPal
   demo: null
 contributions:
 - id: robotpal-contribution-1
-  text: Tracy 계측에서 JPEG 압축이 주 실행 흐름의 병목임을 확인하고 압축·송신을 4개 작업자로 분리
+  text: Tracy 측정에서 JPEG 압축이 주 실행 흐름을 막는 병목임을 확인해 압축·송신을 작업자 4개로 분리
   evidenceIds:
   - robotpal-benchmark
   status: reported
@@ -60,12 +60,12 @@ contributions:
   status: reported
 outcomes:
 - id: robotpal-bottleneck
-  text: PBO-only 구성은 성능을 개선하지 못했습니다. Tracy 계측에서 JPEG 압축이 주 실행 흐름의 병목임을 확인하고 4개 작업 스레드로 분리했습니다.
+  text: PBO만 적용한 구성에서는 성능이 나아지지 않았습니다. Tracy 측정에서 JPEG 압축이 주 실행 흐름을 막는 병목임을 확인해 작업 스레드 4개로 분리했습니다.
   evidenceIds:
   - robotpal-benchmark
   status: reported
 - id: robotpal-target
-  text: 1232×832 iGPU 보고 측정(OFF·ON 각 5회 중앙값, 수신·디코딩 제외)에서 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS였습니다. 카메라 송신 60 FPS 목표에는 도달하지 못했습니다.
+  text: 1232×832 내장 GPU 환경에서 송신을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값입니다(수신·압축 해제 제외). 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS로 높아졌습니다. 카메라 송신은 목표인 60 FPS에 못 미쳤습니다.
   evidenceIds:
   - robotpal-benchmark
   status: reported
@@ -78,10 +78,10 @@ metrics:
   - robotpal-benchmark
   conditions:
   - 해상도 1232×832 고정
-  - 스트리밍을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값
+  - 영상 송신을 끈 상태와 켠 상태에서 각각 5회 측정한 중앙값
   - 동기 방식과 PBO 및 4개 작업자 방식을 비교
-  - 내장 GPU 환경 보고값이며 정확한 모델은 미기재
-  - 수신 및 디코딩 제외
+  - 내장 GPU 환경의 공개 측정값이며 GPU 모델은 기록되지 않음
+  - 영상 수신과 압축 해제 제외
   status: reported
   baseline: 66.7
 - id: camera-send-fps
@@ -92,10 +92,10 @@ metrics:
   - robotpal-benchmark
   conditions:
   - 해상도 1232×832 고정
-  - 스트리밍을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값
+  - 영상 송신을 끈 상태와 켠 상태에서 각각 5회 측정한 중앙값
   - 동기 방식과 PBO 및 4개 작업자 방식을 비교
-  - 내장 GPU 환경 보고값이며 정확한 모델은 미기재
-  - 수신 및 디코딩 제외
+  - 내장 GPU 환경의 공개 측정값이며 GPU 모델은 기록되지 않음
+  - 영상 수신과 압축 해제 제외
   status: reported
   baseline: 26.95
 - id: streaming-penalty

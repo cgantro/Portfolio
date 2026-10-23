@@ -109,8 +109,8 @@ test('mobile navigation keeps contact visible and documents explain all resume f
   for (const [edition, headline] of [['general', '소프트웨어 개발자']]) {
     await page.goto(`${base}resume/${edition}/`);
     await expect(page.locator('.page-heading')).toContainText(headline);
-    await expect(page.locator('.download-panel')).toContainText('JSON Resume');
-    await expect(page.locator('.download-panel')).toContainText('변환 보고서 (JSON)');
+    await expect(page.locator('.download-panel')).toContainText('이력서 데이터(JSON)');
+    await expect(page.locator('.download-panel')).toContainText('변환 보고서(JSON)');
   }
 });
 
@@ -120,7 +120,7 @@ test('DroneSim stays absent until explicit launch and opens in a separate tab', 
   await page.goto(`${base}projects/dronesim/`);
   await expect(page.locator('iframe')).toHaveCount(0);
   expect(demoRequests).toBe(0);
-  const launch = page.getByRole('link', { name: '새 탭에서 데모 열기' });
+  const launch = page.getByRole('link', { name: '새 탭에서 실행하기' });
   await expect(launch).toHaveAttribute('target', '_blank');
   await launch.scrollIntoViewIfNeeded();
   const popupPromise = page.waitForEvent('popup');

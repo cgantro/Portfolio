@@ -4,6 +4,6 @@ import SiteLayout from '../../layouts/SiteLayout.astro';
 import ProjectExplorer from '../../components/ProjectExplorer';
 ---
 <SiteLayout title="프로젝트" description="C++ 로봇 시뮬레이션, 실시간 영상 및 음성 통신 프로젝트의 구현과 검증 근거." active="projects">
-  <div class="container page-heading"><span class="eyebrow">PROJECT ARCHIVE</span><h1>설계부터 검증까지<span class="accent">.</span></h1><p>담당한 구현, 설계 선택, 측정 조건과 한계를 프로젝트별로 기록했습니다.</p></div>
+  <div class="container page-heading"><span class="eyebrow">프로젝트 모음</span><h1>프로젝트<span class="accent">.</span></h1><p>담당 구현과 설계, 측정 조건과 한계를 프로젝트별로 정리했습니다.</p></div>
   <section class="container section project-archive"><h2 class="sr-only">프로젝트 목록</h2><ProjectExplorer projects={projects.map(({ id, title, subtitle, category, period, status, stack, summary, cover }) => ({ id, title, subtitle, category, period, status, stack, summary, cover }))} client:load /></section>
 </SiteLayout>
