@@ -21,7 +21,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install uv for RenderCV resume PDFs
-        uses: astral-sh/setup-uv@v10
+        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
         with:
           version: 0.13.1
           enable-cache: true
@@ -29,8 +29,8 @@ jobs:
       - name: Install Korean PDF font
         run: sudo apt-get update && sudo apt-get install --yes fonts-noto-cjk
 
-      - name: Verify GraspLink browser simulator
-        run: test -s asset/minibcg/index.html
+      - name: Verify DroneSim portfolio preview
+        run: test -s asset/DroneSim-preview.jpg
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
