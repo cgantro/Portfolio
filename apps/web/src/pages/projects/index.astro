@@ -5,5 +5,5 @@ import ProjectExplorer from '../../components/ProjectExplorer';
 ---
 <SiteLayout title="프로젝트" description="C++ 시뮬레이션과 실시간 통신 시스템의 설계 및 구현 사례." active="projects">
   <div class="container page-heading"><span class="eyebrow">개발 사례</span><h1>프로젝트<span class="accent">.</span></h1><p>문제를 분석하고 설계와 코드로 해결한 경험을 프로젝트별로 소개합니다.</p></div>
-  <section class="container section project-archive"><h2 class="sr-only">프로젝트 목록</h2><ProjectExplorer projects={projects.map(({ id, title, subtitle, category, period, status, stack, summary, cover }) => ({ id, title, subtitle, category, period, status, stack, summary, cover }))} client:load /></section>
+  <section class="container section project-archive"><h2 class="sr-only">프로젝트 목록</h2><ProjectExplorer projects={projects.map(({ id, title, subtitle, category, period, status, stack, summary, role, cover }) => ({ id, title, subtitle, category, period, status, stack, summary, role, cover }))} client:load /></section>
 </SiteLayout>

@@ -1,23 +1,22 @@
 # Portfolio V2 design direction
 
-Three directions informed the final interface:
+The public portfolio is a **project showcase for C++ simulation and real-time communication work**. A hiring manager should find a project and its contribution quickly; a technical interviewer should be able to continue into architecture, implementation, and measured results.
 
-| Direction | Strength | Applied to the final site |
-| --- | --- | --- |
-| Editorial Technical | Readable case studies and clear evidence hierarchy | Project pages, numbered sections, reading widths, inline source states |
-| Engineering Minimal | Focused navigation and a restrained information system | Page layout, skill groups, tags, project facts and document metadata |
-| Technical Showcase | A strong first impression from working systems | The dark DroneSim hero panel and simulator preview |
+## Visual and content system
 
-The final choice is **Editorial Technical**, with Engineering Minimal structure and one Technical Showcase hero. The home page is project-first: visitors can open the project archive, read a case study, or follow a technology group to the projects that use it. Education and activity chronology stays out of the home page. The palette is warm white `#f5f4ef`, dark green `#182421`, near black `#1b211e`, and burnt orange `#b73518`. All tokens live in `apps/web/src/styles/tokens.css`; responsive and print rules live in `apps/web/src/styles/global.css`.
-
-Source data and architecture diagrams come from the public shared package and the existing root `asset/` folder.
+- Use a deep blue-green header and DroneSim feature area, a quiet pale canvas for reading, and orange as the action accent. Shared color and layout values live in `src/styles/tokens.css`.
+- The home page introduces the candidate through a featured DroneSim case, then gives RobotPal, Mausoleum, and AutoWingCar full project entries. AutoWingCar includes a specific contribution in the same card structure as the other cases.
+- Project cards show a short summary, one assigned implementation, and a compact plain-text technology line. The home page groups the existing skill data by category and links each group to its related projects; technology names do not become decorative tag clouds.
+- The project archive supports search and category filters. Project detail pages retain their project facts, full technology list, contribution, architecture, implementation narrative, and relevant measurements.
+- At 375px, 768px, and 1440px, content keeps a clear reading order, useful text size, visible navigation, and no horizontal overflow. Core content and links render without JavaScript; search and filtering remain the only hydrated controls.
+- The portfolio does not publish resume or portfolio downloads. DroneSim opens its separate deployed app only through an explicit new-tab link.
 
 ## Runtime boundaries
 
-Astro renders all content, navigation, evidence, and project detail HTML statically. React hydrates project search/filter controls only. DroneSim opens from its own deployed origin in a new tab after the visitor presses the launch link. The WebAssembly demo uses the kinematic baseline; native AirSim rigid-body physics is a separate Windows execution path. Its simulation bundle is not imported into the portfolio runtime.
+Astro renders content and routes. React hydrates project search and filtering only. DroneSim remains on its own deployed origin because its WebAssembly, SharedArrayBuffer, and COI worker behavior requires a top-level page. Its simulator bundle is not imported into the portfolio.
 
-`/Portfolio/` is the deployment base. The root `asset/` directory is Astro's public directory, so original filenames and license files remain addressable beneath the deployment base. Shared `/assets/` identifiers are normalized by `assetUrl()` to these public URLs.
+`/Portfolio/` is the deployment base. The root `asset/` directory is Astro's public directory; shared `/assets/` identifiers are normalized by `assetUrl()`.
 
-## Checks
+## Review and validation
 
-`pnpm --filter @portfolio/web test:unit` tests URL handling and filtering. `test:e2e` covers static routes, keyboard access, filtering, missing assets, absent file downloads, and the explicit new-tab simulator launch. `test:visual` captures the home page, project archive, and four project pages at 375px, 768px, and 1440px and checks horizontal overflow. Screenshots land in `artifacts/design-review/screenshots/`; `pnpm report:visual` records their names and SHA256 hashes. They are review artifacts rather than committed image snapshots.
+Playwright captures the home page, project archive, and four project detail pages at 375px, 768px, and 1440px. Browser checks cover routes, accessibility, keyboard use, filters, no-download behavior, asset loading, and explicit simulator launch. Screenshots and findings are stored in `artifacts/design-review/` as review artifacts rather than committed image snapshots.

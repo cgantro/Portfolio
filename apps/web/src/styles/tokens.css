@@ -1,18 +1,19 @@
 :root {
-  --color-page: #f5f4ef;
+  --color-page: #eef1ef;
   --color-surface: #fff;
-  --color-surface-muted: #eeede7;
-  --color-ink: #1b211e;
-  --color-muted: #606860;
-  --color-line: #d9dcd3;
-  --color-accent: #b73518;
-  --color-dark: #182421;
-  --color-dark-muted: #aebcb4;
+  --color-surface-muted: #e3e9e5;
+  --color-ink: #14232a;
+  --color-muted: #53636a;
+  --color-line: #c9d2ce;
+  --color-accent: #a63b24;
+  --color-accent-bright: #ff9b72;
+  --color-dark: #12222a;
+  --color-dark-muted: #bcc9ca;
   --font-body: 'Pretendard', 'Noto Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
   --space-unit: 4px;
-  --content-width: 1200px;
+  --content-width: 1240px;
   --reading-width: 820px;
   --radius-small: 4px;
-  --radius-card: 8px;
+  --radius-card: 3px;
 }

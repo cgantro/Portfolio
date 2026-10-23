@@ -88,17 +88,31 @@ test('technology navigation returns visitors to the project-linked skill map', a
   await expect(page.getByRole('heading', { name: '사용한 기술' })).toBeVisible();
 });
 
-test('mobile navigation keeps contact visible and the homepage presents the subproject', async ({ page }) => {
+test('mobile navigation stays visible and the homepage gives AutoWingCar a full project entry', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto(base);
-  const contact = page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '연락하기' });
+  const contact = page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '연락처' });
   await expect(contact).toBeVisible();
   await expect(contact).toHaveAttribute('href', /^mailto:/);
 
   await page.goto(base);
-  await expect(page.locator('.supporting-project')).toContainText('오토잉카');
-  await expect(page.locator('.supporting-project')).toContainText('Spring Boot');
-  await expect(page.locator('.supporting-project')).toContainText('A*');
+  const autoWingCard = page.locator('.project-grid-home .project-card').filter({ has: page.locator('a[href*="autowingcar"]') });
+  await expect(autoWingCard).toContainText('Spring Boot');
+  await expect(autoWingCard).toContainText('A*');
+  await expect(autoWingCard.getByText('담당 구현')).toBeVisible();
+  await expect(page.locator('.project-grid-home .project-card')).toHaveCount(3);
+});
+
+test('homepage leads with DroneSim and offers its case study and web launch', async ({ page }) => {
+  let demoRequests = 0;
+  page.on('request', request => { if (request.url().startsWith('https://cgantro.github.io/DroneSim/')) demoRequests += 1; });
+  await page.goto(base);
+  await expect(page.getByRole('heading', { name: /시뮬레이션과 통신을/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: '구현 사례 보기', exact: true })).toHaveAttribute('href', /projects\/dronesim\/$/);
+  const launch = page.getByRole('link', { name: '웹에서 실행' });
+  await expect(launch).toHaveAttribute('target', '_blank');
+  await expect(page.locator('.showcase-image img')).toBeVisible();
+  expect(demoRequests).toBe(0);
 });
 
 test('DroneSim stays absent until explicit launch and opens in a separate tab', async ({ page }) => {
