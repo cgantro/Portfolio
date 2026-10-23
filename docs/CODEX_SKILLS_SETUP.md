@@ -22,17 +22,17 @@ The audit script captures mobile, tablet and desktop screenshots plus a JSON rep
 The installer clones the public sources into the local app-data cache and copies their skill directories into .agents/skills. It copies selected reviewer definitions into .codex/agents and removes fixed model IDs and sandbox metadata (actual permissions follow Codex host policy). Existing installed skills are skipped; the -Force switch overwrites them. Review source changes before future updates.
 
 ## Bundled original skills (available by checking out branch)
-- korean-technical-resume: factual and professionally written Korean C++ engineering resume
-- korean-technical-portfolio: project narratives for web/PDF, technical decision + measurement proof
+- korean-technical-resume: evidence-backed Korean C++ engineering resume with fact and ATS checks
+- korean-technical-portfolio: evidence-backed technical project case studies and portfolio narratives
 - career-evidence-retrieval: evidence-first search of a local career-db without vectors
-- portfolio-design-review: screenshot-based design QA with local Playwright
+- portfolio-design-review: responsive browser, accessibility, screenshot, and PDF review with local tools
 
 ## Installed third-party skills
 - write-korean-cover-letter: seolbbb, Korean cover letters
 - job-application-tailor: kgyujin, role/JD tailoring
 - portfolio-build, hiring-prep-doc-feedback, hiring-sim-resume-review, hiring-sim-resume-redteam, hiring-sim-portfolio-review, hiring-sim-portfolio-redteam: techeer-sv/Career-Skills
 - humanize-korean: epoko77-ai/im-not-ai, with materialized references and Python scripts
-- design-first-ui-prompting, editorial-tech, split-layout-technical, workflow-progress-screenshots, workflow-score-to-target: MengTo/Skills
+- design-first-ui-prompting: MengTo/Skills
 - six reviewers: VoltAgent/awesome-codex-subagents
 
 ## Sequence
@@ -53,10 +53,10 @@ Do not invoke all skills for every task. The skills reuse the Codex model and it
 - https://github.com/VoltAgent/awesome-codex-subagents
 - https://github.com/garrytan/gstack/tree/main/design-review (methodology only)
 
-The original resume-craft skill is not automatically copied because its repository lacks a verified root license; use the original project-local korean-technical-resume skill here. gstack itself is not installed because its Codex support involves an additional experimental runtime. The in-repo portfolio-design-review is a small original implementation, not a copy of gstack.
+Resume fact-checking guidance from the reviewed resume-craft skill is integrated into korean-technical-resume. Generic resume templates and scoring claims are not installed. gstack itself is not installed because its Codex support involves an additional experimental runtime. The in-repo portfolio-design-review is a small original implementation, not a copy of gstack.
 
 Career data may contain private details. Never add that data to the public website or Git without checking disclosure. Third-party skills are instructions/code from outside the project; inspect them before executing scripts or accepting modifications. All copied sources retain their source licenses.
 
-The techeer portfolio-build templates are large. Check Git status before committing generated or installed third-party files.
+Portfolio screenshot, defect-prioritization, and PDF review procedures are consolidated in portfolio-design-review. The techeer portfolio-build templates are large. Check Git status before committing generated or installed third-party files.
 
 This package has not been executed on the user's Windows PC. The manifest checker verifies presence, not functional correctness.

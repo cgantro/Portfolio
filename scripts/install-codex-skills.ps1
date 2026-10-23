@@ -76,7 +76,7 @@ Copy-License $Human "im-not-ai"
 
 if (!$SkipDesign) {
   $Meng=Get-Repo "MengTo-Skills" "https://github.com/MengTo/Skills.git"
-  foreach($Rel in @("ui\design-first-ui-prompting","web-design\editorial-tech","web-design\split-layout-technical","workflow\workflow-progress-screenshots","workflow\workflow-score-to-target")) {
+  foreach($Rel in @("ui\design-first-ui-prompting")) {
     Install-Directory (Join-Path $Meng "agent-skills\$Rel") (Split-Path $Rel -Leaf)
   }
   Copy-License $Meng "MengTo-Skills"

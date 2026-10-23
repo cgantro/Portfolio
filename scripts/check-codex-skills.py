@@ -2,7 +2,7 @@ from pathlib import Path
 import re, sys
 root=Path(__file__).resolve().parents[1]
 base=root/".agents"/"skills"
-names=["korean-technical-resume","korean-technical-portfolio","career-evidence-retrieval","portfolio-design-review","write-korean-cover-letter","job-application-tailor","portfolio-build","hiring-prep-doc-feedback","hiring-sim-resume-review","hiring-sim-resume-redteam","hiring-sim-portfolio-review","hiring-sim-portfolio-redteam","humanize-korean","design-first-ui-prompting","editorial-tech","split-layout-technical","workflow-progress-screenshots","workflow-score-to-target"]
+names=['career-evidence-retrieval', 'design-first-ui-prompting', 'hiring-panel', 'hiring-sim-portfolio-redteam', 'hiring-sim-portfolio-review', 'hiring-sim-resume-redteam', 'job-application-tailor', 'job-hunter', 'korean-technical-portfolio', 'korean-technical-resume', 'linkedin-review', 'mock-interview', 'optimize-web-animations', 'portfolio-build', 'portfolio-content-audit', 'portfolio-design-review', 'write-korean-cover-letter']
 errors=[]
 for name in names:
  p=base/name/"SKILL.md"
