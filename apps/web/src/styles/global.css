@@ -72,6 +72,8 @@ h3 { font-size: 21px; }
 .project-meta { display: flex; justify-content: space-between; gap: 15px; color: var(--color-muted); font-size: 11px; }
 .project-card-body h3, .project-card-body h2 { margin-top: 10px; font-size: 25px; letter-spacing: -.035em; }
 .project-card-body > p { font-size: 14px; color: var(--color-muted); margin-top: 7px; }
+.supporting-project { border-top: 1px solid var(--color-line); margin-top: 35px; padding-top: 20px; color: var(--color-muted); font-size: 13px; }
+.supporting-project a { color: var(--color-ink); font-weight: 600; }
 .tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 15px; }
 .tags > span { padding: 4px 8px; border: 1px solid var(--color-line); border-radius: 3px; font: 10px/1.4 var(--font-mono); color: #596054; }
 .skill-section { border-top: 1px solid var(--color-line); }
@@ -160,6 +162,12 @@ h3 { font-size: 21px; }
 .metric-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 15px; }
 .metric-card { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 5px; padding: 23px; }
 .metric-label { font-size: 13px; }
+.metric-comparison { display: flex; align-items: center; gap: 16px; margin-block: 13px; }
+.metric-comparison > div { display: flex; flex-direction: column; gap: 3px; }
+.metric-comparison > div > span { color: var(--color-muted); font-size: 10px; }
+.metric-comparison strong { font: 25px/1.4 var(--font-mono); letter-spacing: -.06em; white-space: nowrap; }
+.metric-comparison small { color: var(--color-muted); font: 11px var(--font-body); letter-spacing: 0; }
+.metric-arrow { color: var(--color-accent); font-size: 18px; }
 .metric-value { font: 36px/1.5 var(--font-mono); letter-spacing: -.06em; margin-block: 10px; }
 .metric-value > span { margin-left: 9px; font-size: 14px; color: var(--color-muted); letter-spacing: 0; }
 .metric-card > p { font-size: 11px; color: var(--color-muted); }

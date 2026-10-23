@@ -3,16 +3,14 @@ title: RobotPal
 subtitle: 로봇 제어와 카메라 영상 전송을 잇는 C++ 시뮬레이터
 category: C++ 로봇 시뮬레이터와 실시간 영상 전송
 summary:
-- 실물 JETANK의 주행을 재현한 C++ 시뮬레이터로, 가상 카메라 프레임을 압축해 Python 인공지능 모듈에 전달하고 로봇 제어 명령을 연결했습니다.
-- Tracy로 JPEG 압축 병목을 확인하고 4개 작업자로 분리했습니다. 보고된 1232×832 iGPU 측정에서 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS였습니다(각 5회 중앙값, 수신·디코딩 제외, 60 FPS 목표 미달).
+- 실물 JETANK의 주행을 재현한 C++ 시뮬레이터입니다. 가상 카메라 영상을 Python 모듈에 전달하고, 로봇과 팔의 제어 명령을 연결했습니다.
 period: 2025.11 – 2025.12
 startDate: 2025-11
 endDate: 2025-12
 status: complete
-team: 팀 프로젝트 · 공개 자료의 팀 규모 기록 불일치
+team: 팀 프로젝트
 role:
 - Tracy로 JPEG 압축이 주 실행 흐름의 병목임을 확인하고, 압축·송신을 4개 작업자로 분리
-- 1232×832 iGPU 보고 측정에서 스트리밍 중 시뮬레이션 66.70→96.01 FPS, 카메라 송신 26.95→40.05 FPS 기록(OFF·ON 각 5회 중앙값; 수신·디코딩 제외, 60 FPS 목표 미달)
 - Qt 화면에서 실물 JETANK 이동 로봇의 상태를 확인하고 조작 입력을 보내는 기능 구현
 - 좌우 모터 입력과 실측 주행값으로 가상 이동 로봇의 직진과 회전 속도 보정
 - Python 인공지능 명령을 이동 로봇, 로봇 팔, 집게, 카메라 기울기 제어에 연결
@@ -45,11 +43,6 @@ contributions:
   evidenceIds:
   - robotpal-benchmark
   status: reported
-- id: robotpal-contribution-2
-  text: 1232×832 iGPU 보고 측정에서 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS였습니다(OFF·ON 각 5회 중앙값; 수신·디코딩 제외, 60 FPS 목표 미달)
-  evidenceIds:
-  - robotpal-benchmark
-  status: reported
 - id: robotpal-contribution-3
   text: Qt 화면에서 실물 JETANK 이동 로봇의 상태를 확인하고 조작 입력을 보내는 기능 구현
   evidenceIds:
@@ -78,96 +71,95 @@ outcomes:
   status: reported
 metrics:
 - id: simulation-streaming-fps
-  label: Streaming ON Simulation
+  label: 스트리밍 중 시뮬레이션 갱신률
   value: 96.01
   unit: FPS
   evidenceIds:
   - robotpal-benchmark
   conditions:
   - 해상도 1232×832 고정
-  - Streaming OFF와 ON 각각 5회 측정의 median
-  - Sync와 PBO+4Worker 비교
-  - iGPU 환경 보고값; 정확한 모델 미기재
+  - 스트리밍을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값
+  - 동기 방식과 PBO 및 4개 작업자 방식을 비교
+  - 내장 GPU 환경 보고값이며 정확한 모델은 미기재
   - 수신 및 디코딩 제외
   status: reported
   baseline: 66.7
 - id: camera-send-fps
-  label: Camera Send
+  label: 카메라 영상 송신률
   value: 40.05
   unit: FPS
   evidenceIds:
   - robotpal-benchmark
   conditions:
   - 해상도 1232×832 고정
-  - Streaming OFF와 ON 각각 5회 측정의 median
-  - Sync와 PBO+4Worker 비교
-  - iGPU 환경 보고값; 정확한 모델 미기재
+  - 스트리밍을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값
+  - 동기 방식과 PBO 및 4개 작업자 방식을 비교
+  - 내장 GPU 환경 보고값이며 정확한 모델은 미기재
   - 수신 및 디코딩 제외
   status: reported
   baseline: 26.95
 - id: streaming-penalty
-  label: Streaming Penalty
+  label: 스트리밍에 따른 시뮬레이션 저하율
   value: 6.74
   unit: '%'
   evidenceIds:
   - robotpal-benchmark
   conditions:
   - 해상도 1232×832 고정
-  - Streaming OFF와 ON 각각 5회 측정의 median
-  - Sync와 PBO+4Worker 비교
-  - iGPU 환경 보고값; 정확한 모델 미기재
+  - 스트리밍을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값
+  - 동기 방식과 PBO 및 4개 작업자 방식을 비교
+  - 내장 GPU 환경 보고값이며 정확한 모델은 미기재
   - 수신 및 디코딩 제외
   status: reported
   baseline: 34.84
 - id: simulation-gain
-  label: Streaming ON Simulation 개선
+  label: 스트리밍 중 시뮬레이션 개선율
   value: 43.9
   unit: '%'
   evidenceIds:
   - robotpal-benchmark
   conditions:
   - 해상도 1232×832 고정
-  - Streaming OFF와 ON 각각 5회 측정의 median
-  - Sync와 PBO+4Worker 비교
-  - iGPU 환경 보고값; 정확한 모델 미기재
+  - 스트리밍을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값
+  - 동기 방식과 PBO 및 4개 작업자 방식을 비교
+  - 내장 GPU 환경 보고값이며 정확한 모델은 미기재
   - 수신 및 디코딩 제외
   status: reported
 - id: camera-gain
-  label: Camera Send 개선
+  label: 카메라 송신 개선율
   value: 48.6
   unit: '%'
   evidenceIds:
   - robotpal-benchmark
   conditions:
   - 해상도 1232×832 고정
-  - Streaming OFF와 ON 각각 5회 측정의 median
-  - Sync와 PBO+4Worker 비교
-  - iGPU 환경 보고값; 정확한 모델 미기재
+  - 스트리밍을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값
+  - 동기 방식과 PBO 및 4개 작업자 방식을 비교
+  - 내장 GPU 환경 보고값이며 정확한 모델은 미기재
   - 수신 및 디코딩 제외
   status: reported
 evidence:
 - id: robotpal-public
   label: 기존 공개 프로젝트 데이터
-  source: data/projects/robotpal.md
+  source: https://github.com/cgantro/RobotPal
   kind: public-source
   status: reported
   locator: role, implementations, caseStudies
   note: 구현 설명은 공개 기록의 보고 내용입니다. 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
 - id: robotpal-notes
   label: 공개 프로젝트 상세 기록
-  source: data/projects/robotpal.md
+  source: https://github.com/cgantro/RobotPal
   kind: public-source
   status: reported
 - id: robotpal-benchmark
   label: 1232×832 스트리밍 비교 측정
-  source: data/projects/robotpal.md
+  source: https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md
   kind: public-source
   status: reported
   locator: 3. 카메라 스트리밍 성능 최적화 / 최종 결과
-  note: Sync / PBO / PBO+4Worker, OFF/ON 각 5회 median. 원본 로그와 정확한 하드웨어 사양은 미포함.
+  note: 스트리밍 OFF·ON 각각 5회 측정한 중앙값. 원본 로그와 정확한 하드웨어 사양은 공개 기록에 없습니다.
 limitations:
-- 이전 요약에는 4인, 상세 문서에는 2인으로 기록되어 팀 규모 확인이 필요합니다.
-- 초기 개발은 2025.11–12로 표시합니다. Markdown 메타에는 2026.04.09까지의 후속 작업 기간이 있어 범위가 다릅니다.
+- 공개 자료에 팀원 수와 후속 작업 기간이 서로 다르게 기록되어 있어 인원 수를 생략했습니다. 표기한 기간은 프로젝트 요약의 2025.11–12를 따릅니다.
 - 측정값은 공개 문서의 보고값입니다. 원본 로그, 정확한 CPU/GPU 사양, 빌드 설정이 없어 이 저장소만으로 재현하거나 독립 검증할 수 없습니다.
 - 1232×832의 iGPU 환경에서 보고된 결과를 다른 GPU나 해상도로 일반화하지 않습니다.
 - 수신 및 디코딩은 측정 범위에서 제외되었습니다. Camera Send 40.05 FPS는 목표 60 FPS에 미달했습니다.
