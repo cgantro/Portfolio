@@ -40,12 +40,12 @@ links:
   demo: null
 contributions:
 - id: autowingcar-contribution-1
-  text: 6인 팀에서 Java 서버 개발 도구인 Spring Boot로 서버 전반을 단독 구현하고 장비와 관제 서비스를 연결
+  text: 6인 팀 프로젝트에서 Spring Boot 서버를 맡아 MQTT 차량 메시지와 관제 서비스를 연결
   evidenceIds:
   - autowingcar-public
   status: reported
 - id: autowingcar-contribution-2
-  text: 차량에 보내는 명령과 수신 확인, 실시간 관제 화면 갱신, 차량 상태 변경 흐름 구현
+  text: 차량 명령의 장비 응답을 확인하고, DB 커밋 이후 명령을 발행하도록 순서를 조정해 오래된 상태가 최신 값을 덮는 오류를 수정
   evidenceIds:
   - autowingcar-public
   status: reported

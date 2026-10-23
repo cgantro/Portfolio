@@ -3,11 +3,12 @@ profile:
   id: hong-yoonpyo
   name: 홍윤표
   nameEn: Hong Yoonpyo
-  role: 소프트웨어 개발자
-  tagline: C++로 로봇·드론 시뮬레이터와 실시간 시스템을 구현하고, 계측 조건과 검증 범위를 함께 설명합니다.
+  role: 시뮬레이션 및 실시간 SW 개발자
+  tagline: C++로 로봇·드론 시뮬레이터와 실시간 영상·음성 시스템을 구현하고, 계측 결과와 검증 범위를 함께 설명합니다.
   summary:
   - DroneSim에서 고정 Tick 비행 시뮬레이션, AirSim 강체 물리 연결, UDP 지상통제와 다중 드론 JSON 시나리오를 구현했습니다. 공개 Release 측정에서 64대 분리 배치의 Tick p95는 493.9µs에서 137.7µs로, 밀집 32대 배치의 p95 중앙값은 1,344.3µs에서 665.1µs로 감소했습니다. 두 비교는 각각 전후 3회 측정이며 해당 조건 밖의 성능을 보장하지 않습니다.
-  - 공개 프로젝트 기록에서 구현 내용과 측정 조건을 함께 설명합니다.
+  - RobotPal에서 JPEG 압축을 4개 작업자로 분리했습니다. 1232×832 iGPU 보고 측정(OFF·ON 각 5회 중앙값, 수신·디코딩 제외)에서 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS였고 60 FPS 목표에는 미달했습니다.
+  - C++ 음성 서버에서 UDP 방별 중계와 참가자 상태에 따른 청취 규칙을 구현했습니다.
   email: cgantro@gmail.com
   github: https://github.com/cgantro
   location: 대한민국
@@ -255,11 +256,11 @@ activities:
     note: 공연 횟수와 수상은 공개 기재 사항이며 증빙 원본은 포함하지 않습니다.
 editions:
 - id: general
-  label: 소프트웨어 개발
-  headline: 소프트웨어 개발자
+  label: 시뮬레이션 및 실시간 SW
+  headline: 시뮬레이션 및 실시간 SW 개발자
   projectIds:
-  - robotpal
   - dronesim
+  - robotpal
   - mausoleum
   - autowingcar
   skillCategories:
