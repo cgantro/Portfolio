@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { assetUrl, localUrl, projectUrl, evidenceUrl, matchesProject } from '../src/lib/urls.mjs';
+import { assetUrl, localUrl, projectUrl, matchesProject } from '../src/lib/urls.mjs';
 
 test('repository base applies to routes and Korean original asset names', () => {
   assert.equal(localUrl(), '/Portfolio/');
@@ -9,12 +9,6 @@ test('repository base applies to routes and Korean original asset names', () => 
   assert.equal(assetUrl('/assets/coi-serviceworker.min.js'), '/Portfolio/coi-serviceworker.min.js');
   assert.equal(projectUrl('dronesim'), '/Portfolio/projects/dronesim/');
   assert.equal(assetUrl('https://example.com/a.webp'), 'https://example.com/a.webp');
-});
-
-test('evidence URLs distinguish public URLs, assets and repository locators', () => {
-  assert.equal(evidenceUrl({ source: 'https://github.com/cgantro/DroneSim', kind: 'repository' }), 'https://github.com/cgantro/DroneSim');
-  assert.equal(evidenceUrl({ source: '/assets/dronesim-system-architecture.svg', kind: 'asset' }), '/Portfolio/dronesim-system-architecture.svg');
-  assert.equal(evidenceUrl({ source: 'career-db/08_SOURCES/records.json', kind: 'public-source' }), null);
 });
 
 test('project search combines title, summary, technologies and category', () => {

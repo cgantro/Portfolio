@@ -3,18 +3,16 @@ title: DroneSim
 subtitle: 드론 비행과 카메라, 지상통제 명령을 시험하는 C++ 시뮬레이터
 category: C++ 드론 시뮬레이션
 summary:
-- DroneSim은 가상 드론의 비행과 탑재 카메라, 지상통제 명령을 한 시뮬레이터에서 시험하는 개인 프로젝트입니다. 실행 화면에는 AeroSimLab이라는 제품명이 표시됩니다.
-- 화면을 띄워 조작하거나 화면 없이 JSON 시나리오를 실행할 때 모두 같은 SimulationCore를 사용합니다. Windows 네이티브 실행에서는 AirSim 강체 물리를 선택할 수 있고, WebAssembly에서는 운동학 모델을 씁니다.
+- 가상 드론의 비행·탑재 카메라·지상통제 흐름을 시험하는 개인 C++20 시뮬레이터입니다.
 period: 2026.08 – 진행 중
 startDate: 2026-08
 endDate: null
 status: ongoing
 team: 개인 프로젝트
 role:
-- 고정 시간 간격의 비행 상태 갱신, 드론·카메라 ECS와 네이티브 강체 물리 연결 구현
-- 화면 조작, 게임패드, UDP 지상통제, JSON 시나리오의 입력을 공통 시뮬레이션 명령으로 처리
-- 여러 드론의 편대 비행과 통신·카메라 장애, 화면 없는 공동 임무 시험 구현
-- 시뮬레이션 주기와 충돌 계산 시간을 측정하고, 조건과 한계를 공개 문서에 기록
+- 고정 시간 간격의 비행 상태 갱신과 드론·카메라 ECS, 네이티브 AirSim 물리 연결 구현
+- 게임패드, UDP 지상통제, JSON 시나리오 입력을 공통 시뮬레이션 명령으로 처리
+- 다중 드론 시나리오와 충돌 계산 개선, 성능 측정 구현
 stack:
 - C++20
 - CMake, Flecs ECS
@@ -31,9 +29,8 @@ architecture:
   src: /assets/dronesim-system-architecture.svg
   alt: 게임패드, UDP 지상통제와 화면 없는 시나리오가 SimulationCore에 입력되고, 물리·상태가 렌더링과 카메라 분석으로 이어지는 구조
   summary:
-  - 화면 조작과 화면 없는 시나리오 실행은 같은 SimulationCore를 사용하므로 비행 명령과 주기 갱신 방식이 같습니다.
-  - Flecs가 드론과 카메라 상태를 갱신합니다. Windows 네이티브 강체 모드에서만 AirSim 물리를 호출하고, WebAssembly에서는 운동학 모델을 씁니다.
-  - 화면에는 장면과 드론 탑재 EO 카메라 영상을 각각 그립니다. 지상통제 장치와는 UDP로 명령과 상태를 주고받습니다.
+  - 화면 조작, 게임패드, UDP 지상통제와 화면 없는 JSON 시나리오가 공통 명령 형식으로 SimulationCore에 입력됩니다.
+  - Flecs 상태 갱신 뒤 물리 계산과 화면·카메라 처리가 이어지며, 지상통제 장치와는 UDP로 명령과 상태를 주고받습니다.
 links:
   github: https://github.com/cgantro/DroneSim
   demo: https://cgantro.github.io/DroneSim/
@@ -78,9 +75,9 @@ metrics:
   evidenceIds:
   - dronesim-source
   conditions:
-  - Windows Release 빌드에서 드론 64대를 서로 떨어뜨려 배치
+  - Windows Release 빌드에서 드론 64대를 서로 떨어뜨려 배치하고 강체 모드로 실행
   - 수정 전과 후에 각각 3회 측정
-  - 공개 기록의 중앙값이며 다른 PC에서도 같은 성능이 나온다는 뜻은 아님
+  - 수정 전후 세 측정값의 중앙값
   status: reported
 - id: crowded-32-tick-p95
   label: 밀집 배치·드론 32대 주기 p95 중앙값
@@ -92,7 +89,7 @@ metrics:
   conditions:
   - Windows Release 빌드에서 충돌 상자가 서로 가까이 겹치도록 드론 32대를 배치
   - 수정 전과 후에 각각 3회 측정한 값의 중앙값
-  - 화면 그리기, 통신, 영상 분석을 포함한 전체 처리 시간은 아님
+  - 화면 그리기, 통신, 영상 분석 시간은 포함하지 않음
   status: reported
 evidence:
 - id: dronesim-source

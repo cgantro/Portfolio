@@ -51,6 +51,10 @@ test('every available document download is served from the repository base', asy
       }
     }
   }
+  for (const internalArtifact of ['resume.json', 'resume.loss-report.json', 'portfolio.data.json']) {
+    const response = await request.get(`${base}downloads/general/${internalArtifact}`);
+    expect(response.status(), `${internalArtifact} stays local to the build`).toBe(404);
+  }
 });
 
 test('project content and links are readable without client JavaScript', async ({ browser }) => {
@@ -61,8 +65,8 @@ test('project content and links are readable without client JavaScript', async (
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('#overview')).toBeVisible();
   await expect(page.locator('#architecture img')).toHaveAttribute('alt', /.+/);
-  await expect(page.locator('#verification')).toBeVisible();
-  await expect(page.locator('#limitations')).toBeVisible();
+  await expect(page.locator('#implementation')).toContainText('충돌 상자');
+  await expect(page.locator('#verification, #limitations, [data-evidence-ids]')).toHaveCount(0);
   await expect(page.locator('#demo a[target="_blank"]')).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
   await context.close();
 });
@@ -105,12 +109,12 @@ test('mobile navigation keeps contact visible and documents explain all resume f
   await expect(contact).toHaveAttribute('href', /^mailto:/);
 
   await page.goto(`${base}documents/`);
-  await expect(page.locator('.document-card').first()).toContainText('PDF · HTML · JSON');
+  await expect(page.locator('.document-card').first()).toContainText('PDF · HTML');
   for (const [edition, headline] of [['general', '소프트웨어 개발자']]) {
     await page.goto(`${base}resume/${edition}/`);
     await expect(page.locator('.page-heading')).toContainText(headline);
-    await expect(page.locator('.download-panel')).toContainText('이력서 데이터(JSON)');
-    await expect(page.locator('.download-panel')).toContainText('변환 보고서(JSON)');
+    await expect(page.locator('.download-panel')).toContainText('PDF 포트폴리오');
+    await expect(page.locator('.download-panel')).not.toContainText('변환 보고서');
   }
 });
 

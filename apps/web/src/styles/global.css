@@ -174,19 +174,7 @@ h3 { font-size: 21px; }
 .metric-card details { border-top: 1px solid var(--color-line); margin-top: 17px; padding-top: 14px; }
 .metric-card summary { cursor: pointer; font-size: 12px; }
 .metric-card details li { font-size: 11px; line-height: 1.8; }
-.metric-status { color: var(--color-muted); font-size: 10px; }
 .quiet-panel { padding: 22px 25px; background: var(--color-surface-muted); border-radius: 5px; }
-.outcomes li + li, .limitations-list li + li { margin-top: 12px; }
-.limitations-list { border-left: 3px solid #859181; background: var(--color-surface-muted); padding: 23px 25px 23px 43px; border-radius: 0 5px 5px 0; }
-.evidence-list { list-style: none; padding: 0; margin: 23px 0 0; }
-.evidence-list li { padding-block: 20px; border-bottom: 1px solid var(--color-line); }
-.evidence-list li:last-child { border-bottom: 0; }
-.evidence-list li > div { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
-.evidence-list a, .evidence-list strong { font-size: 13px; font-weight: 600; }
-.status-badge { font: 9px/1.6 var(--font-body); padding: 3px 7px; background: #e5e9e0; border-radius: 3px; color: #3c513b; flex-shrink: 0; }
-.status-badge.unverified { background: #f1e1cc; color: #685023; }
-.evidence-list code { display: block; font: 10px/1.7 var(--font-mono); color: var(--color-muted); margin-top: 7px; overflow-wrap: anywhere; }
-.evidence-list p { font-size: 12px; line-height: 1.9; color: var(--color-muted); margin-top: 7px; }
 .demo-container { overflow: hidden; border-radius: 5px; background: var(--color-dark); }
 .demo-poster { position: relative; }
 .demo-poster > img { width: 100%; min-height: 390px; aspect-ratio: 1.6; object-fit: contain; opacity: .36; }
@@ -216,21 +204,6 @@ h3 { font-size: 21px; }
 .document-card dl div { display: flex; justify-content: space-between; }
 .document-card dd { margin: 0; }
 .document-card .button { font-size: 11px; }
-.source-project { border-top: 1px solid var(--color-line); }
-.source-project:last-child { border-bottom: 1px solid var(--color-line); }
-.source-project > summary { display: flex; justify-content: space-between; gap: 25px; align-items: center; padding-block: 25px; cursor: pointer; list-style: none; }
-.source-project > summary::-webkit-details-marker { display: none; }
-.source-project strong { font-size: 20px; }
-.source-project small { display: block; color: var(--color-muted); font-size: 11px; margin-top: 4px; }
-.source-project summary > span:last-child { color: var(--color-muted); font-size: 11px; }
-.source-project summary > span:last-child span { margin-left: 22px; font-size: 22px; }
-.source-project .evidence-list { margin-top: 0; }
-.source-project > a { margin-block: 10px 25px; }
-.document-policy { border-top: 1px solid var(--color-line); }
-.policy-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 40px; margin-top: 30px; }
-.policy-grid h3 { font-size: 17px; margin-bottom: 14px; }
-.policy-grid p, .policy-grid a { font-size: 13px; color: var(--color-muted); }
-.policy-grid a { display: inline-block; margin-top: 15px; }
 .download-panel { display: grid; grid-template-columns: 1fr 1.5fr; gap: 50px; padding: 35px; border: 1px solid var(--color-line); border-radius: 5px; background: var(--color-surface); margin-bottom: 55px; }
 .download-panel p { font-size: 13px; color: var(--color-muted); margin-top: 15px; }
 .download-panel ul { list-style: none; padding: 0; margin: 0; }
@@ -340,7 +313,7 @@ h3 { font-size: 21px; }
   .demo-poster > img { min-height: 350px; }
   .demo-container iframe { height: 480px; }
   .demo-actions { flex-direction: column; }
-  .related-grid, .document-grid, .policy-grid { grid-template-columns: 1fr; gap: 18px; }
+  .related-grid, .document-grid { grid-template-columns: 1fr; gap: 18px; }
   .related-section { padding-bottom: 45px; }
   .document-card { padding: 25px; }
   .document-card h3 { font-size: 21px; }

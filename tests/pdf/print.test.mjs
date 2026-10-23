@@ -10,7 +10,7 @@ import { renderPortfolio, preparePortfolio, escapeHtml } from '../../apps/print/
 import { validatePdf } from '../../apps/print/src/pdf.mjs';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
-test('print document retains Korean project content, edu/cert entries and evidence IDs', () => {
+test('print document presents Korean project narratives without internal audit markers', () => {
   const selected = selectEdition(careerData);
   const html = renderPortfolio(selected, '');
   assert.match(html, /lang="ko"/);
@@ -19,8 +19,10 @@ test('print document retains Korean project content, edu/cert entries and eviden
   assert.match(html, /아카데미 14기/);
   for (const project of selected.projects) {
     assert.ok(html.includes(project.title));
-    assert.ok(html.includes(project.contributions[0].evidenceIds[0]));
+    assert.ok(html.includes(project.summary[0]));
   }
+  assert.match(html, /충돌 상자/);
+  assert.doesNotMatch(html, /프로젝트 근거|검증 범위|dronesim-source|robotpal-benchmark/);
   assert.equal(escapeHtml('<script>"&'), '&lt;script&gt;&quot;&amp;');
 });
 test('offline prepare maps /assets/ to tracked asset/ and writes honest adapter losses', async () => {

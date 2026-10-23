@@ -1,12 +1,9 @@
 ---
-import { profile, projects, editions } from '@portfolio/career-data';
+import { editions } from '@portfolio/career-data';
 import SiteLayout from '../layouts/SiteLayout.astro';
-import EvidenceList from '../components/EvidenceList.astro';
-import { localUrl, projectUrl } from '../lib/urls.mjs';
+import { localUrl } from '../lib/urls.mjs';
 ---
-<SiteLayout title="문서" description="홍윤표의 포트폴리오와 이력서, 프로젝트 공개 근거." active="documents">
-  <header class="container page-heading"><span class="eyebrow">이력서와 포트폴리오</span><h1>포트폴리오와 이력서<span class="accent">.</span></h1><p>프로젝트 경험과 공개 근거를 웹 페이지와 내려받을 문서로 정리했습니다.</p></header>
-  <section class="section container documents-section"><div class="section-heading"><div><span class="eyebrow">01 · 지원 문서</span><h2>포트폴리오와 이력서</h2></div><p>프로젝트와 기술 경험을 문서별 목적에 맞게 정리했습니다.</p></div><div class="document-grid">{editions.map((edition, index) => <article class="document-card"><div class="document-icon" aria-hidden="true">0{index + 1}<span>문서</span></div><h3>{edition.label}</h3><p>지원 직무를 한정하지 않고 프로젝트와 기술 경험을 담았습니다.</p><dl><div><dt>판</dt><dd>두 번째 판</dd></div><div><dt>파일 형식</dt><dd>PDF · HTML · JSON</dd></div></dl><a class="button secondary" href={localUrl(`resume/${edition.id}/`)}>문서 보기 ↗</a></article>)}</div></section>
-  <section class="section container"><div class="section-heading"><div><span class="eyebrow">02 · 공개 자료</span><h2>프로젝트별 근거 자료</h2></div></div><div class="source-projects">{projects.map(project => <details class="source-project"><summary><span><strong>{project.title}</strong><small>{project.category}</small></span><span>근거 {project.evidence.length}개 <span aria-hidden="true">+</span></span></summary><EvidenceList evidence={project.evidence} /><a class="text-link" href={projectUrl(project.id)}>구현 내용과 한계 보기 ↗</a></details>)}</div></section>
-  <section class="section container document-policy"><span class="eyebrow">03 · 문서 작성 원칙</span><h2>문서 작성 기준</h2><div class="policy-grid"><article><h3>사실은 하나로, 문서는 목적에 맞게</h3><p>웹과 PDF는 같은 공개 자료를 바탕으로 만듭니다. 포트폴리오에는 구현과 근거를 자세히 담고, 이력서에는 핵심 경험을 추려 담습니다.</p></article><article><h3>측정 조건과 한계</h3><p>성능 수치에는 측정 조건과 공개 근거를 함께 적습니다. 실제 환경에서 얻은 결과와 시뮬레이션 결과가 적용되는 범위를 구분합니다.</p></article><article><h3>개인정보와 공개 범위</h3><p>공개 이력과 저장소에서 확인할 수 있는 정보만 씁니다. 추가 자료가 필요하면 이메일로 문의해 주세요.</p><a href={`mailto:${profile.email}`}>{profile.email} ↗</a></article></div></section>
+<SiteLayout title="문서" description="홍윤표의 이력서와 포트폴리오 문서." active="documents">
+  <header class="container page-heading"><span class="eyebrow">이력서와 포트폴리오</span><h1>문서 내려받기<span class="accent">.</span></h1><p>지원 분야와 문서 형식에 맞춰 이력서와 포트폴리오를 제공합니다.</p></header>
+  <section class="section container documents-section"><div class="section-heading"><div><span class="eyebrow">01 · 지원 문서</span><h2>포트폴리오와 이력서</h2></div><p>프로젝트와 기술 경험을 문서별 목적에 맞게 정리했습니다.</p></div><div class="document-grid">{editions.map((edition, index) => <article class="document-card"><div class="document-icon" aria-hidden="true">0{index + 1}<span>문서</span></div><h3>{edition.label}</h3><p>주요 프로젝트와 개발 경험을 담았습니다.</p><dl><div><dt>판</dt><dd>두 번째 판</dd></div><div><dt>파일 형식</dt><dd>PDF · HTML</dd></div></dl><a class="button secondary" href={localUrl(`resume/${edition.id}/`)}>문서 보기 ↗</a></article>)}</div></section>
 </SiteLayout>

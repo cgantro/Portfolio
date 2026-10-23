@@ -77,11 +77,10 @@ metrics:
   evidenceIds:
   - robotpal-benchmark
   conditions:
-  - 해상도 1232×832 고정
+  - 1232×832 해상도의 내장 GPU 환경
+  - 동기 방식, PBO, 작업자 4개 구성을 비교
   - 영상 송신을 끈 상태와 켠 상태에서 각각 5회 측정한 중앙값
-  - 동기 방식과 PBO 및 4개 작업자 방식을 비교
-  - 내장 GPU 환경의 공개 측정값이며 GPU 모델은 기록되지 않음
-  - 영상 수신과 압축 해제 제외
+  - 영상 수신과 압축 해제는 제외
   status: reported
   baseline: 66.7
 - id: camera-send-fps
@@ -91,11 +90,10 @@ metrics:
   evidenceIds:
   - robotpal-benchmark
   conditions:
-  - 해상도 1232×832 고정
+  - 1232×832 해상도의 내장 GPU 환경
+  - 동기 방식, PBO, 작업자 4개 구성을 비교
   - 영상 송신을 끈 상태와 켠 상태에서 각각 5회 측정한 중앙값
-  - 동기 방식과 PBO 및 4개 작업자 방식을 비교
-  - 내장 GPU 환경의 공개 측정값이며 GPU 모델은 기록되지 않음
-  - 영상 수신과 압축 해제 제외
+  - 영상 수신과 압축 해제는 제외
   status: reported
   baseline: 26.95
 - id: streaming-penalty

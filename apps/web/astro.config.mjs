@@ -16,7 +16,7 @@ const documents = {
         const editionSource = `${source}/${edition}`;
         if (!existsSync(editionSource)) continue;
         mkdirSync(`${target}/${edition}`, { recursive: true });
-        for (const filename of ['portfolio.pdf', 'portfolio.html', 'resume.rendercv.pdf', 'resume.json', 'resume.loss-report.json']) {
+        for (const filename of ['portfolio.pdf', 'portfolio.html', 'resume.rendercv.pdf']) {
           if (existsSync(`${editionSource}/${filename}`)) cpSync(`${editionSource}/${filename}`, `${target}/${edition}/${filename}`);
         }
         const editionAssets = `${editionSource}/assets`;

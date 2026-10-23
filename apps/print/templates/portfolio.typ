@@ -39,25 +39,20 @@
   par(project.period + " / " + project.category)
   text(size: 8pt, fill: rgb("1d4ed8"), project.stack.join(" · "))
   lines(project.summary)
-  heading(level: 2, "MY ROLE")
+  heading(level: 2, "담당한 일")
   bullets(project.role)
   if "printImage" in project {
     block(above: 3mm, below: 3mm, image(project.printImage, width: 100%, height: 58mm, fit: "contain"))
   }
-  heading(level: 2, "구현과 결과")
-  for claim in project.contributions {
-    list(claim.text + " [" + claim.evidenceIds.join(", ") + "]")
+  heading(level: 2, "핵심 구현")
+  if project.sharedMetricConditions.len() > 0 {
+    par(strong("공통 조건: ") + project.sharedMetricConditions.join(" · "))
   }
   for metric in project.metrics {
     block(stroke: .5pt + rgb("bfdbfe"), inset: 3mm)[
-      #strong(metric.label + ": " + str(metric.value) + " " + metric.unit)
-      #par(text(size: 8pt, metric.conditions.join(" · ")))
-      #text(size: 7pt, "[" + metric.evidenceIds.join(", ") + "]")
+      #strong(metric.label + ": " + str(metric.value) + (if "rangeMax" in metric { "–" + str(metric.rangeMax) } else { "" }) + " " + metric.unit)
+      #if metric.conditions.len() > 0 { par(text(size: 8pt, metric.conditions.join(" · "))) }
     ]
-  }
-  if project.limitations.len() > 0 {
-    heading(level: 2, "검증 범위")
-    text(size: 8pt, bullets(project.limitations))
   }
   if project.links.github != none { par(link(project.links.github, project.links.github)) }
 }
@@ -69,20 +64,5 @@
     text(size: 8pt, item.period)
     par(item.detail)
     if "note" in item { par(item.note) }
-  }
-}
-#pagebreak()
-= 프로젝트 근거
-#set text(size: 7pt)
-#for project in data.projects {
-  heading(level: 2, project.title)
-  for evidence in project.evidence {
-    if evidence.status != "unverified" {
-      par(evidence.id + " / " + evidence.label)
-      if evidence.source.starts-with("https://") or evidence.source.starts-with("http://") {
-        par(link(evidence.source, evidence.source))
-      } else { par(evidence.source) }
-      if "locator" in evidence { par(evidence.locator) }
-    }
   }
 }

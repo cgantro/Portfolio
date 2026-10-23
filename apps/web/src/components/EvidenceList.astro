@@ -1,8 +1,0 @@
----
-import { evidenceUrl } from '../lib/urls.mjs';
-import { projects } from '@portfolio/career-data';
-interface Props { evidence: (typeof projects)[number]['evidence']; }
-const { evidence } = Astro.props;
-const labels = { verified: '검증됨', reported: '원문 근거', unverified: '추가 확인 필요' };
----
-<ul class="evidence-list">{evidence.map(item => <li><div><span class:list={['status-badge', item.status]}>{labels[item.status]}</span>{evidenceUrl(item) ? <a href={evidenceUrl(item)} target="_blank" rel="noopener noreferrer">{item.label} <span aria-hidden="true">↗</span></a> : <strong>{item.label}</strong>}</div>{item.locator && <code>{item.locator}</code>}{item.note && <p>{item.note}</p>}</li>)}</ul>

@@ -5,7 +5,7 @@
   @bottom-right { content: counter(page) " / " counter(pages); font-family: sans-serif; font-size: 8pt; color: #64748b; }
 }
 * { box-sizing: border-box; }
-html { color: #152033; background: #fff; font-family: "Malgun Gothic", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; font-size: 10pt; line-height: 1.64; word-break: keep-all; overflow-wrap: anywhere; }
+html { color: #152033; background: #fff; font-family: "Malgun Gothic", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; font-size: 9.5pt; line-height: 1.52; word-break: keep-all; overflow-wrap: anywhere; }
 body { margin: 0; }
 .page { break-before: page; }
 .page:first-child { break-before: auto; }
@@ -39,28 +39,24 @@ li { margin-bottom: 1.5mm; }
 .metadata { display: flex; gap: 7mm; color: #64748b; font-size: 8.5pt; margin-bottom: 3mm; }
 .stack { display: flex; flex-wrap: wrap; gap: 1.5mm; margin: 3mm 0 4mm; }
 .stack span { padding: .8mm 2mm; border: .2mm solid #bfdbfe; color: #1d4ed8; font-size: 8pt; background: #eff6ff; }
-.project h2 { margin-top: 4mm; font-size: 11pt; }
-.project figure { margin: 4mm 0; break-inside: avoid; }
-.project figure img { width: 100%; max-height: 61mm; object-fit: contain; display: block; }
+.project { line-height: 1.48; }
+.project h2 { margin: 2.5mm 0 1mm; font-size: 10.5pt; }
+.project figure { margin: 2.5mm 0; break-inside: avoid; }
+.project figure img { width: 100%; max-height: 43mm; object-fit: contain; display: block; }
 figcaption { color: #64748b; font-size: 7pt; margin-top: 1.5mm; text-align: center; }
-.claims { font-size: 9pt; }
-small { font-size: 7pt; color: #64748b; }
-.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 3mm; margin-top: 3mm; }
-.metrics > div { border-left: 1mm solid #1d4ed8; padding-left: 3mm; break-inside: avoid; }
-.metrics strong { font-size: 9pt; display: block; }
-.metrics span { font-size: 8pt; display: block; color: #475569; }
+.project .prose h3 { font-size: 9.5pt; margin: 2mm 0 .7mm; }
+.project .prose h4 { font-size: 9pt; margin: 1.5mm 0 .7mm; }
+.project .prose p, .project .prose li { font-size: 8.75pt; }
+.project pre { background: #f1f5f9; padding: 2mm; overflow-wrap: anywhere; white-space: pre-wrap; font: 7pt/1.35 "Cascadia Code", Consolas, monospace; break-inside: avoid; }
+.project code { font: .9em "Cascadia Code", Consolas, monospace; }
+.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm; margin-top: 2mm; }
+.metrics > article { border-left: 1mm solid #1d4ed8; padding-left: 2mm; break-inside: avoid; }
+.metric-shared { grid-column: 1 / -1; font-size: 8pt; }
+.metrics > article > strong { font-size: 9pt; display: block; }
 .metrics p { font-size: 7.5pt; margin: 1mm 0; }
-aside { background: #f1f5f9; padding: 3mm 4mm; margin: 4mm 0; break-inside: avoid; font-size: 8pt; }
-aside ul { margin-bottom: 0; }
 .project-links { font-size: 7.5pt; margin-top: 3mm; }
 .timeline article { padding: 5mm 0; border-top: .25mm solid #cbd5e1; break-inside: avoid; }
 .timeline h2 { margin-top: 1mm; }
-.evidence h1 { font-size: 23pt; }
-.evidence h2 { font-size: 11pt; margin-top: 5mm; }
-.sources { font-size: 7pt; color: #475569; padding-left: 4mm; }
-.sources li { margin-bottom: 2mm; break-inside: avoid; }
-.source-path { font-family: monospace; }
-.status { color: #64748b; font-size: 6.5pt; }
 @media screen {
   html { background: #e2e8f0; }
   .page { width: 210mm; min-height: 297mm; padding: 18mm; margin: 10mm auto; background: #fff; box-shadow: 0 3mm 10mm #0f172a15; }

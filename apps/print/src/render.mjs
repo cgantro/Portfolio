@@ -1,31 +1,110 @@
 import { readFile, mkdir, writeFile, copyFile } from 'node:fs/promises';
 import { resolve, relative, sep, basename, extname } from 'node:path';
 import { selectEdition, eligibleClaims, eligibleMetrics, toJsonResume } from '@portfolio/resume-adapter';
+import { implementationNarrative } from '../../web/src/lib/narrative.mjs';
 
 export const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
 const e = escapeHtml;
-const labelStatus = status => status === 'verified' ? '근거 확인' : '기존 자료 기록';
-const list = items => `<ul>${items.map(item => `<li>${e(item)}</li>`).join('')}</ul>`;
 const paragraphs = items => items.map(item => `<p>${e(item)}</p>`).join('');
 const heading = (index, title) => `<div class="eyebrow">PORTFOLIO / ${String(index).padStart(2, '0')}</div><h1>${e(title)}</h1>`;
 const publicLink = value => /^https?:\/\//.test(value);
-const evidenceMarkup = evidence => `<ol class="sources">${evidence.map(item => `<li><strong>${e(item.id)}</strong> ${e(item.label)}<br>${publicLink(item.source) ? `<a href="${e(item.source)}">${e(item.source)}</a>` : `<span class="source-path">${e(item.source)}</span>`}${item.locator ? ` · ${e(item.locator)}` : ''}${item.note ? `<br>${e(item.note)}` : ''} <span class="status">${labelStatus(item.status)}</span></li>`).join('')}</ol>`;
+
+function renderMarkdown(markdown) {
+  const blocks = [];
+  let paragraph = [];
+  let items = [];
+  let code = null;
+  const inline = text => text.split(/(`[^`]+`)/g).map(part => part.startsWith('`') && part.endsWith('`')
+    ? `<code>${e(part.slice(1, -1))}</code>`
+    : e(part)).join('');
+  const flushParagraph = () => {
+    if (paragraph.length) blocks.push(`<p>${inline(paragraph.join(' '))}</p>`);
+    paragraph = [];
+  };
+  const flushItems = () => {
+    if (items.length) blocks.push(`<ul>${items.map(item => `<li>${inline(item)}</li>`).join('')}</ul>`);
+    items = [];
+  };
+
+  for (const line of markdown.split(/\r?\n/)) {
+    const fence = line.match(/^```(\w*)\s*$/);
+    if (fence) {
+      flushParagraph();
+      flushItems();
+      if (code === null) code = { language: fence[1], lines: [] };
+      else {
+        blocks.push(`<pre><code${code.language ? ` class="language-${e(code.language)}"` : ''}>${e(code.lines.join('\n'))}</code></pre>`);
+        code = null;
+      }
+      continue;
+    }
+    if (code) {
+      code.lines.push(line);
+      continue;
+    }
+    const title = line.match(/^(#{2,5})\s+(.+)$/);
+    if (title) {
+      flushParagraph();
+      flushItems();
+      const level = Math.min(title[1].length, 4);
+      blocks.push(`<h${level}>${inline(title[2])}</h${level}>`);
+    } else if (/^[-*]\s+/.test(line)) {
+      flushParagraph();
+      items.push(line.replace(/^[-*]\s+/, ''));
+    } else if (!line.trim()) {
+      flushParagraph();
+      flushItems();
+    } else {
+      flushItems();
+      paragraph.push(line.trim());
+    }
+  }
+  flushParagraph();
+  flushItems();
+  return `<div class="prose">${blocks.join('')}</div>`;
+}
+
+const visibleConditions = conditions => conditions.filter(condition => !/미기재|미포함/.test(condition));
+function projectMetrics(project) {
+  let metrics = eligibleMetrics(project);
+  if (project.id === 'robotpal') metrics = metrics.filter(metric => ['simulation-streaming-fps', 'camera-send-fps'].includes(metric.id));
+  if (project.id === 'autowingcar') metrics = metrics.filter(metric => metric.id !== 'response-max-reported');
+  return metrics;
+}
+
+function metricsMarkup(project) {
+  const metrics = projectMetrics(project);
+  if (!metrics.length) return '';
+  const shared = metrics.length > 1
+    ? metrics[0].conditions.filter(condition => metrics.every(metric => metric.conditions.includes(condition)))
+    : [];
+  const sharedMarkup = shared.length ? `<p class="metric-shared"><strong>공통 조건</strong> ${e(visibleConditions(shared).join(' · '))}</p>` : '';
+  const cards = metrics.map(metric => {
+    const maximum = metric.id === 'response-min-reported'
+      ? project.metrics.find(item => item.id === 'response-max-reported')?.value
+      : undefined;
+    const value = maximum !== undefined
+      ? `${metric.value}–${maximum} ${metric.unit}`
+      : metric.baseline !== undefined
+        ? `${metric.baseline} → ${metric.value} ${metric.unit}`
+        : `${metric.value} ${metric.unit}`;
+    const conditions = visibleConditions(metric.conditions.filter(condition => !shared.includes(condition)));
+    return `<article><strong>${e(metric.label)}: ${e(value)}</strong>${conditions.length ? `<p>${e(conditions.join(' · '))}</p>` : ''}</article>`;
+  }).join('');
+  return `<div class="metrics">${sharedMarkup}${cards}</div>`;
+}
 
 export function renderPortfolio({ data, edition, projects }, stylesheet) {
   const { profile } = data;
   const renderedProjects = projects.map((project, index) => {
-    const claims = eligibleClaims(project);
-    const metrics = eligibleMetrics(project);
     return `<section class="page project" id="${e(project.id)}">
       ${heading(index + 3, project.title)}<p class="subtitle">${e(project.subtitle)}</p>
       <div class="metadata"><span>${e(project.period)}</span><span>${e(project.category)}</span></div>
       <div class="stack">${project.stack.map(item => `<span>${e(item)}</span>`).join('')}</div>
       ${paragraphs(project.summary)}
-      <h2>MY ROLE</h2>${list(project.role)}
       ${project.printImage ? `<figure><img src="${e(project.printImage)}" alt="${e(project.architecture.alt)}"><figcaption>${e(project.architecture.alt)}</figcaption></figure>` : ''}
-      <h2>구현과 결과</h2><ul class="claims">${claims.map(claim => `<li>${e(claim.text)} <small>[${claim.evidenceIds.map(e).join(', ')}]</small></li>`).join('')}</ul>
-      ${metrics.length ? `<div class="metrics">${metrics.map(metric => `<div><strong>${e(metric.label)}: ${e(metric.value)} ${e(metric.unit)}</strong>${metric.baseline !== undefined ? `<span>비교 기준 ${e(metric.baseline)} ${e(metric.unit)}</span>` : ''}<p>${e(metric.conditions.join(' · '))}</p><small>[${metric.evidenceIds.map(e).join(', ')}]</small></div>`).join('')}</div>` : ''}
-      ${project.limitations.length ? `<aside><h3>검증 범위</h3>${list(project.limitations)}</aside>` : ''}
+      <h2>기술 사례</h2>${renderMarkdown(implementationNarrative(project.narrativeMarkdown))}
+      ${metricsMarkup(project)}
       <div class="project-links">${Object.entries(project.links).filter(([, value]) => value && publicLink(value)).map(([label, value]) => `<a href="${e(value)}">${e(label.toUpperCase())} ↗ ${e(value)}</a>`).join('<br>')}</div>
     </section>`;
   }).join('');
@@ -34,7 +113,6 @@ export function renderPortfolio({ data, edition, projects }, stylesheet) {
     <section class="page overview">${heading(2, '프로젝트와 기술')}<p class="subtitle">${e(edition.headline)}</p><div class="project-index">${projects.map((project, index) => `<article><span class="index-number">${String(index + 1).padStart(2, '0')}</span><h2><a href="#${e(project.id)}">${e(project.title)}</a></h2><p>${e(project.subtitle)}</p><p class="muted">${e(project.period)} · ${e(project.category)}</p></article>`).join('')}</div><h2>기술 경험</h2><dl class="skill-list">${data.skills.map(group => { const items = group.items.filter(item => item.projectIds.some(id => edition.projectIds.includes(id))); return items.length ? `<dt>${e(group.category)}</dt><dd>${e(items.map(item => item.name).join(' · '))}</dd>` : ''; }).join('')}</dl></section>
     ${renderedProjects}
     <section class="page background">${heading(projects.length + 3, '학습과 경험')}<div class="timeline">${data.timeline.filter(item => item.type === 'edu' || item.type === 'cert' || item.type === 'work').map(item => `<article><p class="eyebrow">${e(item.period)}</p><h2>${e(item.title)}</h2><p>${e(item.detail)}</p>${item.note ? `<p class="muted">${e(item.note)}</p>` : ''}</article>`).join('')}</div></section>
-    <section class="page evidence">${heading(projects.length + 4, '프로젝트 근거')}<p class="muted">본문의 근거 ID와 원본 자료를 연결했습니다. 기록된 사실의 검증 범위는 프로젝트별로 표시합니다.</p>${projects.map(project => `<article class="evidence-project"><h2>${e(project.title)}</h2>${evidenceMarkup(project.evidence.filter(item => item.status !== 'unverified'))}</article>`).join('')}</section>
   </body></html>`;
 }
 
@@ -60,7 +138,29 @@ export async function preparePortfolio(input, editionId, { root, outputDir }) {
   const stylesheet = await readFile(new URL('../styles/portfolio.css', import.meta.url), 'utf8');
   const html = renderPortfolio({ ...selected, projects }, stylesheet);
   const { resume, lossReport } = toJsonResume(input, editionId);
-  const printData = { profile: selected.data.profile, edition: selected.edition, projects: projects.map(project => ({ ...project, contributions: eligibleClaims(project), outcomes: [], metrics: eligibleMetrics(project) })), timeline: selected.data.timeline };
+  const printData = {
+    profile: selected.data.profile,
+    edition: selected.edition,
+    projects: projects.map(project => {
+      const metrics = projectMetrics(project);
+      const sharedConditions = metrics.length > 1
+        ? metrics[0].conditions.filter(condition => metrics.every(metric => metric.conditions.includes(condition)))
+        : [];
+      return {
+        ...project,
+        contributions: eligibleClaims(project),
+        outcomes: [],
+        sharedMetricConditions: visibleConditions(sharedConditions),
+        metrics: metrics.map(metric => ({
+          ...metric,
+          label: metric.id === 'response-min-reported' ? '응답 시간 범위' : metric.label,
+          rangeMax: metric.id === 'response-min-reported' ? project.metrics.find(item => item.id === 'response-max-reported')?.value : undefined,
+          conditions: visibleConditions(metric.conditions.filter(condition => !sharedConditions.includes(condition))),
+        })),
+      };
+    }),
+    timeline: selected.data.timeline,
+  };
   await writeFile(resolve(outputDir, 'portfolio.html'), html, 'utf8');
   await writeFile(resolve(outputDir, 'resume.json'), JSON.stringify(resume, null, 2) + '\n', 'utf8');
   await writeFile(resolve(outputDir, 'resume.loss-report.json'), JSON.stringify(lossReport, null, 2) + '\n', 'utf8');

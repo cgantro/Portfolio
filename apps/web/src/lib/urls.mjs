@@ -13,12 +13,6 @@ export function projectUrl(id, base = '/Portfolio/') {
   return localUrl(`projects/${encodeURIComponent(id)}/`, base);
 }
 
-export function evidenceUrl(evidence, base = '/Portfolio/') {
-  if (/^https?:\/\//.test(evidence.source)) return evidence.source;
-  if (evidence.kind === 'asset') return assetUrl(evidence.source, base);
-  return null;
-}
-
 export function matchesProject(project, query, category) {
   const term = query.trim().toLocaleLowerCase();
   const text = [project.title, project.subtitle, project.category, ...project.stack, ...project.summary].join(' ').toLocaleLowerCase();
