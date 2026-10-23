@@ -81,6 +81,13 @@ test('keyboard skip link and navigation are reachable', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '프로젝트', exact: true })).toHaveAttribute('aria-current', 'page');
 });
 
+test('technology navigation returns visitors to the project-linked skill map', async ({ page }) => {
+  await page.goto(`${base}projects/autowingcar/`);
+  await page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '기술' }).click();
+  await expect(page).toHaveURL(/\/Portfolio\/#skills$/);
+  await expect(page.getByRole('heading', { name: '사용한 기술' })).toBeVisible();
+});
+
 test('mobile navigation keeps contact visible and the homepage presents the subproject', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto(base);

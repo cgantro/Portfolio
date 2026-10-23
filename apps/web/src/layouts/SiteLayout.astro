@@ -3,9 +3,9 @@ import { profile } from '@portfolio/career-data';
 import { localUrl, assetUrl } from '../lib/urls.mjs';
 import '../styles/global.css';
 interface Props { title?: string; description?: string; active?: string; }
-const { title, description = profile.tagline, active = 'home' } = Astro.props;
+const { title, description = profile.tagline, active = '' } = Astro.props;
 const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — C++ 개발자 포트폴리오`;
-const navigation = [{ id: 'home', label: '소개', path: '' }, { id: 'projects', label: '프로젝트', path: 'projects/' }];
+const navigation = [{ id: 'projects', label: '프로젝트', path: 'projects/' }, { id: 'skills', label: '기술', path: '#skills' }];
 ---
 <!doctype html>
 <html lang="ko">
@@ -28,7 +28,7 @@ const navigation = [{ id: 'home', label: '소개', path: '' }, { id: 'projects',
       <div class="container header-inner">
         <a class="wordmark" href={localUrl()} aria-label={`${profile.name} 포트폴리오 홈`}><span class="brand-mark">h.</span><span>{profile.name}<small>C++ 소프트웨어 개발자</small></span></a>
         <nav aria-label="주 메뉴">
-          {navigation.map(item => <a href={localUrl(item.path)} aria-current={active === item.id ? 'page' : undefined}>{item.label}</a>)}
+          {navigation.map(item => <a href={item.id === 'skills' ? `${localUrl()}#skills` : localUrl(item.path)} aria-current={active === item.id ? 'page' : undefined}>{item.label}</a>)}
           <a class="nav-contact" href={`mailto:${profile.email}`}><span class="nav-contact-label">연락하기</span><span aria-hidden="true">↗</span></a>
         </nav>
       </div>

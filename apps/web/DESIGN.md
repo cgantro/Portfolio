@@ -8,7 +8,7 @@ Three directions informed the final interface:
 | Engineering Minimal | Focused navigation and a restrained information system | Page layout, skill groups, tags, project facts and document metadata |
 | Technical Showcase | A strong first impression from working systems | The dark DroneSim hero panel and simulator preview |
 
-The final choice is **Editorial Technical**, with Engineering Minimal structure and one Technical Showcase hero. The palette is warm white `#f5f4ef`, dark green `#182421`, near black `#1b211e`, and burnt orange `#b73518`. All tokens live in `apps/web/src/styles/tokens.css`; responsive and print rules live in `apps/web/src/styles/global.css`.
+The final choice is **Editorial Technical**, with Engineering Minimal structure and one Technical Showcase hero. The home page is project-first: visitors can open the project archive, read a case study, or follow a technology group to the projects that use it. Education and activity chronology stays out of the home page. The palette is warm white `#f5f4ef`, dark green `#182421`, near black `#1b211e`, and burnt orange `#b73518`. All tokens live in `apps/web/src/styles/tokens.css`; responsive and print rules live in `apps/web/src/styles/global.css`.
 
 Source data and architecture diagrams come from the public shared package and the existing root `asset/` folder.
 
@@ -20,4 +20,4 @@ Astro renders all content, navigation, evidence, and project detail HTML statica
 
 ## Checks
 
-`pnpm --filter @portfolio/web test:unit` tests URL handling and filtering. `test:e2e` covers static routes, keyboard access, filtering, missing assets and the explicit new-tab simulator launch. `test:visual` captures 10 routes at 375px, 768px, and 1440px and checks horizontal overflow. Screenshots land in `artifacts/design-review/screenshots/`; `pnpm report:visual` records their names and SHA256 hashes. They are review artifacts rather than committed image snapshots.
+`pnpm --filter @portfolio/web test:unit` tests URL handling and filtering. `test:e2e` covers static routes, keyboard access, filtering, missing assets, absent file downloads, and the explicit new-tab simulator launch. `test:visual` captures the home page, project archive, and four project pages at 375px, 768px, and 1440px and checks horizontal overflow. Screenshots land in `artifacts/design-review/screenshots/`; `pnpm report:visual` records their names and SHA256 hashes. They are review artifacts rather than committed image snapshots.
