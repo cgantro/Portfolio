@@ -5,7 +5,7 @@ import '../styles/global.css';
 interface Props { title?: string; description?: string; active?: string; }
 const { title, description = profile.tagline, active = 'home' } = Astro.props;
 const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — C++ 개발자 포트폴리오`;
-const navigation = [{ id: 'home', label: '소개', path: '' }, { id: 'projects', label: '프로젝트', path: 'projects/' }, { id: 'documents', label: '문서', path: 'documents/' }];
+const navigation = [{ id: 'home', label: '소개', path: '' }, { id: 'projects', label: '프로젝트', path: 'projects/' }];
 ---
 <!doctype html>
 <html lang="ko">
@@ -36,7 +36,7 @@ const navigation = [{ id: 'home', label: '소개', path: '' }, { id: 'projects',
     <main id="main"><slot /></main>
     <footer class="site-footer container">
       <div><strong>{profile.name}</strong><p>{profile.role}</p></div>
-      <div class="footer-links"><a href={`mailto:${profile.email}`}>이메일 ↗</a><a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href={localUrl('documents/')}>이력서·문서</a></div>
+      <div class="footer-links"><a href={`mailto:${profile.email}`}>이메일 ↗</a><a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
       <small>© {new Date().getFullYear()} {profile.nameEn}</small>
     </footer>
   </body>

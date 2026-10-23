@@ -40,9 +40,11 @@ const related = projects.filter(item => item.id !== project.id);
         {sharedMetricConditions.length > 0 && <div class="quiet-panel"><strong>공통 조건</strong><ul>{sharedMetricConditions.map(condition => <li>{condition}</li>)}</ul></div>}
         <div class="metric-list">
           {displayMetrics.map(metric => {
-            const conditions = metric.conditions.filter(condition =>
-              !sharedMetricConditions.includes(condition) && !/미기재|미포함/.test(condition),
-            );
+            const conditions = metric.id === 'response-min-reported'
+              ? []
+              : metric.conditions.filter(condition =>
+                  !sharedMetricConditions.includes(condition) && !/미기재|미포함/.test(condition),
+                );
             const responseMaximum = metric.id === 'response-min-reported'
               ? metrics.find(item => item.id === 'response-max-reported')?.value
               : undefined;

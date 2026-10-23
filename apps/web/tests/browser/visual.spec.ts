@@ -8,8 +8,7 @@ mkdirSync(screenshotRoot, { recursive: true });
 const routes = [
   ['', 'home'], ['projects/', 'projects'], ['projects/dronesim/', 'dronesim'],
   ['projects/robotpal/', 'robotpal'], ['projects/mausoleum/', 'mausoleum'],
-  ['projects/autowingcar/', 'autowingcar'], ['documents/', 'documents'],
-  ['resume/general/', 'resume-general'],
+  ['projects/autowingcar/', 'autowingcar'],
 ] as const;
 
 for (const [device, width, height] of [['desktop', 1440, 1000], ['tablet', 768, 1024], ['mobile', 375, 812]] as const) {

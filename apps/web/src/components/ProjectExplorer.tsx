@@ -19,7 +19,7 @@ export default function ProjectExplorer({ projects }: { projects: ProjectPreview
     <div className="project-grid">
       {visible.map(project => <article className="project-card" key={project.id}>
         <a className="project-cover" href={projectUrl(project.id)} aria-label={`${project.title} 프로젝트 상세 보기`}><img src={assetUrl(project.cover.src)} alt={project.cover.alt} loading="lazy" width="960" height="640" /><span className="project-index">프로젝트 {String(projects.indexOf(project) + 1).padStart(2, '0')}</span><span className="cover-arrow" aria-hidden="true">↗</span></a>
-        <div className="project-card-body"><div className="project-meta"><span>{project.category}</span><span>{project.status === 'ongoing' ? '진행 중' : project.period}</span></div><h2><a href={projectUrl(project.id)}>{project.title}</a></h2><p>{project.subtitle}</p><div className="tags">{project.stack.slice(0, 4).map(tag => <span key={tag}>{tag}</span>)}</div></div>
+        <div className="project-card-body"><div className="project-meta"><span>{project.category}</span><span>{project.status === 'ongoing' ? '진행 중' : project.period}</span></div><h2><a href={projectUrl(project.id)}>{project.title}</a></h2><p>{project.summary[0]}</p><div className="tags">{project.stack.slice(0, 4).map(tag => <span key={tag}>{tag}</span>)}</div></div>
       </article>)}
     </div>
     {visible.length === 0 && <div className="empty-state"><h2>검색 결과가 없습니다.</h2><p>다른 기술 이름이나 프로젝트 이름으로 검색해 주세요.</p><button type="button" className="button secondary" onClick={() => { setQuery(''); setCategory('all'); }}>필터 초기화</button></div>}

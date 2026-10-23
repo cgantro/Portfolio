@@ -2,8 +2,8 @@ import AxeBuilder from '@axe-core/playwright';
 import { test, expect } from '@playwright/test';
 
 const routes = [
-  '', 'projects/', 'documents/', 'projects/robotpal/', 'projects/mausoleum/',
-  'projects/autowingcar/', 'projects/dronesim/', 'resume/general/',
+  '', 'projects/', 'projects/robotpal/', 'projects/mausoleum/',
+  'projects/autowingcar/', 'projects/dronesim/',
 ];
 
 for (const route of routes) {

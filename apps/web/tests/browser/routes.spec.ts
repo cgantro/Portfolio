@@ -7,7 +7,7 @@ test('all static routes render and internal navigation keeps deployment base', a
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const missingAssets: string[] = [];
   page.on('response', response => { if (response.status() >= 400 && response.url().startsWith('http://127.0.0.1:4321/')) missingAssets.push(response.url()); });
-  for (const route of ['', 'projects/', 'documents/', 'projects/robotpal/', 'projects/mausoleum/', 'projects/autowingcar/', 'projects/dronesim/', 'resume/general/']) {
+  for (const route of ['', 'projects/', 'projects/robotpal/', 'projects/mausoleum/', 'projects/autowingcar/', 'projects/dronesim/']) {
     const response = await page.goto(`${base}${route}`);
     expect(response?.status()).toBe(200);
     await expect(page.locator('main h1')).toHaveCount(1);
@@ -28,32 +28,12 @@ test('DroneSim project assets preserve their deployed paths', async ({ request }
   }
 });
 
-test('every available document download is served from the repository base', async ({ page, request }) => {
-  for (const edition of ['general']) {
-    await page.goto(`${base}resume/${edition}/`);
-    const downloads = await page.locator('a[href*="/downloads/"]').evaluateAll(elements => elements.map(element => element.getAttribute('href')!));
-    expect(downloads).toContain(`${base}downloads/${edition}/resume.rendercv.pdf`);
-    for (const href of downloads) {
-      expect(href.startsWith(`${base}downloads/${edition}/`)).toBe(true);
-      const response = await request.get(href);
-      expect(response.status()).toBe(200);
-      const body = await response.body();
-      expect(body.length).toBeGreaterThan(0);
-      if (href.endsWith('/portfolio.html')) {
-        const html = body.toString('utf8');
-        const imageSources = [...html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/g)].map(match => match[1]);
-        expect(imageSources.length).toBeGreaterThan(0);
-        for (const source of imageSources) {
-          const assetUrl = new URL(source, `http://127.0.0.1:4321${href}`).pathname;
-          const assetResponse = await request.get(assetUrl);
-          expect(assetResponse.status(), `${source} should be available beside downloaded HTML`).toBe(200);
-        }
-      }
-    }
-  }
-  for (const internalArtifact of ['resume.json', 'resume.loss-report.json', 'portfolio.data.json']) {
-    const response = await request.get(`${base}downloads/general/${internalArtifact}`);
-    expect(response.status(), `${internalArtifact} stays local to the build`).toBe(404);
+test('portfolio pages have no downloadable files or document pages', async ({ page, request }) => {
+  await page.goto(base);
+  await expect(page.locator('a[download], a[href*="/downloads/"]')).toHaveCount(0);
+  await expect(page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '이력서' })).toHaveCount(0);
+  for (const path of ['documents/', 'resume/general/', 'downloads/general/portfolio.pdf', 'downloads/general/portfolio.html', 'downloads/general/resume.rendercv.pdf']) {
+    expect((await request.get(`${base}${path}`)).status(), `${path} is not published`).toBe(404);
   }
 });
 
@@ -101,21 +81,17 @@ test('keyboard skip link and navigation are reachable', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '프로젝트', exact: true })).toHaveAttribute('aria-current', 'page');
 });
 
-test('mobile navigation keeps contact visible and documents explain all resume formats', async ({ page }) => {
+test('mobile navigation keeps contact visible and the homepage presents the subproject', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto(base);
   const contact = page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '연락하기' });
   await expect(contact).toBeVisible();
   await expect(contact).toHaveAttribute('href', /^mailto:/);
 
-  await page.goto(`${base}documents/`);
-  await expect(page.locator('.document-card').first()).toContainText('PDF · HTML');
-  for (const [edition, headline] of [['general', '소프트웨어 개발자']]) {
-    await page.goto(`${base}resume/${edition}/`);
-    await expect(page.locator('.page-heading')).toContainText(headline);
-    await expect(page.locator('.download-panel')).toContainText('PDF 포트폴리오');
-    await expect(page.locator('.download-panel')).not.toContainText('변환 보고서');
-  }
+  await page.goto(base);
+  await expect(page.locator('.supporting-project')).toContainText('오토잉카');
+  await expect(page.locator('.supporting-project')).toContainText('Spring Boot');
+  await expect(page.locator('.supporting-project')).toContainText('A*');
 });
 
 test('DroneSim stays absent until explicit launch and opens in a separate tab', async ({ page }) => {

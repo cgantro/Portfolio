@@ -1,9 +1,0 @@
----
-import { editions } from '@portfolio/career-data';
-import SiteLayout from '../layouts/SiteLayout.astro';
-import { localUrl } from '../lib/urls.mjs';
----
-<SiteLayout title="문서" description="홍윤표의 이력서와 포트폴리오 문서." active="documents">
-  <header class="container page-heading"><span class="eyebrow">이력서와 포트폴리오</span><h1>문서 내려받기<span class="accent">.</span></h1><p>지원 분야와 문서 형식에 맞춰 이력서와 포트폴리오를 제공합니다.</p></header>
-  <section class="section container documents-section"><div class="section-heading"><div><span class="eyebrow">01 · 지원 문서</span><h2>포트폴리오와 이력서</h2></div><p>프로젝트와 기술 경험을 문서별 목적에 맞게 정리했습니다.</p></div><div class="document-grid">{editions.map((edition, index) => <article class="document-card"><div class="document-icon" aria-hidden="true">0{index + 1}<span>문서</span></div><h3>{edition.label}</h3><p>주요 프로젝트와 개발 경험을 담았습니다.</p><dl><div><dt>판</dt><dd>두 번째 판</dd></div><div><dt>파일 형식</dt><dd>PDF · HTML</dd></div></dl><a class="button secondary" href={localUrl(`resume/${edition.id}/`)}>문서 보기 ↗</a></article>)}</div></section>
-</SiteLayout>

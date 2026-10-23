@@ -8,6 +8,10 @@ const e = escapeHtml;
 const paragraphs = items => items.map(item => `<p>${e(item)}</p>`).join('');
 const heading = (index, title) => `<div class="eyebrow">PORTFOLIO / ${String(index).padStart(2, '0')}</div><h1>${e(title)}</h1>`;
 const publicLink = value => /^https?:\/\//.test(value);
+const projectLinks = project => Object.entries(project.links)
+  .filter(([, value]) => value && publicLink(value))
+  .map(([label, value]) => `<a href="${e(value)}">${e(label.toUpperCase())} ↗ ${e(value)}</a>`)
+  .join('<br>');
 
 function renderMarkdown(markdown) {
   const blocks = [];
@@ -88,10 +92,12 @@ function metricsMarkup(project) {
       : metric.baseline !== undefined
         ? `${metric.baseline} → ${metric.value} ${metric.unit}`
         : `${metric.value} ${metric.unit}`;
-    const conditions = visibleConditions(metric.conditions.filter(condition => !shared.includes(condition)));
+    const conditions = metric.id === 'response-min-reported'
+      ? []
+      : visibleConditions(metric.conditions.filter(condition => !shared.includes(condition)));
     return `<article><strong>${e(metric.label)}: ${e(value)}</strong>${conditions.length ? `<p>${e(conditions.join(' · '))}</p>` : ''}</article>`;
   }).join('');
-  return `<div class="metrics">${sharedMarkup}${cards}</div>`;
+  return `<section class="page result-page"><div class="eyebrow">${e(project.title)} · 측정 결과</div><h1>측정 결과</h1><p class="subtitle">${e(project.subtitle)}</p>${sharedMarkup}<div class="metrics">${cards}</div><div class="project-links">${projectLinks(project)}</div></section>`;
 }
 
 export function renderPortfolio({ data, edition, projects }, stylesheet) {
@@ -104,9 +110,8 @@ export function renderPortfolio({ data, edition, projects }, stylesheet) {
       ${paragraphs(project.summary)}
       ${project.printImage ? `<figure><img src="${e(project.printImage)}" alt="${e(project.architecture.alt)}"><figcaption>${e(project.architecture.alt)}</figcaption></figure>` : ''}
       <h2>기술 사례</h2>${renderMarkdown(implementationNarrative(project.narrativeMarkdown))}
-      ${metricsMarkup(project)}
-      <div class="project-links">${Object.entries(project.links).filter(([, value]) => value && publicLink(value)).map(([label, value]) => `<a href="${e(value)}">${e(label.toUpperCase())} ↗ ${e(value)}</a>`).join('<br>')}</div>
-    </section>`;
+      ${projectMetrics(project).length ? '' : `<div class="project-links">${projectLinks(project)}</div>`}
+    </section>${metricsMarkup(project)}`;
   }).join('');
   return `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="author" content="${e(profile.name)}"><title>${e(profile.name)} | ${e(edition.headline)}</title><style>${stylesheet}</style></head><body>
     <section class="page cover">${heading(1, profile.name)}<p class="name-en">${e(profile.nameEn)}</p><div class="cover-title"><h2>${e(edition.headline)}</h2><p>${e(profile.tagline)}</p></div>${paragraphs(profile.summary)}<dl class="contacts">${profile.email ? `<dt>EMAIL</dt><dd><a href="mailto:${e(profile.email)}">${e(profile.email)}</a></dd>` : ''}<dt>GITHUB</dt><dd><a href="${e(profile.github)}">${e(profile.github)}</a></dd></dl><div class="cover-edition">${e(edition.label)}<br><span>PROJECT PORTFOLIO · 한국어</span></div></section>
@@ -155,7 +160,9 @@ export async function preparePortfolio(input, editionId, { root, outputDir }) {
           ...metric,
           label: metric.id === 'response-min-reported' ? '응답 시간 범위' : metric.label,
           rangeMax: metric.id === 'response-min-reported' ? project.metrics.find(item => item.id === 'response-max-reported')?.value : undefined,
-          conditions: visibleConditions(metric.conditions.filter(condition => !sharedConditions.includes(condition))),
+          conditions: metric.id === 'response-min-reported'
+            ? []
+            : visibleConditions(metric.conditions.filter(condition => !sharedConditions.includes(condition))),
         })),
       };
     }),
