@@ -21,7 +21,7 @@
 - Before a release, run `pnpm run build`, `pnpm run test:unit`, `pnpm run test:e2e`, `pnpm run test:visual`, and `pnpm validate:pdf`.
 - For visual review, capture 375px, 768px, and 1440px viewports and save findings with page, state, evidence, and a concrete fix. Use Playwright evidence, separate subjective taste from reproducible defects, and do not claim checks passed unless the commands or reviews actually ran.
 - Do not break GitHub Pages routing or production deployment.
-- Work on `rebuild/portfolio-v2`; keep `main` unchanged until the user explicitly asks to merge or publish.
+- Work directly on `main` only. Before changing files, verify `git branch --show-current` is `main`; never create or switch to feature, codex, rebuild, temporary, or worktree branches. Do not open pull requests for ordinary portfolio changes. Do not make new branches for backups. Keep the working tree and user changes intact. Do not force-push or rewrite `main` history. After edits, run relevant checks and clearly report whether changes have been committed, pushed, or deployed. Deleting old local/remote branches is a one-time maintenance task: inspect unique commits first, preserve needed work, and never delete `main`.
 
 ## Skills and agents
 
