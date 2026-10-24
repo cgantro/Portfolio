@@ -1,27 +1,19 @@
 ---
 import { projectUrl, assetUrl } from '../lib/urls.mjs';
 import { projects } from '@portfolio/career-data';
-interface Props { project: (typeof projects)[number]; index?: number; headingLevel?: 'h2' | 'h3'; }
-const { project, index = 1, headingLevel = 'h3' } = Astro.props;
-const highlights = project.id === 'autowingcar'
-  ? [project.role[0], project.role[2]].filter((item): item is string => Boolean(item))
-  : project.role.slice(0, 1);
+interface Props { project: (typeof projects)[number]; headingLevel?: 'h2' | 'h3'; }
+const { project, headingLevel = 'h3' } = Astro.props;
 ---
-<article class:list={['project-entry', `project-entry-${project.id}`]}>
-  <a class="project-entry-image" href={projectUrl(project.id)} aria-label={`${project.title} 상세 내용 보기`}>
-    <img src={assetUrl(project.cover.src)} alt={project.cover.alt} loading="lazy" width="960" height="640" />
+<article class:list={['archive-project', 'archive-' + project.id]}>
+  <a class="archive-project-image" href={projectUrl(project.id)} aria-label={project.title + ' 상세 내용 보기'}>
+    <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="960" height="640" loading="lazy" />
   </a>
-  <div class="project-entry-copy">
-    <p class="project-entry-kicker"><span>{String(index).padStart(2, '0')}</span>{project.category}</p>
-    {headingLevel === 'h2'
-      ? <h2><a href={projectUrl(project.id)}>{project.title}</a></h2>
-      : <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>}
-    <p class="project-entry-subtitle">{project.subtitle}</p>
-    <p class="project-entry-summary">{project.summary[0]}</p>
-    {highlights.length > 0 && <div class="project-entry-work"><strong>구현 내용</strong>{highlights.map(item => <p>{item}</p>)}</div>}
-    <div class="project-entry-bottom">
-      <span>{project.status === 'ongoing' ? '진행 중' : project.period}</span>
-      <a href={projectUrl(project.id)}>상세 보기 <span aria-hidden="true">↗</span></a>
-    </div>
+  <div class="archive-project-copy">
+    <p class="project-state">{project.status === 'ongoing' ? '진행 중인 개인 프로젝트' : project.period}</p>
+    {headingLevel === 'h2' ? <h2><a href={projectUrl(project.id)}>{project.title}</a></h2> : <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>}
+    <p class="archive-subtitle">{project.subtitle}</p>
+    <p>{project.summary[0]}</p>
+    <ul>{project.role.slice(0, 2).map(item => <li>{item}</li>)}</ul>
+    <a class="project-link" href={projectUrl(project.id)}>구현 사례 보기 <span aria-hidden="true">↗</span></a>
   </div>
 </article>

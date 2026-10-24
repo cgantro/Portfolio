@@ -1,59 +1,66 @@
----
+﻿---
 import { projects } from '@portfolio/career-data';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import MarkdownContent from '../../components/MarkdownContent';
 import { assetUrl, localUrl, projectUrl } from '../../lib/urls.mjs';
 import { implementationNarrative } from '../../lib/narrative.mjs';
+
 interface Props { project: (typeof projects)[number]; }
-export function getStaticPaths() { return projects.map(project => ({ params: { id: project.id }, props: { project } })); }
+export function getStaticPaths() {
+  return projects.map(project => ({ params: { id: project.id }, props: { project } }));
+}
 const { project } = Astro.props;
 const metrics = project.id === 'robotpal'
   ? project.metrics.filter(metric => ['simulation-streaming-fps', 'camera-send-fps'].includes(metric.id))
-  : project.metrics;
-const displayMetrics = project.id === 'autowingcar'
-  ? metrics.filter(metric => metric.id !== 'response-max-reported')
-  : metrics;
-const sections = [
-  { id: 'overview', label: '개요' },
-  { id: 'architecture', label: '구조' },
-  { id: 'implementation', label: '기술 사례' },
-  ...(displayMetrics.length ? [{ id: 'benchmarks', label: '측정 결과' }] : []),
-  ...(project.links.demo ? [{ id: 'demo', label: '웹 실행' }] : []),
-];
-const sharedMetricConditions = displayMetrics.length > 1
-  ? displayMetrics[0].conditions.filter(condition => displayMetrics.every(metric => metric.conditions.includes(condition)))
+  : project.id === 'autowingcar'
+    ? project.metrics.filter(metric => metric.id !== 'response-max-reported')
+    : project.metrics;
+const sharedConditions = metrics.length > 1
+  ? metrics[0].conditions.filter(condition => metrics.every(metric => metric.conditions.includes(condition)))
   : [];
 const related = projects.filter(item => item.id !== project.id);
+const isDroneSim = project.id === 'dronesim';
+const metricHeading = project.id === 'robotpal' ? '카메라 스트리밍 성능' : project.id === 'dronesim' ? '충돌 계산 주기' : '부하 시험';
 ---
 <SiteLayout title={project.title} description={project.subtitle} active="projects">
-  <header class="container project-heading"><a class="back-link" href={localUrl('projects/')}><span aria-hidden="true">←</span> 전체 프로젝트</a><div class="eyebrow">{project.category}</div><h1>{project.title}</h1><p class="project-subtitle">{project.subtitle}</p><dl class="project-facts"><div><dt>기간</dt><dd>{project.period}</dd></div><div><dt>팀 구성</dt><dd>{project.team}</dd></div><div><dt>진행 상태</dt><dd>{project.status === 'ongoing' ? '진행 중' : '완료'}</dd></div>{project.links.github && <div><dt>코드</dt><dd><a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></dd></div>}</dl><p class="technology-line technology-line-detail"><strong>사용 기술</strong><span>{project.stack.join(' · ')}</span></p>
+  <header class="container project-heading">
+    <a class="back-link" href={localUrl('projects/')}>← 전체 프로젝트</a>
+    <h1>{project.title}</h1>
+    <p class="project-subtitle">{project.subtitle}</p>
+    <dl class="project-facts">
+      <div><dt>기간</dt><dd>{project.period}</dd></div>
+      <div><dt>참여</dt><dd>{project.team}</dd></div>
+      <div><dt>담당</dt><dd>{project.role[0]}</dd></div>
+      <div><dt>상태</dt><dd>{project.status === 'ongoing' ? '진행 중' : '완료'}</dd></div>
+    </dl>
+    <div class="project-top-links">
+      {project.links.github && <a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub 저장소 ↗</a>}
+      {project.links.demo && <a href={project.links.demo} target="_blank" rel="noopener noreferrer">시뮬레이터 실행 ↗</a>}
+    </div>
+    <p class="technology-line-detail"><strong>주요 기술</strong><span>{project.stack.slice(0, 6).join(' · ')}</span></p>
   </header>
-  <div class="container project-cover-wide"><img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="850" fetchpriority="high" /></div>
-  <div class="container project-reading"><aside class="project-toc"><nav aria-label="프로젝트 목차"><span class="eyebrow">목차</span>{sections.map((section, index) => <a href={`#${section.id}`}><span>0{index + 1}</span>{section.label}</a>)}</nav></aside><div class="project-content">
-    <section id="overview" class="detail-section"><span class="eyebrow">01 · 개요</span><h2>프로젝트 개요</h2>{project.summary.map(text => <p>{text}</p>)}{project.role.length > 0 && <div class="contribution-list"><h3>담당한 구현</h3><ul>{project.role.map(item => <li>{item}</li>)}</ul></div>}</section>
-    <section id="architecture" class="detail-section"><span class="eyebrow">02 · 구조</span><h2>시스템 구조</h2><figure class="architecture-figure"><a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={`${project.title} 구조도 원본 이미지 열기`}><img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} loading="lazy" width="1400" height="900" /></a><figcaption>그림을 누르면 원본 크기로 볼 수 있습니다.</figcaption></figure>{project.architecture.summary.map(text => <p>{text}</p>)}</section>
-    <section id="implementation" class="detail-section"><span class="eyebrow">03 · 기술 사례</span><h2>설계와 문제 해결</h2><MarkdownContent content={implementationNarrative(project.narrativeMarkdown)} /></section>
-    {displayMetrics.length > 0 && (
-      <section id="benchmarks" class="detail-section">
-        <span class="eyebrow">04 · 결과</span>
-        <h2>측정 결과</h2>
-        {sharedMetricConditions.length > 0 && <div class="quiet-panel"><strong>공통 조건</strong><ul>{sharedMetricConditions.map(condition => <li>{condition}</li>)}</ul></div>}
-        <div class="metric-list">
-          {displayMetrics.map(metric => {
-            const conditions = metric.id === 'response-min-reported'
-              ? []
-              : metric.conditions.filter(condition =>
-                  !sharedMetricConditions.includes(condition) && !/미기재|미포함/.test(condition),
-                );
-            const responseMaximum = metric.id === 'response-min-reported'
-              ? metrics.find(item => item.id === 'response-max-reported')?.value
-              : undefined;
 
+  <figure class="container project-cover-wide">
+    <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="900" fetchpriority="high" />
+  </figure>
+
+  <div class="container project-content">
+    {metrics.length > 0 && project.id !== 'autowingcar' && (
+      <section class="detail-section" aria-labelledby="metrics-title">
+        <h2 id="metrics-title">{metricHeading}</h2>
+        <div class="metric-list">
+          {metrics.map(metric => {
+            const conditions = metric.conditions.filter(condition =>
+              !sharedConditions.includes(condition) && !/미기재|미포함/.test(condition),
+            );
+            const responseMax = metric.id === 'response-min-reported'
+              ? project.metrics.find(item => item.id === 'response-max-reported')?.value
+              : undefined;
             return (
               <article class="metric-card">
                 <div class="metric-label">{metric.label}</div>
-                {responseMaximum !== undefined ? (
-                  <div class="metric-value">{metric.value.toLocaleString('ko-KR')}–{responseMaximum.toLocaleString('ko-KR')}<span> {metric.unit}</span></div>
+                {responseMax !== undefined ? (
+                  <div class="metric-value">{metric.value}–{responseMax}<span> {metric.unit}</span></div>
                 ) : metric.baseline !== undefined ? (
                   <div class="metric-comparison">
                     <div><span>개선 전</span><strong>{metric.baseline.toLocaleString('ko-KR')}<small> {metric.unit}</small></strong></div>
@@ -63,14 +70,67 @@ const related = projects.filter(item => item.id !== project.id);
                 ) : (
                   <div class="metric-value">{metric.value.toLocaleString('ko-KR')}<span> {metric.unit}</span></div>
                 )}
-                {conditions.length > 0 && <details open><summary>측정 조건</summary><ul>{conditions.map(condition => <li>{condition}</li>)}</ul></details>}
+                {conditions.length > 0 && <ul class="metric-conditions">{conditions.map(condition => <li>{condition}</li>)}</ul>}
               </article>
             );
           })}
         </div>
+        {sharedConditions.length > 0 && <p class="metric-shared-condition">{sharedConditions.join(' · ')}</p>}
       </section>
     )}
-    {project.links.demo && <section id="demo" class="detail-section"><span class="eyebrow">05 · 체험</span><h2>웹 데모</h2><p>웹 데모는 운동학 모델로 비행 상태와 시뮬레이션 흐름을 보여줍니다. AirSim 강체 물리는 Windows 네이티브 실행에서 사용할 수 있습니다.</p><a class="button" href={project.links.demo} target="_blank" rel="noopener noreferrer">새 탭에서 실행하기 <span aria-hidden="true">↗</span></a></section>}
-  </div></div>
-  <section class="container related-section"><div class="section-heading"><h2>다른 프로젝트</h2><a href={localUrl('projects/')}>전체 보기 ↗</a></div><div class="related-grid">{related.map(item => <a href={projectUrl(item.id)}><span>{item.category}</span><strong>{item.title} <span aria-hidden="true">↗</span></strong><p>{item.subtitle}</p></a>)}</div></section>
+
+    <section class="detail-section" aria-labelledby="architecture-title">
+      <h2 id="architecture-title">구조와 데이터 흐름</h2>
+      <div class="architecture-grid">
+        <figure class="architecture-figure">
+          <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={project.title + ' 구조도 원본 크기로 보기'}>
+            <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
+          </a>
+          <figcaption>그림을 누르면 원본 크기로 볼 수 있습니다.</figcaption>
+        </figure>
+        <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>
+      </div>
+    </section>
+
+    <section class="detail-section" aria-labelledby="work-title">
+      <h2 id="work-title">{project.id === 'robotpal' ? '병목 분석과 개선' : project.id === 'dronesim' ? '시뮬레이션 구현과 충돌 계산' : project.id === 'mausoleum' ? '음성 통신 구현' : '관제 서버 구현과 문제 해결'}</h2>
+      <div class="project-narrative"><MarkdownContent content={implementationNarrative(project.narrativeMarkdown)} /></div>
+    </section>
+
+    {project.id === 'autowingcar' && metrics.length > 0 && (
+      <section class="detail-section" aria-labelledby="metrics-title">
+        <h2 id="metrics-title">{metricHeading}</h2>
+        <div class="metric-list">
+          {metrics.map(metric => {
+            const responseMax = metric.id === 'response-min-reported'
+              ? project.metrics.find(item => item.id === 'response-max-reported')?.value
+              : undefined;
+            return (
+              <article class="metric-card">
+                <div class="metric-label">{metric.label}</div>
+                {responseMax !== undefined
+                  ? <div class="metric-value">{metric.value}–{responseMax}<span> {metric.unit}</span></div>
+                  : <div class="metric-value">{metric.value.toLocaleString('ko-KR')}<span> {metric.unit}</span></div>}
+              </article>
+            );
+          })}
+        </div>
+        <p class="metric-shared-condition">가상 차량 500대가 초당 10회씩 상태를 보낸 조건입니다. 공개 기록에는 응답 시간 통계 기준과 반복 횟수가 없습니다.</p>
+      </section>
+    )}
+
+    {project.links.demo && (
+      <section class="detail-section project-demo-section" aria-labelledby="demo-title">
+        <div><h2 id="demo-title">웹 시뮬레이터</h2><p>시뮬레이터는 별도 탭에서 실행합니다. WebAssembly 빌드는 운동학 모델을 사용하며 AirSim 강체 물리는 Windows 네이티브 실행에서 사용합니다.</p></div>
+        <a class="button" href={project.links.demo} target="_blank" rel="noopener noreferrer">새 탭에서 실행 <span aria-hidden="true">↗</span></a>
+      </section>
+    )}
+  </div>
+
+  <section class="container related-section" aria-labelledby="related-title">
+    <h2 id="related-title">다른 프로젝트</h2>
+    <div class="related-grid">
+      {related.map(item => <a href={projectUrl(item.id)}><span>{item.category}</span><strong>{item.title}</strong><p>{item.subtitle}</p></a>)}
+    </div>
+  </section>
 </SiteLayout>

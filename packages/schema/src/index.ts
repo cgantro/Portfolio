@@ -99,8 +99,13 @@ export const TimelineEntrySchema = z.object({
   startDate: PartialDateSchema, endDate: PartialDateSchema.nullable(), evidence: z.array(EvidenceSchema).min(1),
 }).strict();
 export const SkillGroupSchema = z.object({
-  category: NonEmpty, evidence: NonEmpty,
-  items: z.array(z.object({ name: NonEmpty, detail: NonEmpty, projectIds: z.array(ProjectFields.id).min(1) }).strict()).min(1),
+  category: z.enum(['Languages (프로그래밍 언어)', 'Tech Stack (기술 스택)', 'Tools (개발 도구)']), evidence: NonEmpty,
+  items: z.array(z.object({
+    name: NonEmpty,
+    detail: NonEmpty,
+    rating: z.number().int().min(1).max(3),
+    projectIds: z.array(ProjectFields.id).min(1),
+  }).strict()).min(1),
 }).strict();
 export const ActivitySchema = z.object({
   id: NonEmpty, title: NonEmpty, subtitle: NonEmpty, period: NonEmpty,
@@ -112,13 +117,15 @@ export const EditionSchema = z.object({
 }).strict();
 export const CareerFactsSchema = z.object({
   version: z.literal(2), profile: ProfileSchema, timeline: z.array(TimelineEntrySchema),
-  skills: z.array(SkillGroupSchema), activities: z.array(ActivitySchema), editions: z.array(EditionSchema).min(1),
+  skills: z.array(SkillGroupSchema).length(3), activities: z.array(ActivitySchema), editions: z.array(EditionSchema).min(1),
 }).strict();
 export const CareerDataSchema = CareerFactsSchema.extend({ projects: z.array(ProjectSchema).min(1) }).strict().superRefine((data, ctx) => {
   const ids = data.projects.map((project) => project.id);
   if (new Set(ids).size !== ids.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['projects'], message: 'Duplicate project ID' });
   const editionIds = data.editions.map((edition) => edition.id);
   if (new Set(editionIds).size !== editionIds.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['editions'], message: 'Duplicate edition ID' });
+  const skillCategories = data.skills.map((group) => group.category);
+  if (new Set(skillCategories).size !== skillCategories.length) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['skills'], message: 'Duplicate skill category' });
   data.editions.forEach((edition, index) => edition.projectIds.forEach((id) => {
     if (!ids.includes(id)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['editions', index, 'projectIds'], message: `Missing project: ${id}` });
   }));

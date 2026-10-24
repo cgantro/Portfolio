@@ -2,7 +2,7 @@ name: Portfolio V2 CI
 
 on:
   push:
-    branches: [main, rebuild/portfolio-v2]
+    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:

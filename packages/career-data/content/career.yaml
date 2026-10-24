@@ -117,140 +117,123 @@ timeline:
     locator: ssafy
     note: 공개 포트폴리오 기재 사항이며 증명서 원본은 이 저장소에 포함하지 않습니다.
 skills:
-- category: C++ 응용 개발
-  evidence: DroneSim, RobotPal, 영묘
+- category: Languages (프로그래밍 언어)
+  evidence: RobotPal, DroneSim, Mausoleum, AutoWingCar
   items:
-  - name: C++17
-    detail: 로봇 시뮬레이터와 서버 프로그램 구현
-    projectIds:
-    - robotpal
-  - name: C++20
-    detail: 드론 시뮬레이션 프로그램 구현
-    projectIds:
-    - dronesim
+  - name: C++
+    detail: 시뮬레이터와 실시간 서버 기능 구현
+    rating: 3
+    projectIds: [robotpal, dronesim, mausoleum]
+  - name: Java
+    detail: 공항 차량 관제 서버 구현
+    rating: 2
+    projectIds: [autowingcar]
+  - name: Python
+    detail: 로봇 시뮬레이터의 인공지능 연동
+    rating: 2
+    projectIds: [robotpal]
+- category: Tech Stack (기술 스택)
+  evidence: 실제 프로젝트에서 사용한 라이브러리, 프레임워크, 통신 기술과 데이터베이스
+  items:
   - name: STL
-    detail: C++ 표준 자료 구조와 알고리즘
-    projectIds:
-    - robotpal
-    - mausoleum
-    - dronesim
-  - name: CMake
-    detail: 프로그램 빌드 설정 관리
-    projectIds:
-    - robotpal
-    - mausoleum
-    - dronesim
+    detail: 표준 자료 구조와 알고리즘
+    rating: 2
+    projectIds: [robotpal, dronesim, mausoleum]
   - name: 멀티스레딩
-    detail: 여러 작업 흐름을 동시에 실행
-    projectIds:
-    - robotpal
-    - mausoleum
-    - dronesim
-- category: 시뮬레이션·그래픽스
-  evidence: DroneSim, RobotPal
-  items:
-  - name: OpenGL
-    detail: 3D 화면 그리기
-    projectIds:
-    - robotpal
-    - dronesim
+    detail: 시뮬레이션·영상·음성 작업 분리
+    rating: 3
+    projectIds: [robotpal, dronesim, mausoleum]
   - name: Flecs
-    detail: 드론 상태와 비행 시스템 관리
-    projectIds:
-    - robotpal
-    - dronesim
-  - name: AirSim
-    detail: 네이티브 강체 비행 물리 계산
-    projectIds:
-    - dronesim
-  - name: OpenCV
-    detail: 카메라 프레임 품질 지표 계산
-    projectIds:
-    - dronesim
-- category: 실시간 통신·미디어
-  evidence: RobotPal, 영묘
-  items:
-  - name: TCP
-    detail: 데이터 순서를 지켜 전달
-    projectIds:
-    - robotpal
-  - name: WebSocket
-    detail: 연결을 유지해 양방향 통신
-    projectIds:
-    - robotpal
-    - mausoleum
-    - autowingcar
-  - name: JPEG
-    detail: 이미지 파일 크기 축소
-    projectIds:
-    - robotpal
+    detail: 드론·로봇 상태와 시스템 관리
+    rating: 2
+    projectIds: [robotpal, dronesim]
   - name: UDP
-    detail: 지연을 줄이는 음성 전송
-    projectIds:
-    - mausoleum
+    detail: 지상통제와 실시간 음성 전송
+    rating: 2
+    projectIds: [dronesim, mausoleum]
+  - name: OpenGL
+    detail: 로봇·드론 시뮬레이터 화면 구현
+    rating: 2
+    projectIds: [robotpal, dronesim]
+  - name: AirSim
+    detail: 네이티브 강체 비행 물리 연결
+    rating: 2
+    projectIds: [dronesim]
+  - name: OpenCV
+    detail: 카메라 프레임 분석
+    rating: 1
+    projectIds: [dronesim]
+  - name: TCP
+    detail: 로봇 제어 데이터 전달
+    rating: 2
+    projectIds: [robotpal]
+  - name: WebSocket
+    detail: 로비와 관제 화면 통신
+    rating: 2
+    projectIds: [robotpal, mausoleum, autowingcar]
   - name: Opus
-    detail: 실시간 음성 압축
-    projectIds:
-    - mausoleum
-  - name: 언리얼 엔진 5
-    detail: 3D 게임 화면과 서버 개발
-    projectIds:
-    - robotpal
-    - mausoleum
-- category: 성능 측정·검증
-  evidence: RobotPal, DroneSim, 오토윙카
-  items:
-  - name: Tracy
-    detail: 프로그램 구간별 실행 시간 측정
-    projectIds:
-    - robotpal
-  - name: Google Benchmark
-    detail: C++ 기능의 실행 시간 비교
-    projectIds:
-    - dronesim
-  - name: CTest
-    detail: C++ 자동 검사 실행
-    projectIds:
-    - dronesim
-  - name: k6
-    detail: 가상 접속을 만들어 부하 측정
-    projectIds:
-    - autowingcar
-- category: 서버·관제
-  evidence: 오토윙카
-  items:
-  - name: Java 17
-    detail: 서버 프로그램 언어
-    projectIds:
-    - autowingcar
+    detail: 음성 인코딩과 재생
+    rating: 2
+    projectIds: [mausoleum]
+  - name: Unreal Engine 5
+    detail: 협동 게임 클라이언트와 전용 서버
+    rating: 2
+    projectIds: [mausoleum]
   - name: Spring Boot
-    detail: Java 서버 개발 도구
-    projectIds:
-    - autowingcar
-  - name: Redis
-    detail: 자주 쓰는 값을 빠르게 임시 저장
-    projectIds:
-    - autowingcar
-  - name: PostgreSQL
-    detail: 차량 상태와 운행 이력 저장
-    projectIds:
-    - autowingcar
+    detail: 공항 차량 관제 서버
+    rating: 2
+    projectIds: [autowingcar]
   - name: MQTT
-    detail: 차량 명령·상태 메시지 교환
-    projectIds:
-    - autowingcar
-  - name: STOMP
-    detail: 관제 화면에 변경 상태 전달
-    projectIds:
-    - autowingcar
+    detail: 차량 명령과 상태 전달
+    rating: 2
+    projectIds: [autowingcar]
+  - name: Redis
+    detail: 차량 상태·갱신 토큰 관리
+    rating: 2
+    projectIds: [autowingcar]
+  - name: PostgreSQL
+    detail: 지도와 주행 이력 저장
+    rating: 2
+    projectIds: [autowingcar]
+- category: Tools (개발 도구)
+  evidence: 실제 프로젝트에서 빌드, 성능 측정, 시험, 배포에 사용
+  items:
+  - name: CMake
+    detail: C++ 프로젝트 빌드 설정
+    rating: 2
+    projectIds: [robotpal, dronesim, mausoleum]
+  - name: Tracy
+    detail: 시뮬레이션·영상 구간 성능 측정
+    rating: 2
+    projectIds: [robotpal]
+  - name: Google Benchmark
+    detail: 충돌 계산 성능 비교
+    rating: 2
+    projectIds: [dronesim]
+  - name: CTest
+    detail: 시뮬레이션 자동 시험 실행
+    rating: 2
+    projectIds: [dronesim]
+  - name: Emscripten
+    detail: C++ WebAssembly 빌드
+    rating: 2
+    projectIds: [robotpal, dronesim]
+  - name: Git
+    detail: 프로젝트 형상 관리
+    rating: 2
+    projectIds: [robotpal, dronesim, mausoleum, autowingcar]
   - name: Docker
-    detail: 실행 환경 구성
-    projectIds:
-    - autowingcar
+    detail: 관제 서버 실행 환경 구성
+    rating: 2
+    projectIds: [autowingcar]
   - name: GitLab CI
-    detail: 자동 빌드·배포 구성
-    projectIds:
-    - autowingcar
+    detail: 관제 서버 자동 빌드와 배포
+    rating: 2
+    projectIds: [autowingcar]
+  - name: k6
+    detail: 차량 상태 메시지 부하 시험
+    rating: 2
+    projectIds: [autowingcar]
 activities:
 - id: band
   title: 교내 밴드 동아리 마스터
@@ -278,8 +261,6 @@ editions:
   - mausoleum
   - autowingcar
   skillCategories:
-  - C++ 응용 개발
-  - 시뮬레이션·그래픽스
-  - 실시간 통신·미디어
-  - 성능 측정·검증
-  - 서버·관제
+  - Languages (프로그래밍 언어)
+  - Tech Stack (기술 스택)
+  - Tools (개발 도구)

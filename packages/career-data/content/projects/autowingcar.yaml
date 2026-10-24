@@ -34,7 +34,7 @@ architecture:
   - 차량 메시지 통신으로 장비 상태와 결과를 받고, 열린 웹 연결로 관제 화면을 갱신했습니다.
   - 인공지능과 차량 장치, 관제 화면을 연결하는 서버 전반을 맡았습니다.
 links:
-  github: null
+  github: https://github.com/cgantro/Autowing_car
   demo: null
 contributions:
 - id: autowingcar-contribution-1

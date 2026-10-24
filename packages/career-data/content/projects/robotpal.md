@@ -12,12 +12,20 @@ JETANK 이동 로봇의 주행을 가상 환경에서 재현하고 카메라 영
 
 ## 구현
 
+파일: RobotPal/src/Util/StreamingWorker.cpp
+
 ```cpp
 {
     std::lock_guard<std::mutex> lock(m_encodeQueueMutex);
-    if (m_encodeQueue.size() >= EncodeQueueCapacity)
+    if (m_encodeQueue.size() >= EncodeQueueCapacity) {
+        const auto droppedFrameId = m_encodeQueue.front().frameId;
         m_encodeQueue.pop();
+        robotpal::benchmark::Event(
+            "encode_queue_dropped", droppedFrameId, 0,
+            EncodeQueueCapacity, "drop_oldest_capacity_6");
+    }
     m_encodeQueue.push(std::move(job));
+    robotpal::benchmark::Event("encode_queued", frameId, 0, m_encodeQueue.size());
 }
 m_encodeQueueCv.notify_one();
 ```

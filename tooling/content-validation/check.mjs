@@ -22,14 +22,18 @@ for (const record of publicRecords) {
   }
 }
 const projectFiles = (await readdir(resolve(contentRoot, 'projects'))).filter(name => name.endsWith('.md'));
-const requiredHeadings = ['개요', '구현'];
+const projectTopics = {
+  robotpal: /^(#{1,3})\s+.*(?:문제 해결|성능 개선)/m,
+  dronesim: /^(#{1,3})\s+.*충돌 후보/m,
+  mausoleum: /^(#{1,3})\s+.*(?:구현|문제 해결)/m,
+  autowingcar: /^(#{1,3})\s+.*(?:구현|문제 해결)/m,
+};
 for (const filename of projectFiles) {
   const projectId = filename.replace(/\.md$/, '');
   const text = await readFile(resolve(contentRoot, 'projects', filename), 'utf8');
   if (!careerData.projects.some(project => project.id === projectId)) errors.push(`${filename}: no matching canonical YAML project`);
-  for (const heading of requiredHeadings) {
-    if (!new RegExp(`^#{1,3}\\s+.*${heading}`, 'm').test(text)) errors.push(`${filename}: missing a ${heading} heading`);
-  }
+  if (!/^#{1,3}\s+.*개요/m.test(text)) errors.push(`${filename}: missing an overview heading`);
+  if (!projectTopics[projectId]?.test(text)) errors.push(`${filename}: missing its project-specific technical section`);
   if (text.length < 500) errors.push(`${filename}: narrative is unexpectedly short (${text.length} characters)`);
   if (/\b(?:TODO|TBD|FIXME|lorem ipsum)\b/i.test(text)) errors.push(`${filename}: contains a draft placeholder`);
   if (/(^|[/\\])(?:career-db|PRIVATE_NOT_FOR_GITHUB)([/\\]|$)/i.test(text)) errors.push(`${filename}: contains a private source path`);

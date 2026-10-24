@@ -41,21 +41,20 @@ test('project content and links are readable without client JavaScript', async (
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(`http://127.0.0.1:4321${base}projects/`);
-  await expect(page.locator('.project-entry')).toHaveCount(4);
+  await expect(page.locator('.archive-project')).toHaveCount(4);
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
-  await expect(page.locator('#overview')).toBeVisible();
-  await expect(page.locator('#architecture img')).toHaveAttribute('alt', /.+/);
-  await expect(page.locator('#implementation')).toContainText('충돌 상자');
-  await expect(page.locator('#verification, #limitations, [data-evidence-ids]')).toHaveCount(0);
-  await expect(page.locator('#demo a[target="_blank"]')).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
+  await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
+  await expect(page.locator('.project-narrative')).toContainText('충돌 상자');
+  await expect(page.locator('[data-evidence-ids]')).toHaveCount(0);
+  await expect(page.locator('.project-demo-section a[target="_blank"]')).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
   await context.close();
 });
 
 test('project index presents all four cases without client-side controls', async ({ page }) => {
   await page.goto(`${base}projects/`);
-  await expect(page.locator('.project-entry')).toHaveCount(4);
+  await expect(page.locator('.archive-project')).toHaveCount(4);
   await expect(page.locator('astro-island')).toHaveCount(0);
-  await expect(page.locator('.project-entry').nth(3)).toContainText('오토잉카');
+  await expect(page.locator('.archive-project').nth(3)).toContainText('오토잉카');
 });
 
 test('keyboard skip link and navigation are reachable', async ({ page }) => {
@@ -70,38 +69,36 @@ test('keyboard skip link and navigation are reachable', async ({ page }) => {
   await expect(page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '프로젝트', exact: true })).toHaveAttribute('aria-current', 'page');
 });
 
-test('technology navigation returns visitors to the project-linked skill map', async ({ page }) => {
+test('intro navigation returns visitors to the profile section', async ({ page }) => {
   await page.goto(`${base}projects/autowingcar/`);
-  await page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '기술' }).click();
-  await expect(page).toHaveURL(/\/Portfolio\/#skills$/);
-  await expect(page.getByRole('heading', { name: '기술 분야' })).toBeVisible();
+  await page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '소개' }).click();
+  await expect(page).toHaveURL(/\/Portfolio\/#about$/);
+  await expect(page.getByRole('heading', { name: '소개', exact: true })).toBeVisible();
 });
 
-test('mobile navigation stays visible and the homepage gives AutoWingCar a full project entry', async ({ page }) => {
+test('mobile menu opens by keyboard and supporting projects stay visible', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
   await page.goto(base);
-  const contact = page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '연락처' });
-  await expect(contact).toBeVisible();
-  await expect(contact).toHaveAttribute('href', /^mailto:/);
-
-  await page.goto(base);
-  const autoWingProject = page.locator('.project-entry-autowingcar');
-  await expect(autoWingProject).toContainText('Spring Boot');
-  await expect(autoWingProject).toContainText('A*');
-  await expect(autoWingProject.getByText('구현 내용')).toBeVisible();
-  await expect(page.locator('.project-entry')).toHaveCount(3);
+  const menu = page.locator('.mobile-nav summary');
+  await menu.focus();
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.mobile-nav')).toHaveAttribute('open', '');
+  await expect(page.locator('.mobile-nav nav a', { hasText: '프로젝트' })).toBeVisible();
+  await expect(page.locator('.supporting-project')).toHaveCount(2);
+  await expect(page.locator('.supporting-project').nth(1)).toContainText('MQTT');
 });
 
-test('homepage leads with DroneSim and offers its case study and web launch', async ({ page }) => {
+test('homepage introduces the developer before the featured project cases', async ({ page }) => {
   let demoRequests = 0;
   page.on('request', request => { if (request.url().startsWith('https://cgantro.github.io/DroneSim/')) demoRequests += 1; });
   await page.goto(base);
-  await expect(page.getByRole('heading', { name: /시뮬레이션과 실시간 시스템을/ })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'DroneSim 구현 보기' })).toHaveAttribute('href', /projects\/dronesim\/$/);
-  const launch = page.getByRole('link', { name: '웹에서 실행' });
+  await expect(page.getByRole('heading', { name: /C\+\+ 시뮬레이터를 개발하고/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();
+  const launch = page.getByRole('link', { name: '시뮬레이터 실행' });
   await expect(launch).toHaveAttribute('target', '_blank');
-  await expect(page.locator('.home-feature-image img')).toBeVisible();
-  await expect(page.locator('.project-entry')).toHaveCount(3);
+  await expect(page.locator('.featured-project')).toHaveCount(2);
+  await expect(page.locator('.supporting-project')).toHaveCount(2);
   expect(demoRequests).toBe(0);
 });
 
@@ -111,7 +108,7 @@ test('DroneSim stays absent until explicit launch and opens in a separate tab', 
   await page.goto(`${base}projects/dronesim/`);
   await expect(page.locator('iframe')).toHaveCount(0);
   expect(demoRequests).toBe(0);
-  const launch = page.getByRole('link', { name: '새 탭에서 실행하기' });
+  const launch = page.getByRole('link', { name: '새 탭에서 실행' });
   await expect(launch).toHaveAttribute('target', '_blank');
   await launch.scrollIntoViewIfNeeded();
   const popupPromise = page.waitForEvent('popup');

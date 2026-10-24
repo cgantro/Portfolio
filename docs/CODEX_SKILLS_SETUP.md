@@ -1,6 +1,6 @@
 # Codex Career Skills Setup
 
-This branch adds original project skills plus a Windows installer for the verified third-party skills. It does not modify the main branch.
+This repository contains portfolio-specific Codex skills and a Windows installer for reviewed third-party skills. Portfolio changes are made directly on `main`.
 
 ## Windows VS Code setup
 
@@ -21,7 +21,7 @@ The audit script captures mobile, tablet and desktop screenshots plus a JSON rep
 
 The installer clones the public sources into the local app-data cache and copies their skill directories into .agents/skills. It copies selected reviewer definitions into .codex/agents and removes fixed model IDs and sandbox metadata (actual permissions follow Codex host policy). Existing installed skills are skipped; the -Force switch overwrites them. Review source changes before future updates.
 
-## Bundled original skills (available by checking out branch)
+## Bundled original skills
 - korean-technical-resume: evidence-backed Korean C++ engineering resume with fact and ATS checks
 - korean-technical-portfolio: evidence-backed technical project case studies and portfolio narratives
 - career-evidence-retrieval: evidence-first search of a local career-db without vectors

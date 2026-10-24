@@ -1,11 +1,14 @@
 ---
 import { profile } from '@portfolio/career-data';
-import { localUrl, assetUrl } from '../lib/urls.mjs';
+import { localUrl } from '../lib/urls.mjs';
 import '../styles/global.css';
 interface Props { title?: string; description?: string; active?: string; }
 const { title, description = profile.tagline, active = '' } = Astro.props;
 const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — C++ 개발자 포트폴리오`;
-const navigation = [{ id: 'projects', label: '프로젝트', path: 'projects/' }, { id: 'skills', label: '기술', path: '#skills' }];
+const navigation = [
+  { id: 'projects', label: '프로젝트', href: localUrl('projects/') },
+  { id: 'about', label: '소개', href: `${localUrl()}#about` },
+];
 ---
 <!doctype html>
 <html lang="ko">
@@ -13,12 +16,11 @@ const navigation = [{ id: 'projects', label: '프로젝트', path: 'projects/' }
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#f5f5f2" />
+    <meta name="theme-color" content="#F8FAFC" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="ko_KR" />
-    <meta property="og:image" content={new URL(assetUrl('DroneSim-preview.jpg'), Astro.site).href} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <title>{pageTitle}</title>
   </head>
@@ -26,11 +28,18 @@ const navigation = [{ id: 'projects', label: '프로젝트', path: 'projects/' }
     <a class="skip-link" href="#main">본문으로 바로가기</a>
     <header class="site-header">
       <div class="container header-inner">
-        <a class="wordmark" href={localUrl()} aria-label={`${profile.name} 포트폴리오 홈`}><span>{profile.name}<small>C++ 시뮬레이션 · 실시간 통신</small></span></a>
-        <nav aria-label="주 메뉴">
-          {navigation.map(item => <a href={item.id === 'skills' ? `${localUrl()}#skills` : localUrl(item.path)} aria-current={active === item.id ? 'page' : undefined}>{item.label}</a>)}
-          <a class="nav-contact" href={`mailto:${profile.email}`}><span class="nav-contact-label">연락처</span><span aria-hidden="true">↗</span></a>
+        <a class="wordmark" href={localUrl()} aria-label={`${profile.name} 포트폴리오 홈`}><span>{profile.name}<small>C++ Software Engineer</small></span></a>
+        <nav class="desktop-nav" aria-label="주 메뉴">
+          {navigation.map(item => <a href={item.href} aria-current={active === item.id ? 'page' : undefined}>{item.label}</a>)}
+          <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
         </nav>
+        <details class="mobile-nav">
+          <summary aria-label="메뉴 열기">메뉴</summary>
+          <nav aria-label="모바일 메뉴">
+            {navigation.map(item => <a href={item.href} aria-current={active === item.id ? 'page' : undefined}>{item.label}</a>)}
+            <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+          </nav>
+        </details>
       </div>
     </header>
     <main id="main"><slot /></main>

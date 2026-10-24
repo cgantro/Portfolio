@@ -9,3 +9,10 @@ test('case-study prose excludes duplicated overview and keeps canonical implemen
   assert.match(result, /### 문제 해결 과정\n#### Bottleneck\nDecision/);
   assert.doesNotMatch(result, /Overview|Limits|# Project/);
 });
+
+test('project-specific technical headings keep their content', () => {
+  const markdown = '# DroneSim\n\n## 개요\nOverview\n\n## 충돌 후보 계산 줄이기\nCandidate pruning';
+  const result = implementationNarrative(markdown);
+  assert.match(result, /### 충돌 후보 계산 줄이기\nCandidate pruning/);
+  assert.doesNotMatch(result, /Overview|# DroneSim/);
+});

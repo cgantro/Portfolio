@@ -38,9 +38,9 @@ pnpm test:live-simulator
 pnpm run validate:pdf
 ```
 
-`pnpm run build`는 콘텐츠/이력서 검증, 12페이지 기술 포트폴리오 PDF와 RenderCV 1페이지 이력서 PDF 생성, Astro 정적 웹사이트 빌드를 수행합니다. 웹 산출물은 `apps/web/dist/`, PDF와 교환용 JSON Resume은 `apps/print/dist/{edition}/`에 생성되고, 다운로드로 복사됩니다. PDF 성공은 파일 존재만으로 처리하지 않고, 페이지 수와 한국어 텍스트 추출을 확인한 뒤 기록합니다.
+`pnpm run build`는 콘텐츠 검증, 포트폴리오·이력서 PDF 생성, Astro 정적 웹사이트 빌드를 수행합니다. 웹 산출물은 `apps/web/dist/`, PDF는 검증용 `apps/print/dist/{edition}/`에 생성됩니다. PDF는 웹 산출물에 복사하지 않으며, 웹 포트폴리오에도 이력서 화면이나 내려받기 링크를 두지 않습니다.
 
-브라우저 검사는 배포 경로 `/Portfolio/`를 포함한 실제 정적 빌드에서 라우트, 검색·필터, 다운로드, 키보드 동작, 시뮬레이터 실행을 검사합니다. axe-core는 WCAG 자동 점검에 사용됩니다. 시각 검사는 8개 경로를 375px, 768px, 1440px에서 캡처해 `artifacts/design-review/`에 보관합니다. `pnpm report:visual`은 스크린샷 목록과 해시를 기록합니다. `pnpm test:live-simulator`는 공개 DroneSim 웹 데모를 실제 브라우저에서 열어 확인하므로 네트워크가 필요하며 CI에서는 실행하지 않습니다.
+브라우저 검사는 배포 경로 `/Portfolio/`를 포함한 실제 정적 빌드에서 여섯 경로, 키보드 탐색, 접근성, 시뮬레이터 실행을 확인합니다. axe-core는 WCAG 자동 점검에 사용됩니다. 시각 검사는 첫 화면, 프로젝트 목록, 네 프로젝트 상세를 375px, 768px, 1440px에서 캡처해 `artifacts/design-review/screenshots/`에 보관합니다. `pnpm test:live-simulator`는 공개 DroneSim 웹 데모를 실제 브라우저에서 열어 확인하므로 네트워크가 필요하며 CI에서는 실행하지 않습니다.
 
 선택형 엔진 비교는 다음 명령으로 실행합니다.
 
@@ -65,7 +65,7 @@ pnpm --filter @portfolio/print resume:rendercv
 
 ## 배포
 
-`main`에 푸시하면 `.github/workflows/deploy.yml`이 빌드하고 `apps/web/dist/`를 GitHub Pages에 배포합니다. `rebuild/portfolio-v2` 브랜치 푸시와 `main` 대상 PR은 단위·브라우저·시각·PDF 검사를 수행합니다. V2를 배포하기 전에는 변경된 경로와 GitHub Pages 설정을 확인해야 합니다.
+`main`에 직접 푸시하면 `.github/workflows/deploy.yml`이 빌드하고 `apps/web/dist/`를 GitHub Pages에 배포합니다. 포트폴리오 작업은 `main`에서만 진행하며 별도 브랜치나 작업 트리를 만들지 않습니다. `.github/workflows/portfolio-v2-ci.yml`은 `main` 변경을 검사합니다.
 
 ## DroneSim
 

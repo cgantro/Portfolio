@@ -1,30 +1,29 @@
-# Portfolio design system
+﻿# Portfolio 디자인 기준
 
-The site is a Korean project showcase for C++ simulation, modeling, and real-time communication roles. Recruiters should understand the work and contribution at a glance; technical interviewers can follow the project link into architecture, implementation, and measurements.
+이 사이트는 C++ 시뮬레이션·모델링·실시간 통신 개발자의 작업을 보여주는 웹 포트폴리오다. 첫 화면은 개발자 소개로 시작하고, RobotPal과 DroneSim에서 문제 분석과 구현을 보여준 뒤 두 보조 프로젝트, 기술 역량, 학력과 자격으로 이어진다.
 
-## Page hierarchy
+## 화면 구성
 
-- The home page introduces the candidate briefly and leads with the DroneSim simulator image, one implementation detail, a case-study link, and the separate web launch.
-- The four projects use one editorial index pattern: project image, field, title, concise summary, specific implementation, and detail link. AutoWingCar remains a full project entry.
-- The project archive is a static list. Four entries do not need search or category controls; every project remains readable with JavaScript disabled.
-- Project detail pages retain their project-specific facts, architecture, implementation narratives, and relevant measurements. Do not expose evidence IDs or internal audit language.
-- Technology is organized by the existing skill groups and linked to projects that use it. Avoid decorative tag clouds and repeated stack summaries.
-- Resume pages and downloadable documents are not part of the site.
+- 첫 화면에는 짧은 직무 소개와 프로젝트 이동, GitHub 링크만 둔다.
+- 주요 프로젝트는 RobotPal을 먼저 크게 보여주고 DroneSim을 반대 방향으로 배치한다. Mausoleum과 AutoWingCar는 두 열의 작은 항목으로 나란히 둔다.
+- 프로젝트 목록은 네 항목을 정적 HTML로 보여준다. 검색이나 필터는 넣지 않는다.
+- 기술 역량은 Languages (프로그래밍 언어), Tech Stack (기술 스택), Tools (개발 도구) 세 범주로 나눈다. 기술명 옆에 1–3/5 숙련도와 해당 프로젝트 링크를 붙인다.
+- 소개에는 학력, SSAFY 교육, 자격과 개발 분야를 표시한다. 이력서 화면과 내려받기 링크는 두지 않는다.
+- 프로젝트 상세에서는 실제 화면, 필요한 경우에만 측정 결과, 구조도와 프로젝트 고유의 구현 설명을 차례로 보여준다. 코드에는 원본 경로를 함께 적는다.
 
-## Visual system
+## 시각 기준
 
-- Use the warm light canvas, dark readable text, restrained rust accent, and shared dimensions defined in `src/styles/tokens.css`.
-- Use large project imagery and typography to establish hierarchy. Avoid repeating card shells, decorative micro-labels, and rules that do not separate meaningful content.
-- Keep Korean labels concise and natural. Do not translate English heading patterns literally.
-- At 375px, 768px, and 1440px, preserve reading order, useful text size, visible navigation, and a page width with no horizontal overflow.
-- Maintain visible keyboard focus, reduced-motion support, semantic headings, and readable content without JavaScript.
+- src/styles/tokens.css의 밝은 회색 바탕, 흰 콘텐츠 면, 짙은 글자, 파랑 강조색을 사용한다.
+- 콘텐츠 최대 너비 1180px, 기술 설명 본문 최대 너비 780px로 맞춘다.
+- 기본 글꼴은 Pretendard 우선, 코드는 읽기 쉬운 고정폭 글꼴을 쓴다.
+- 프로젝트 이미지는 실제 화면을 그대로 보여준다. 의미 없는 테두리나 배경 장식으로 감싸지 않는다.
+- 과도한 카드, 배지, 번호 장식, 반복 문구를 쓰지 않는다.
+- 화면에 자바스크립트가 없어도 본문과 링크를 읽고 이동할 수 있어야 한다.
 
-## Runtime and deployment
+## 확인
 
-Astro renders the pages and project data. The site does not hydrate a project search/filter. DroneSim remains on its own deployed origin because its WebAssembly, SharedArrayBuffer, and COI worker behavior requires a top-level page; visitors open it only through an explicit link.
+집, 프로젝트 목록, 네 프로젝트 상세를 375px·768px·1440px에서 확인한다. 초점 표시, 대비, 모바일 메뉴, 이미지, 링크, 문서 가로 넘침과 페이지 오류를 실제 브라우저에서 살핀다. 결과와 화면 자료는 artifacts/design-review/에 저장한다.
 
-`/Portfolio/` is the GitHub Pages base. The root `asset/` directory is Astro's public directory; shared `/assets/` identifiers are normalized by `assetUrl()`.
+## 경로와 실행
 
-## Review
-
-Capture the home page, project archive, and all four detail routes at 375px, 768px, and 1440px. Check responsive reading order, image loading, keyboard focus, contrast, links, and page errors in a browser. Save review artifacts and findings under `artifacts/design-review/`.
+Astro가 콘텐츠를 빌드하고 정적 페이지를 만든다. /Portfolio/는 GitHub Pages 기본 경로다. DroneSim은 WebAssembly, SharedArrayBuffer, COI worker 조건 때문에 별도 최상위 페이지에서 실행하며 사용자가 링크를 눌렀을 때만 연다.

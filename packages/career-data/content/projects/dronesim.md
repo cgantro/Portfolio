@@ -2,7 +2,7 @@
 
 ## 개요
 
-가상 드론의 비행 상태와 카메라, 지상통제 명령을 시험하는 C++ 시뮬레이터입니다. 화면 조작과 화면 없는 JSON 시나리오가 같은 `SimulationCore`를 사용해 편대 비행, 공동 임무, 통신 지연·손실을 반복 실행할 수 있습니다.
+가상 드론의 비행 상태와 카메라, 지상통제 명령을 시험하는 C++ 시뮬레이터입니다. 화면 조작과 화면 없는 JSON 시나리오가 같은 SimulationCore를 사용해 편대 비행, 공동 임무, 통신 지연·손실을 반복 실행합니다.
 
 ## 설계 선택
 
@@ -10,28 +10,36 @@
 
 네이티브 실행은 선택에 따라 AirSim 강체 물리를 사용하고, WebAssembly는 운동학 모델을 사용합니다. 물리 엔진 차이는 한 주기 처리 경계에 두고 시나리오 실행과 상태 갱신 흐름은 공유합니다.
 
-## 구현
+## 충돌 후보 계산 줄이기
 
-`AdvanceOneTick`은 일시 정지 상태를 확인한 뒤 Flecs 상태를 갱신하고, 네이티브 강체 모드에서만 AirSim 계산을 호출합니다. 주기 번호와 카메라 자세는 마지막에 맞춥니다.
+드론이 늘면 가능한 모든 쌍을 비교하는 방식은 불필요한 충돌 계산까지 늘립니다. 각 강체의 충돌 상자를 월드 좌표로 한 번 계산하고 X 좌표로 정렬한 뒤, 서로 충돌 반경이 닿을 수 있는 드론만 후보로 살핍니다. 후보 한 쌍의 상자 접촉은 한 번 계산해 양쪽 드론에 기록합니다.
+
+파일: modules/simulation_core/src/PhysicsWorld.cpp
 
 ```cpp
-void SimulationCore::AdvanceOneTick()
+void PrepareDroneContacts(double largestCollisionRadius)
 {
-    if (paused_)
-        return;
-
-    ecs_->world.progress(DroneModel::fixedStepSeconds);
-#if !defined(__EMSCRIPTEN__)
-    if (ecs_->dynamics == SimulationDynamics::RigidBody)
-        ecs_->AdvancePhysicsWorld();
-#endif
-    ++ecs_->tickCount;
-    ecs_->SynchronizeCameraPose();
+    droneContacts.clear();
+    droneContacts.resize(bodies.size());
+    for (std::size_t orderIndex = 0;
+        orderIndex < bodyPositionsByX.size(); ++orderIndex)
+    {
+        const std::size_t bodyIndex = bodyPositionsByX[orderIndex].second;
+        const Body& body = *bodies[bodyIndex];
+        const double maximumCandidateX = body.collisionState.positionMeters.x
+            + body.collisionRadiusMeters + largestCollisionRadius;
+        for (std::size_t candidateOrder = orderIndex + 1U;
+            candidateOrder < bodyPositionsByX.size()
+                && bodyPositionsByX[candidateOrder].first <= maximumCandidateX;
+            ++candidateOrder)
+        {
+            const std::size_t otherIndex = bodyPositionsByX[candidateOrder].second;
+            RecordDronePairContacts(bodyIndex, otherIndex);
+        }
+    }
 }
 ```
 
-화면 없는 실행에서도 같은 코어에 시나리오를 넣어 최종 상태를 확인합니다. 입력 장치나 렌더링에 기대지 않고 드론 수, 편대 구성, 통신 장애에 따른 동작을 반복 시험할 수 있습니다.
+가장 큰 충돌 반경을 검색 폭에 포함해 크기가 다른 기체도 후보에서 빠지지 않게 합니다. 분산 배치와 밀집 배치는 각각 따로 측정했습니다. 수정 전후의 주기 p95를 아래 결과에서 조건과 함께 확인할 수 있습니다.
 
-## 문제 해결 과정
-
-드론이 늘면서 모든 충돌 상자를 서로 비교하는 계산이 주기 시간을 키웠습니다. 먼저 멀리 떨어진 객체를 충돌 후보에서 제외하고, 한 주기 안에서 구한 충돌 상자 변환값을 재사용하도록 바꿨습니다. 분산 배치와 밀집 배치의 결과는 아래 측정값으로 나눠 확인할 수 있습니다.
+화면 없는 실행에서는 같은 SimulationCore로 드론 수, 편대 구성, 통신 지연·손실에 따른 동작을 반복 시험합니다. Windows 네이티브 실행은 AirSim 강체 물리를 연결하고, WebAssembly는 운동학 모델을 사용합니다.
