@@ -1,13 +1,27 @@
 ---
 import { projectUrl, assetUrl } from '../lib/urls.mjs';
 import { projects } from '@portfolio/career-data';
-interface Props { project: (typeof projects)[number]; index?: number; featured?: boolean; }
-const { project, index = 0, featured = false } = Astro.props;
+interface Props { project: (typeof projects)[number]; index?: number; headingLevel?: 'h2' | 'h3'; }
+const { project, index = 1, headingLevel = 'h3' } = Astro.props;
 const highlights = project.id === 'autowingcar'
   ? [project.role[0], project.role[2]].filter((item): item is string => Boolean(item))
   : project.role.slice(0, 1);
 ---
-<article class:list={['project-card', { 'project-card-featured': featured }]}>
-  <a class="project-cover" href={projectUrl(project.id)} aria-label={`${project.title} 프로젝트 상세 보기`}><img src={assetUrl(project.cover.src)} alt={project.cover.alt} loading="lazy" width="960" height="640" /><span class="project-index">프로젝트 {String(index + 1).padStart(2, '0')}</span><span class="cover-arrow" aria-hidden="true">↗</span></a>
-  <div class="project-card-body"><div class="project-meta"><span>{project.category}</span><span>{project.status === 'ongoing' ? '진행 중' : project.period}</span></div><h3><a href={projectUrl(project.id)}>{project.title}</a></h3><p>{project.summary[0]}</p>{highlights.length > 0 && <div class="project-contribution"><strong>담당 구현</strong><ul>{highlights.map(item => <li>{item}</li>)}</ul></div>}<p class="technology-line"><strong>주요 기술</strong><span>{project.stack.slice(0, 3).join(' · ')}</span></p><a class="project-card-link" href={projectUrl(project.id)}>구현 내용 보기 <span aria-hidden="true">↗</span></a></div>
+<article class:list={['project-entry', `project-entry-${project.id}`]}>
+  <a class="project-entry-image" href={projectUrl(project.id)} aria-label={`${project.title} 상세 내용 보기`}>
+    <img src={assetUrl(project.cover.src)} alt={project.cover.alt} loading="lazy" width="960" height="640" />
+  </a>
+  <div class="project-entry-copy">
+    <p class="project-entry-kicker"><span>{String(index).padStart(2, '0')}</span>{project.category}</p>
+    {headingLevel === 'h2'
+      ? <h2><a href={projectUrl(project.id)}>{project.title}</a></h2>
+      : <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>}
+    <p class="project-entry-subtitle">{project.subtitle}</p>
+    <p class="project-entry-summary">{project.summary[0]}</p>
+    {highlights.length > 0 && <div class="project-entry-work"><strong>구현 내용</strong>{highlights.map(item => <p>{item}</p>)}</div>}
+    <div class="project-entry-bottom">
+      <span>{project.status === 'ongoing' ? '진행 중' : project.period}</span>
+      <a href={projectUrl(project.id)}>상세 보기 <span aria-hidden="true">↗</span></a>
+    </div>
+  </div>
 </article>

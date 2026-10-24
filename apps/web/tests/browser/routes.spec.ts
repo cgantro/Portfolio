@@ -41,7 +41,7 @@ test('project content and links are readable without client JavaScript', async (
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(`http://127.0.0.1:4321${base}projects/`);
-  await expect(page.locator('.project-card')).toHaveCount(4);
+  await expect(page.locator('.project-entry')).toHaveCount(4);
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('#overview')).toBeVisible();
   await expect(page.locator('#architecture img')).toHaveAttribute('alt', /.+/);
@@ -51,22 +51,11 @@ test('project content and links are readable without client JavaScript', async (
   await context.close();
 });
 
-test('project search and category filters work with a useful empty state', async ({ page }) => {
+test('project index presents all four cases without client-side controls', async ({ page }) => {
   await page.goto(`${base}projects/`);
-  await expect(page.locator('astro-island[component-url*="ProjectExplorer"]')).not.toHaveAttribute('ssr', '');
-  await expect(page.locator('.project-card')).toHaveCount(4);
-  const search = page.getByRole('searchbox', { name: '프로젝트 또는 기술 검색' });
-  await search.fill('DroneSim');
-  await expect(page.locator('.project-card')).toHaveCount(1);
-  await expect(page.getByRole('heading', { name: 'DroneSim' })).toBeVisible();
-  await search.fill('there-is-no-project');
-  await expect(page.getByRole('heading', { name: '검색 결과가 없습니다.' })).toBeVisible();
-  await page.getByRole('button', { name: '필터 초기화' }).click();
-  await expect(page.locator('.project-card')).toHaveCount(4);
-  const categories = page.locator('.filter-categories button');
-  await categories.nth(1).click();
-  await expect(categories.nth(1)).toHaveAttribute('aria-pressed', 'true');
-  expect(await page.locator('.project-card').count()).toBeGreaterThan(0);
+  await expect(page.locator('.project-entry')).toHaveCount(4);
+  await expect(page.locator('astro-island')).toHaveCount(0);
+  await expect(page.locator('.project-entry').nth(3)).toContainText('오토잉카');
 });
 
 test('keyboard skip link and navigation are reachable', async ({ page }) => {
@@ -85,7 +74,7 @@ test('technology navigation returns visitors to the project-linked skill map', a
   await page.goto(`${base}projects/autowingcar/`);
   await page.getByRole('navigation', { name: '주 메뉴' }).getByRole('link', { name: '기술' }).click();
   await expect(page).toHaveURL(/\/Portfolio\/#skills$/);
-  await expect(page.getByRole('heading', { name: '사용한 기술' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '기술 분야' })).toBeVisible();
 });
 
 test('mobile navigation stays visible and the homepage gives AutoWingCar a full project entry', async ({ page }) => {
@@ -96,22 +85,23 @@ test('mobile navigation stays visible and the homepage gives AutoWingCar a full 
   await expect(contact).toHaveAttribute('href', /^mailto:/);
 
   await page.goto(base);
-  const autoWingCard = page.locator('.project-grid-home .project-card').filter({ has: page.locator('a[href*="autowingcar"]') });
-  await expect(autoWingCard).toContainText('Spring Boot');
-  await expect(autoWingCard).toContainText('A*');
-  await expect(autoWingCard.getByText('담당 구현')).toBeVisible();
-  await expect(page.locator('.project-grid-home .project-card')).toHaveCount(3);
+  const autoWingProject = page.locator('.project-entry-autowingcar');
+  await expect(autoWingProject).toContainText('Spring Boot');
+  await expect(autoWingProject).toContainText('A*');
+  await expect(autoWingProject.getByText('구현 내용')).toBeVisible();
+  await expect(page.locator('.project-entry')).toHaveCount(3);
 });
 
 test('homepage leads with DroneSim and offers its case study and web launch', async ({ page }) => {
   let demoRequests = 0;
   page.on('request', request => { if (request.url().startsWith('https://cgantro.github.io/DroneSim/')) demoRequests += 1; });
   await page.goto(base);
-  await expect(page.getByRole('heading', { name: /시뮬레이션과 통신을/ })).toBeVisible();
-  await expect(page.getByRole('link', { name: '구현 사례 보기', exact: true })).toHaveAttribute('href', /projects\/dronesim\/$/);
+  await expect(page.getByRole('heading', { name: /시뮬레이션과 실시간 시스템을/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'DroneSim 구현 보기' })).toHaveAttribute('href', /projects\/dronesim\/$/);
   const launch = page.getByRole('link', { name: '웹에서 실행' });
   await expect(launch).toHaveAttribute('target', '_blank');
-  await expect(page.locator('.showcase-image img')).toBeVisible();
+  await expect(page.locator('.home-feature-image img')).toBeVisible();
+  await expect(page.locator('.project-entry')).toHaveCount(3);
   expect(demoRequests).toBe(0);
 });
 
