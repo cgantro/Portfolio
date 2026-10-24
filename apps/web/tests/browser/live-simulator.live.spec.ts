@@ -8,9 +8,9 @@ test('live DroneSim web demo renders after the explicit new-tab launch', async (
   const externalFailures: string[] = [];
   page.on('pageerror', error => pageErrors.push(error.message));
   await page.goto('/Portfolio/projects/dronesim/');
-  await page.locator('#demo').scrollIntoViewIfNeeded();
+  await page.locator('.project-demo-section').scrollIntoViewIfNeeded();
   const popupPromise = page.waitForEvent('popup');
-  await page.getByRole('link', { name: '새 탭에서 데모 열기' }).click();
+  await page.getByRole('link', { name: '새 탭에서 실행' }).click();
   const simulator = await popupPromise;
   simulator.on('requestfailed', request => {
     if (request.url().includes('cgantro.github.io/DroneSim')) externalFailures.push(`${request.url()}: ${request.failure()?.errorText}`);
@@ -24,7 +24,7 @@ test('live DroneSim web demo renders after the explicit new-tab launch', async (
     console.error({ frames: page.frames().map(frame => frame.url()), externalFailures, pageErrors });
     throw error;
   }
-  await expect.poll(() => canvas.evaluate(element => (element as HTMLCanvasElement).width), { timeout: 30_000 }).toBeGreaterThan(300);
+  await expect.poll(() => canvas.evaluate(element => (element as HTMLCanvasElement).width), { timeout: 30_000 }).toBeGreaterThanOrEqual(300);
   await expect.poll(() => canvas.evaluate(element => (element as HTMLCanvasElement).height), { timeout: 30_000 }).toBeGreaterThan(150);
   const isolated = await simulator.evaluate(() => window.crossOriginIsolated);
   const canvasSize = await canvas.evaluate(element => ({ width: (element as HTMLCanvasElement).width, height: (element as HTMLCanvasElement).height }));

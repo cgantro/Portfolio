@@ -25,7 +25,7 @@
     "test:unit": "pnpm -r --if-present test:unit",
     "test:e2e": "pnpm --filter @portfolio/web test:e2e",
     "test:visual": "pnpm --filter @portfolio/web test:visual",
-    "test:live-simulator": "pnpm --filter @portfolio/web exec playwright test --project=live-simulator",
+    "test:live-simulator": "pnpm --filter @portfolio/web test:live-simulator",
     "report:visual": "node tooling/visual-review/report.mjs",
     "build": "pnpm run validate:content && pnpm run audit:content && pnpm run validate:resume && pnpm run build:portfolio && pnpm run resume:rendercv && pnpm run build:web"
   },
