@@ -22,7 +22,7 @@ const droneMetric = dronesim.metrics.find(metric => metric.id === 'rigid-body-64
   <div class="container intro-copy">
     <p class="eyebrow">C++ 시뮬레이션 · 실시간 통신</p>
     <h1 id="home-title">C++ 시뮬레이터를 개발하고<br class="desktop-break" /> 실시간 처리 문제를 해결해 왔습니다.</h1>
-    <p class="intro-summary">로봇 시뮬레이터의 카메라 전송 병목을 분석하고, 협동 게임의 UDP 음성 서버를 구현했습니다. 지금은 드론 비행과 지상통제 명령을 시험하는 C++ 시뮬레이터를 개발하고 있습니다.</p>
+    <p class="intro-summary">로봇 시뮬레이터에서 카메라 영상의 JPEG 압축 병목을 분석하고, 협동 게임용 UDP 음성 서버를 구현했습니다. 지금은 드론 비행과 지상통제 명령을 시험하는 C++ 시뮬레이터를 개발하고 있습니다.</p>
     <div class="intro-actions">
       <a class="button" href="#projects">프로젝트 보기 <span aria-hidden="true">↓</span></a>
       <a class="button button-outline" href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
@@ -60,15 +60,15 @@ const droneMetric = dronesim.metrics.find(metric => metric.id === 'rigid-body-64
             )}
             {droneMetric && project.id === 'dronesim' && (
               <div class="featured-result">
-                <span>드론 64대 · 주기 p95</span>
-                <strong>{droneMetric.baseline?.toFixed(1)} → {droneMetric.value.toFixed(1)} <small>{droneMetric.unit}</small></strong>
+                <span>밀집 배치 · 드론 64대 틱 처리 시간 p95</span>
+                <strong>{droneMetric.value.toFixed(1)} <small>{droneMetric.unit}</small></strong>
               </div>
             )}
             <p class="metric-condition">{project.id === 'robotpal'
               ? '내장 GPU · 1232×832 · 각 구성 5회 측정 중앙값'
-              : 'Windows Release · 강체 모드 · 분산 배치 · 수정 전후 각 3회 측정 주기 p95 중앙값'}</p>
-            <a class="project-link" href={projectUrl(project.id)}>구현 사례 보기 <span aria-hidden="true">↗</span></a>
-            {project.links.demo && <a class="project-demo-link" href={project.links.demo} target="_blank" rel="noopener noreferrer">시뮬레이터 실행 <span aria-hidden="true">↗</span></a>}
+              : 'Windows Release · 30,000 Tick씩 3회 실행 · 각 실행의 틱 처리 시간 p95 중앙값'}</p>
+            <a class="project-link" href={projectUrl(project.id)}>상세 보기 <span aria-hidden="true">↗</span></a>
+            {project.links.demo && <a class="project-demo-link" href={project.links.demo} target="_blank" rel="noopener noreferrer">웹 데모 실행 <span aria-hidden="true">↗</span></a>}
           </div>
         </article>
       );
@@ -84,14 +84,14 @@ const droneMetric = dronesim.metrics.find(metric => metric.id === 'rigid-body-64
           <p class="project-state">{project.period}</p>
           <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
           <p>{project.id === 'mausoleum'
-            ? '협동 게임의 C++ UDP 음성 서버와 실시간 음성 송수신을 구현했습니다.'
-            : 'MQTT 차량 상태와 관제 화면을 연결하고, 명령·상태 처리 순서를 다뤘습니다.'}</p>
+            ? '협동 게임용 C++ UDP 음성 중계 서버와 클라이언트 음성 처리를 구현했습니다.'
+            : 'MQTT 차량 통신과 WebSocket 관제 갱신을 구현하고, 상태와 명령 처리 순서를 정리했습니다.'}</p>
           <ul class="supporting-highlights">
             {(project.id === 'mausoleum'
-              ? ['방별 음성 작업 분배', 'Opus 인코딩과 재생', '오래된 음성 대기열 초기화']
-              : ['MQTT 상태 수신', '명령 확인과 실제 상태 분리', 'DB 확정 뒤 장비 명령 발행']).map(item => <li>{item}</li>)}
+              ? ['룸별 작업 큐 분배', '화자별 음성 디코딩', '포커스 전환 중 오래된 캡처 폐기']
+              : ['MQTT 차량 상태·응답 처리', '명령과 차량 상태 분리', 'DB 커밋 뒤 MQTT 명령 발행']).map(item => <li>{item}</li>)}
           </ul>
-          <a class="project-link" href={projectUrl(project.id)}>구현 사례 보기 <span aria-hidden="true">↗</span></a>
+          <a class="project-link" href={projectUrl(project.id)}>상세 보기 <span aria-hidden="true">↗</span></a>
         </div>
       </article>
     ))}
@@ -120,7 +120,7 @@ const droneMetric = dronesim.metrics.find(metric => metric.id === 'rigid-body-64
         </section>
       ))}
     </div>
-    <p class="rating-note">별점은 사용 기간이 아니라 프로젝트에서 직접 구현하고 문제를 해결한 범위를 기준으로 매겼습니다. 5점 만점 중 최대 3점까지만 표시합니다.</p>
+    <p class="rating-note">별점은 프로젝트에서 확인되는 구현 경험을 1~3점으로 표시합니다. 4·5점은 이 포트폴리오의 평가 기준에 포함하지 않습니다.</p>
   </div>
 </section>
 
@@ -128,7 +128,7 @@ const droneMetric = dronesim.metrics.find(metric => metric.id === 'rigid-body-64
   <div class="section-heading"><h2 id="about-title">소개</h2></div>
   <div class="about-columns">
     <section aria-labelledby="education-title">
-      <h3 id="education-title">학력과 교육</h3>
+      <h3 id="education-title">학력 및 교육</h3>
       <ol class="timeline-list">
         {education.map(item => (
           <li>
@@ -143,7 +143,7 @@ const droneMetric = dronesim.metrics.find(metric => metric.id === 'rigid-body-64
       <ul class="certification-list">
         {certifications.map(item => <li><strong>{item.title}</strong><span>{item.period}</span></li>)}
       </ul>
-      <h3 class="about-subheading">개발 분야</h3>
+      <h3 class="about-subheading">주요 개발 분야</h3>
       <p>시뮬레이션 코어와 물리 처리, 실시간 영상·음성 통신, 상태 일관성과 성능 분석</p>
     </section>
   </div>

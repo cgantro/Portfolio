@@ -24,7 +24,7 @@ stack:
 - CTest, Google Benchmark
 cover:
   src: /assets/DroneSim-preview.jpg
-  alt: AeroSimLab 시뮬레이터의 산악 지형 장면, 비행 상태 패널과 드론 카메라 화면
+  alt: DroneSim 시연 화면. 실행 창에는 AeroSimLab 이름이 표시되며 산악 지형, 비행 상태와 드론 카메라 화면을 보여 줍니다.
 architecture:
   src: /assets/dronesim-system-architecture.svg
   alt: 게임패드, UDP 지상통제와 화면 없는 시나리오가 SimulationCore에 입력되고, 물리·상태가 렌더링과 카메라 분석으로 이어지는 구조
@@ -68,29 +68,26 @@ outcomes:
   status: reported
 metrics:
 - id: rigid-body-64-tick-p95
-  label: 강체 모드·드론 64대 주기 p95
-  value: 137.7
-  baseline: 493.9
+  label: 밀집 배치·드론 64대 틱 처리 시간 p95
+  value: 202.8
   unit: µs
   evidenceIds:
   - dronesim-source
   conditions:
   - Windows Release 빌드
-  - 강체 모드에서 드론 64대 분산 배치
-  - 수정 전·후 각 3회 측정한 주기 p95 중앙값
+  - Windows Release에서 드론 64대 밀집 배치
+  - 30,000 Tick씩 3회 실행한 각 p95의 중앙값
   status: reported
 - id: crowded-32-tick-p95
-  label: 밀집 배치·드론 32대 주기 p95 중앙값
-  value: 665.1
-  baseline: 1344.3
+  label: 밀집 배치·드론 32대 틱 처리 시간 p95
+  value: 97.1
   unit: µs
   evidenceIds:
   - dronesim-source
   conditions:
-  - Windows Release 빌드
-  - 강체 모드에서 드론 32대 밀집 배치
-  - 수정 전·후 각 3회 측정한 주기 p95 중앙값
-  - 시뮬레이션 주기 처리 시간 기준(화면·통신·영상 분석 제외)
+  - Windows Release에서 드론 32대 밀집 배치
+  - 30,000 Tick씩 3회 실행한 각 p95의 중앙값
+  - 화면·통신·영상 분석 시간은 포함하지 않음
   status: reported
 evidence:
 - id: dronesim-source

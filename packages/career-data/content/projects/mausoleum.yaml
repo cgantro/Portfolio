@@ -1,10 +1,10 @@
 id: mausoleum
 title: 영묘 (Mausoleum)
-subtitle: 언리얼 엔진 5와 C++ 서버를 잇는 실시간 음성 통신
+subtitle: 언리얼 엔진 5 협동 게임의 C++ UDP 음성 통신
 category: C++ 실시간 음성 통신과 온라인 게임 서버
 summary:
-- 영묘(Mausoleum)는 언리얼 엔진 5 협동 게임에 음성 채팅을 연결한 팀 프로젝트입니다. 게임 클라이언트는 방 상태를 받고, 별도 C++ 서버는 같은 방 참가자끼리 UDP로 음성을 주고받게 합니다.
-- 방 식별 코드로 로비·게임 세션·음성 서버를 연결하고, 마이크 입력부터 음성 전송과 재생까지 구현했습니다.
+  - 영묘(Mausoleum)는 언리얼 엔진 5 협동 게임에 음성 채팅을 구현한 팀 프로젝트입니다. 별도 C++ 음성 서버가 룸별 UDP 음성 패킷을 중계합니다.
+  - 방 식별 정보로 로비·게임 세션·음성 서버를 연동하고, 마이크 입력부터 음성 전송과 재생까지 구현했습니다.
 period: 2026.02 – 2026.03
 startDate: '2026-02-24'
 endDate: '2026-03-27'
@@ -17,14 +17,14 @@ role:
 - Linux와 Windows의 네트워크 처리를 구성하고, 백그라운드에서 돌아온 뒤 오래된 음성 대기열을 비우도록 처리
 stack:
 - C++
-- 언리얼 엔진 5 게임 개발 도구
-- UDP 음성 데이터 전송
-- WebSocket 지속 연결
-- uWebSockets 통신 라이브러리
-- Opus 음성 압축
-- Protocol Buffers 메시지 형식
-- CMake 빌드 설정
-- 여러 작업 스레드 동시 실행
+- Unreal Engine 5
+- UDP
+- WebSocket
+- uWebSockets
+- Opus
+- Protocol Buffers
+- CMake
+- 멀티스레딩
 cover:
   src: /assets/영묘.png
   alt: 영묘 (Mausoleum) 프로젝트 화면
@@ -62,21 +62,17 @@ contributions:
   status: reported
 outcomes:
 - id: mausoleum-outcome-1
-  text: 마이크 입력을 Opus로 압축하고 복원해 UDP로 보낸 뒤 스피커에서 재생하도록 연결했습니다. Opus는 실시간 음성의 데이터 크기를 줄이는 압축 방식입니다. 화자마다 압축 상태를 따로
-    두고, 한 채널 음성을 초당 16,000번 읽어 0.02초 단위로 나눈 뒤 초당 24킬로비트로 압축했습니다. FEC는 일부 음성 데이터가 빠졌을 때 복구 정보를 보내고, DTX는 말하지 않을
-    때 전송량을 줄입니다.
+  text: 마이크 입력은 Opus로 인코딩해 UDP로 보내고, 수신 음성은 화자별 디코더 상태로 복원해 재생했습니다. 송신 인코더에는 16 kHz 단일 채널, 20 ms 프레임, 24 kbps와 FEC·DTX 설정을 적용했습니다. 이 설정만으로 패킷 손실 복구가 확인된 것은 아닙니다.
   evidenceIds:
   - mausoleum-public
   status: reported
 - id: mausoleum-outcome-2
-  text: 방 식별 코드로 담당 작업 대기열을 정해 같은 방의 음성 데이터는 늘 같은 대기열에 넣었습니다. 같은 방에서는 먼저 들어온 데이터부터 처리하고, 여러 방의 음성은 여러 작업 스레드가 나눠
-    맡습니다. 음성을 여러 참가자에게 보낼 때는 같은 데이터를 함께 써 불필요한 복사를 줄였습니다.
+  text: 룸 코드 해시로 음성 패킷을 워커별 작업 큐에 배정했습니다. 같은 룸의 패킷은 같은 큐로 들어가며, 서로 다른 룸은 여러 워커가 처리합니다. 다수 참가자에게 전달할 때는 페이로드를 공유해 복사를 줄였습니다.
   evidenceIds:
   - mausoleum-public
   status: reported
 - id: mausoleum-outcome-3
-  text: Protocol Buffers는 데이터를 정해진 항목과 형식에 맞춰 묶어 여러 프로그램이 함께 읽을 수 있게 하는 메시지 형식입니다. 서버는 데이터 길이와 방, 보낸 사람을 나타내는 값을 확인한 뒤
-    해당 방의 대기열로 보냅니다. 담당 작업 스레드는 방 참가자에게 음성을 전달하고, 여러 명에게 보낼 때는 같은 데이터를 함께 씁니다.
+  text: 서버는 음성 패킷의 길이와 룸·세션 정보를 확인한 뒤 룸 코드에 따라 작업 큐로 보냅니다. 워커는 해당 룸의 참가자에게 패킷을 중계하며, 여러 수신자에게 보낼 때 페이로드를 공유합니다.
   evidenceIds:
   - mausoleum-public
   status: reported

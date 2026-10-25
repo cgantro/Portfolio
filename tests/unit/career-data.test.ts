@@ -40,7 +40,9 @@ test('reported benchmark values retain conditions and their original limits', ()
   assert.match(robotpal.limitations.join(' '), /60 FPS에 미달/);
   assert.match(robotpal.limitations.join(' '), /팀원 수.*서로 다르게 기록/);
   assert.match(robotpal.limitations.join(' '), /인원 수를 생략/);
-  assert.ok(getProject('autowingcar')!.limitations.some((text) => text.includes('p95')));
+  const autowingcar = getProject('autowingcar')!;
+  assert.equal(autowingcar.metrics.length, 0);
+  assert.ok(autowingcar.limitations.some((text) => text.includes('집계 기준')));
 });
 
 test('schema rejects dangling provenance, duplicate evidence, and confidence inflation', () => {

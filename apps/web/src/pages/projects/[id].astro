@@ -20,7 +20,7 @@ const sharedConditions = metrics.length > 1
   : [];
 const related = projects.filter(item => item.id !== project.id);
 const isDroneSim = project.id === 'dronesim';
-const metricHeading = project.id === 'robotpal' ? '카메라 스트리밍 성능' : project.id === 'dronesim' ? '충돌 계산 주기' : '부하 시험';
+const metricHeading = project.id === 'robotpal' ? '카메라 스트리밍 성능' : project.id === 'dronesim' ? '충돌 계산 틱 처리 시간' : '부하 시험';
 ---
 <SiteLayout title={project.title} description={project.subtitle} active="projects">
   <header class="container project-heading">
@@ -34,8 +34,8 @@ const metricHeading = project.id === 'robotpal' ? '카메라 스트리밍 성능
       <div><dt>상태</dt><dd>{project.status === 'ongoing' ? '진행 중' : '완료'}</dd></div>
     </dl>
     <div class="project-top-links">
-      {project.links.github && <a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub 저장소 ↗</a>}
-      {project.links.demo && <a href={project.links.demo} target="_blank" rel="noopener noreferrer">시뮬레이터 실행 ↗</a>}
+      {project.links.github && <a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>}
+      {project.links.demo && <a href={project.links.demo} target="_blank" rel="noopener noreferrer">웹 데모 실행 ↗</a>}
     </div>
     <p class="technology-line-detail"><strong>주요 기술</strong><span>{project.stack.slice(0, 6).join(' · ')}</span></p>
   </header>
@@ -121,8 +121,8 @@ const metricHeading = project.id === 'robotpal' ? '카메라 스트리밍 성능
 
     {project.links.demo && (
       <section class="detail-section project-demo-section" aria-labelledby="demo-title">
-        <div><h2 id="demo-title">웹 시뮬레이터</h2><p>시뮬레이터는 별도 탭에서 실행합니다. WebAssembly 빌드는 운동학 모델을 사용하며 AirSim 강체 물리는 Windows 네이티브 실행에서 사용합니다.</p></div>
-        <a class="button" href={project.links.demo} target="_blank" rel="noopener noreferrer">새 탭에서 실행 <span aria-hidden="true">↗</span></a>
+        <div><h2 id="demo-title">웹 데모와 시나리오 범위</h2><p>웹 데모는 별도 탭에서 실행합니다. WebAssembly는 운동학 모델을 사용하고, Windows 네이티브 실행에서 AirSim 강체 물리를 사용합니다. 현재 시나리오는 편대·공동 임무, 통신 지연·손실, 카메라 고장을 다룹니다. 데모 지형은 약 18.8 × 23.7km의 북한산 지형이며 건물·시설은 중심 구역에 한정됩니다. 건물 내부 임무와 실내 수색은 아직 구현하지 않았습니다.</p></div>
+        <a class="button" href={project.links.demo} target="_blank" rel="noopener noreferrer">별도 탭에서 실행 <span aria-hidden="true">↗</span></a>
       </section>
     )}
   </div>

@@ -14,6 +14,6 @@ const { project, headingLevel = 'h3' } = Astro.props;
     <p class="archive-subtitle">{project.subtitle}</p>
     <p>{project.summary[0]}</p>
     <ul>{project.role.slice(0, 2).map(item => <li>{item}</li>)}</ul>
-    <a class="project-link" href={projectUrl(project.id)}>구현 사례 보기 <span aria-hidden="true">↗</span></a>
+    <a class="project-link" href={projectUrl(project.id)}>상세 보기 <span aria-hidden="true">↗</span></a>
   </div>
 </article>
