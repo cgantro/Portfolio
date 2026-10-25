@@ -131,6 +131,8 @@ h3 { font-size: 25px; }
 .project-facts div { display: flex; align-items: baseline; gap: 9px; }
 .project-facts dt { color: var(--color-muted); font-size: 12px; }
 .project-facts dd { margin: 0; font-size: 13px; }
+.project-meta-brief { margin-top: 18px; color: var(--color-muted); font-size: 13px; }
+.project-meta-brief span { padding-inline: 6px; color: var(--color-line-strong, var(--color-muted)); }
 .technology-line-detail { display: flex; flex-wrap: wrap; gap: 5px 14px; max-width: 900px; margin-top: 15px; font-size: 13px; }
 .technology-line-detail strong { font-weight: 650; }
 .project-cover-wide { background: white; }

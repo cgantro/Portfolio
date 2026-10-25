@@ -1,7 +1,7 @@
 id: dronesim
 title: DroneSim
-subtitle: 드론 비행과 카메라, 지상통제 명령을 시험하는 C++ 시뮬레이터
-category: C++ 드론 시뮬레이션
+subtitle: 드론 비행과 지상통제 명령을 시험하는 M&S 시뮬레이터
+category: 드론 시뮬레이션
 summary:
 - 가상 드론의 비행·탑재 카메라·지상통제 흐름을 시험하는 개인 C++20 시뮬레이터입니다.
 period: 2026.08 – 진행 중
@@ -14,14 +14,11 @@ role:
 - 게임패드, UDP 지상통제, JSON 시나리오 입력을 공통 시뮬레이션 명령으로 처리
 - 다중 드론 시나리오와 충돌 계산 개선, 성능 측정 구현
 stack:
-- C++20
-- CMake, Flecs ECS
+- Flecs ECS
 - AirSim 강체 물리
-- OpenGL, GLFW, GLM
-- OpenCV 영상 분석
-- UDP, JSON, 게임패드 입력
-- WebAssembly, Emscripten
-- CTest, Google Benchmark
+- UDP 지상통제
+- OpenGL·EO 카메라
+- JSON 시나리오
 cover:
   src: /assets/DroneSim-preview.jpg
   alt: DroneSim 시연 화면. 실행 창에는 AeroSimLab 이름이 표시되며 산악 지형, 비행 상태와 드론 카메라 화면을 보여 줍니다.
@@ -29,8 +26,8 @@ architecture:
   src: /assets/dronesim-system-architecture.svg
   alt: 게임패드, UDP 지상통제와 화면 없는 시나리오가 SimulationCore에 입력되고, 물리·상태가 렌더링과 카메라 분석으로 이어지는 구조
   summary:
-  - 화면 조작, 게임패드, UDP 지상통제와 화면 없는 JSON 시나리오가 공통 명령 형식으로 SimulationCore에 입력됩니다.
-  - Flecs 상태 갱신 뒤 물리 계산과 화면·카메라 처리가 이어지며, 지상통제 장치와는 UDP로 명령과 상태를 주고받습니다.
+  - 화면 조작·게임패드·UDP·JSON 입력이 공통 드론 명령으로 변환되어 SimulationCore의 고정 Tick에서 처리됩니다.
+  - Flecs 상태 갱신 뒤 물리 계산을 거쳐 OpenGL 장면과 EO 카메라에 전달되며, JSON 시나리오는 임무 결과를 기록합니다.
 links:
   github: https://github.com/cgantro/DroneSim
   demo: https://cgantro.github.io/DroneSim/
@@ -46,14 +43,14 @@ contributions:
   - dronesim-source
   status: reported
 - id: dronesim-contribution-3
-  text: 시뮬레이션 주기와 물리 처리 시간을 측정하고, 밀집 배치에서 충돌 후보 계산을 줄인 뒤 수정 전후 조건과 반복 측정 결과를 공개했습니다.
+  text: 충돌 후보 목록의 X 좌표를 갱신한 뒤 순서가 바뀐 경우에만 다시 정렬하도록 바꾸고, 분리·밀집 배치에서 변경 전후 물리 단계 시간을 측정했습니다.
   evidenceIds:
-  - dronesim-source
+  - dronesim-sort-reuse
   status: reported
 - id: dronesim-contribution-4
-  text: 화면 없는 실행에서 다중 드론의 비행·편대·공동 임무 결과를 JSON 시나리오로 확인할 수 있게 했습니다.
+  text: 헤드리스 JSON 시나리오에서 상태 보고 단절을 모의하고 미완료 과제를 재할당해, 4~256대 조건의 임무 완료와 실행 시간을 확인했습니다.
   evidenceIds:
-  - dronesim-source
+  - dronesim-reallocation
   status: reported
 outcomes:
 - id: dronesim-outcome-1
@@ -67,27 +64,60 @@ outcomes:
   - dronesim-source
   status: reported
 metrics:
-- id: rigid-body-64-tick-p95
-  label: 밀집 배치·드론 64대 틱 처리 시간 p95
-  value: 202.8
+- id: separated-128-physics-p95
+  label: 분리 배치·128대 물리 단계 p95
+  baseline: 188.0
+  value: 184.2
   unit: µs
   evidenceIds:
-  - dronesim-source
+  - dronesim-sort-reuse
   conditions:
-  - Windows Release 빌드
-  - Windows Release에서 드론 64대 밀집 배치
-  - 30,000 Tick씩 3회 실행한 각 p95의 중앙값
+  - Windows Release, 준비 120 Tick 후 30,000 Tick씩 3회
+  - 분리 배치 간격 2.5m, 반복별 p95의 중앙값
   status: reported
-- id: crowded-32-tick-p95
-  label: 밀집 배치·드론 32대 틱 처리 시간 p95
-  value: 97.1
+- id: separated-256-physics-p95
+  label: 분리 배치·256대 물리 단계 p95
+  baseline: 370.1
+  value: 345.4
   unit: µs
   evidenceIds:
-  - dronesim-source
+  - dronesim-sort-reuse
   conditions:
-  - Windows Release에서 드론 32대 밀집 배치
-  - 30,000 Tick씩 3회 실행한 각 p95의 중앙값
-  - 화면·통신·영상 분석 시간은 포함하지 않음
+  - Windows Release, 준비 120 Tick 후 30,000 Tick씩 3회
+  - 분리 배치 간격 2.5m, 반복별 p95의 중앙값
+  status: reported
+- id: separated-512-physics-p95
+  label: 분리 배치·512대 물리 단계 p95
+  baseline: 741.8
+  value: 669.9
+  unit: µs
+  evidenceIds:
+  - dronesim-sort-reuse
+  conditions:
+  - Windows Release, 준비 120 Tick 후 30,000 Tick씩 3회
+  - 분리 배치 간격 2.5m, 반복별 p95의 중앙값
+  status: reported
+- id: compact-128-physics-p95
+  label: 밀집 배치·128대 물리 단계 p95
+  baseline: 472.3
+  value: 408.6
+  unit: µs
+  evidenceIds:
+  - dronesim-sort-reuse
+  conditions:
+  - Windows Release, 준비 120 Tick 후 30,000 Tick씩 3회
+  - 밀집 배치 간격 0.55m, 반복별 p95의 중앙값
+  status: reported
+- id: compact-256-physics-p95
+  label: 밀집 배치·256대 물리 단계 p95
+  baseline: 827.6
+  value: 791.6
+  unit: µs
+  evidenceIds:
+  - dronesim-sort-reuse
+  conditions:
+  - Windows Release, 준비 120 Tick 후 30,000 Tick씩 3회
+  - 밀집 배치 간격 0.55m, 반복별 p95의 중앙값
   status: reported
 evidence:
 - id: dronesim-source
@@ -97,9 +127,19 @@ evidence:
   status: reported
   locator: README.md, modules/simulation_core/src/SimulationCore.cpp, modules/simulation_core/src/ScenarioRunner.cpp, benchmarks/results
   note: 공개 코드와 기록에서 구현 및 수치를 대조했습니다. 이 포트폴리오에서 별도 빌드나 실기체 검증을 수행했다는 뜻은 아닙니다.
+- id: dronesim-sort-reuse
+  label: 충돌 정렬 재사용 전후 코드와 반복 측정
+  source: https://github.com/cgantro/DroneSim
+  kind: repository
+  status: reported
+  locator: modules/simulation_core/src/PhysicsWorld.cpp, benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-23-94c39b94-before-sort-reuse.json, benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-23-69ecab93-after-sort-reuse.json
+  note: 포트폴리오의 중앙값은 원자료의 세 반복 p95를 직접 정렬해 중앙값으로 다시 계산했습니다.
+- id: dronesim-reallocation
+  label: 상태 보고 단절과 임무 재할당 시나리오
+  source: https://github.com/cgantro/DroneSim
+  kind: repository
+  status: reported
+  locator: modules/simulation_core/src/ScenarioRunner.cpp, benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-24-26c7fce1.json
+  note: 운동학 헤드리스 시나리오의 합성 상태 보고 단절 결과입니다. 실제 UDP 링크 장애나 실기체 비행 결과는 아닙니다.
 limitations:
-- 물리 계수는 공개 자료를 참고했으며 실제 비행 로그와 대조하지 않았습니다. 디지털 트윈 또는 비행 안전·성능 예측으로 볼 수 없습니다.
-- AirSim 강체 물리는 Windows 네이티브 실행에 한정됩니다. WebAssembly 데모는 운동학 기준 모델을 사용합니다.
 - 드론과 장애물의 충돌 형상은 상자로 단순화하며, 강체마다 한 주기에 접촉 한 건만 처리합니다. 세밀한 메시 충돌이나 여러 접촉이 동시에 일어나는 상황은 다루지 않습니다.
-- 지형 높이는 약 30m 간격이며, 건물 자료가 없는 일부 위치의 3m 상자는 시연용입니다.
-- 실제 게임패드 기기별 동작, 장시간 실행 안정성, 영상 분석을 포함한 전체 경로 성능은 공개 측정에서 확인되지 않았습니다.

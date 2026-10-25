@@ -28,7 +28,7 @@ const navigation = [
     <a class="skip-link" href="#main">본문으로 바로가기</a>
     <header class="site-header">
       <div class="container header-inner">
-        <a class="wordmark" href={localUrl()} aria-label={`${profile.name} 포트폴리오 홈`}><span>{profile.name}<small>C++ Software Engineer</small></span></a>
+        <a class="wordmark" href={localUrl()} aria-label={`${profile.name} 포트폴리오 홈`}><span>{profile.name}<small>시뮬레이션·통신 개발자</small></span></a>
         <nav class="desktop-nav" aria-label="주 메뉴">
           {navigation.map(item => <a href={item.href} aria-current={active === item.id ? 'page' : undefined}>{item.label}</a>)}
           <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>

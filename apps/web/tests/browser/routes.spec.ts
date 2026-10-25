@@ -46,7 +46,7 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
   await expect(page.locator('.project-narrative')).toContainText('충돌 상자');
   await expect(page.locator('[data-evidence-ids]')).toHaveCount(0);
-  await expect(page.locator('.project-demo-section a[target="_blank"]')).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
+  await expect(page.locator('.project-top-links a[target="_blank"]').filter({ hasText: '웹 데모 실행' })).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
   await context.close();
 });
 
@@ -108,7 +108,7 @@ test('DroneSim stays absent until explicit launch and opens in a separate tab', 
   await page.goto(`${base}projects/dronesim/`);
   await expect(page.locator('iframe')).toHaveCount(0);
   expect(demoRequests).toBe(0);
-  const launch = page.getByRole('link', { name: '별도 탭에서 실행' });
+  const launch = page.locator('.project-top-links').getByRole('link', { name: '웹 데모 실행' });
   await expect(launch).toHaveAttribute('target', '_blank');
   await launch.scrollIntoViewIfNeeded();
   const popupPromise = page.waitForEvent('popup');
