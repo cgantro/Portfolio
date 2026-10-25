@@ -34,7 +34,7 @@ h3 { font-size: 25px; }
 
 .intro-section { padding-block: 75px 82px; }
 .intro-copy { max-width: var(--content-width); }
-.intro-copy h1 { max-width: 940px; font-size: clamp(36px, 4.2vw, 54px); line-height: 1.24; letter-spacing: -.05em; }
+.intro-copy h1 { max-width: var(--content-width); font-size: clamp(36px, 3.4vw, 48px); line-height: 1.24; letter-spacing: -.05em; }
 .intro-summary { max-width: 770px; margin-top: 20px; color: var(--color-muted); font-size: 17px; line-height: 1.8; }
 .intro-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 25px; }
 .projects-section { padding-bottom: 90px; }
@@ -300,6 +300,9 @@ h3 { font-size: 25px; }
   .dronesim-narrative h2 { margin-block: 50px 13px; font-size: 24px; }
   .prose h3 { font-size: 19px; }
   .prose pre { padding: 15px; font-size: 11px; }
+  .dronesim-narrative .prose table { display: table; width: 100%; table-layout: fixed; font-size: 11px; }
+  .dronesim-narrative .prose th, .dronesim-narrative .prose td { padding: 6px 4px; white-space: normal; overflow-wrap: anywhere; }
+  .dronesim-narrative .prose th:first-child, .dronesim-narrative .prose td:first-child { width: 28%; }
   .metric-list, .related-grid { grid-template-columns: 1fr; }
   .metric-comparison strong, .metric-value { font-size: 23px; }
   .project-demo-section { align-items: flex-start; }

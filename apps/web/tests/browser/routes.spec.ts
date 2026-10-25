@@ -45,9 +45,12 @@ test('project content and links are readable without client JavaScript', async (
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
   await expect(page.locator('.dronesim-narrative')).toContainText('충돌 형상은 상자로 단순화');
-  await expect(page.locator('.dronesim-narrative h2')).toHaveCount(4);
-  await expect(page.locator('.dronesim-narrative h2').nth(0)).toHaveText('고정 Tick과 물리 모델');
-  await expect(page.locator('.dronesim-narrative h2').nth(3)).toHaveText('통신 단절 시나리오 결과');
+  await expect(page.locator('.dronesim-narrative h2')).toHaveCount(5);
+  await expect(page.locator('.dronesim-narrative h2').nth(0)).toHaveText('시뮬레이션 코어와 비행 모델');
+  await expect(page.locator('.dronesim-narrative h2').nth(1)).toHaveText('충돌 후보 정렬 재사용');
+  await expect(page.locator('.dronesim-narrative h2').nth(4)).toHaveText('모델의 한계');
+  await expect(page.locator('.dronesim-narrative')).toContainText('188.0');
+  await expect(page.locator('.dronesim-narrative')).toContainText('184.2µs');
   await expect(page.locator('[data-evidence-ids]')).toHaveCount(0);
   await expect(page.locator('.project-top-links a[target="_blank"]').filter({ hasText: '웹 데모 실행' })).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
   await context.close();
@@ -96,6 +99,7 @@ test('homepage introduces the developer before the featured project cases', asyn
   page.on('request', request => { if (request.url().startsWith('https://cgantro.github.io/DroneSim/')) demoRequests += 1; });
   await page.goto(base);
   await expect(page.getByRole('heading', { name: '시뮬레이션·실시간 통신 개발자 홍윤표입니다.' })).toBeVisible();
+  await expect(page.locator('main h1')).not.toContainText('C++');
   await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();
   const launch = page.getByRole('link', { name: '웹 데모 실행' });

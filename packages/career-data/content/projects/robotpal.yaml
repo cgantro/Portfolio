@@ -1,7 +1,7 @@
 id: robotpal
 title: RobotPal
-subtitle: 로봇을 제어하고 카메라 영상을 전송하는 C++ 시뮬레이터
-category: C++ 로봇 시뮬레이터와 실시간 영상 전송
+subtitle: 로봇을 제어하고 카메라 영상을 전송하는 시뮬레이터
+category: 로봇 시뮬레이션과 실시간 영상 전송
 summary:
 - JETANK의 주행을 가상 환경에서 재현한 C++ 시뮬레이터입니다. 가상 카메라 영상을 Python 모듈로 보내고 이동 로봇과 로봇 팔을 제어합니다.
 period: 2025.11 – 2025.12

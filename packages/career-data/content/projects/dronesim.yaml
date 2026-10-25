@@ -3,7 +3,7 @@ title: DroneSim
 subtitle: 다중 드론 비행과 지상통제 임무를 시험하는 M&S 시뮬레이터
 category: 드론 시뮬레이션
 summary:
-- 화면 조작과 JSON 시나리오가 같은 시뮬레이션 중심부를 사용하도록 구성해, 조작 화면 없이도 비행 규칙과 임무 결과를 반복 시험합니다.
+- 다중 드론의 비행과 지상통제, 통신 단절 뒤 임무 재할당을 시나리오로 시험합니다.
 period: 2026.08 – 진행 중
 startDate: 2026-08
 endDate: null
@@ -17,7 +17,6 @@ stack:
 - Flecs ECS
 - AirSim 강체 물리
 - UDP 지상통제
-- OpenGL·EO 카메라
 - JSON 시나리오
 cover:
   src: /assets/DroneSim-preview.jpg

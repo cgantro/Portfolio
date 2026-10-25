@@ -4,7 +4,7 @@ import { localUrl } from '../lib/urls.mjs';
 import '../styles/global.css';
 interface Props { title?: string; description?: string; active?: string; }
 const { title, description = profile.tagline, active = '' } = Astro.props;
-const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — C++ 개발자 포트폴리오`;
+const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — 개발 포트폴리오`;
 const navigation = [
   { id: 'projects', label: '프로젝트', href: localUrl('projects/') },
   { id: 'about', label: '소개', href: `${localUrl()}#about` },
