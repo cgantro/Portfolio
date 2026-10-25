@@ -31,13 +31,14 @@ function renderMarkdown(markdown) {
   };
 
   for (const line of markdown.split(/\r?\n/)) {
-    const fence = line.match(/^```(\w*)\s*$/);
+    const fence = line.match(/^```(\w*)(?:\s+title="([^"]+)")?\s*$/);
     if (fence) {
       flushParagraph();
       flushItems();
-      if (code === null) code = { language: fence[1], lines: [] };
+      if (code === null) code = { language: fence[1], title: fence[2], lines: [] };
       else {
-        blocks.push(`<pre><code${code.language ? ` class="language-${e(code.language)}"` : ''}>${e(code.lines.join('\n'))}</code></pre>`);
+        const caption = code.title ? `<figcaption>${code.language ? `${e(code.language)} · ` : ''}${e(code.title)}</figcaption>` : '';
+        blocks.push(`<figure class="code-sample">${caption}<pre><code${code.language ? ` class="language-${e(code.language)}"` : ''}>${e(code.lines.join('\n'))}</code></pre></figure>`);
         code = null;
       }
       continue;

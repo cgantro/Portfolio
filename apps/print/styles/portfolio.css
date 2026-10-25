@@ -48,6 +48,8 @@ figcaption { color: #64748b; font-size: 7pt; margin-top: 1.5mm; text-align: cent
 .project .prose h4 { font-size: 9pt; margin: 1.5mm 0 .7mm; }
 .project .prose p, .project .prose li { font-size: 8.75pt; }
 .project pre { background: #f1f5f9; padding: 2mm; overflow-wrap: anywhere; white-space: pre-wrap; font: 7pt/1.35 "Cascadia Code", Consolas, monospace; break-inside: avoid; }
+.project .code-sample { margin: 3mm 0; break-inside: avoid; }
+.project .code-sample figcaption { margin-bottom: 1mm; color: #475569; font: 6.5pt/1.3 "Cascadia Code", Consolas, monospace; }
 .project code { font: .9em "Cascadia Code", Consolas, monospace; }
 .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm; margin-top: 2mm; }
 .metrics > article { border-left: 1mm solid #1d4ed8; padding-left: 2mm; break-inside: avoid; }
