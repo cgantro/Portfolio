@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 850" role="img" aria-labelledby="title desc">
   <title id="title">DroneSim 시스템 아키텍처</title>
-  <desc id="desc">게임패드, UDP 지상통제, 화면 없는 시나리오 입력이 공통 시뮬레이션 중심부에 연결됩니다. Tick 상태는 네이티브 강체 물리와 렌더링·EO 카메라 분석으로 이어집니다.</desc>
+  <desc id="desc">게임패드, UDP 지상통제, 화면 없는 시나리오 입력이 공통 시뮬레이션 중심부에 연결됩니다. Tick 상태는 네이티브 AirSim 강체 모델 또는 WebAssembly 운동학 모델을 거쳐 OpenGL 장면과 EO 카메라로 이어집니다.</desc>
   <defs>
     <style>
       .bg{fill:#f5f4ef}.box{fill:#fff;stroke:#cbd1c7;stroke-width:2}.core{fill:#182421;stroke:#182421;stroke-width:2}.soft{fill:#e8ece5;stroke:#bdc8bb;stroke-width:2}.optional{fill:#fbf2e9;stroke:#d8a27d;stroke-width:2}.title{font:700 22px sans-serif;fill:#182421}.small{font:15px sans-serif;fill:#536057}.white{fill:#fff}.tiny{font:13px sans-serif;fill:#657068}.line{fill:none;stroke:#66766a;stroke-width:3;marker-end:url(#arrow)}.dash{fill:none;stroke:#b73518;stroke-width:3;stroke-dasharray:9 8;marker-end:url(#arrowRed)}.label{font:12px sans-serif;fill:#657068}
@@ -25,27 +25,28 @@
   <text class="small white" x="510" y="439">Flecs 상태 갱신 · 고정 1/60초 Tick</text>
   <text class="small white" x="510" y="474">드론 · 카메라 · 명령 · 임무 진행</text>
 
-  <rect class="optional" x="965" y="220" width="350" height="125" rx="8"/>
-  <text class="title" x="1000" y="265">AirSim 강체 물리</text>
-  <text class="small" x="1000" y="297">Windows 네이티브에서만 연결</text>
-  <text class="tiny" x="1000" y="324">로터 · 관성 · 충돌 후 반응</text>
+  <rect class="optional" x="965" y="190" width="350" height="115" rx="8"/>
+  <text class="title" x="1000" y="232">AirSim 강체 물리</text>
+  <text class="small" x="1000" y="263">Windows 네이티브 · 로터·관성·접촉</text>
 
-  <rect class="soft" x="965" y="425" width="350" height="125" rx="8"/>
-  <text class="title" x="1000" y="470">장면 렌더링</text>
-  <text class="small" x="1000" y="502">OpenGL · 지형 · 드론 상태</text>
-  <text class="tiny" x="1000" y="529">시뮬레이션 상태를 화면에 표시</text>
+  <rect class="soft" x="965" y="340" width="350" height="105" rx="8"/>
+  <text class="title" x="1000" y="382">운동학 기준 모델</text>
+  <text class="small" x="1000" y="414">WebAssembly · 단순 비행 규칙</text>
 
-  <rect class="soft" x="965" y="625" width="350" height="125" rx="8"/>
-  <text class="title" x="1000" y="670">EO 카메라 · 영상 분석</text>
-  <text class="small" x="1000" y="702">별도 카메라 화면 · 프레임 상태</text>
-  <text class="tiny" x="1000" y="729">OpenCV 품질 지표 (네이티브)</text>
+  <rect class="soft" x="965" y="480" width="350" height="105" rx="8"/>
+  <text class="title" x="1000" y="522">장면 렌더링</text>
+  <text class="small" x="1000" y="554">OpenGL · 지형 · 드론 상태</text>
+
+  <rect class="soft" x="965" y="630" width="350" height="115" rx="8"/>
+  <text class="title" x="1000" y="672">EO 카메라 · 영상 분석</text>
+  <text class="small" x="1000" y="703">별도 화면 · OpenCV 품질 지표</text>
+  <text class="tiny" x="1000" y="728">밝기 · 대비 · 선명도</text>
 
   <path class="line" d="M330 272H400V390H465"/><text class="label" x="365" y="255">입력 변환</text>
   <path class="line" d="M330 422H465"/><text class="label" x="365" y="410">공통 명령</text>
   <path class="line" d="M330 572H400V490H465"/><text class="label" x="365" y="592">같은 Tick 실행</text>
-  <path class="dash" d="M815 385H890V282H965"/><text class="label" x="842" y="268">네이티브 전용</text>
-  <path class="line" d="M815 438H965"/><text class="label" x="852" y="424">상태</text>
-  <path class="line" d="M815 495H890V687H965"/><text class="label" x="838" y="672">카메라 동기화</text>
-
-  <text class="tiny" x="70" y="790">WebAssembly는 AirSim 대신 운동학 기준 모델을 사용합니다. 실기체 비행 성능 검증을 의미하지 않습니다.</text>
+  <path class="dash" d="M815 375H890V248H965"/><text class="label" x="836" y="231">네이티브 전용</text>
+  <path class="line" d="M815 410H965"/><text class="label" x="838" y="397">웹·선택 실행</text>
+  <path class="line" d="M815 455H890V532H965"/><text class="label" x="839" y="516">계산 결과</text>
+  <path class="line" d="M815 495H910V687H965"/><text class="label" x="839" y="672">카메라 상태 동기화</text>
 </svg>

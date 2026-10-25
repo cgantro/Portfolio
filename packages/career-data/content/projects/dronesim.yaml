@@ -1,9 +1,9 @@
 id: dronesim
 title: DroneSim
-subtitle: 드론 비행과 지상통제 명령을 시험하는 M&S 시뮬레이터
+subtitle: 다중 드론 비행과 지상통제 임무를 시험하는 M&S 시뮬레이터
 category: 드론 시뮬레이션
 summary:
-- 가상 드론의 비행·탑재 카메라·지상통제 흐름을 시험하는 개인 C++20 시뮬레이터입니다.
+- 화면 조작과 JSON 시나리오가 같은 시뮬레이션 중심부를 사용하도록 구성해, 조작 화면 없이도 비행 규칙과 임무 결과를 반복 시험합니다.
 period: 2026.08 – 진행 중
 startDate: 2026-08
 endDate: null
@@ -24,10 +24,10 @@ cover:
   alt: DroneSim 시연 화면. 실행 창에는 AeroSimLab 이름이 표시되며 산악 지형, 비행 상태와 드론 카메라 화면을 보여 줍니다.
 architecture:
   src: /assets/dronesim-system-architecture.svg
-  alt: 게임패드, UDP 지상통제와 화면 없는 시나리오가 SimulationCore에 입력되고, 물리·상태가 렌더링과 카메라 분석으로 이어지는 구조
+  alt: 게임패드, UDP 지상통제와 JSON 시나리오가 고정 Tick 중심부에 입력되고, 네이티브 AirSim 강체 모델 또는 WebAssembly 운동학 모델을 거쳐 장면과 EO 카메라로 이어지는 구조
   summary:
-  - 화면 조작·게임패드·UDP·JSON 입력이 공통 드론 명령으로 변환되어 SimulationCore의 고정 Tick에서 처리됩니다.
-  - Flecs 상태 갱신 뒤 물리 계산을 거쳐 OpenGL 장면과 EO 카메라에 전달되며, JSON 시나리오는 임무 결과를 기록합니다.
+  - 화면 조작·게임패드·UDP·JSON 입력은 공통 비행 명령을 거쳐 SimulationCore의 고정 Tick에 들어갑니다.
+  - Flecs가 상태를 갱신하고, 선택한 물리 모델의 결과를 화면·EO 카메라 또는 시나리오 판정에 전달합니다.
 links:
   github: https://github.com/cgantro/DroneSim
   demo: https://cgantro.github.io/DroneSim/

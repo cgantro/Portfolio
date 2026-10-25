@@ -2,23 +2,29 @@
 
 ## 개요
 
-드론 비행과 지상통제 명령을 한 환경에서 시험하는 M&S 시뮬레이터입니다. 화면 조작과 JSON 시나리오가 같은 SimulationCore를 실행합니다. 입력 장치나 화면에 기대지 않고 비행 규칙과 임무 결과를 반복 확인할 수 있게 구성했습니다.
+화면 조작과 JSON 시나리오가 같은 시뮬레이션 중심부를 사용하도록 구성해, 조작 화면 없이도 비행 규칙과 임무 결과를 반복 시험합니다.
 
-화면에서는 비행 상태와 EO 카메라 영상을 확인하고, UDP 지상통제 명령을 보낼 수 있습니다. 화면 없는 시나리오에서는 여러 기체의 편대·공동 임무와 상태 보고 단절을 재현합니다. 영상 인식이나 실기체 비행 검증을 구현한 것은 아닙니다.
+## 고정 Tick과 물리 모델
 
-## 고정 주기 시뮬레이션과 물리 모델
+화면 프레임에 맞춰 비행 상태를 갱신하면 화면 갱신률에 따라 모의 시간이 달라집니다. 앱은 누적 시간을 1/60초 단위로 소비해 Tick을 진행하고, 한 화면 프레임 사이에 여러 Tick을 처리할 수 있습니다. 화면 없는 JSON 시나리오도 같은 `SimulationCore`를 호출하므로 조작 화면 없이 비행 규칙과 임무 결과를 반복 시험할 수 있습니다.
 
-화면 프레임마다 비행 상태를 한 번씩 갱신하면 PC 성능과 화면 갱신률에 따라 모의 결과가 달라집니다. DroneSim은 누적 시간을 1/60초 단위로 소비해 시뮬레이션 Tick을 진행하고, 렌더링은 그 결과를 그립니다. 게임패드·UDP·JSON 입력은 공통 드론 명령으로 바꿔 같은 시뮬레이션 흐름에 넣습니다.
+Flecs 시스템은 드론의 상태와 조종값을 받아 매 Tick 기체를 갱신합니다. 네이티브 실행은 AirSim에 모터 입력과 충돌 접촉을 전달해 강체의 이동·회전을 계산합니다. WebAssembly는 같은 명령 흐름에서 운동학 기준 모델을 사용합니다. 물리 계산 코드는 빌드 대상에 따라 분리해 웹 빌드에 AirSim을 포함하지 않았습니다.
 
-Flecs ECS가 각 Tick의 드론 상태를 갱신하고, 네이티브 실행은 선택한 물리 모드에 따라 AirSim 강체 계산을 연결합니다. WebAssembly에서는 운동학 기준 모델을 씁니다. 두 실행은 입력과 시나리오 흐름을 공유하지만 물리 계산은 같지 않습니다.
+AirSim은 물리 계산 엔진으로 사용하고, 장면과 기체의 좌표계를 잇는 변환 및 물리 계수 전달은 직접 구현했습니다. 세계 좌표는 ENU에서 NED로, 기체 좌표는 FLU에서 FRD로 바꿉니다. EO 카메라 상태도 시뮬레이션 Tick 뒤 기체 자세에 맞추며, 별도 해상도로 그린 영상을 비동기 픽셀 읽기로 넘겨 OpenCV의 밝기·대비·선명도 지표를 계산합니다. 이 지표는 영상 품질 수치이며 사람이나 물체를 인식하지 않습니다.
 
-## 입력에서 화면과 시험 결과까지
+[SimulationCore.cpp](https://github.com/cgantro/DroneSim/blob/main/modules/simulation_core/src/SimulationCore.cpp) · [PhysicsWorld.cpp](https://github.com/cgantro/DroneSim/blob/main/modules/simulation_core/src/PhysicsWorld.cpp)
 
-입력은 공통 명령으로 변환된 뒤 SimulationCore의 고정 Tick에서 처리됩니다. 갱신한 상태는 화면의 OpenGL 장면과 EO 카메라에 전달되고, JSON 시나리오 실행에서는 임무 완료·장애 대응 결과를 기록합니다. 물리 선택과 화면 출력의 경계를 나눠 같은 비행 규칙을 대화형 실행과 자동 시험에서 재사용했습니다.
+## UDP 지상통제와 임무 조정
+
+UDP 수신부는 한 패킷에 담긴 명령 종류와 형식을 확인한 뒤 비행·카메라·상태 조회 경로로 전달합니다. 상태 조회는 현재 상태로 응답하고, 비행이나 카메라 변경은 다음 Tick에 반영한 뒤 결과를 보냅니다. 적용할 지상통제 명령이 있는 Tick에는 게임패드나 기록 재생 입력을 함께 적용하지 않아 입력 우선순위를 분명히 했습니다.
+
+화면 없는 시험에서는 실제 UDP 패킷을 보내는 대신 JSON 시나리오가 상태 보고 단절 시점을 지정합니다. 정해진 시간 안에 heartbeat가 돌아오지 않으면 기체 상태를 `unknown`으로 두고, 미완료 임무를 대기열에 돌립니다. 조정기는 연결되어 비행 중인 기체 가운데 목표에 가까운 기체를 골라 임무를 다시 맡깁니다. 이미 다른 구역을 맡은 기체라면 현재 구역을 대기열에 넣고 새 임무부터 처리합니다.
+
+통신 단절과 임무 재할당은 시나리오 규칙으로 모의했습니다. 이 시험은 UDP 소켓의 실제 장애나 무선 환경을 재현하지 않습니다. [Protocol.cpp](https://github.com/cgantro/DroneSim/blob/main/modules/communication/src/Protocol.cpp) · [ScenarioRunner.cpp](https://github.com/cgantro/DroneSim/blob/main/modules/simulation_core/src/ScenarioRunner.cpp)
 
 ## 충돌 후보 정렬 재사용
 
-충돌 계산은 충돌 상자의 X 좌표 순으로 정렬한 강체 목록에서 서로 가까운 후보만 살핍니다. 이전에는 Tick마다 목록 전체를 정렬했습니다. 드론이 서로 앞지르지 않았다면 순서는 유지되므로, 좌표만 갱신하고 순서가 바뀐 경우에만 다시 정렬하도록 바꿨습니다.
+매 Tick 충돌 후보를 만들기 전, 기존 목록의 X 좌표를 갱신합니다. 기체가 서로 앞지르지 않아 순서가 유지됐다면 전체 정렬을 건너뜁니다. 순서가 바뀐 경우에는 다시 정렬해 후보 탐색의 전제 조건을 지킵니다.
 
 [PhysicsWorld.cpp의 정렬 재사용 코드](https://github.com/cgantro/DroneSim/blob/69ecab93/modules/simulation_core/src/PhysicsWorld.cpp#L544-L549)
 
@@ -30,31 +36,27 @@ if (!std::is_sorted(bodyPositionsByX.begin(), bodyPositionsByX.end()))
     std::sort(bodyPositionsByX.begin(), bodyPositionsByX.end());
 ```
 
-이 최적화가 적용된 변경 전후 커밋에서 분리·밀집 배치를 각각 측정했습니다. 아래 값은 각 조건의 세 반복에서 구한 물리 단계 p95의 중앙값입니다. 감소율은 이 중앙값을 기준으로 다시 계산했습니다.
+변경 전후 같은 배치에서 측정한 물리 단계 p95 중앙값은 다음과 같습니다. 드론 수가 적거나 배치가 조밀할 때 개선 폭이 작을 수 있고, 물리 단계에는 좌표 갱신과 후보 쌍 검사도 들어갑니다. 따라서 감소분 전부를 정렬 생략만의 효과로 볼 수는 없습니다.
 
-| 배치 | 드론 수 | 변경 전 | 변경 후 | 감소율 |
+| 배치 | 드론 수 | 변경 전 | 변경 후 | 감소 |
 | --- | ---: | ---: | ---: | ---: |
-| 분리, 간격 2.5m | 128 | 188.0µs | 184.2µs | 2.0% |
-| 분리, 간격 2.5m | 256 | 370.1µs | 345.4µs | 6.7% |
 | 분리, 간격 2.5m | 512 | 741.8µs | 669.9µs | 9.7% |
 | 밀집, 간격 0.55m | 128 | 472.3µs | 408.6µs | 13.5% |
 | 밀집, 간격 0.55m | 256 | 827.6µs | 791.6µs | 4.4% |
 
-Windows Release에서 준비 Tick 120회 뒤 조건별 30,000 Tick을 세 번 실행했습니다. 물리 단계 시간은 충돌 계산을 포함한 구간입니다. 접촉 후보 생성에는 정렬 외에 충돌 상자 좌표 갱신과 후보 쌍 검사도 포함되므로, 전체 감소량을 정렬 생략 하나의 효과로 단정할 수 없습니다. 이 확장성 시험에는 지형과 정적 장애물을 넣지 않았습니다. [변경 전 원자료](https://github.com/cgantro/DroneSim/blob/main/benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-23-94c39b94-before-sort-reuse.json)와 [변경 후 원자료](https://github.com/cgantro/DroneSim/blob/main/benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-23-69ecab93-after-sort-reuse.json)에서 반복값을 확인할 수 있습니다.
+Windows Release에서 준비 Tick 120회 뒤 각 조건을 30,000 Tick씩 세 번 실행했고, 각 실행의 물리 단계 p95를 구해 세 값의 중앙값을 비교했습니다. 이 확장성 시험에는 지형과 정적 장애물이 없습니다. [변경 전 원자료](https://github.com/cgantro/DroneSim/blob/main/benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-23-94c39b94-before-sort-reuse.json) · [변경 후 원자료](https://github.com/cgantro/DroneSim/blob/main/benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-23-69ecab93-after-sort-reuse.json)
 
-## 상태 보고 단절 뒤 임무 재할당
+## 통신 단절 시나리오 결과
 
-다중 기체 시나리오는 임무 시작 직전 일부 드론의 상태 보고를 끊고, 남은 기체가 미완료 과제를 이어받는지 확인합니다. 준비 실행 뒤 드론 수별로 세 번 측정했으며, 모든 과제를 기한 안에 끝내면 해당 시나리오를 통과한 것으로 판정했습니다.
+조사 임무를 시작할 때 전체 기체의 25%에서 상태 보고가 끊기도록 JSON 시나리오를 구성했습니다. 시험은 남은 기체가 중단된 기체의 미완료 과제를 이어받아 기한 안에 끝내는지 판정합니다. 드론 수를 4대에서 256대까지 늘려 각 조건을 세 번 실행했고, 모든 실행에서 과제를 전부 완료했습니다.
 
-| 드론 수 | 상태 보고 단절 | 재할당 횟수 중앙값 | 임무 완료율 | 시나리오 실행 시간 중앙값 |
+| 드론 수 | 보고 단절 | 재할당 | 완료율 | 시나리오 실행 시간 중앙값 |
 | ---: | ---: | ---: | ---: | ---: |
-| 4 | 1대 (25%) | 1회 | 100% | 2.210ms |
-| 16 | 4대 (25%) | 4회 | 100% | 3.005ms |
-| 64 | 16대 (25%) | 16회 | 100% | 7.895ms |
-| 256 | 64대 (25%) | 64회 | 100% | 66.757ms |
+| 4 | 1대 | 1회 | 100% | 2.210ms |
+| 16 | 4대 | 4회 | 100% | 3.005ms |
+| 64 | 16대 | 16회 | 100% | 7.895ms |
+| 256 | 64대 | 64회 | 100% | 66.757ms |
 
-이 결과는 운동학 기반 헤드리스 시나리오에서 상태 보고가 사라진 상황을 모의한 것입니다. 세 번의 실행에서 모든 과제가 완료됐고, 단절된 기체 수만큼 과제를 다시 배정했습니다. 실행 시간은 조정기만 따로 잰 값이 아니라 상태 갱신과 임무 처리를 포함한 시나리오 전체 시간입니다. 실제 UDP 링크 장애나 실기체 임무 성공률을 검증한 결과는 아닙니다. [시나리오 실행기](https://github.com/cgantro/DroneSim/blob/main/modules/simulation_core/src/ScenarioRunner.cpp)와 [Release 측정 원자료](https://github.com/cgantro/DroneSim/blob/main/benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-24-26c7fce1.json)를 함께 볼 수 있습니다.
+실행 시간은 상태 갱신과 임무 처리를 포함한 헤드리스 시나리오 전체 시간입니다. 단절 시점과 비율을 정한 반복 시험이므로 실제 통신 장애에서의 성공률을 뜻하지 않습니다. [시나리오 실행 코드](https://github.com/cgantro/DroneSim/blob/main/modules/simulation_core/src/ScenarioRunner.cpp) · [측정 원자료](https://github.com/cgantro/DroneSim/blob/main/benchmarks/results/archive/aerosimlab-full-benchmark-release-2026-10-24-26c7fce1.json)
 
-## 물리 모델의 범위
-
-AirSim 강체 물리는 Windows 네이티브 실행에서 사용하고, 웹 데모는 운동학 모델로 실행합니다. 공개된 물리 계수는 실제 비행 로그와 대조하지 않았으므로 실기체의 움직임을 예측하는 모델로 해석할 수 없습니다.
+실제 비행 로그와 물리 계수를 대조하는 정확도 검증은 아직 하지 않았습니다. 충돌 형상은 상자로 단순화했고, 강체마다 한 Tick에 접촉 한 건을 처리합니다.

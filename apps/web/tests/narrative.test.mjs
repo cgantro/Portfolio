@@ -16,3 +16,10 @@ test('project-specific technical headings keep their content', () => {
   assert.match(result, /### 충돌 후보 계산 줄이기\nCandidate pruning/);
   assert.doesNotMatch(result, /Overview|# DroneSim/);
 });
+
+test('a page-specific case study can keep its section headings at the page level', () => {
+  const markdown = '# DroneSim\n\n## 고정 Tick과 물리 모델\nDetails\n\n## 시나리오 결과\nResults';
+  const result = implementationNarrative(markdown, { headingOffset: 0 });
+  assert.match(result, /## 고정 Tick과 물리 모델\nDetails/);
+  assert.match(result, /## 시나리오 결과\nResults/);
+});

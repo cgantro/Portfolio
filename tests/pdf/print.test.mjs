@@ -21,7 +21,7 @@ test('print document presents Korean project narratives without internal audit m
     assert.ok(html.includes(project.title));
     assert.ok(html.includes(project.summary[0]));
   }
-  assert.match(html, /충돌 상자/);
+  assert.match(html, /충돌 형상은 상자로 단순화/);
   assert.doesNotMatch(html, /프로젝트 근거|검증 범위|dronesim-source|robotpal-benchmark/);
   assert.equal(escapeHtml('<script>"&'), '&lt;script&gt;&quot;&amp;');
 });

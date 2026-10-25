@@ -44,7 +44,10 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.archive-project')).toHaveCount(4);
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
-  await expect(page.locator('.project-narrative')).toContainText('충돌 상자');
+  await expect(page.locator('.dronesim-narrative')).toContainText('충돌 형상은 상자로 단순화');
+  await expect(page.locator('.dronesim-narrative h2')).toHaveCount(4);
+  await expect(page.locator('.dronesim-narrative h2').nth(0)).toHaveText('고정 Tick과 물리 모델');
+  await expect(page.locator('.dronesim-narrative h2').nth(3)).toHaveText('통신 단절 시나리오 결과');
   await expect(page.locator('[data-evidence-ids]')).toHaveCount(0);
   await expect(page.locator('.project-top-links a[target="_blank"]').filter({ hasText: '웹 데모 실행' })).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
   await context.close();

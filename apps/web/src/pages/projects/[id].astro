@@ -49,6 +49,7 @@ const metricHeading = project.id === 'robotpal' ? '카메라 스트리밍 성능
   </figure>
 
   <div class="container project-content">
+    {isDroneSim && <p class="project-overview">{project.summary[0]}</p>}
     {metrics.length > 0 && project.id !== 'autowingcar' && !isDroneSim && (
       <section class="detail-section" aria-labelledby="metrics-title">
         <h2 id="metrics-title">{metricHeading}</h2>
@@ -83,23 +84,38 @@ const metricHeading = project.id === 'robotpal' ? '카메라 스트리밍 성능
       </section>
     )}
 
-    <section class="detail-section" aria-labelledby="architecture-title">
-      <h2 id="architecture-title">구조와 데이터 흐름</h2>
+    <section class:list={["detail-section", { "dronesim-architecture": isDroneSim }]} aria-labelledby="architecture-title">
+      <h2 id="architecture-title">{isDroneSim ? '시뮬레이션 흐름' : '구조와 데이터 흐름'}</h2>
       <div class="architecture-grid">
         <figure class="architecture-figure">
           <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={project.title + ' 구조도 원본 크기로 보기'}>
             <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
           </a>
-          <figcaption>그림을 누르면 원본 크기로 볼 수 있습니다.</figcaption>
+          <figcaption>{isDroneSim ? '입력, 시뮬레이션 계산, 화면 출력을 연결한 구조입니다.' : '그림을 누르면 원본 크기로 볼 수 있습니다.'}</figcaption>
         </figure>
+        {isDroneSim && (
+          <ol class="dronesim-flow-mobile" aria-label="DroneSim 처리 흐름">
+            <li><strong>입력</strong><span>화면 조작 · 게임패드 · UDP · JSON 시나리오</span></li>
+            <li><strong>공통 비행 명령</strong><span>입력 형식을 SimulationCore 명령으로 변환</span></li>
+            <li><strong>고정 Tick</strong><span>Flecs가 1/60초 간격으로 드론·카메라 상태 갱신</span></li>
+            <li><strong>물리 계산</strong><span>네이티브 AirSim 강체 모델 · WebAssembly 운동학 모델</span></li>
+            <li><strong>상태와 결과</strong><span>OpenGL 장면 · EO 영상 · 시나리오 판정</span></li>
+          </ol>
+        )}
         <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>
       </div>
     </section>
 
-    <section class="detail-section" aria-labelledby="work-title">
-      <h2 id="work-title">{project.id === 'robotpal' ? '병목 분석과 개선' : project.id === 'dronesim' ? '구현과 시나리오 검증' : project.id === 'mausoleum' ? '음성 통신 구현' : '관제 서버 구현과 문제 해결'}</h2>
-      <div class="project-narrative"><MarkdownContent content={implementationNarrative(project.narrativeMarkdown)} /></div>
-    </section>
+    {isDroneSim ? (
+      <div class="project-narrative dronesim-narrative">
+        <MarkdownContent content={implementationNarrative(project.narrativeMarkdown, { headingOffset: 0 })} />
+      </div>
+    ) : (
+      <section class="detail-section" aria-labelledby="work-title">
+        <h2 id="work-title">{project.id === 'robotpal' ? '병목 분석과 개선' : project.id === 'mausoleum' ? '음성 통신 구현' : '관제 서버 구현과 문제 해결'}</h2>
+        <div class="project-narrative"><MarkdownContent content={implementationNarrative(project.narrativeMarkdown)} /></div>
+      </section>
+    )}
 
     {project.id === 'autowingcar' && metrics.length > 0 && (
       <section class="detail-section" aria-labelledby="metrics-title">
