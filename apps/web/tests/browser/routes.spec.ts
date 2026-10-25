@@ -95,7 +95,7 @@ test('homepage introduces the developer before the featured project cases', asyn
   await expect(page.getByRole('heading', { name: /C\+\+ 시뮬레이터를 개발하고/ })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();
-  const launch = page.getByRole('link', { name: '시뮬레이터 실행' });
+  const launch = page.getByRole('link', { name: '웹 데모 실행' });
   await expect(launch).toHaveAttribute('target', '_blank');
   await expect(page.locator('.featured-project')).toHaveCount(2);
   await expect(page.locator('.supporting-project')).toHaveCount(2);
@@ -108,7 +108,7 @@ test('DroneSim stays absent until explicit launch and opens in a separate tab', 
   await page.goto(`${base}projects/dronesim/`);
   await expect(page.locator('iframe')).toHaveCount(0);
   expect(demoRequests).toBe(0);
-  const launch = page.getByRole('link', { name: '새 탭에서 실행' });
+  const launch = page.getByRole('link', { name: '별도 탭에서 실행' });
   await expect(launch).toHaveAttribute('target', '_blank');
   await launch.scrollIntoViewIfNeeded();
   const popupPromise = page.waitForEvent('popup');
