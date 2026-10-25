@@ -92,7 +92,7 @@ test('homepage introduces the developer before the featured project cases', asyn
   let demoRequests = 0;
   page.on('request', request => { if (request.url().startsWith('https://cgantro.github.io/DroneSim/')) demoRequests += 1; });
   await page.goto(base);
-  await expect(page.getByRole('heading', { name: 'C++ 시뮬레이션·실시간 통신 개발자 홍윤표입니다.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '시뮬레이션·실시간 통신 개발자 홍윤표입니다.' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();
   const launch = page.getByRole('link', { name: '웹 데모 실행' });
