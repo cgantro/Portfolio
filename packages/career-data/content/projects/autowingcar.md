@@ -12,7 +12,7 @@
 
 차량이 게이트에 도착한 상태 보고를 처리하는 중 서버의 자동 동작이 상태를 `DOCKING`으로 바꾼 뒤, 같은 메시지에 담긴 이전 상태 `MOVING_TO_GATE`가 저장될 수 있었습니다. 입력 상태를 그대로 쓰지 않고 자동 동작 전후의 상태를 비교해, 처리 중 서버가 상태를 바꿨다면 그 값을 저장하도록 했습니다.
 
-```java
+```java title="차량 상태 갱신과 전이 조정"
 CarStatus preAutoActionStatus = assignedCar.getCarStatus();
 checkAndTriggerAutoActions(assignedCar, x, y, status);
 
@@ -31,7 +31,7 @@ assignedCar.updateStatus(x, y, heading, velocity, battery, status);
 
 운행 정보를 갱신하는 트랜잭션이 롤백되더라도 MQTT 명령이 먼저 차량으로 전달될 수 있었습니다. `afterCommit`으로 발행 시점을 트랜잭션 성공 뒤로 옮겼습니다.
 
-```java
+```java title="트랜잭션 커밋 뒤 MQTT 명령 발행"
 TxUtil.executeAfterCommit(
     () -> towingCarMqttService.sendDriveCommand(carCode, payload));
 ```

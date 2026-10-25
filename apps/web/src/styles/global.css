@@ -169,8 +169,21 @@ h3 { font-size: 25px; }
 .prose h4 { margin-block: 22px 10px; font-size: 17px; }
 .prose p + p { margin-top: 14px; }
 .prose a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
-.prose pre { overflow-x: auto; max-width: 100%; margin-block: 18px; padding: 20px; background: #111827; color: #F8FAFC; font: 12px/1.75 var(--font-mono); }
+.prose .code-sample { max-width: 100%; margin: 22px 0; overflow: hidden; border: 1px solid #25334A; border-radius: 10px; background: #111827; }
+.prose .code-sample figcaption { display: flex; align-items: center; gap: 12px; min-height: 38px; padding: 8px 16px; border-bottom: 1px solid #334155; color: #93C5FD; font: 11px/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: .06em; }
+.prose .code-sample figcaption > span:first-child { flex: 0 0 auto; }
+.prose .code-sample__title { min-width: 0; overflow: hidden; color: #CBD5E1; text-overflow: ellipsis; text-transform: none; letter-spacing: 0; white-space: nowrap; }
+.prose pre { overflow-x: auto; max-width: 100%; margin: 0; padding: 17px 18px; background: #111827; color: #E2E8F0; font: 14px/1.7 var(--font-mono); tab-size: 4; }
+.prose pre:focus-visible { outline: 2px solid #60A5FA; outline-offset: -3px; }
 .prose pre code { overflow-wrap: normal; }
+.prose .token.comment, .prose .token.prolog, .prose .token.cdata { color: #94A3B8; }
+.prose .token.keyword, .prose .token.atrule, .prose .token.selector { color: #F9A8D4; }
+.prose .token.string, .prose .token.char, .prose .token.attr-value { color: #86EFAC; }
+.prose .token.function { color: #93C5FD; }
+.prose .token.class-name, .prose .token.builtin, .prose .token.type { color: #C4B5FD; }
+.prose .token.number, .prose .token.boolean, .prose .token.constant { color: #FCD34D; }
+.prose .token.operator, .prose .token.punctuation { color: #CBD5E1; }
+.prose .token.property, .prose .token.symbol { color: #67E8F9; }
 .prose code { font-family: var(--font-mono); font-size: .88em; }
 .prose blockquote { margin: 19px 0; padding-left: 18px; border-left: 2px solid var(--color-accent); color: var(--color-muted); }
 .prose table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; margin-block: 18px; font-size: 12px; }
@@ -307,7 +320,7 @@ h3 { font-size: 25px; }
   .dronesim-architecture { margin-bottom: 54px; }
   .dronesim-narrative h2 { margin-block: 50px 13px; font-size: 24px; }
   .prose h3 { font-size: 19px; }
-  .prose pre { padding: 15px; font-size: 11px; }
+  .prose pre { padding: 13px 14px; font-size: 12px; }
   .dronesim-narrative .prose table { display: table; width: 100%; table-layout: fixed; font-size: 11px; }
   .dronesim-narrative .prose th, .dronesim-narrative .prose td { padding: 6px 4px; white-space: normal; overflow-wrap: anywhere; }
   .dronesim-narrative .prose th:first-child, .dronesim-narrative .prose td:first-child { width: 28%; }

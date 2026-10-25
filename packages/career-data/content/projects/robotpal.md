@@ -12,7 +12,7 @@ Tracy로 구간별 시간을 다시 쟀습니다. 동기 Readback p50은 1.144ms
 
 프레임 생성 쪽은 큐가 여섯 장을 넘으면 가장 오래된 프레임을 버리고 새 프레임을 넣습니다. 인코더가 화면 갱신보다 느릴 때 지연된 화면이 계속 쌓이지 않게 하려는 정책입니다.
 
-```cpp
+```cpp title="RobotPal/src/Util/StreamingWorker.cpp"
 {
     std::lock_guard<std::mutex> lk(m_encodeQueueMutex);
     if (m_encodeQueue.size() >= EncodeQueueCapacity)
@@ -24,7 +24,7 @@ m_encodeQueueCv.notify_one();
 
 워커는 조건 변수로 새 작업을 기다렸다가 큐에서 꺼냅니다. 잠금은 작업을 꺼낼 때만 잡고, JPEG 인코딩과 송신은 잠금을 푼 뒤 처리합니다.
 
-```cpp
+```cpp title="RobotPal/src/Util/StreamingWorker.cpp · 워커 대기열"
 std::unique_lock<std::mutex> lk(m_encodeQueueMutex);
 m_encodeQueueCv.wait(lk, [&] {
     return !m_encodeQueue.empty() || !m_isRunning.load();
@@ -37,7 +37,7 @@ lk.unlock();
 
 워커가 큐에서 꺼낸 프레임은 JPEG로 인코딩한 뒤 네트워크 엔진에 넘깁니다.
 
-```cpp
+```cpp title="RobotPal/src/Util/StreamingWorker.cpp · JPEG 송신"
 bool ok = jpeg->EncodeRGB(
     rgbPtr, job.width, job.height, 70, jpegOut);
 if (!ok) {

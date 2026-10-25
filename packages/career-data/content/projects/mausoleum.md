@@ -14,7 +14,7 @@
 
 C++ 음성 서버는 UDP 패킷의 길이와 종류를 확인하고, 세션 토큰·룸·화자 정보가 유효한지 검사한 뒤 룸 코드 해시로 입력 큐를 고릅니다. 같은 룸은 같은 큐와 워커가 처리하므로 여러 룸은 워커 풀에 나뉩니다. 이는 서버 내부의 작업 분배 방식이며, UDP에서 도착 순서가 바뀐 패킷을 복원하지는 않습니다.
 
-```cpp
+```cpp title="룸별 음성 입력 큐 분배"
 const size_t shard = shardIndexForRoom(roomCode);
 if (shard >= voiceInboundQueues_.size()) {
     return;

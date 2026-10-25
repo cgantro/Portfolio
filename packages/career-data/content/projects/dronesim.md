@@ -29,7 +29,7 @@
 
 드론 충돌 후보를 좁히기 전에 X 좌표순으로 강체 목록을 정렬합니다. 기존 구현은 매 Tick 전체 목록을 다시 정렬했습니다. 기체가 서로 앞지르지 않아 순서가 유지되는 동안에는 좌표만 갱신하고, 순서가 바뀐 경우에만 정렬하도록 고쳤습니다.
 
-```cpp
+```cpp title="modules/simulation_core/src/PhysicsWorld.cpp"
 for (auto& [positionX, bodyIndex] : bodyPositionsByX)
     positionX = bodies[bodyIndex]->collisionState.positionMeters.x;
 
