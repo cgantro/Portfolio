@@ -1,39 +1,33 @@
 id: robotpal
 title: RobotPal
-subtitle: 로봇을 제어하고 카메라 영상을 전송하는 시뮬레이터
+subtitle: JETANK 이동·로봇 팔 제어 시뮬레이터
 category: 로봇 시뮬레이션과 실시간 영상 전송
 summary:
-- JETANK의 주행을 가상 환경에서 재현한 C++ 시뮬레이터입니다. 가상 카메라 영상을 Python 모듈로 보내고 이동 로봇과 로봇 팔을 제어합니다.
+- 실물 JETANK 없이 주행과 카메라 인식 기능을 시험할 수 있도록 가상 카메라와 Python 영상 인식 모듈을 연결했습니다.
 period: 2025.11 – 2025.12
 startDate: 2025-11
 endDate: 2025-12
 status: complete
 team: 팀 프로젝트
 role:
-- Tracy로 메인 스레드를 막는 JPEG 압축 병목을 확인하고 압축·송신을 워커 스레드 4개로 분리
-- Qt 화면에서 실물 JETANK 이동 로봇의 상태를 확인하고 조작 입력을 보내는 기능 구현
-- 좌우 모터 입력과 실제 주행값을 대조해 가상 이동 로봇의 직진·회전 속도를 보정
-- Python 인공지능 명령을 이동 로봇, 로봇 팔, 집게, 카메라 기울기 제어에 연결
-- 가상 카메라 화면을 이미지로 압축해 Python 인공지능 모듈에 전달
+- Tracy 계측으로 JPEG 메인 스레드 병목을 찾아 인코딩·송신을 워커 스레드 4개로 분리
+- 실물 JETANK 연결과 주행 측정값에 따른 가상 이동 속도 보정
+- Python 인식 명령을 이동체·로봇 팔·집게 제어에 연결
 stack:
 - C++17
 - OpenGL
-- Flecs
-- libjpeg
+- JPEG 인코딩
 - Tracy
-- TCP
-- WebSocket
-- Emscripten
 - WebAssembly
-- Python
-- CMake
 cover:
   src: /assets/로봇팔 시연.webp
   alt: RobotPal 프로젝트 화면
 architecture:
   src: /assets/robotpal-system-architecture.svg
   alt: 가상 카메라 영상을 압축해 인공지능 모듈로 보내고, 인공지능 명령으로 이동 로봇과 로봇 팔을 제어하는 구조
-  summary: []
+  summary:
+  - 카메라 프레임은 GPU에서 읽어 JPEG로 인코딩한 뒤 Python 영상 인식 모듈로 전송합니다.
+  - 인식 명령은 공통 제어 인터페이스를 거쳐 가상 또는 실물 로봇에 전달합니다.
 links:
   github: https://github.com/cgantro/RobotPal
   demo: null
@@ -137,10 +131,10 @@ metrics:
 evidence:
 - id: robotpal-public
   label: 기존 공개 프로젝트 데이터
-  source: https://github.com/cgantro/RobotPal
+  source: https://github.com/cgantro/RobotPal/tree/main/RobotPal
   kind: public-source
   status: reported
-  locator: role, implementations, caseStudies
+  locator: source, include/RobotPal/Systems, include/RobotPal/Util
   note: 구현 설명은 공개 기록의 보고 내용입니다. 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
 - id: robotpal-notes
   label: 공개 프로젝트 상세 기록
@@ -152,7 +146,7 @@ evidence:
   source: https://github.com/cgantro/RobotPal/blob/main/docs/streaming-performance-result.md
   kind: public-source
   status: reported
-  locator: 3. 카메라 스트리밍 성능 최적화 / 최종 결과
+  locator: 최종 결과, 병목 분석, 멀티스레딩 효과
   note: 스트리밍 OFF·ON 각각 5회 측정한 중앙값. 원본 로그와 정확한 하드웨어 사양은 공개 기록에 없습니다.
 limitations:
 - 공개 자료에 팀원 수와 후속 작업 기간이 서로 다르게 기록되어 있어 인원 수를 생략했습니다. 표기한 기간은 프로젝트 요약의 2025.11–12를 따릅니다.

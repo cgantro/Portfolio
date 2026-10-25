@@ -1,30 +1,25 @@
 id: mausoleum
 title: 영묘 (Mausoleum)
-subtitle: 언리얼 엔진 5 협동 게임의 UDP 음성 통신
+subtitle: UE5 협동 게임을 위한 UDP 음성 서버
 category: 실시간 음성 통신과 온라인 게임 서버
 summary:
-  - 영묘(Mausoleum)는 언리얼 엔진 5 협동 게임에 음성 채팅을 구현한 팀 프로젝트입니다. 별도 C++ 음성 서버가 룸별 UDP 음성 패킷을 중계합니다.
-  - 방 식별 정보로 로비·게임 세션·음성 서버를 연동하고, 마이크 입력부터 음성 전송과 재생까지 구현했습니다.
+  - 협동 게임 중 룸·거리 정책에 따라 음성을 전달하고 재생하는 기능을 클라이언트와 서버에 구현했습니다.
 period: 2026.02 – 2026.03
 startDate: '2026-02-24'
 endDate: '2026-03-27'
 status: complete
 team: 6인
 role:
-- 언리얼 엔진 5 음성 기능에서 마이크 입력, 화자별 압축, 음성 전송과 재생 구현
-- C++ 음성 서버에서 데이터와 권한을 확인하고, 방 식별 코드에 따라 작업을 나눠 음성을 전달
-- 웹소켓 로비와 화면을 그리지 않고 게임을 진행하는 전용 서버를 연결하고 단계별 아이템 생성 연동
-- Linux와 Windows의 네트워크 처리를 구성하고, 백그라운드에서 돌아온 뒤 오래된 음성 대기열을 비우도록 처리
+- UE5 클라이언트의 마이크 캡처, 화자별 Opus 처리, UDP 송수신과 음성 재생 구현
+- C++ 음성 서버의 패킷·세션 확인, 룸별 워커 분배와 음성 중계 구현
+- Windows·Linux 네트워크 이벤트 루프 분리와 포커스 복귀 뒤 캡처 버퍼·인코더 초기화
+- 전용 게임 서버 리팩터링과 페이즈 연동 아이템 생성 구현
 stack:
 - C++
 - Unreal Engine 5
 - UDP
-- WebSocket
-- uWebSockets
 - Opus
-- Protocol Buffers
-- CMake
-- 멀티스레딩
+- 워커 스레드
 cover:
   src: /assets/영묘.png
   alt: 영묘 (Mausoleum) 프로젝트 화면
@@ -32,10 +27,9 @@ architecture:
   src: /assets/mausoleum-system-architecture.svg
   alt: 언리얼 엔진 5 게임 클라이언트가 방을 관리하는 로비, 게임 진행 서버, 음성 전달 서버에 각각 연결되는 구성도
   summary:
-  - 웹소켓 로비 서버는 방 생성과 참가자 정보 동기화를 처리합니다.
-  - 언리얼 전용 서버는 화면을 그리지 않은 채 게임 공간과 진행 단계를 관리합니다.
-  - C++ 음성 서버는 게임 진행과 별도로 방마다 음성 데이터를 전달합니다.
-  - 게임 화면에서는 마이크 입력부터 음성 압축과 송수신, 재생까지 이어지도록 구현했습니다.
+  - UE5 클라이언트는 마이크 입력을 Opus로 인코딩해 UDP로 보내고, 화자별로 디코딩해 재생합니다.
+  - 별도 C++ 서버는 패킷과 세션을 확인한 뒤 룸 코드 해시로 워커 큐를 선택해 음성을 중계합니다.
+  - 로비 전체 음성과 게임 내 거리 기반 음성은 서로 다른 전략으로 처리합니다.
 links:
   github: https://github.com/cgantro/Mausoleum
   demo: null
@@ -80,10 +74,10 @@ metrics: []
 evidence:
 - id: mausoleum-public
   label: 기존 공개 프로젝트 데이터
-  source: data/projects/mausoleum.md
+  source: https://github.com/cgantro/Mausoleum
   kind: public-source
   status: reported
-  locator: role, implementations, caseStudies
+  locator: README.md, Server/GameServer/src/voice/VoiceServer.cpp, A302/Source/A302Client/Voice/PrivateVoiceChatComponent.cpp
   note: 구현 설명은 공개 기록의 보고 내용입니다. 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
 - id: mausoleum-notes
   label: 공개 프로젝트 상세 기록

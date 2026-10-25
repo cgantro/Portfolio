@@ -1,29 +1,25 @@
 id: autowingcar
 title: 오토잉카 (AutoWing Car)
-subtitle: 공항 견인차의 상태와 명령을 관리하는 Spring Boot 관제 서버
+subtitle: 공항 견인차 상태 관제와 운행 경로
 category: Java 기반 공항 차량 관제 서버
 summary:
-  - 공항 토잉카의 상태와 운행 경로를 관리하는 6인 팀 프로젝트입니다. 백엔드 전반을 맡아 차량 통신, 관제 API와 데이터 저장을 구현했습니다.
+  - 공항 견인차에 운행 명령을 보내고 상태를 관제하는 6인 팀 프로젝트에서 차량 메시지, 웹 갱신과 경로 탐색을 구현했습니다.
 period: 2026.01 – 2026.02
 startDate: '2026-01-16'
 endDate: '2026-02-09'
 status: complete
 team: 6인
 role:
-- 6인 팀에서 백엔드 전반을 맡아 Spring Boot 관제 서버 구현
-- 차량에 보내는 명령과 수신 확인, 실시간 관제 화면 갱신, 차량 상태 변경 흐름 구현
-- 이동 비용이 낮은 길을 찾는 A*와 다른 경로를 찾는 Yen 탐색, 경로 모양을 유지하며 점을 줄이는 RDP 구현
-- 데이터베이스와 임시 상태 저장, 로그인 확인 토큰, 배포 환경과 k6 부하 시험 환경 구성
+- 6인 팀의 백엔드 담당으로 MQTT 차량 통신과 운행 상태 관리 구현
+- WebSocket·STOMP 관제 갱신과 차량 상태·주행 이력 저장 구현
+- 상태 역행 방지와 DB 커밋 뒤 MQTT 명령 발행 처리
+- 이동 시간 비용을 적용한 A*·Yen 경로 탐색과 RDP 경로 단순화 구현
 stack:
 - Java 17
 - Spring Boot
 - MQTT
-- WebSocket, STOMP
+- WebSocket·STOMP
 - PostgreSQL
-- Redis
-- Docker
-- GitLab CI
-- k6
 cover:
   src: /assets/오토잉카_실물.png
   alt: 오토잉카 (AutoWing Car) 프로젝트 화면
@@ -31,8 +27,8 @@ architecture:
   src: /assets/autowing-system-architecture.svg
   alt: 차량과 인공지능 서비스가 장비 메시지와 웹 요청으로 Java 서버에 연결되고 관제 화면은 실시간 연결로 갱신되는 구성도
   summary:
-  - MQTT로 차량 상태와 명령 응답을 받고, WebSocket·STOMP로 관제 화면에 변경 내용을 보냈습니다.
-  - AI 모듈·차량 장치·관제 화면 사이의 백엔드 흐름을 맡았습니다.
+  - 차량은 MQTT로 상태·명령 응답을 보내고, 서버는 상태 전이를 확인해 관제용 데이터를 갱신합니다.
+  - 변경된 차량·항공편·비상 정보는 WebSocket·STOMP로 화면에 보내고 운행 기록은 DB에 저장합니다.
 links:
   github: https://github.com/cgantro/Autowing_car
   demo: null
@@ -77,10 +73,10 @@ metrics: []
 evidence:
 - id: autowingcar-public
   label: 기존 공개 프로젝트 데이터
-  source: data/projects/agv.md
+  source: https://github.com/cgantro/Autowing_car
   kind: public-source
   status: reported
-  locator: role, implementations, caseStudies
+  locator: Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
   note: 구현 설명은 공개 기록의 보고 내용입니다. 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
 - id: autowingcar-notes
   label: 공개 프로젝트 상세 기록
@@ -97,4 +93,3 @@ evidence:
 limitations:
 - 원본 k6 부하 보고서가 없어 응답 시간 통계 기준, 반복 횟수, 부하 발생기와 서버 사양을 확인할 수 없습니다.
 - 공개 부하 요약의 처리량과 응답 시간은 집계 기준·반복 횟수가 없어 성능 수치로 제시하지 않습니다.
-- 공개 저장소 및 실행 데모 URL을 확인할 수 없어 구현 설명은 추적되는 공개 포트폴리오 자료를 근거로 합니다.

@@ -23,10 +23,10 @@ for (const record of publicRecords) {
 }
 const projectFiles = (await readdir(resolve(contentRoot, 'projects'))).filter(name => name.endsWith('.md'));
 const projectTopics = {
-  robotpal: /^(#{1,3})\s+.*(?:문제 해결|성능 개선)/m,
+  robotpal: /^(#{1,3})\s+.*(?:스트리밍 병목|성능 개선)/m,
   dronesim: /^(#{1,3})\s+.*충돌 후보/m,
-  mausoleum: /^(#{1,3})\s+.*(?:구현|문제 해결)/m,
-  autowingcar: /^(#{1,3})\s+.*(?:구현|문제 해결)/m,
+  mausoleum: /^(#{1,3})\s+.*(?:음성 처리|작업 분배)/m,
+  autowingcar: /^(#{1,3})\s+.*(?:상태.*문제|상태와 관제)/m,
 };
 for (const filename of projectFiles) {
   const projectId = filename.replace(/\.md$/, '');

@@ -1,3 +1,78 @@
 ---
 import { projects } from '@portfolio/career-data';
-import SiteLayout from '../../layouts/SiteLayout.v������k�w��V�BVF�B76VC�G�&��V7Df��W2��V�wF���'&F�fW2�G�6&VW$FF�&��V7G2��V�wF��6���6�&��V7G2�Wf�FV�6R&V�F���266�V��6�V6�VB���Ч�Р
+import SiteLayout from '../../layouts/SiteLayout.astro';
+import MarkdownContent from '../../components/MarkdownContent';
+import { assetUrl, localUrl, projectUrl } from '../../lib/urls.mjs';
+import { implementationNarrative } from '../../lib/narrative.mjs';
+
+interface Props { project: (typeof projects)[number]; }
+export function getStaticPaths() {
+  return projects.map(project => ({ params: { id: project.id }, props: { project } }));
+}
+const { project } = Astro.props;
+const related = projects.filter(item => item.id !== project.id);
+const isDroneSim = project.id === 'dronesim';
+---
+<SiteLayout title={project.title} description={project.subtitle} active="projects">
+  <header class="container project-heading">
+    <a class="back-link" href={localUrl('projects/')}>← 전체 프로젝트</a>
+    <h1>{project.title}</h1>
+    <p class="project-subtitle">{project.subtitle}</p>
+    <p class="project-meta-brief">
+      {project.team}<span aria-hidden="true"> · </span>{project.period}
+    </p>
+    <div class="project-top-links">
+      {project.links.github && <a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>}
+      {project.links.demo && <a href={project.links.demo} target="_blank" rel="noopener noreferrer">웹 데모 실행 ↗</a>}
+    </div>
+    <p class="technology-line-detail"><strong>주요 기술</strong><span>{project.stack.join(' · ')}</span></p>
+  </header>
+
+  <figure class="container project-cover-wide">
+    <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="900" fetchpriority="high" />
+  </figure>
+
+  <div class="container project-content">
+    <section class="project-overview" aria-label="프로젝트 소개">
+      {project.summary.map(text => <p>{text}</p>)}
+    </section>
+
+    <section class="project-role" aria-labelledby="project-role-title">
+      <h2 id="project-role-title">담당한 구현</h2>
+      <ul>{project.role.map(text => <li>{text}</li>)}</ul>
+    </section>
+
+    <section class:list={["detail-section", { "dronesim-architecture": isDroneSim }]} aria-labelledby="architecture-title">
+      <h2 id="architecture-title">{isDroneSim ? '시뮬레이션 흐름' : '시스템 구조'}</h2>
+      <div class="architecture-grid">
+        <figure class="architecture-figure">
+          <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={project.title + ' 구조도 원본 크기로 보기'}>
+            <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
+          </a>
+          <figcaption>주요 구성 요소와 데이터 흐름</figcaption>
+        </figure>
+        {isDroneSim && (
+          <ol class="dronesim-flow-mobile" aria-label="DroneSim 처리 흐름">
+            <li><strong>입력</strong><span>화면 조작 · 게임패드 · UDP · JSON 시나리오</span></li>
+            <li><strong>공통 비행 명령</strong><span>입력 형식을 SimulationCore 명령으로 변환</span></li>
+            <li><strong>고정 Tick</strong><span>Flecs가 1/60초 간격으로 드론·카메라 상태 갱신</span></li>
+            <li><strong>물리 계산</strong><span>네이티브 AirSim 강체 모델 · WebAssembly 운동학 모델</span></li>
+            <li><strong>상태와 결과</strong><span>OpenGL 장면 · EO 영상 · 시나리오 판정</span></li>
+          </ol>
+        )}
+        {project.architecture.summary.length > 0 && <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>}
+      </div>
+    </section>
+
+    <div class:list={["project-narrative", { "dronesim-narrative": isDroneSim }]}>
+      <MarkdownContent content={implementationNarrative(project.narrativeMarkdown, { headingOffset: 0 })} />
+    </div>
+  </div>
+
+  <section class="container related-section" aria-labelledby="related-title">
+    <h2 id="related-title">다른 프로젝트</h2>
+    <div class="related-grid">
+      {related.map(item => <a href={projectUrl(item.id)}><span>{item.category}</span><strong>{item.title}</strong><p>{item.subtitle}</p></a>)}
+    </div>
+  </section>
+</SiteLayout>

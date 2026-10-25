@@ -21,7 +21,9 @@ test('print document presents Korean project narratives without internal audit m
     assert.ok(html.includes(project.title));
     assert.ok(html.includes(project.summary[0]));
   }
-  assert.match(html, /충돌 형상은 상자로 단순화/);
+  assert.match(html, /4초 위치 RMSE는 약 1\.041m/);
+  assert.match(html, /JPEG 인코딩 p50은 오히려 27\.075ms/);
+  assert.match(html, /서버의 자동 동작이 상태를/);
   assert.doesNotMatch(html, /프로젝트 근거|검증 범위|dronesim-source|robotpal-benchmark/);
   assert.equal(escapeHtml('<script>"&'), '&lt;script&gt;&quot;&amp;');
 });

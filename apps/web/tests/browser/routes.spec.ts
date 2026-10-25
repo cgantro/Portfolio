@@ -44,11 +44,13 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.archive-project')).toHaveCount(4);
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
-  await expect(page.locator('.dronesim-narrative')).toContainText('충돌 형상은 상자로 단순화');
+  await expect(page.locator('.dronesim-narrative')).toContainText('4초 위치 RMSE는 약 1.041m');
   await expect(page.locator('.dronesim-narrative h2')).toHaveCount(5);
-  await expect(page.locator('.dronesim-narrative h2').nth(0)).toHaveText('시뮬레이션 코어와 비행 모델');
-  await expect(page.locator('.dronesim-narrative h2').nth(1)).toHaveText('충돌 후보 정렬 재사용');
-  await expect(page.locator('.dronesim-narrative h2').nth(4)).toHaveText('모델의 한계');
+  await expect(page.locator('.dronesim-narrative h2').nth(0)).toHaveText('고정 Tick과 비행 계산');
+  await expect(page.locator('.dronesim-narrative h2').nth(1)).toHaveText('통신 단절과 임무 재할당');
+  await expect(page.locator('.dronesim-narrative h2').nth(2)).toHaveText('충돌 후보 정렬 재사용');
+  await expect(page.locator('.dronesim-narrative h2').nth(3)).toHaveText('PX4 비행 기록 재생과 접촉 오차');
+  await expect(page.locator('.dronesim-narrative h2').nth(4)).toHaveText('지상통제 명령');
   await expect(page.locator('.dronesim-narrative')).toContainText('188.0');
   await expect(page.locator('.dronesim-narrative')).toContainText('184.2µs');
   await expect(page.locator('[data-evidence-ids]')).toHaveCount(0);
