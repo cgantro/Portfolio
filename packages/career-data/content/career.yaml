@@ -128,17 +128,9 @@ skills:
     detail: 공항 차량 관제 서버 구현
     rating: 2
     projectIds: [autowingcar]
-  - name: Python
-    detail: 로봇 시뮬레이터의 인공지능 연동
-    rating: 2
-    projectIds: [robotpal]
 - category: Tech Stack (기술 스택)
   evidence: 실제 프로젝트에서 사용한 라이브러리, 프레임워크, 통신 기술과 데이터베이스
   items:
-  - name: C++ STL
-    detail: 표준 자료 구조와 알고리즘
-    rating: 2
-    projectIds: [robotpal, dronesim, mausoleum]
   - name: 멀티스레딩
     detail: 시뮬레이션·영상·음성 작업 분리
     rating: 3
@@ -159,42 +151,10 @@ skills:
     detail: 네이티브 강체 비행 물리 연결
     rating: 2
     projectIds: [dronesim]
-  - name: OpenCV
-    detail: 카메라 프레임 분석
-    rating: 1
-    projectIds: [dronesim]
-  - name: TCP
-    detail: 로봇 제어 데이터 전달
-    rating: 2
-    projectIds: [robotpal]
-  - name: WebSocket
-    detail: 로비와 관제 화면 통신
-    rating: 2
-    projectIds: [robotpal, mausoleum, autowingcar]
   - name: Opus
     detail: 음성 인코딩과 재생
     rating: 2
     projectIds: [mausoleum]
-  - name: Unreal Engine 5
-    detail: 협동 게임 클라이언트와 전용 서버
-    rating: 2
-    projectIds: [mausoleum]
-  - name: Spring Boot
-    detail: 공항 차량 관제 서버
-    rating: 2
-    projectIds: [autowingcar]
-  - name: MQTT
-    detail: 차량 명령과 상태 전달
-    rating: 2
-    projectIds: [autowingcar]
-  - name: Redis
-    detail: 차량 상태·갱신 토큰 관리
-    rating: 2
-    projectIds: [autowingcar]
-  - name: PostgreSQL
-    detail: 지도와 주행 이력 저장
-    rating: 2
-    projectIds: [autowingcar]
 - category: Tools (개발 도구)
   evidence: 실제 프로젝트에서 빌드, 성능 측정, 시험, 배포에 사용
   items:
@@ -210,30 +170,6 @@ skills:
     detail: 충돌 계산 성능 비교
     rating: 2
     projectIds: [dronesim]
-  - name: CTest
-    detail: 시뮬레이션 자동 시험 실행
-    rating: 2
-    projectIds: [dronesim]
-  - name: Emscripten
-    detail: C++ WebAssembly 빌드
-    rating: 2
-    projectIds: [robotpal, dronesim]
-  - name: Git
-    detail: 프로젝트 형상 관리
-    rating: 2
-    projectIds: [robotpal, dronesim, mausoleum, autowingcar]
-  - name: Docker
-    detail: 관제 서버 실행 환경 구성
-    rating: 2
-    projectIds: [autowingcar]
-  - name: GitLab CI
-    detail: 관제 서버 자동 빌드와 배포
-    rating: 2
-    projectIds: [autowingcar]
-  - name: k6
-    detail: 차량 상태 메시지 부하 시험
-    rating: 2
-    projectIds: [autowingcar]
 activities:
 - id: band
   title: 교내 밴드 동아리 마스터
@@ -264,3 +200,4 @@ editions:
   - Languages (프로그래밍 언어)
   - Tech Stack (기술 스택)
   - Tools (개발 도구)
+
