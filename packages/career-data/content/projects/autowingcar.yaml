@@ -19,6 +19,7 @@ stack:
 - Spring Boot
 - MQTT
 - WebSocket·STOMP
+- Redis
 - PostgreSQL
 cover:
   src: /assets/오토잉카_실물.png

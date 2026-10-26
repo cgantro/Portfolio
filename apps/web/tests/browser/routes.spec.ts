@@ -45,7 +45,7 @@ test('project content and links are readable without client JavaScript', async (
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
   await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과']);
-  await expect(page.locator('.project-narrative')).toContainText('지정 시나리오 완료율은 모두 100%');
+  await expect(page.locator('.project-narrative')).toContainText('완료율 100%');
   await expect(page.locator('.project-narrative')).toContainText('188.0');
   await expect(page.locator('.project-narrative')).toContainText('184.2µs');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
@@ -74,6 +74,15 @@ test('all projects use the same five-part narrative structure', async ({ page })
   for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
     await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과']);
+    const features = page.locator('.project-story-section').nth(1).locator('ul').first().locator('li');
+    expect(await features.count(), `${id} has 3–5 user-facing features`).toBeGreaterThanOrEqual(3);
+    expect(await features.count(), `${id} has 3–5 user-facing features`).toBeLessThanOrEqual(5);
+    const troubleshootings = page.locator('.project-story-section').nth(3).locator('h3');
+    expect(await troubleshootings.count(), `${id} has 1–2 troubleshooting cases`).toBeGreaterThanOrEqual(1);
+    expect(await troubleshootings.count(), `${id} has 1–2 troubleshooting cases`).toBeLessThanOrEqual(2);
+    await expect(page.locator('.project-story-section .code-disclosure[open]')).toHaveCount(0);
+    await expect(page.locator('.project-cover-wide img')).toHaveAttribute('alt', /.+/);
+    await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
   }
 });
 

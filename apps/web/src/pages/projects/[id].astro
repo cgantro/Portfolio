@@ -43,7 +43,7 @@ const sections = project.narrativeMarkdown
         <h2 id={`project-section-${index}`}>{section.heading}</h2>
         <MarkdownContent content={section.content} collapsibleCode />
         {section.heading === '주요 기능' && <section class="detail-section project-architecture" aria-labelledby="architecture-title">
-          <h3 id="architecture-title">시스템 구조</h3>
+          <h3 id="architecture-title" class="sr-only">{project.title}의 주요 기능 흐름</h3>
           <div class="architecture-grid">
             <figure class="architecture-figure">
               <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={project.title + ' 구조도 원본 크기로 보기'}>
