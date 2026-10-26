@@ -12,7 +12,7 @@ team: 6인
 role:
 - 6인 팀의 백엔드 담당으로 MQTT 차량 통신과 운행 상태 관리 구현
 - WebSocket·STOMP 관제 갱신과 차량 상태·주행 이력 저장 구현
-- 상태 역행 방지와 DB 커밋 뒤 MQTT 명령 발행 처리
+- Redis Streams 운행 로그 일괄 저장과 재처리 구조 후속 개선
 - 이동 시간 비용을 적용한 A*·Yen 경로 탐색과 RDP 경로 단순화 구현
 stack:
 - Java 17
@@ -30,72 +30,102 @@ architecture:
   summary:
   - 차량의 MQTT 상태·명령 응답은 서버에서 분리해 처리하고, 관제 화면은 WebSocket·STOMP로 갱신합니다.
   - 차량의 최신 상태와 주행 이력은 각각 Redis와 PostgreSQL에 저장합니다.
-  - 운행 명령은 DB 커밋 뒤 MQTT로 발행하고, A*·Yen 탐색 결과를 경로 안내에 사용합니다.
+  - 후속 개선에서는 운행 로그를 Redis Streams에 적재하고 별도 소비자가 DB에 일괄 저장합니다.
 detail:
   layout: autowingcar
-  overview: 공항 견인차에 운행 명령을 보내고, 차량 상태와 이동 경로를 관제하는 서버를 개발한 6인 팀 프로젝트입니다. 관제 화면은 차량·항공편·비상 알림 변화를 실시간으로 보여줍니다.
+  overview: 공항 견인차의 위치·운행 상태를 관제하고 차량에 미션 명령을 전달하는 시스템입니다. 차량 상태 조회, 실시간 알림, 주행 경로와 대체 경로 탐색을 지원합니다.
   features:
   - title: 견인차 상태 관제
-    description: 차량에서 받은 위치·속도·배터리·운행 상태를 관제 화면과 주행 이력에 반영합니다.
+    description: 차량의 위치·속도·배터리·운행 상태를 관제 화면에서 확인합니다.
     evidenceIds: [autowingcar-public]
   - title: 운행 명령과 응답 확인
     description: 차량에 명령을 보내고 장비의 수신 응답과 실제 운행 상태를 각각 확인합니다.
     evidenceIds: [autowingcar-public]
-  - title: 실시간 관제 화면 갱신
-    description: 차량·항공편·비상 알림의 변경 내용을 WebSocket·STOMP로 전달합니다.
+  - title: 관제 알림·상태 저장
+    description: 차량·항공편·비상 상태 변화를 관제 화면에 알리고, 차량별 최신 상태와 위치·속도·배터리 등의 주행 이력을 저장합니다.
     evidenceIds: [autowingcar-public]
-  - title: 경로와 대체 경로 탐색
-    description: 통제 구간과 다른 차량이 점유한 구간을 피하는 운행 경로를 찾습니다.
+  - title: 주행 경로 탐색
+    description: 통제·점유 구간과 예상 이동 시간을 반영해 경로를 찾고, Yen 알고리즘으로 대체 경로를 최대 3개 제시한 뒤 RDP로 좌표를 줄입니다.
     evidenceIds: [autowingcar-public]
   roleAreas:
-  - title: 차량 메시지와 관제 갱신
+  - title: 차량 통신·실시간 관제
     items:
-    - text: Spring Boot에서 MQTT 차량 상태와 명령 응답을 처리하고 WebSocket·STOMP로 관제 화면을 갱신했습니다.
+    - text: MQTT 상태 메시지에서 위치·속도·배터리·운행 상태를 읽고 장비 응답 처리
       evidenceIds: [autowingcar-public]
-    - text: 장비의 명령 수신 응답과 실제 운행 상태를 분리해 관리했습니다.
+    - text: WebSocket·STOMP 상태·알림 전송 및 Redis 차량별 최신 상태 조회·갱신
       evidenceIds: [autowingcar-public]
-  - title: 상태 관리와 경로 탐색
+    - text: 미션 명령의 장비 ACK와 실제 차량 운행 상태를 구분해 관리
+      evidenceIds: [autowingcar-public]
+  - title: 상태 정합성·명령 처리 순서
     items:
-    - text: Redis의 최신 상태와 PostgreSQL의 운행 기록을 나눠 관리했습니다. 이동 시간 비용을 반영한 A* 경로와 Yen K=3 대체 경로를 찾고, RDP로 안내 경로의 점을 줄였습니다.
+    - text: 자동 상태 전이 뒤 MQTT 보고에 포함된 오래된 상태가 최신 DB 상태를 덮지 않도록 현재 상태를 우선 반영
       evidenceIds: [autowingcar-public]
+    - text: 차량 운행 명령은 데이터베이스 트랜잭션 커밋 뒤 MQTT로 발행
+      evidenceIds: [autowingcar-public, autowingcar-command-order]
+  - title: 경로 탐색
+    items:
+    - text: 노드·간선 지도 그래프에 이동 시간 비용을 적용한 A* 탐색 구현
+      evidenceIds: [autowingcar-public]
+    - text: Yen 알고리즘으로 대체 경로 최대 3개 탐색, RDP로 경로 좌표 단순화
+      evidenceIds: [autowingcar-public]
+  - title: 데이터 처리·시험 구성
+    items:
+    - text: PostgreSQL 운행 이력 저장과 Redis 최신 상태 관리를 분리
+      evidenceIds: [autowingcar-public]
+    - text: 지도·미션·항공편 조회 API의 부하·스트레스 시험을 k6 HTTP 시나리오로 구성
+      evidenceIds: [autowingcar-k6]
+    - text: 별도 Python 하네스에 모의 차량 500대 × 10Hz 입력을 구성해 RDP 좌표 단순화와 비동기 버퍼 처리 검사
+      evidenceIds: [autowingcar-load]
+  - title: Redis 운행 로그 처리 · 후속 개선
+    items:
+    - text: 프로젝트 종료 후 Redis Streams 적재와 별도 소비자의 JDBC 일괄 저장으로 운행 로그 저장 경로 변경
+      evidenceIds: [autowingcar-streams]
+    - text: pending 레코드 우선 재처리, DB 커밋 뒤 ACK, Stream ID와 DB 복합 키를 이용한 중복 INSERT 방지 구현
+      evidenceIds: [autowingcar-streams]
+    - text: 차량 상태 트랜잭션의 afterCommit 콜백에서 운행 로그를 Stream에 적재하도록 순서 조정
+      evidenceIds: [autowingcar-streams]
+    diagram:
+      src: /assets/autowing-streams-flow.svg
+      alt: 커밋 뒤 Redis Streams에 운행 기록을 넣고, 소비자가 데이터베이스에 저장한 다음 확인하는 흐름
+      caption: Redis Streams를 이용한 운행 로그 후속 개선입니다. 데이터베이스 저장이 끝난 뒤 Stream 항목을 확인 처리합니다.
+      width: 1200
+      height: 360
   troubleshooting:
-  - title: 자동 상태 전이 뒤 이전 차량 상태가 다시 저장됨
-    symptom: 게이트 도착 메시지 처리 중 서버가 차량을 `DOCKING`으로 바꾼 뒤, 같은 메시지에 담긴 이전 상태 `MOVING_TO_GATE`가 다시 저장될 수 있었습니다.
-    cause: 자동 동작이 상태를 바꾼 뒤에도 수신 메시지의 오래된 상태값을 이어서 반영했습니다.
-    solution: 자동 동작 전 상태를 보관하고 처리 뒤 상태가 바뀌었으면 서버가 정한 값을 우선 적용했습니다. 그다음 상태 조정기가 허용된 전이인지 확인합니다.
-    verification: 수정한 상태 처리 흐름과 프로젝트 테스트에서 자동 상태 변경 뒤 수신 메시지의 이전 상태가 덮어쓰지 못하도록 확인했습니다.
+  - title: 자동 상태 변경 뒤 오래된 MQTT 상태가 최신 값을 덮음
+    symptom: 차량이 게이트에 도착해 서버가 DOCKING으로 바꾼 뒤, MQTT로 늦게 도착한 MOVING_TO_GATE 상태가 저장될 수 있었습니다.
+    cause: 같은 메시지 처리 안에서 자동 동작이 차량 상태를 바꾼 뒤, 원래 메시지의 상태값을 다시 저장했습니다.
+    solution: 자동 동작 전 상태를 기록하고, 처리 중 상태가 달라졌다면 차량 객체의 현재 상태를 MQTT 메시지 값보다 우선해 저장합니다. 게이트 이동 중과 도킹 전환 구간의 오래된 상태도 별도로 걸러냅니다.
+    verification: processCarMonitoring()에서 전환 전후 상태를 비교해 최신 객체 상태를 저장하는 분기를 확인했습니다. 저장소에는 관련 상태 전이와 DOCKING 유지 동작을 확인하는 테스트가 있습니다.
     evidenceIds: [autowingcar-public]
     metricIds: []
     code:
       path: Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
       language: java
-      title: 자동 동작으로 바뀐 상태를 우선 반영
+      title: 자동 상태 전환 뒤 오래된 메시지 값을 덮어쓰지 않음
       source: |-
         CarStatus preAutoActionStatus = assignedCar.getCarStatus();
         checkAndTriggerAutoActions(assignedCar, x, y, status);
-
         if (assignedCar.getCarStatus() != preAutoActionStatus) {
             status = assignedCar.getCarStatus();
         }
-
         status = stateCoordinator.resolveCarStatus(assignedCar, status);
         assignedCar.updateStatus(x, y, heading, velocity, battery, status);
       url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
-  - title: DB 커밋 전에 운행 명령이 먼저 발행될 수 있음
-    symptom: 운행 정보를 저장하는 트랜잭션이 실패해도 MQTT 명령은 이미 차량에 전달될 수 있었습니다.
-    cause: 데이터베이스 반영과 MQTT 발행 순서를 분리하지 않았습니다.
-    solution: 트랜잭션이 성공적으로 커밋된 뒤에만 MQTT 명령을 발행하도록 `afterCommit` 처리를 적용했습니다.
-    verification: 커밋 뒤 발행 흐름으로 순서를 정리했습니다. DB와 MQTT를 하나의 원자적 트랜잭션으로 묶은 것은 아닙니다.
-    evidenceIds: [autowingcar-public]
+  - title: 데이터베이스 반영 전에 차량 명령이 발행될 수 있음
+    symptom: 서버가 명령 처리를 마친 뒤 데이터베이스 트랜잭션이 롤백되면 차량만 명령을 받은 상태가 될 수 있었습니다.
+    cause: 데이터베이스 상태 변경과 MQTT 발행은 별도 작업인데, 명령을 커밋 이후로 미루지 않았습니다.
+    solution: 운행 명령 발행을 TxUtil.executeAfterCommit()에 등록해 데이터베이스 커밋이 끝난 뒤 MQTT로 보내도록 바꿨습니다.
+    verification: 서비스 테스트에서 명령 처리 후 예상한 MQTT 주행 명령과 내용을 확인합니다. 커밋·롤백을 함께 검증하는 별도 통합 시험은 공개 자료에 없습니다.
+    evidenceIds: [autowingcar-command-order]
     metricIds: []
     code:
-      path: Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
+      path: Backend/autowing_car/src/main/java/com/project/service/MissionService.java
       language: java
-      title: 트랜잭션 커밋 이후 MQTT 명령 발행
+      title: 트랜잭션 커밋 뒤 주행 명령 발행
       source: |-
-        TxUtil.executeAfterCommit(
-            () -> towingCarMqttService.sendDriveCommand(carCode, payload));
-      url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
+        TxUtil.executeAfterCommit(() ->
+            towingCarMqttService.sendDriveCommand(car.getCode(), payload));
+      url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/service/MissionService.java
 links:
   github: https://github.com/cgantro/Autowing_car
   demo: null
@@ -106,7 +136,7 @@ contributions:
   - autowingcar-public
   status: reported
 - id: autowingcar-contribution-2
-  text: 차량 명령의 장비 응답을 확인하고, DB 커밋 이후 명령을 발행하도록 순서를 조정해 오래된 상태가 최신 값을 덮는 오류를 수정
+  text: 차량 명령의 장비 ACK와 실제 운행 상태를 구분하고 Redis 최신 상태와 PostgreSQL 주행 이력 관리 구현
   evidenceIds:
   - autowingcar-public
   status: reported
@@ -116,20 +146,37 @@ contributions:
   - autowingcar-public
   status: reported
 - id: autowingcar-contribution-4
-  text: 데이터베이스와 임시 상태 저장, 로그인 확인 토큰, 배포 환경과 k6 부하 검증 구성
+  text: 지도·미션·항공편 조회 API의 k6 부하 시험과 별도 Python 모의 차량 입력 하네스 구성
   evidenceIds:
-  - autowingcar-public
+  - autowingcar-k6
+  - autowingcar-load
+  status: reported
+- id: autowingcar-contribution-5
+  text: 후속 개선으로 Redis Streams 로그 적재, JDBC 일괄 저장과 pending 재처리, 고정 식별자·복합 키 기반 중복 INSERT 방지 구현
+  evidenceIds:
+  - autowingcar-streams
+  - autowingcar-streams-tests
   status: reported
 outcomes:
 - id: autowingcar-outcome-1
-  text: 차량·항공편·비상 알림의 변경 내용을 관제 화면에 실시간으로 전달하고, 견인차 상태와 운행 경로를 한 서비스에서 확인하도록 연결했습니다.
-  evidenceIds:
-  - autowingcar-public
+  text: MQTT 상태 보고의 오래된 값이 서버 자동 전이 상태를 덮지 않도록 처리
+  evidenceIds: [autowingcar-public]
   status: reported
 - id: autowingcar-outcome-2
-  text: 명령 수신 응답과 실제 주행 상태를 구분하고, 자동 상태 전이와 DB 커밋 뒤 명령 발행 순서를 정리했습니다.
-  evidenceIds:
-  - autowingcar-public
+  text: 차량 주행 명령을 데이터베이스 커밋 뒤 MQTT로 발행하도록 순서 조정
+  evidenceIds: [autowingcar-command-order]
+  status: reported
+- id: autowingcar-outcome-3
+  text: 후속 개선으로 운행 로그 일괄 저장·pending 재처리·중복 INSERT 방지 구조 구현
+  evidenceIds: [autowingcar-streams]
+  status: reported
+- id: autowingcar-outcome-4
+  text: DB 저장 뒤 ACK, DB 오류 시 pending 보존, 재처리 식별자 유지에 대한 단위 테스트 구성
+  evidenceIds: [autowingcar-streams-tests]
+  status: reported
+- id: autowingcar-outcome-5
+  text: 모의 차량 500대 × 10Hz 입력의 Python 로컬 하네스와 조회 API의 k6 HTTP 시험을 각각 구성
+  evidenceIds: [autowingcar-load, autowingcar-k6]
   status: reported
 metrics: []
 evidence:
@@ -139,19 +186,53 @@ evidence:
   kind: public-source
   status: reported
   locator: Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
-  note: 구현 설명은 공개 기록의 보고 내용입니다. 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
+  note: 차량 메시지·관제·경로 기능의 프로젝트 기록과 현재 소스
+- id: autowingcar-command-order
+  label: 트랜잭션 커밋 뒤 차량 명령 발행
+  source: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/service/MissionService.java
+  kind: public-source
+  status: reported
+  locator: TxUtil.executeAfterCommit, sendDriveCommand
+  note: 차량 운행 명령을 트랜잭션 커밋 뒤 MQTT로 발행하는 구현. 커밋·롤백 통합 검증으로 확대하지 않음.
 - id: autowingcar-notes
   label: 공개 프로젝트 상세 기록
   source: data/projects/agv.md
   kind: public-source
   status: reported
 - id: autowingcar-load
-  label: 기존 공개 부하 검증 요약
-  source: data/projects/agv.md
+  label: 모의 차량 입력 Python 로컬 하네스
+  source: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/perf/high_frequency_validation.py
   kind: public-source
   status: reported
-  locator: verification.items
-  note: 원본 k6 보고서가 없어 처리량 집계 범위, 응답 시간 통계와 반복 횟수를 확인할 수 없습니다.
+  locator: VEHICLE_COUNT, HZ, TOTAL_MESSAGES, generate_messages
+  note: 500대 × 10Hz 입력을 만드는 로컬 Python 하네스. 실제 MQTT·Java·Redis·DB 통합 부하 시험과 구분.
+- id: autowingcar-k6
+  label: 조회 API k6 부하·스트레스 시나리오
+  source: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/perf/load-and-stress.js
+  kind: repository
+  status: reported
+  locator: requestMap, requestMission, requestFlightInfo, options.scenarios
+  note: 지도·미션·항공편 HTTP GET. MQTT 차량 상태 송신 시나리오가 아님.
+- id: autowingcar-streams
+  label: Redis Streams 운행 로그 후속 개선
+  source: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/docs/DRIVING_LOG_WRITE_BEHIND.md
+  kind: repository
+  status: reported
+  locator: DrivingLogWriteBehindService, DrivingLogBatchWriter, BufferedDrivingLog
+  note: 원 프로젝트 기간과 구분하는 후속 코드 개선. 현재 TowingCarService는 DrivingLogWriteBehindService를 호출.
+- id: autowingcar-streams-tests
+  label: 운행 로그 저장 순서·재처리 단위 테스트
+  source: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/test/java/com/project/domain/towingcar/service/DrivingLogWriteBehindServiceTest.java
+  kind: repository
+  status: reported
+  locator: databaseCommitComesBeforeAcknowledgement, databaseFailureLeavesRecordPending, stableIdAndTimestampSurviveRedelivery
+  note: 모의 객체로 저장 호출·ACK 순서와 오류 처리, 재전달 식별자를 검사. DB 중복 INSERT 방지는 SQL의 ON CONFLICT 구현으로 확인.
+- id: autowingcar-streams-order
+  label: 상태 수신 경로의 커밋 후 Stream 적재
+  source: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/DrivingLogWriteBehindService.java
+  kind: repository
+  status: reported
+  locator: enqueueAfterCommit, TxUtil.executeAfterCommit, TowingCarService.processCarMonitoring
+  note: 활성 경로의 afterCommit 연결을 소스로 확인. 별도 DrivingLogStreamService 테스트를 활성 경로의 커밋·롤백 시험으로 간주하지 않음.
 limitations:
-- 원본 k6 부하 보고서가 없어 응답 시간 통계 기준, 반복 횟수, 부하 발생기와 서버 사양을 확인할 수 없습니다.
-- 공개 부하 요약의 처리량과 응답 시간은 집계 기준·반복 횟수가 없어 성능 수치로 제시하지 않습니다.
+- Redis Streams 후속 개선의 DB 처리량·지연 개선 수치는 통합 비교 시험 전까지 제시하지 않습니다.

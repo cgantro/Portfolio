@@ -1,6 +1,6 @@
 id: robotpal
 title: RobotPal
-subtitle: JETANK 이동·로봇 팔 제어 시뮬레이터
+subtitle: JETANK 이동 로봇·로봇팔 제어 시뮬레이터
 category: 로봇 시뮬레이션과 실시간 영상 전송
 summary:
 - 실물 JETANK 없이 주행과 카메라 인식 기능을 시험할 수 있도록 가상 카메라와 Python 영상 인식 모듈을 연결했습니다.
@@ -16,9 +16,10 @@ role:
 stack:
 - C++17
 - OpenGL
-- JPEG 인코딩
+- TCP/WebSocket
+- Emscripten
+- JPEG
 - Tracy
-- WebAssembly
 cover:
   src: /assets/로봇팔 시연.webp
   alt: RobotPal 프로젝트 화면
@@ -30,47 +31,70 @@ architecture:
   - Python 인식 결과는 공통 제어 인터페이스를 거쳐 가상 또는 실물 로봇에 적용합니다.
 detail:
   layout: robotpal
-  overview: 가상 JETANK과 로봇 팔을 조작하고, 실물 JETANK과 영상 인식 모듈을 연결해 주행·인식·제어 흐름을 시험하는 시뮬레이터입니다. 4인 팀이 2025년 11월부터 12월까지 개발했습니다.
+  overview: 실물 JETANK의 주행과 로봇팔 조작을 가상환경에서 시험하는 시뮬레이터입니다. 가상 카메라를 Python 영상 인식 모듈에 연결해 인식 결과로 가상·실물 장비를 제어합니다.
   features:
-  - title: 가상 JETANK·로봇 팔 조작
-    description: 가상 이동 로봇을 주행시키고 로봇 팔과 집게를 조작합니다.
+  - title: 가상 로봇 조작
+    description: JETANK 주행, 로봇팔 관절 이동, 집게 제어
     evidenceIds: [robotpal-public]
-  - title: 영상 인식 기반 제어
-    description: 가상 카메라 영상을 Python 인식 모듈로 보내고, 돌려받은 명령을 이동체·로봇 팔 제어에 연결합니다.
-    evidenceIds: [robotpal-public]
-  - title: 카메라 영상 전송
-    description: OpenGL 카메라 프레임을 JPEG로 압축해 TCP 또는 WebAssembly의 WebSocket 경로로 전달합니다.
+  - title: 가상 카메라
+    description: OpenGL 카메라 영상을 Python 영상 인식 모듈로 보내고, 인식 결과를 이동체·로봇팔·집게 제어에 반영
     evidenceIds: [robotpal-public]
   - title: 실물 JETANK 연동
-    description: 실물 장비의 상태와 조작을 확인하고, 가상·실물 제어 대상을 전환해 시험합니다.
+    description: Qt 관제 화면에서 실물 장비를 확인·조작하고 공통 제어 인터페이스로 가상 로봇과 전환
+    evidenceIds: [robotpal-public]
+  - title: 데스크톱·웹 실행
+    description: 네이티브 TCP 및 WebAssembly WebSocket 통신 지원
+    evidenceIds: [robotpal-public]
+  - title: 실측 기반 주행 보정
+    description: 실물 JETANK의 주행을 측정해 가상 AGV 이동 계수 조정
     evidenceIds: [robotpal-public]
   roleAreas:
-  - title: 실물 제어와 가상 주행
+  - title: 실측 기반 주행 보정
     items:
-    - text: Qt 제어 화면에서 실물 JETANK 상태를 확인하고 조작 입력을 보냈습니다.
+    - text: 입력값 0.3에서 실물 JETANK 직진 약 2.4cm/s·회전 약 24°/s 측정
       evidenceIds: [robotpal-public]
-    - text: 입력값 0.3에서 측정한 실물 주행값(직진 약 2.4cm/s, 회전 약 24°/s)을 가상 이동 계수에 반영했습니다.
+    - text: 좌우 모터 입력의 평균·차이를 선속도·각속도로 변환하고 실측값으로 가상 AGV 이동 계수 보정
       evidenceIds: [robotpal-public]
-  - title: Python 인식 모듈 연결
+  - title: 제어 통신
     items:
-    - text: TCP JSON 제어 명령을 IRobotController 기반 가상·실물 제어 경로에 연결했습니다. 카메라 영상은 별도 TCP·WebSocket 스트리밍 경로로 전송했습니다.
+    - text: TCP JSON 명령 수신·처리와 Python 인식 명령의 이동체·로봇팔·집게 제어 연동
       evidenceIds: [robotpal-public]
-  - title: 영상 스트리밍 성능 분석
+    - text: '`IRobotController`를 기준으로 가상 ECS 제어와 실물 장비 제어 구현 분리'
+      evidenceIds: [robotpal-public]
+    - text: Qt 제어 화면의 실물 JETANK 상태 확인 및 조작 입력 연동
+      evidenceIds: [robotpal-public]
+  - title: 카메라 스트리밍
     items:
-    - text: Tracy 계측과 PBO 비교로 JPEG 압축이 메인 스레드 처리 시간을 많이 차지하는 것을 확인했습니다.
+    - text: OpenGL Framebuffer의 GPU Readback, JPEG 압축, 네트워크 전송 연결
+      evidenceIds: [robotpal-public]
+    - text: 데스크톱 TCP·웹 WebSocket 전송 경로 분리
+      evidenceIds: [robotpal-public]
+  - title: 멀티스레드 영상 처리
+    items:
+    - text: Tracy로 Readback·JPEG 인코딩·송신 구간 계측, PBO·Fence 기반 비동기 픽셀 읽기 적용
       evidenceIds: [robotpal-benchmark]
-    - text: JPEG 압축 워커 4개와 별도 TCP 송신 작업자를 구성했습니다.
-      evidenceIds: [robotpal-benchmark]
+    - text: JPEG 워커 4개와 인코딩 대기열 6프레임·TCP 송신 대기열 2프레임 구성
+      evidenceIds: [robotpal-benchmark, robotpal-public]
+    - text: 대기열 포화 시 오래된 프레임 폐기, 프레임 번호 검사로 늦게 끝난 과거 프레임의 역순 송신 방지
+      evidenceIds: [robotpal-public]
+    - text: 워커별 JPEG 인코더와 픽셀·압축 버퍼를 분리하고 반복 작업에서 버퍼 재사용
+      evidenceIds: [robotpal-public]
   troubleshooting:
-  - title: 카메라 스트리밍이 시뮬레이션 갱신을 늦춤
-    symptom: 스트리밍을 켜자 시뮬레이션 갱신률이 102.38 FPS에서 66.70 FPS로 떨어졌습니다.
-    cause: PBO를 적용해도 갱신률은 65.60 FPS였습니다. Tracy에서 동기 Readback p50은 1.144ms, 메인 스레드 JPEG 압축 p50은 16.406ms로 측정돼 JPEG 압축이 메인 스레드 처리 시간을 더 많이 차지하는 것을 확인했습니다.
-    solution: 메인 스레드에서는 프레임을 인코딩 큐에 넣고 바로 돌아오도록 바꿨습니다. JPEG 압축 워커 4개가 최대 6프레임 큐를 처리하며, 가득 차면 오래된 프레임을 버립니다. 압축이 끝난 프레임은 별도 TCP 송신 큐(최대 2프레임)로 넘기고, 프레임 번호를 확인해 늦게 끝난 과거 프레임을 보내지 않습니다.
-    verification: 큐 삽입 p50은 0.017ms, 워커의 JPEG 압축 p50은 27.075ms였습니다. 개별 압축 시간은 늘었지만 스트리밍 중 전체 갱신률과 카메라 송신률은 개선됐습니다.
+  - title: 카메라 스트리밍 중 시뮬레이션 성능 저하
+    symptom: 스트리밍을 켜면 시뮬레이션 갱신률이 102.38→66.70 FPS로 떨어져 GPU Readback 대기를 주요 병목으로 예상했습니다.
+    cause: PBO·Fence 적용 후에도 갱신률은 65.60 FPS였습니다. Tracy 측정에서 Readback p50은 1.144ms, JPEG 인코딩 p50은 16.406ms로 JPEG 압축의 메인 스레드 점유가 더 컸습니다.
+    solution: JPEG 인코딩을 워커 4개로 옮기고 메인 스레드는 작업을 대기열에 넣은 뒤 다음 프레임을 진행하도록 바꿨습니다. 인코딩 대기열은 6프레임, TCP 송신 대기열은 2프레임으로 제한하고 가득 차면 오래된 프레임을 버립니다. 병렬 압축이 끝난 순서가 바뀌어도 프레임 번호를 비교해 과거 프레임을 거부합니다.
+    verification: 메인 스레드 작업 삽입 p50은 0.017ms로, JPEG 인코딩 완료를 기다리는 구간을 분리했습니다. 워커의 개별 JPEG 압축 p50은 27.075ms였지만 동기·PBO 단독·PBO+워커 비교에서 전체 갱신률과 송신률은 개선됐습니다.
     evidenceIds: [robotpal-benchmark, robotpal-public]
     metricIds: [simulation-streaming-fps, camera-send-fps, streaming-penalty]
+    diagram:
+      src: /assets/robotpal-streaming-flow.svg
+      alt: 동기 방식과 워커 분리 방식의 GPU 픽셀 회수·JPEG 압축·TCP 송신 대기열 흐름 비교
+      caption: 동기 방식에서는 메인 스레드가 JPEG 압축과 송신을 기다렸습니다. 변경 뒤에는 JPEG 압축을 워커 네 개로 옮기고 대기열 크기와 프레임 순서를 관리합니다.
+      width: 1200
+      height: 470
     comparison:
-      caption: 동기 Readback·JPEG, PBO·JPEG, PBO·JPEG 워커 4개 구성을 비교했습니다.
+      caption: 1232×832, 스트리밍 OFF·ON 구성별 5회 중앙값, 수신·디코딩 제외.
       columns: [시뮬레이션 갱신률, 카메라 송신률, 갱신률 저하]
       rows:
       - label: 동기 Readback·JPEG
@@ -87,9 +111,19 @@ detail:
       source: |-
         {
             std::lock_guard<std::mutex> lk(m_encodeQueueMutex);
-            if (m_encodeQueue.size() >= EncodeQueueCapacity)
+            if (m_encodeQueue.size() >= EncodeQueueCapacity) {
+                const auto droppedFrameId = m_encodeQueue.front().frameId;
                 m_encodeQueue.pop();
+                robotpal::benchmark::Event(
+                    "encode_queue_dropped",
+                    droppedFrameId,
+                    0,
+                    EncodeQueueCapacity,
+                    "drop_oldest_capacity_6"
+                );
+            }
             m_encodeQueue.push(std::move(job));
+            robotpal::benchmark::Event("encode_queued", frameId, 0, m_encodeQueue.size());
         }
         m_encodeQueueCv.notify_one();
       url: https://github.com/cgantro/RobotPal/blob/main/RobotPal/src/Util/StreamingWorker.cpp
@@ -119,19 +153,17 @@ contributions:
   status: reported
 outcomes:
 - id: robotpal-target
-  text: 스트리밍 중 시뮬레이션 갱신률은 66.70→96.01 FPS(43.9%), 카메라 송신률은 26.95→40.05 FPS(48.6%)로 개선됐고, 갱신률 저하율은 34.84→6.74%로 줄었습니다.
+  text: '시뮬레이션 갱신률: 66.70→96.01 FPS, 43.9% 개선'
   evidenceIds:
   - robotpal-benchmark
   status: reported
-- id: robotpal-integration
-  text: 실물 JETANK 주행·회전값을 가상 이동 계수에 반영하고, Python 인식 명령을 이동체와 로봇 팔 조작에 연결했습니다.
-  evidenceIds:
-  - robotpal-public
+- id: robotpal-camera-result
+  text: '카메라 프레임 송신률: 26.95→40.05 FPS, 48.6% 개선'
+  evidenceIds: [robotpal-benchmark]
   status: reported
-- id: robotpal-benchmark-conditions
-  text: 1232×832 해상도에서 스트리밍을 끄고 켠 상태를 각각 5회 측정한 중앙값입니다. 영상 수신과 압축 해제는 측정에서 제외했습니다.
-  evidenceIds:
-  - robotpal-benchmark
+- id: robotpal-penalty-result
+  text: '스트리밍에 따른 갱신률 저하: 34.84%→6.74%'
+  evidenceIds: [robotpal-benchmark]
   status: reported
 metrics:
 - id: simulation-streaming-fps
@@ -205,7 +237,7 @@ evidence:
   kind: public-source
   status: reported
   locator: source, include/RobotPal/Systems, include/RobotPal/Util
-  note: 구현 설명은 공개 기록의 보고 내용입니다. 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
+  note: 구현 설명은 공개 기록의 보고 내용입니다. 팀 규모 4인은 사용자 확인값이며, 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
 - id: robotpal-notes
   label: 공개 프로젝트 상세 기록
   source: https://github.com/cgantro/RobotPal

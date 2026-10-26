@@ -41,10 +41,11 @@ paths or public URLs. Private source paths are rejected.
 External repository and demo links are recorded from public sources; their current
 availability has not been verified during the migration.
 
-RobotPal's team size and phase dates conflict between two public source files.
-Its initial development period is retained, the team count is left unresolved,
-and the differing follow-up period is documented in `limitations`. AutoWing Car's
-load figures retain their report caveats and do not claim a response percentile.
+RobotPal's team size is user-confirmed as four; older source notes that say two
+describe an earlier portfolio record and are no longer used for the public team
+count. Its initial development period is retained, and differing follow-up dates
+remain documented in `limitations`. AutoWing Car's load figures retain their
+report caveats and do not claim a response percentile.
 
 ## Editing
 

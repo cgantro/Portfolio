@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 470" role="img" aria-labelledby="title desc">
+  <title id="title">RobotPal 카메라 프레임 처리 구조 비교</title>
+  <desc id="desc">동기 방식은 메인 스레드가 GPU 픽셀 회수와 JPEG 압축, TCP 송신을 차례로 기다린다. 개선 뒤에는 메인 스레드가 프레임을 제한된 대기열에 넣고 작업자가 압축한다. TCP 송신 큐에 넣기 전에 프레임 번호를 비교해 오래된 프레임을 거부한다.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,5 L0,10 z" fill="#64748B" />
+    </marker>
+    <style>
+      .bg{fill:#F8FAFC}.panel{fill:#fff;stroke:#CBD5E1;stroke-width:2}.title{font:700 24px Pretendard,Arial,sans-serif;fill:#111827}.label{font:600 16px Pretendard,Arial,sans-serif;fill:#111827}.small{font:13px Pretendard,Arial,sans-serif;fill:#475569}.accent{fill:#EFF6FF;stroke:#2563EB;stroke-width:2}.neutral{fill:#F1F5F9;stroke:#94A3B8;stroke-width:2}.warning{fill:#FFF7ED;stroke:#F59E0B;stroke-width:2}.arrow{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="470" rx="16" />
+  <text class="title" x="32" y="42">카메라 프레임 처리 구조</text>
+
+  <rect class="panel" x="24" y="66" width="1152" height="158" rx="12" />
+  <text class="label" x="48" y="101">동기 처리</text>
+  <text class="small" x="48" y="127">메인 스레드가 각 단계를 차례로 마칠 때까지 다음 Tick이 기다림</text>
+  <rect class="neutral" x="48" y="151" width="214" height="48" rx="8" />
+  <text class="label" x="155" y="181" text-anchor="middle">GPU 픽셀 회수</text>
+  <path class="arrow" d="M266 175 H302" />
+  <rect class="warning" x="310" y="151" width="214" height="48" rx="8" />
+  <text class="label" x="417" y="181" text-anchor="middle">JPEG 압축</text>
+  <path class="arrow" d="M528 175 H564" />
+  <rect class="neutral" x="572" y="151" width="214" height="48" rx="8" />
+  <text class="label" x="679" y="181" text-anchor="middle">TCP 송신</text>
+  <path class="arrow" d="M790 175 H826" />
+  <rect class="neutral" x="834" y="151" width="214" height="48" rx="8" />
+  <text class="label" x="941" y="181" text-anchor="middle">다음 시뮬레이션 Tick</text>
+
+  <rect class="panel" x="24" y="240" width="1152" height="206" rx="12" />
+  <text class="label" x="48" y="276">워커 분리</text>
+  <text class="small" x="48" y="301">메인 스레드는 프레임을 큐에 넣고 다음 Tick을 진행</text>
+  <rect class="neutral" x="48" y="330" width="150" height="52" rx="8" />
+  <text class="small" x="123" y="360" text-anchor="middle">GPU 픽셀 회수</text>
+  <path class="arrow" d="M202 356 H222" />
+  <rect class="accent" x="230" y="330" width="190" height="52" rx="8" />
+  <text class="label" x="325" y="351" text-anchor="middle">인코딩 큐</text>
+  <text class="small" x="325" y="371" text-anchor="middle">최대 6프레임 · 오래된 순 폐기</text>
+  <path class="arrow" d="M424 356 H444" />
+  <rect class="accent" x="452" y="320" width="190" height="72" rx="8" />
+  <text class="label" x="547" y="349" text-anchor="middle">JPEG 작업자 4개</text>
+  <text class="small" x="547" y="372" text-anchor="middle">프레임별 병렬 압축</text>
+  <path class="arrow" d="M646 356 H666" />
+  <rect class="warning" x="674" y="330" width="166" height="52" rx="8" />
+  <text class="label" x="757" y="351" text-anchor="middle">프레임 번호 확인</text>
+  <text class="small" x="757" y="371" text-anchor="middle">오래된 프레임 거부</text>
+  <path class="arrow" d="M844 356 H864" />
+  <rect class="accent" x="872" y="330" width="174" height="52" rx="8" />
+  <text class="label" x="959" y="351" text-anchor="middle">TCP 송신 큐</text>
+  <text class="small" x="959" y="371" text-anchor="middle">최대 2프레임</text>
+  <path class="arrow" d="M1050 356 H1070" />
+  <rect class="neutral" x="1078" y="330" width="82" height="52" rx="8" />
+  <text class="small" x="1119" y="360" text-anchor="middle">TCP 송신</text>
+  <text class="small" x="757" y="420" text-anchor="middle">TcpSendQueue에 넣기 전에 최신 프레임 번호와 비교</text>
+</svg>

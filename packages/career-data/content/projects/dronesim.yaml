@@ -1,6 +1,6 @@
 id: dronesim
 title: DroneSim
-subtitle: 시설물 외벽 영상 수집 임무를 모의하는 드론 시뮬레이터
+subtitle: 드론 비행·EO 영상 수집·지상통제 통합 M&S 시뮬레이터
 category: 드론 시뮬레이션
 summary:
 - 탄천교 주변 지형에서 드론 비행과 지상통제, 외벽 EO 영상 수집·저장을 시험합니다. 영상과 위치·시각·자세 기록을 함께 남깁니다.
@@ -14,10 +14,14 @@ role:
 - 게임패드·UDP 지상통제·JSON 시나리오 입력을 공통 비행 명령으로 연결하고, 헤드리스 임무·충돌 시험을 구성했습니다.
 - EO 영상 촬영·기록과 네이티브 H.264/RTP 송수신, 녹화 파일 전달을 지상통제 프로그램에 연결했습니다.
 stack:
-- Flecs ECS
-- AirSim 강체 물리
-- UDP 지상통제
-- GStreamer·H.264/RTP
+- C++20
+- Flecs
+- AirSim
+- OpenGL
+- OpenCV
+- UDP
+- GStreamer
+- CMake
 cover:
   src: /assets/DroneSim-current-view.png
   alt: OSM 건물 외벽 시험 위치를 선택해 EO 영상 수집 임무를 진행하는 DroneSim 웹 지상통제 화면
@@ -30,43 +34,73 @@ architecture:
   - EO 프레임은 실시간 H.264/RTP 영상 경로와 녹화 파일·촬영 기록 경로로 나뉘어 지상통제 프로그램에 전달됩니다. 웹 저장 자료는 별도로 내려받습니다.
 detail:
   layout: dronesim
-  overview: 탄천교 주변 지형을 배경으로 드론 비행, 지상통제, 시설물 외벽 EO 영상 수집을 시험하는 M&S 시뮬레이터입니다. 촬영 영상과 위치·시각·자세 기록을 함께 저장하고, 네이티브 실행과 웹 실행을 나눠 개발하고 있습니다.
+  overview: 드론 비행과 시설물 외벽 EO 영상 수집, 지상통제를 가상환경에서 시험하는 시뮬레이터입니다. 사람이 정한 촬영 지점을 방문해 영상과 비행 정보를 저장하며, 다중 드론 임무와 통신 장애 시나리오를 지원합니다.
   features:
-  - title: 비행 시뮬레이션
-    description: 게임패드·UDP 지상통제·JSON 시나리오로 드론을 조종하고 상태를 확인합니다. 네이티브는 AirSim 강체 물리, 웹은 운동학 모델을 사용합니다.
+  - title: 드론 비행
+    description: 이륙·호버링·이동·착륙과 게임패드·경유점 조종을 지원하며, UDP 지상통제 명령·ACK·적용 Tick 및 기체 상태를 확인
     evidenceIds: [dronesim-source]
-  - title: 탄천교 주변 3D 환경
-    description: SRTM 30m 격자 지형과 OSM 건물 정보를 사용합니다. 항공 정사영상 텍스처와 탄천교 정밀 3D 모델은 아직 적용하지 않았습니다.
+  - title: 3D 환경
+    description: X500 모델, 탄천교 주변 90m NGII DEM의 30m 간격 높이 격자, 2025 정사영상과 OSM 건물·도로·교량 표시
     evidenceIds: [dronesim-source]
-  - title: EO 영상 수집과 기록
-    description: 지정 위치에서 촬영한 영상에 위치·시각·자세를 붙여 저장합니다. 네이티브는 MP4·JSONL, 웹은 WebM·PNG·JSON 기록을 만듭니다.
+  - title: EO 외벽 촬영 임무
+    description: OSM에서 외벽 시험 위치를 골라 자동 이동·촬영하고 위치·시각·자세를 기록합니다. 임무를 멈추거나 재개·중단할 수 있으며, 네이티브는 H.264/RTP와 MP4·JSONL·TCP 자료 전달, 웹은 WebM·PNG·JSON 저장을 지원합니다.
     evidenceIds: [dronesim-source]
-  - title: 실시간 영상·녹화 자료 전달
-    description: 네이티브 시뮬레이터와 지상통제 프로그램 사이에 H.264/RTP 영상을 보내고 녹화 영상과 촬영 기록 파일을 전달합니다.
-    evidenceIds: [dronesim-source]
-  - title: 여러 드론의 임무 시험
-    description: 여러 드론에 임무를 나누고 임무를 시작·일시정지·재개·중단합니다. 상태 보고가 끊긴 기체의 미완료 임무는 시나리오에서 다시 배정합니다.
+  - title: 다중 드론 운용
+    description: 기체별 임무·상태 관리, 위치 공유 중단·복구, 헤드리스 시나리오의 미완료 임무 재할당
     evidenceIds: [dronesim-reallocation]
+  - title: 시나리오 기록·재생
+    description: JSON 명령과 조종 입력을 Tick 기준으로 기록·재생하고 통신 지연·손실·중복 및 카메라 장애를 넣어 시험
+    evidenceIds: [dronesim-source]
   roleAreas:
-  - title: 시뮬레이션 중심부와 비행 제어
+  - title: 시뮬레이션 코어
     items:
-    - text: 화면 갱신과 분리된 Flecs ECS 기반 60Hz 고정 주기 코어를 구성하고 위치·속도·자세를 갱신해 비행 상태를 계산했습니다.
+    - text: Flecs ECS 기반 드론·물리 객체·카메라 상태 관리
       evidenceIds: [dronesim-source]
-    - text: 게임패드·UDP·JSON 입력을 공통 비행 명령으로 연결하고, 네이티브 AirSim 강체 물리와 웹 운동학 모델을 분리했습니다.
+    - text: 60Hz 고정 Tick과 렌더링 주기 분리, 동일 코어를 사용하는 헤드리스 시나리오 실행 경로 구성
       evidenceIds: [dronesim-source]
-  - title: 지상통제와 시나리오 시험
+  - title: 비행 제어·물리
     items:
-    - text: UDP 명령의 순서·중복을 확인하고 응답을 돌려주며 JSON 임무 입력과 헤드리스 비행·충돌·상태 보고 단절 시나리오를 처리했습니다.
-      evidenceIds: [dronesim-source, dronesim-reallocation]
+    - text: 위치·속도 오차로 목표 가속도를 구하고 쿼터니언 자세 오차·각속도로 목표 토크 산출
+      evidenceIds: [dronesim-source]
+    - text: 로터 배치·회전 방향에 따라 힘과 토크를 나눠 목표 회전 속도를 계산하고 AirSim 모터·강체 계산에 전달
+      evidenceIds: [dronesim-source]
+    - text: PX4 X500 공개 파라미터를 반영한 네이티브 AirSim 강체 모델과 웹 운동학 모델 분리
+      evidenceIds: [dronesim-source]
   - title: 충돌 처리
     items:
-    - text: AABB로 충돌 후보를 추리고 회전 상자끼리는 SAT로 겹침을 판정했습니다. X 좌표순 후보 목록은 순서가 달라졌을 때만 다시 정렬합니다.
-      evidenceIds: [dronesim-sort-reuse]
-  - title: 카메라·영상·파일 처리
-    items:
-    - text: EO 프레임에 위치·시각·자세 기록을 연결하고 네이티브 H.264/RTP 송수신과 녹화 파일 전달을 지상통제 프로그램에 연결했습니다.
+    - text: 회전 상자 기반 기체 충돌 형상과 AABB 후보 검사·SAT 접촉 판정 구현
       evidenceIds: [dronesim-source]
-    - text: 웹 실행에서는 WebM·PNG·JSON 기록을 저장하고 내려받도록 구현했습니다.
+    - text: 충돌 상자 계산 재사용, 중복 후보 검사 감소, X 좌표순 후보 목록 정렬 재사용
+      evidenceIds: [dronesim-sort-reuse]
+  - title: 3D 그래픽스
+    items:
+    - text: OpenGL 메시·셰이더·텍스처·Framebuffer 관리 및 X500·지형·건물·시설물 렌더링
+      evidenceIds: [dronesim-source]
+    - text: DEM 높이 격자와 정사영상의 좌표를 맞추고 OSM 건물·도로·교량 자료를 장면에 반영
+      evidenceIds: [dronesim-source]
+  - title: EO 영상
+    items:
+    - text: 드론 위치·자세를 반영한 가상 카메라와 PBO·Fence 기반 비동기 RGB 프레임 회수 구현
+      evidenceIds: [dronesim-source]
+    - text: OpenCV로 밝기·대비·선명도를 계산하고 프레임에 촬영 Tick·위치·자세 메타데이터 연결
+      evidenceIds: [dronesim-source]
+    - text: 네이티브 MP4·JSONL 녹화와 웹 WebM·PNG·JSON 저장 경로 구성
+      evidenceIds: [dronesim-source]
+  - title: 통신·지상통제
+    items:
+    - text: 게임패드·UDP·JSON 입력을 공통 비행 명령으로 변환하고 시퀀스 번호로 중복·역순 명령 검사
+      evidenceIds: [dronesim-source]
+    - text: 변경 명령을 고정 Tick에 적용한 뒤 ACK와 적용 Tick·현재 상태 응답
+      evidenceIds: [dronesim-source]
+    - text: GStreamer 기반 H.264/RTP 영상 송수신 및 녹화 자료 TCP 전달·CRC-32 검사 구현
+      evidenceIds: [dronesim-source]
+  - title: 임무·시험
+    items:
+    - text: 외벽 촬영 임무의 이동·촬영·일시정지·재개·중단 처리
+      evidenceIds: [dronesim-source]
+    - text: 다중 드론 임무 배정·상태 보고 단절·재할당 시나리오와 헤드리스 반복 시험 구성
+      evidenceIds: [dronesim-reallocation]
+    - text: 조종 명령의 Tick별 기록·재생과 처리시간 계측 구현
       evidenceIds: [dronesim-source]
   troubleshooting:
   - title: 충돌 후보를 찾기 전마다 전체 목록을 다시 정렬함
@@ -106,7 +140,7 @@ detail:
     symptom: PX4 비행 기록을 재생할 때 바닥 접촉 위치가 실행마다 달라졌습니다.
     cause: 좌표가 `float` 반올림 경계에 걸리면서 접촉 여부가 흔들렸습니다.
     solution: 좌표 크기에 맞춰 달라지는 허용 오차를 접촉 위치 비교에 적용해 경계값을 처리했습니다.
-    verification: 새 프로세스에서 12회 재생해 상태 항목을 비교했으며 각 항목의 원래 단위 기준 차이는 2.6×10⁻⁶ 이내였습니다. 접촉 처리의 반복 안정성을 확인한 값이며 비행 모델 정확도를 검증한 결과는 아닙니다.
+    verification: 새 프로세스에서 12회 반복 재생해 상태 항목별 차이가 각 항목의 원래 단위 기준 2.6×10⁻⁶ 이내인 것을 확인했습니다. 동일 입력을 반복했을 때의 접촉 처리 안정성을 비교한 값입니다.
     evidenceIds: [dronesim-px4]
     metricIds: []
 links:
@@ -135,17 +169,17 @@ contributions:
   status: reported
 outcomes:
 - id: dronesim-outcome-1
-  text: 충돌 후보 목록의 순서가 유지되면 재정렬을 건너뛰도록 바꿨고, 비교한 5개 배치·기체 수 조건에서 물리 단계 p95가 2.0~13.5% 줄었습니다.
+  text: 충돌 후보 정렬 재사용 후 물리 단계 p95 2.0~13.5% 감소
   evidenceIds:
   - dronesim-sort-reuse
   status: reported
 - id: dronesim-outcome-2
-  text: Windows Release의 로컬 연결에서 네이티브 H.264/RTP 인코딩·전송·디코딩 왕복을 확인했습니다. 자동 시험에서는 녹화 자료 전달과 CRC-32 대조를, 웹에서는 Chromium으로 내려받은 자료의 크기와 SHA-256을 확인했습니다.
+  text: 네이티브 H.264/RTP 인코딩·전송·디코딩 로컬 시험 및 촬영 자료 TCP 전달·CRC-32 검사 확인
   evidenceIds:
   - dronesim-source
   status: reported
 - id: dronesim-outcome-3
-  text: 지정한 헤드리스 다중 드론 시나리오에서 전체 기체의 25%에 상태 보고 단절을 넣고, 4~256대 조건별 3회 모두 임무 완료율 100%를 기록했습니다. 합성 입력에 대한 시나리오 결과입니다.
+  text: 지정한 헤드리스 모의 시나리오 임무 완료율 100% — 전체 기체의 25%에 상태 보고 단절을 넣은 4~256대 조건별 3회 실행
   evidenceIds:
   - dronesim-reallocation
   status: reported

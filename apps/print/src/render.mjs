@@ -20,7 +20,7 @@ function renderMarkdown(markdown) {
   let code = null;
   const inline = text => text.split(/(`[^`]+`)/g).map(part => part.startsWith('`') && part.endsWith('`')
     ? `<code>${e(part.slice(1, -1))}</code>`
-    : e(part)).join('');
+    : e(part).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')).join('');
   const flushParagraph = () => {
     if (paragraph.length) blocks.push(`<p>${inline(paragraph.join(' '))}</p>`);
     paragraph = [];

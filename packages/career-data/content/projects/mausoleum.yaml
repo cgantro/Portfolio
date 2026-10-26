@@ -1,6 +1,6 @@
 id: mausoleum
 title: 영묘 (Mausoleum)
-subtitle: UE5 협동 게임을 위한 UDP 음성 서버
+subtitle: UE5 협동 멀티플레이 게임의 서버·실시간 음성 통신
 category: 실시간 음성 통신과 온라인 게임 서버
 summary:
   - 협동 게임 중 룸·거리 정책에 따라 음성을 전달하고 재생하는 기능을 클라이언트와 서버에 구현했습니다.
@@ -10,70 +10,92 @@ endDate: '2026-03-27'
 status: complete
 team: 6인
 role:
-- UPrivateVoiceChatComponent를 중심으로 UE5 클라이언트의 마이크 캡처, 화자별 Opus 처리, UDP 송수신과 음성 재생 구현
-- C++ 음성 서버의 패킷·세션 확인, 룸별 워커 분배와 음성 중계 구현
-- 로비의 룸 전체 음성과 게임 내 거리 기반 음성 전달 전략 분리
-- Windows·Linux 네트워크 이벤트 루프 분리와 포커스 복귀 뒤 캡처 버퍼·인코더 초기화
-- 전용 게임 서버 리팩터링과 페이즈 연동 아이템 생성 구현
+- C++ WebSocket 로비와 UE5 전용 서버의 방별 상태·페이즈 관리
+- UDP 음성 패킷·세션 검사, 방 코드별 워커 분배와 음성 중계
+- 마이크 캡처·Opus 처리·화자별 재생 및 상태별 청취 정책 구현
 stack:
 - C++
 - Unreal Engine 5
+- WebSocket
 - UDP
 - Opus
-- 워커 스레드
+- HRTF
 cover:
   src: /assets/영묘.png
-  alt: 영묘 (Mausoleum) 프로젝트 화면
+  alt: 영묘 협동 게임 타이틀 화면
 architecture:
   src: /assets/mausoleum-system-architecture.svg
   alt: 언리얼 엔진 5 게임 클라이언트가 방을 관리하는 로비, 게임 진행 서버, 음성 전달 서버에 각각 연결되는 구성도
   summary:
-  - UE5 클라이언트는 마이크 입력을 화자별로 인코딩해 서버에 보내고, 수신 음성을 화자별로 복원합니다.
-  - C++ UDP 서버는 패킷과 세션을 확인하고 룸 코드에 따라 작업 큐를 선택합니다.
-  - 게임 모드에 따라 로비 룸 전체 또는 게임 내 거리 필터를 적용해 음성을 전달합니다.
+  - WebSocket 로비는 방·참가자를 관리하고, UE5 전용 서버는 방별 게임 상태와 페이즈를 처리합니다.
+  - 음성은 마이크 캡처 → Opus 인코딩 → UDP 중계 → 화자별 디코딩 → HRTF 재생 순서로 처리합니다.
+  - UDP 서버는 패킷·세션을 확인해 방별 참가자에게 중계하고, 클라이언트는 거리·플레이어 상태에 따라 청취 여부를 결정합니다.
 detail:
   layout: mausoleum
-  overview: Unreal Engine 5로 만든 6인 팀 협동 탈출 게임입니다. 플레이어가 던전의 단계별 퍼즐과 사건을 함께 해결하며, 로비와 게임 안에서 음성으로 대화합니다.
+  overview: 여러 플레이어가 아이템을 수집하고 석상을 함께 조작해 탈출하는 UE5 협동 게임입니다. 단일 전용 서버에서 여러 게임 방을 운영하며, 로비 전체 음성과 게임 내 거리·상태별 음성 대화를 지원합니다.
   features:
-  - title: 방 생성과 입장
-    description: 로비에서 방을 만들거나 기존 방에 들어가 팀원과 게임을 시작합니다.
+  - title: 게임 로비
+    description: 방 생성·입장·퇴장, 참가자 관리와 채팅
     evidenceIds: [mausoleum-public]
-  - title: 협동 게임 진행
-    description: 여러 게임 방을 분리해 플레이어와 진행 상태를 관리하고 페이즈에 맞춰 아이템을 생성합니다.
+  - title: 방별 멀티플레이
+    description: 단일 전용 서버에서 여러 방의 게임을 동시에 진행하며 방별 페이즈 전환·아이템 생성·개인 및 그룹 이벤트·탈출을 처리
     evidenceIds: [mausoleum-public]
-  - title: 로비 음성 대화
-    description: 로비에서는 같은 방 참가자에게 음성을 전달하고, 게임에서는 플레이어 사이의 거리를 반영해 들리는 음성을 고릅니다.
+  - title: 로비 음성 채팅
+    description: 같은 로비 방 참가자에게 음성을 전달하고 게임 안에서는 플레이어 사이 거리로 수신 범위 결정
     evidenceIds: [mausoleum-public]
-  - title: 화자별 음성 재생
-    description: Opus로 화자별 음성을 복원하고 HRTF 공간 음향을 적용해 게임 위치에 맞춰 재생합니다.
+  - title: 공간 음향
+    description: HRTF와 거리 감쇠로 화자의 위치·방향·거리를 반영하고 생존·사망·탈출 상태와 관전 대상에 따라 청취 구분
     evidenceIds: [mausoleum-public]
   roleAreas:
-  - title: UE5 음성 클라이언트
+  - title: 로비·게임 서버
     items:
-    - text: "`UPrivateVoiceChatComponent`에서 마이크 캡처, 화자별 Opus 인코딩·디코딩, UDP 송수신과 HRTF 재생을 연결했습니다."
+    - text: C++ WebSocket 로비의 방·세션 관리 및 UE5 전용 서버 연결
       evidenceIds: [mausoleum-public]
-    - text: 로비 전체 전달과 게임 내 거리 기반 전달을 나눠 게임 상황에 맞는 음성 대화 정책을 구현했습니다.
-      evidenceIds: [mausoleum-public]
-  - title: C++ 음성 서버
+    - text: "`RoomCode`별 레벨 인스턴스·공간 오프셋, 페이즈·이벤트·아이템 생성 관리"
+      evidenceIds: [mausoleum-public, mausoleum-room-tests]
+  - title: UDP 음성 서버
     items:
-    - text: UDP 패킷과 세션을 확인하고 룸 코드 해시로 작업을 분배해 같은 방은 한 큐에서 처리하고 다른 방은 여러 워커가 나눠 처리하도록 했습니다.
+    - text: 패킷 구조·길이, 세션 토큰·방·화자·송신 주소 검사
+      evidenceIds: [mausoleum-voice-tests]
+    - text: 방 코드 해시로 워커 대기열 선택, 대기열 용량 제한 및 오래된 작업 폐기
+      evidenceIds: [mausoleum-voice-tests]
+    - text: 방별 참가자에게 공유 페이로드 중계, Windows·Linux 네트워크 이벤트 처리 분리
       evidenceIds: [mausoleum-public]
-    - text: Windows와 Linux의 네트워크 이벤트 처리를 각각 구성했습니다.
-      evidenceIds: [mausoleum-public]
-    - text: 여러 참가자에게 보낼 때 같은 음성 페이로드를 공유해 복사를 줄였습니다.
-      evidenceIds: [mausoleum-public]
-  - title: 게임 서버 연동
+  - title: 음성 클라이언트
     items:
-    - text: WebSocket 로비에서 방과 세션을 관리하고 전용 게임 서버와 연결했습니다. 서버가 방별 게임 페이즈를 판단하고 단계에 맞는 아이템 생성을 처리하도록 연동했습니다.
+    - text: 마이크 PCM 캡처·Opus 인코딩, UDP 송수신, 화자별 디코딩·재생 연결
+      evidenceIds: [mausoleum-public]
+    - text: 16kHz 모노·20ms 프레임·24kbps 코덱 및 FEC·DTX 옵션 설정
+      evidenceIds: [mausoleum-public]
+    - text: 로비·게임 음성 전략 분리, 생존·사망·탈출·관전 상태별 청취 정책과 HRTF·거리 감쇠 적용
       evidenceIds: [mausoleum-public]
   troubleshooting:
-  - title: 게임 창으로 돌아온 뒤 오래된 음성이 재생됨
-    symptom: 창이 비활성화된 동안 쌓인 마이크 입력이 포커스 복귀 뒤 전송돼, 현재 대화보다 늦은 음성이 재생됐습니다.
-    cause: 백그라운드에서 캡처 버퍼와 Opus 인코더의 이전 상태가 남았습니다.
-    solution: 창에 포커스가 없을 때 캡처 버퍼를 비우고 인코더 상태를 초기화했습니다. 오래된 입력을 복구하지 않고 새 입력부터 처리합니다.
-    verification: 창을 백그라운드로 보냈다가 복귀하는 과정을 확인해, 이전 입력이 밀려 나오지 않고 새 음성부터 재생되는 것을 확인했습니다.
+  - title: 단일 전용 서버의 방별 게임 상태 분리
+    symptom: 하나의 UE 월드에서 여러 게임 방을 운영하므로, 한 방의 페이즈 진행·보상·종료 처리를 다른 방과 분리해야 했습니다.
+    cause: 플레이 공간에 오프셋을 주는 것만으로는 상태 조회와 이벤트 대상이 나뉘지 않아, 게임 진행과 레벨 수명을 관리할 공통 방 식별자가 필요했습니다.
+    solution: "`RoomCode`를 공통 기준으로 삼아 `RoomRuntimeSubsystem`에서 방별 레벨 수명을, 페이즈 서브시스템에서 진행 상태와 보상 수량을 관리했습니다. 방을 중단할 때 해당 방의 상태와 레벨만 정리하도록 처리했습니다."
+    verification: 상태 객체 단위 자동화 테스트에 방 A·B의 보상 수량과 페이즈 진행 분리, 한 방 중단 후 다른 방 유지, 중복 중단·재생성 검사를 작성했습니다.
+    evidenceIds: [mausoleum-public, mausoleum-room-tests]
+    metricIds: []
+  - title: 게임 창 복귀 뒤 오래된 마이크 입력이 섞임
+    symptom: 게임 창을 백그라운드로 두었다가 돌아오면 마이크 입력 버퍼에 쌓인 PCM이 뒤늦게 인코딩·전송되어 과거 음성이 새 대화에 섞였습니다.
+    cause: 포커스가 바뀌는 동안 VoiceCapture의 PCM 버퍼와 Opus 인코더 상태를 비우지 않아, 복귀 뒤 오래된 데이터까지 새 입력처럼 처리했습니다.
+    solution: '`ProcessCapture()`에서 포커스가 없으면 캡처 버퍼를 비우고 인코더를 다시 초기화합니다. 포커스 복귀 뒤에도 8KB를 넘는 입력은 버리고, 한 번의 처리에서 읽는 양은 4KB로 제한합니다.'
+    verification: 게임 창을 백그라운드에 둔 뒤 다시 열고, 이후 새로 말한 음성부터 전달되는지 수동으로 확인했습니다.
     evidenceIds: [mausoleum-public]
     metricIds: []
+    code:
+      path: A302/Source/A302Client/Voice/Capture/VoiceCaptureProcessor.cpp
+      language: cpp
+      title: 포커스가 없는 동안 PCM 버퍼와 Opus 상태 비우기
+      url: https://github.com/cgantro/Mausoleum/blob/main/A302/Source/A302Client/Voice/Capture/VoiceCaptureProcessor.cpp
+      source: |
+        if (!FApp::HasFocus())
+        {
+            DrainAllCaptureData();
+            ResetCodecForRealtime();
+            return;
+        }
 links:
   github: https://github.com/cgantro/Mausoleum
   demo: null
@@ -94,20 +116,28 @@ contributions:
   - mausoleum-public
   status: reported
 - id: mausoleum-contribution-4
-  text: Linux와 Windows의 네트워크 처리를 구성하고 백그라운드에서 돌아온 뒤 오래된 음성 대기열을 비우도록 처리
+  text: Linux·Windows 네트워크 이벤트 처리 분리 및 음성 작업 대기열의 용량·만료 처리 구현
   evidenceIds:
-  - mausoleum-public
+  - mausoleum-voice-tests
   status: reported
 outcomes:
 - id: mausoleum-outcome-1
-  text: UE5 음성 클라이언트와 C++ UDP 중계 서버를 연결하고, 룸별 작업 분배와 로비·게임별 전달 정책을 구현했습니다.
+  text: 단일 UE5 전용 서버에서 게임 방마다 페이즈·이벤트 상태를 나눠 관리
   evidenceIds:
   - mausoleum-public
   status: reported
 - id: mausoleum-outcome-2
-  text: 창이 비활성화된 동안 쌓인 입력을 버리고 인코더를 초기화해 포커스 복귀 뒤 오래된 음성이 재생되지 않도록 수정했습니다.
+  text: Opus 인코딩 → UDP 중계 → 화자별 디코딩 → HRTF 재생 연결
   evidenceIds:
   - mausoleum-public
+  status: reported
+- id: mausoleum-outcome-3
+  text: 로비 전체 음성과 게임 내 거리·상태별 음성 대화 분리
+  evidenceIds: [mausoleum-public]
+  status: reported
+- id: mausoleum-outcome-4
+  text: 창 복귀 때 오래된 마이크 입력이 새 음성에 섞이지 않도록 PCM 버퍼와 코덱 상태 초기화
+  evidenceIds: [mausoleum-public]
   status: reported
 metrics: []
 evidence:
@@ -116,13 +146,27 @@ evidence:
   source: https://github.com/cgantro/Mausoleum
   kind: public-source
   status: reported
-  locator: README.md, Server/GameServer/src/voice/VoiceServer.cpp, A302/Source/A302Client/Voice/PrivateVoiceChatComponent.cpp, UVoiceCaptureProcessor focus handling
-  note: 구현 설명은 공개 기록의 보고 내용입니다. 외부 프로젝트 코드를 별도로 감사하지 않았습니다.
+  locator: README.md, Server/GameServer/src/voice/VoiceServer.cpp, A302/Source/A302Client/Voice/Codec/VoiceCodec.cpp, A302/Source/A302Client/Voice/Strategy/DistanceVoiceChatStrategy.cpp
+  note: 공개 구현과 대조. FEC·DTX는 코덱 설정으로만 서술.
 - id: mausoleum-notes
   label: 공개 프로젝트 상세 기록
   source: data/projects/mausoleum.md
   kind: public-source
   status: reported
+- id: mausoleum-room-tests
+  label: 방별 수명·페이즈 상태 분리 테스트
+  source: https://github.com/cgantro/Mausoleum/blob/main/A302/Source/A302Server/Tests/RoomRuntimeTests.cpp
+  kind: public-source
+  status: reported
+  locator: FA302RoomRuntimeIsolationTest, FA302RoomPhaseIsolationTest
+  note: 월드 없이 만든 상태 객체에서 방 A·B의 준비·중단·재생성과 보상 수량·타임라인 분리를 검사하는 테스트 코드. 실행 통과 기록으로 확대하지 않음.
+- id: mausoleum-voice-tests
+  label: 음성 세션·대기열 처리 구현 및 테스트
+  source: https://github.com/cgantro/Mausoleum/blob/main/Server/GameServer/tests/voice_safety_test.cpp
+  kind: public-source
+  status: reported
+  locator: voice_safety_test.cpp, VoiceServer.cpp, VoiceConstants.h, ConcurrentQueue.inl
+  note: 세션·방·화자·송신 주소, 토큰 폐기, 대기열 용량·종료·만료 경계의 테스트 코드와 실제 처리 구현을 대조. 실행 통과나 종단 지연 개선을 주장하지 않음.
 limitations:
 - 16kHz, 20ms, 24kbps는 설정값입니다. 실측 음성 지연이나 패킷 손실 개선 수치로 제시하지 않습니다.
 - 방별 작업 분배와 공유 페이로드의 효과에 대한 재현 가능한 벤치마크는 포함되지 않습니다.

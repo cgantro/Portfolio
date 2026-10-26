@@ -48,9 +48,11 @@ export const MetricSchema = z.object({
 const ProjectFeatureSchema = z.object({
   title: NonEmpty, description: NonEmpty, evidenceIds: z.array(NonEmpty).min(1),
 }).strict();
+const ProjectDiagramSchema = z.object({ src: PublicSource, alt: NonEmpty, caption: NonEmpty, width: z.number().int().positive(), height: z.number().int().positive() }).strict();
 const ProjectRoleAreaSchema = z.object({
   title: NonEmpty,
   items: z.array(z.object({ text: NonEmpty, evidenceIds: z.array(NonEmpty).min(1) }).strict()).min(1),
+  diagram: ProjectDiagramSchema.optional(),
 }).strict();
 const ProjectCodeSchema = z.object({
   path: NonEmpty, language: z.enum(['cpp', 'java']), title: NonEmpty,
@@ -71,7 +73,7 @@ const ProjectComparisonSchema = z.object({
 const ProjectTroubleshootingSchema = z.object({
   title: NonEmpty, symptom: NonEmpty, cause: NonEmpty, solution: NonEmpty, verification: NonEmpty,
   evidenceIds: z.array(NonEmpty).min(1), metricIds: z.array(NonEmpty),
-  comparison: ProjectComparisonSchema.optional(), code: ProjectCodeSchema.optional(),
+  comparison: ProjectComparisonSchema.optional(), diagram: ProjectDiagramSchema.optional(), code: ProjectCodeSchema.optional(),
 }).strict();
 export const ProjectDetailSchema = z.object({
   layout: z.enum(['robotpal', 'dronesim', 'mausoleum', 'autowingcar']),

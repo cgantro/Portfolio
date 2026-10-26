@@ -43,7 +43,7 @@ test('reported benchmark values retain conditions and their original limits', ()
   assert.match(camera.conditions.join(' '), /1232×832/);
   assert.match(camera.conditions.join(' '), /5회/);
   assert.match(robotpal.narrativeMarkdown, /66\.70→96\.01 FPS/);
-  assert.match(robotpal.narrativeMarkdown, /1232×832 해상도에서.*영상 수신과 압축 해제는 측정에서 제외했습니다/);
+  assert.match(robotpal.detail.troubleshooting[0].comparison!.caption, /1232×832.*5회 중앙값.*수신·디코딩 제외/);
   for (const id of ['dronesim', 'mausoleum', 'autowingcar']) {
     assert.deepEqual(
       getProject(id)!.narrativeMarkdown.match(/^## .+$/gm),
@@ -52,7 +52,7 @@ test('reported benchmark values retain conditions and their original limits', ()
   }
   const autowingcar = getProject('autowingcar')!;
   assert.equal(autowingcar.metrics.length, 0);
-  assert.ok(autowingcar.limitations.some((text) => text.includes('집계 기준')));
+  assert.ok(autowingcar.limitations.some((text) => text.includes('처리량·지연 개선 수치')));
 });
 
 test('schema rejects dangling provenance, duplicate evidence, and confidence inflation', () => {

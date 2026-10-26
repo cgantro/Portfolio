@@ -4,7 +4,7 @@
 
 - **목적**: JETANK 로봇팔 훈련·테스트용 가상 시뮬레이션 환경 구축. 실물 하드웨어 없이 제어 로직 검증 가능하게 함
 - **개발 기간**: 2025-11-12 ~ 2025-12-15 (약 1개월)
-- **팀 구성**: 2인 (엔진 아키텍처 담당 Junwoo + 스트리밍/제어 시스템 담당 yoonpyo)
+- **팀 구성**: 4인 (본인 담당: 스트리밍·제어 시스템)
 - **사용 기술**: C++17, OpenGL, Emscripten (WebAssembly), ImGui, libjpeg-turbo, TCP/WebSocket, Python, CMake
 - **한 줄 설명**: OpenGL 기반 C++ 렌더링 엔진에 실시간 카메라 스트리밍과 그리퍼 제어를 붙여 웹에서도 동작하는 로봇팔 시뮬레이터
 
@@ -126,7 +126,7 @@ GPU Render Target → PBO → map → 약 2.93 MiB memcpy → CPU JPEG
 ## 메타
 
 - 기간: 2025-11-12 ~ 2026-04-09 (약 5개월)
-- 팀 구성: 2인
+- 팀 구성: 4인 (본인 담당: 스트리밍·제어 시스템)
 - 역할: 스트리밍 시스템 / 성능 최적화 / 그리퍼 제어 시스템
 - 기술 스택: C++17, OpenGL, PBO/Fence, JPEG, Tracy, Emscripten, TCP/WebSocket, ImGui, CMake, Python
 - 레포: https://github.com/Junwoo-Seo-1998/RobotPal

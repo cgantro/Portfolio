@@ -21,10 +21,16 @@ test('print document presents Korean project narratives without internal audit m
     assert.ok(html.includes(project.title));
     assert.ok(html.includes(project.summary[0]));
   }
-  assert.match(html, /접촉 처리의 반복 안정성/);
-  assert.match(html, /메인 스레드에서는 프레임을 인코딩 큐에 넣고 바로 돌아오도록 바꿨습니다/);
+  assert.match(html, /접촉 판정이 반복마다 달라짐/);
+  assert.match(html, /워커 4개/);
+  assert.match(html, /마이크 입력 버퍼/);
+  assert.match(html, /오래된 MQTT 상태가 최신 값을 덮음/);
+  assert.match(html, /데이터베이스 반영 전에 차량 명령이 발행될 수 있음/);
+  assert.match(html, /Redis Streams/);
   assert.match(html, /프로젝트 개요[\s\S]*주요 기능[\s\S]*담당 역할[\s\S]*트러블슈팅[\s\S]*결과/);
-  assert.match(html, /게이트 도착 메시지 처리 중 서버가 차량을/);
+  assert.match(html, /<strong>문제<\/strong>/);
+  assert.doesNotMatch(html, /\*\*문제\*\*/);
+  assert.doesNotMatch(html, /오래된 음성 대기열|게이트 도착 메시지 처리 중 서버가|커밋 전에 운행 명령이 먼저 발행/);
   assert.doesNotMatch(html, /프로젝트 근거|검증 범위|dronesim-source|robotpal-benchmark/);
   assert.equal(escapeHtml('<script>"&'), '&lt;script&gt;&quot;&amp;');
 });

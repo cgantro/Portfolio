@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 850" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1040" role="img" aria-labelledby="title desc">
   <title id="title">DroneSim 시스템 아키텍처</title>
-  <desc id="desc">게임패드, UDP 지상통제, 화면 없는 시나리오 입력이 공통 시뮬레이션 중심부에 연결됩니다. Tick 상태는 네이티브 AirSim 강체 모델 또는 WebAssembly 운동학 모델을 거쳐 OpenGL 장면과 EO 카메라로 이어집니다.</desc>
+  <desc id="desc">게임패드, UDP 지상통제, 화면 없는 시나리오 입력이 공통 시뮬레이션 중심부에 연결됩니다. Tick 상태는 네이티브 AirSim 강체 모델 또는 WebAssembly 운동학 모델을 거쳐 OpenGL 장면과 EO 카메라로 이어집니다. 네이티브는 H.264/RTP 영상과 MP4·JSONL 촬영 기록을 전달하고, 웹은 WebM·PNG·JSON 파일을 저장합니다.</desc>
   <defs>
     <style>
       .bg{fill:#f5f4ef}.box{fill:#fff;stroke:#cbd1c7;stroke-width:2}.core{fill:#182421;stroke:#182421;stroke-width:2}.soft{fill:#e8ece5;stroke:#bdc8bb;stroke-width:2}.optional{fill:#fbf2e9;stroke:#d8a27d;stroke-width:2}.title{font:700 22px sans-serif;fill:#182421}.small{font:15px sans-serif;fill:#536057}.white{fill:#fff}.tiny{font:13px sans-serif;fill:#657068}.line{fill:none;stroke:#66766a;stroke-width:3;marker-end:url(#arrow)}.dash{fill:none;stroke:#b73518;stroke-width:3;stroke-dasharray:9 8;marker-end:url(#arrowRed)}.label{font:12px sans-serif;fill:#657068}
@@ -49,4 +49,19 @@
   <path class="line" d="M815 410H965"/><text class="label" x="838" y="397">웹·선택 실행</text>
   <path class="line" d="M815 455H890V532H965"/><text class="label" x="839" y="516">계산 결과</text>
   <path class="line" d="M815 495H910V687H965"/><text class="label" x="839" y="672">카메라 상태 동기화</text>
+
+  <rect class="box" x="465" y="805" width="850" height="185" rx="10"/>
+  <text class="title" x="500" y="847">외벽 EO 촬영 자료 전달</text>
+  <rect class="soft" x="495" y="875" width="245" height="82" rx="8"/>
+  <text class="title" x="520" y="908">네이티브 실시간 영상</text>
+  <text class="small" x="520" y="935">H.264 / RTP 송수신</text>
+  <rect class="soft" x="760" y="875" width="245" height="82" rx="8"/>
+  <text class="title" x="785" y="908">녹화·촬영 기록</text>
+  <text class="small" x="785" y="935">MP4 · JSONL → TCP · CRC-32</text>
+  <rect class="soft" x="1025" y="875" width="260" height="82" rx="8"/>
+  <text class="title" x="1050" y="908">웹 촬영 자료</text>
+  <text class="small" x="1050" y="935">WebM · PNG · JSON 내려받기</text>
+  <path class="line" d="M1100 745V780H620V875"/>
+  <path class="line" d="M1100 745V780H880V875"/>
+  <path class="line" d="M1100 745V780H1155V875"/>
 </svg>

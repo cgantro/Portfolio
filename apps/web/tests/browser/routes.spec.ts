@@ -49,7 +49,7 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.project-narrative')).toContainText('188.0');
   await expect(page.locator('.project-narrative')).toContainText('184.2µs');
   await expect(page.locator('.project-narrative')).toContainText('H.264/RTP');
-  await expect(page.locator('.project-narrative')).toContainText('SHA-256');
+  await expect(page.locator('.project-narrative')).toContainText('90m NGII DEM');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
   await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
   await expect(page.locator('.project-heading')).not.toContainText('2.6×10⁻⁶');
@@ -67,14 +67,14 @@ test('RobotPal follows the project introduction, features, role, troubleshooting
   await expect(page.locator('.project-meta-brief')).toContainText('4인');
   await expect(page.locator('.project-narrative')).toContainText('66.70 FPS');
   await expect(page.locator('.project-narrative')).toContainText('96.01 FPS');
-  await expect(page.locator('.project-narrative')).toContainText('별도 TCP 송신 큐');
+  await expect(page.locator('.project-narrative')).toContainText('TCP 송신 대기열은 2프레임');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
   await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
   await context.close();
 });
 
 test('all projects use the same five-part narrative structure', async ({ page }) => {
-  const expectedFeatureCounts = { robotpal: 4, dronesim: 5, mausoleum: 4, autowingcar: 4 };
+  const expectedFeatureCounts = { robotpal: 5, dronesim: 5, mausoleum: 4, autowingcar: 4 };
   for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
     await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);
