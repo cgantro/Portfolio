@@ -22,9 +22,9 @@ test('print document presents Korean project narratives without internal audit m
     assert.ok(html.includes(project.summary[0]));
   }
   assert.match(html, /접촉 처리의 반복 안정성/);
-  assert.match(html, /메인 스레드가 압축이 끝날 때까지 기다리지 않아 시뮬레이션 계산을 이어갈 수 있었습니다/);
+  assert.match(html, /메인 스레드에서는 프레임을 인코딩 큐에 넣고 바로 돌아오도록 바꿨습니다/);
   assert.match(html, /프로젝트 개요[\s\S]*주요 기능[\s\S]*담당 역할[\s\S]*트러블슈팅[\s\S]*결과/);
-  assert.match(html, /게이트 도착 메시지 처리 중 서버가 차량 상태를/);
+  assert.match(html, /게이트 도착 메시지 처리 중 서버가 차량을/);
   assert.doesNotMatch(html, /프로젝트 근거|검증 범위|dronesim-source|robotpal-benchmark/);
   assert.equal(escapeHtml('<script>"&'), '&lt;script&gt;&quot;&amp;');
 });

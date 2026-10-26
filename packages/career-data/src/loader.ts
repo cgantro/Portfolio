@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseDocument } from 'yaml';
-import { CareerDataSchema, CareerFactsSchema, ProjectFactsSchema, type CareerData } from '@portfolio/schema';
+import { CareerDataSchema, CareerFactsSchema, ProjectFactsSchema, type CareerData, type ProjectFacts } from '@portfolio/schema';
 
 /** Bundlers relocate import.meta.url; discover the same package from a workspace CWD. */
 export function discoverContentDirectory(cwd = process.cwd(), moduleUrl = import.meta.url): string {
@@ -33,8 +33,45 @@ export function loadCareerData(contentDirectory = defaultContentDirectory): Care
     // IDs are already validated by EditionSchema; they cannot escape contentDirectory.
     const project = ProjectFactsSchema.parse(parseFactsYaml(readFileSync(join(contentDirectory, 'projects', `${id}.yaml`), 'utf8')));
     if (project.id !== id) throw new Error(`Project filename ${id} does not match ID ${project.id}`);
-    const narrativeMarkdown = readFileSync(join(contentDirectory, 'projects', `${id}.md`), 'utf8');
+    const narrativeMarkdown = renderProjectNarrative(project);
     return { ...project, narrativeMarkdown };
   });
   return CareerDataSchema.parse({ ...facts, projects });
+}
+
+/** Build print-ready Markdown from the same structured project source used by the web page. */
+function renderProjectNarrative(project: ProjectFacts): string {
+  const featureLines = project.detail.features.map((item) => `- **${item.title}:** ${item.description}`);
+  const roleLines = project.detail.roleAreas.flatMap((area) => [
+    `### ${area.title}`,
+    ...area.items.map((item) => `- ${item.text}`),
+  ]);
+  const troubleshooting = project.detail.troubleshooting.flatMap((item) => {
+    const blocks = [
+      `### ${item.title}`,
+      `**문제**\n\n${item.symptom}`,
+      `**원인**\n\n${item.cause}`,
+      `**해결**\n\n${item.solution}`,
+      `**확인**\n\n${item.verification}`,
+    ];
+    if (item.comparison) {
+      blocks.push([
+        `| 항목 | ${item.comparison.columns.join(' | ')} |`,
+        `| --- | ${item.comparison.columns.map(() => '---').join(' | ')} |`,
+        ...item.comparison.rows.map((row) => `| ${row.label} | ${row.values.join(' | ')} |`),
+        '', item.comparison.caption,
+      ].join('\n'));
+    }
+    if (item.code) blocks.push(`\`\`\`${item.code.language} title="${item.code.path}"\n${item.code.source}\n\`\`\``);
+    return blocks;
+  });
+
+  return [
+    `# ${project.title}`,
+    '## 프로젝트 개요', project.detail.overview,
+    '## 주요 기능', ...featureLines,
+    '## 담당 역할', ...roleLines,
+    '## 트러블슈팅', ...troubleshooting,
+    '## 결과', ...project.outcomes.map((outcome) => `- ${outcome.text}`),
+  ].join('\n\n');
 }

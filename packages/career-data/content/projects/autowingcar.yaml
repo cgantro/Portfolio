@@ -31,6 +31,71 @@ architecture:
   - 차량의 MQTT 상태·명령 응답은 서버에서 분리해 처리하고, 관제 화면은 WebSocket·STOMP로 갱신합니다.
   - 차량의 최신 상태와 주행 이력은 각각 Redis와 PostgreSQL에 저장합니다.
   - 운행 명령은 DB 커밋 뒤 MQTT로 발행하고, A*·Yen 탐색 결과를 경로 안내에 사용합니다.
+detail:
+  layout: autowingcar
+  overview: 공항 견인차에 운행 명령을 보내고, 차량 상태와 이동 경로를 관제하는 서버를 개발한 6인 팀 프로젝트입니다. 관제 화면은 차량·항공편·비상 알림 변화를 실시간으로 보여줍니다.
+  features:
+  - title: 견인차 상태 관제
+    description: 차량에서 받은 위치·속도·배터리·운행 상태를 관제 화면과 주행 이력에 반영합니다.
+    evidenceIds: [autowingcar-public]
+  - title: 운행 명령과 응답 확인
+    description: 차량에 명령을 보내고 장비의 수신 응답과 실제 운행 상태를 각각 확인합니다.
+    evidenceIds: [autowingcar-public]
+  - title: 실시간 관제 화면 갱신
+    description: 차량·항공편·비상 알림의 변경 내용을 WebSocket·STOMP로 전달합니다.
+    evidenceIds: [autowingcar-public]
+  - title: 경로와 대체 경로 탐색
+    description: 통제 구간과 다른 차량이 점유한 구간을 피하는 운행 경로를 찾습니다.
+    evidenceIds: [autowingcar-public]
+  roleAreas:
+  - title: 차량 메시지와 관제 갱신
+    items:
+    - text: Spring Boot에서 MQTT 차량 상태와 명령 응답을 처리하고 WebSocket·STOMP로 관제 화면을 갱신했습니다.
+      evidenceIds: [autowingcar-public]
+    - text: 장비의 명령 수신 응답과 실제 운행 상태를 분리해 관리했습니다.
+      evidenceIds: [autowingcar-public]
+  - title: 상태 관리와 경로 탐색
+    items:
+    - text: Redis의 최신 상태와 PostgreSQL의 운행 기록을 나눠 관리했습니다. 이동 시간 비용을 반영한 A* 경로와 Yen K=3 대체 경로를 찾고, RDP로 안내 경로의 점을 줄였습니다.
+      evidenceIds: [autowingcar-public]
+  troubleshooting:
+  - title: 자동 상태 전이 뒤 이전 차량 상태가 다시 저장됨
+    symptom: 게이트 도착 메시지 처리 중 서버가 차량을 `DOCKING`으로 바꾼 뒤, 같은 메시지에 담긴 이전 상태 `MOVING_TO_GATE`가 다시 저장될 수 있었습니다.
+    cause: 자동 동작이 상태를 바꾼 뒤에도 수신 메시지의 오래된 상태값을 이어서 반영했습니다.
+    solution: 자동 동작 전 상태를 보관하고 처리 뒤 상태가 바뀌었으면 서버가 정한 값을 우선 적용했습니다. 그다음 상태 조정기가 허용된 전이인지 확인합니다.
+    verification: 수정한 상태 처리 흐름과 프로젝트 테스트에서 자동 상태 변경 뒤 수신 메시지의 이전 상태가 덮어쓰지 못하도록 확인했습니다.
+    evidenceIds: [autowingcar-public]
+    metricIds: []
+    code:
+      path: Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
+      language: java
+      title: 자동 동작으로 바뀐 상태를 우선 반영
+      source: |-
+        CarStatus preAutoActionStatus = assignedCar.getCarStatus();
+        checkAndTriggerAutoActions(assignedCar, x, y, status);
+
+        if (assignedCar.getCarStatus() != preAutoActionStatus) {
+            status = assignedCar.getCarStatus();
+        }
+
+        status = stateCoordinator.resolveCarStatus(assignedCar, status);
+        assignedCar.updateStatus(x, y, heading, velocity, battery, status);
+      url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
+  - title: DB 커밋 전에 운행 명령이 먼저 발행될 수 있음
+    symptom: 운행 정보를 저장하는 트랜잭션이 실패해도 MQTT 명령은 이미 차량에 전달될 수 있었습니다.
+    cause: 데이터베이스 반영과 MQTT 발행 순서를 분리하지 않았습니다.
+    solution: 트랜잭션이 성공적으로 커밋된 뒤에만 MQTT 명령을 발행하도록 `afterCommit` 처리를 적용했습니다.
+    verification: 커밋 뒤 발행 흐름으로 순서를 정리했습니다. DB와 MQTT를 하나의 원자적 트랜잭션으로 묶은 것은 아닙니다.
+    evidenceIds: [autowingcar-public]
+    metricIds: []
+    code:
+      path: Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
+      language: java
+      title: 트랜잭션 커밋 이후 MQTT 명령 발행
+      source: |-
+        TxUtil.executeAfterCommit(
+            () -> towingCarMqttService.sendDriveCommand(carCode, payload));
+      url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
 links:
   github: https://github.com/cgantro/Autowing_car
   demo: null
@@ -57,17 +122,12 @@ contributions:
   status: reported
 outcomes:
 - id: autowingcar-outcome-1
-  text: MQTT 차량 메시지에서 위치·속도·배터리·운행 상태를 읽어 주행 이력에 저장했습니다. 차량·항공편·비상 알림의 변경 내용은 WebSocket·STOMP로 관제 화면에 전달했습니다.
+  text: 차량·항공편·비상 알림의 변경 내용을 관제 화면에 실시간으로 전달하고, 견인차 상태와 운행 경로를 한 서비스에서 확인하도록 연결했습니다.
   evidenceIds:
   - autowingcar-public
   status: reported
 - id: autowingcar-outcome-2
-  text: 차량으로 명령을 보내고 장비가 명령을 받았다는 확인 응답을 받아 처리 상태에 반영했습니다. 서버가 보낸 명령과 장비가 보고한 실제 주행 상태를 분리해 관리했습니다.
-  evidenceIds:
-  - autowingcar-public
-  status: reported
-- id: autowingcar-outcome-3
-  text: A*에서 간선별 예상 이동 시간을 경로 비용으로 사용하고 통제 구간과 다른 차량이 점유한 지점·간선은 제외했습니다. Yen 알고리즘으로 대체 경로를 최대 3개 탐색하고, RDP로 경로 형상을 유지하며 중간점을 줄였습니다.
+  text: 명령 수신 응답과 실제 주행 상태를 구분하고, 자동 상태 전이와 DB 커밋 뒤 명령 발행 순서를 정리했습니다.
   evidenceIds:
   - autowingcar-public
   status: reported

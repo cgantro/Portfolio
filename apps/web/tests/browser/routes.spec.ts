@@ -67,25 +67,54 @@ test('RobotPal follows the project introduction, features, role, troubleshooting
   await expect(page.locator('.project-meta-brief')).toContainText('4인');
   await expect(page.locator('.project-narrative')).toContainText('66.70 FPS');
   await expect(page.locator('.project-narrative')).toContainText('96.01 FPS');
-  await expect(page.locator('.project-narrative')).toContainText('별도의 TCP 송신 대기열로 넘기며');
+  await expect(page.locator('.project-narrative')).toContainText('별도 TCP 송신 큐');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
   await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
   await context.close();
 });
 
 test('all projects use the same five-part narrative structure', async ({ page }) => {
+  const expectedFeatureCounts = { robotpal: 4, dronesim: 5, mausoleum: 4, autowingcar: 4 };
   for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
     await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);
     const features = page.locator('.project-story-section').nth(1).locator('ul').first().locator('li');
     expect(await features.count(), `${id} has 3–5 user-facing features`).toBeGreaterThanOrEqual(3);
     expect(await features.count(), `${id} has 3–5 user-facing features`).toBeLessThanOrEqual(5);
+    expect(await features.count(), `${id} keeps its project-specific feature count`).toBe(expectedFeatureCounts[id as keyof typeof expectedFeatureCounts]);
     const troubleshootings = page.locator('.project-story-section').nth(3).locator('h3');
     expect(await troubleshootings.count(), `${id} has 1–2 troubleshooting cases`).toBeGreaterThanOrEqual(1);
     expect(await troubleshootings.count(), `${id} has 1–2 troubleshooting cases`).toBeLessThanOrEqual(2);
     await expect(page.locator('.project-story-section .code-disclosure[open]')).toHaveCount(0);
     await expect(page.locator('.project-cover-wide img')).toHaveAttribute('alt', /.+/);
     await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
+  }
+});
+
+test('project code stays collapsed and exposes its title and source link when opened', async ({ page }) => {
+  await page.goto(`${base}projects/robotpal/`);
+  const codeDisclosure = page.locator('.code-disclosure');
+  await expect(codeDisclosure).toHaveCount(1);
+  await expect(codeDisclosure).not.toHaveAttribute('open', '');
+  await expect(codeDisclosure.locator('summary')).toContainText('JPEG 인코딩 대기열에 프레임 추가');
+  await codeDisclosure.locator('summary').click();
+  await expect(codeDisclosure.locator('pre')).toBeVisible();
+  const troubleshooting = page.locator('.troubleshooting-case');
+  await expect(troubleshooting).toContainText('RobotPal/src/Util/StreamingWorker.cpp');
+  await expect(troubleshooting.getByRole('link', { name: '원본 코드 보기' })).toHaveAttribute('href', 'https://github.com/cgantro/RobotPal/blob/main/RobotPal/src/Util/StreamingWorker.cpp');
+});
+
+test('mobile project tables fit and architecture diagrams have a keyboard-scrollable viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  for (const id of ['robotpal', 'dronesim']) {
+    await page.goto(`${base}projects/${id}/`);
+    const table = page.locator('.project-comparison').first();
+    await expect(table).toBeVisible();
+    expect(await table.evaluate(element => element.scrollWidth)).toBeLessThanOrEqual(375);
+    await expect(table).toContainText(id === 'robotpal' ? '40.05 FPS' : '13.5%');
+    const diagram = page.getByRole('region', { name: /구성 흐름도/ });
+    await diagram.focus();
+    await expect(diagram).toBeFocused();
   }
 });
 

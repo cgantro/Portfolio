@@ -1,10 +1,12 @@
 # Public career data
 
 `content/career.yaml` contains shared profile, education, credentials, skill groups,
-activities, and edition ordering. `content/projects/*.yaml` contains project facts,
-claims, metrics, source records, and limitations. Each matching Markdown file holds
-the longer implementation narrative. The loader validates YAML before consumers can
-render or export it. Markdown is content, never executable code.
+activities, and edition ordering. `content/projects/*.yaml` is the canonical source
+for project facts, user-facing features, implementation areas, troubleshooting cases,
+measurements, outcomes, and evidence. The loader validates the structured content
+before the website or print renderer can use it, then creates print-ready Markdown from
+the same project data. Project pages use semantic Astro layouts rather than rendering
+the same Markdown template for every project.
 
 The package exports `careerData`, `profile`, `projects`, `timeline`, `skills`,
 `activities`, `editions`, `getProject`, `getEdition`, `getProjectsForEdition`,
@@ -46,9 +48,9 @@ load figures retain their report caveats and do not claim a response percentile.
 
 ## Editing
 
-Edit the YAML facts and corresponding Markdown narrative together when a statement
-changes. Keep evidence locators and uncertainty current. An edition changes the
-order and emphasis of the same projects; it does not create a new factual profile.
+Edit the project YAML when a project statement changes. Keep evidence locators and
+measurement conditions current. An edition changes the order and emphasis of the
+same projects; it does not create a new factual profile.
 
 Focused schema, loader, evidence, and tracked asset tests live in `tests/unit`.
 Run from the repository root with `pnpm run test:unit`.

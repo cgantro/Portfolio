@@ -10,19 +10,11 @@ export function getStaticPaths() {
 }
 const { project } = Astro.props;
 const related = projects.filter(item => item.id !== project.id);
-const isDroneSim = project.id === 'dronesim';
-const sections = project.narrativeMarkdown
-  .split(/(?=^## )/m)
-  .filter(section => section.startsWith('## '))
-  .map(section => {
-    const newline = section.indexOf('\n');
-    return { heading: section.slice(3, newline).trim(), content: section.slice(newline + 1).trim() };
-  });
-const expectedSectionHeadings = ['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과'];
-if (sections.length !== expectedSectionHeadings.length
-  || sections.some((section, index) => section.heading !== expectedSectionHeadings[index])) {
-  throw new Error(`${project.id}: 프로젝트 상세 내용은 공통 다섯 항목 순서로 작성해야 합니다.`);
-}
+const detail = project.detail;
+const projectTitleId = (index: number) => `troubleshooting-${project.id}-${index}`;
+const codeMarkdown = (code: (typeof detail.troubleshooting)[number]['code']) => code
+  ? `\`\`\`${code.language} title="${code.title}"\n${code.source}\n\`\`\`\n\n**파일**: \`${code.path}\` · [원본 코드 보기](${code.url})`
+  : '';
 ---
 <SiteLayout title={project.title} description={project.subtitle} active="projects">
   <header class="container project-heading">
@@ -30,36 +22,84 @@ if (sections.length !== expectedSectionHeadings.length
     <h1>{project.title}</h1>
     <p class="project-subtitle">{project.subtitle}</p>
     <p class="project-meta-brief">{project.team}<span aria-hidden="true"> · </span>{project.period}</p>
-    <div class="project-top-links">
+    <nav class="project-top-links" aria-label="프로젝트 링크">
       {project.links.github && <a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>}
       {project.links.demo && <a href={project.links.demo} target="_blank" rel="noopener noreferrer">웹 데모 실행 ↗</a>}
-    </div>
+    </nav>
     <p class="technology-line-detail"><strong>주요 기술</strong><span>{project.stack.join(' · ')}</span></p>
   </header>
 
   <figure class="container project-cover-wide">
     <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="900" fetchpriority="high" />
-    {isDroneSim && <figcaption>웹 지상통제 화면 · OSM 외벽 시험 위치</figcaption>}
+    {project.id === 'dronesim' && <figcaption>웹 지상통제 화면 · OSM 건물 정보를 바탕으로 정한 외벽 시험 위치</figcaption>}
+    {project.id === 'mausoleum' && <figcaption>영묘 게임 타이틀 화면</figcaption>}
+    {project.id === 'autowingcar' && <figcaption>오토잉카 실물 차량</figcaption>}
   </figure>
 
   <div class="container project-content">
     <div class="project-narrative">
-      {sections.map((section, index) => <section class="project-story-section" aria-labelledby={`project-section-${index}`}>
-        <h2 id={`project-section-${index}`}>{section.heading}</h2>
-        <MarkdownContent content={section.content} collapsibleCode />
-        {section.heading === '주요 기능' && <section class="detail-section project-architecture" aria-labelledby="architecture-title">
-          <h3 id="architecture-title" class="sr-only">{project.title}의 주요 기능 흐름</h3>
+      <section class="project-story-section project-overview" aria-labelledby="project-overview-title">
+        <h2 id="project-overview-title">프로젝트 개요</h2>
+        <div class="project-overview-copy"><p>{detail.overview}</p></div>
+      </section>
+
+      <section class="project-story-section project-features" aria-labelledby="project-features-title">
+        <h2 id="project-features-title">주요 기능</h2>
+        <ul class="project-feature-list">
+          {detail.features.map(feature => <li>
+            <h3>{feature.title}</h3>
+            <p>{feature.description}</p>
+          </li>)}
+        </ul>
+        <section class="detail-section project-architecture" aria-labelledby="architecture-title">
+          <h3 id="architecture-title">구성 흐름</h3>
           <div class="architecture-grid">
             <figure class="architecture-figure">
-              <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={project.title + ' 구조도 원본 크기로 보기'}>
+              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 구성 흐름도. 가로로 이동할 수 있습니다.'}>
                 <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
-              </a>
-              <figcaption>주요 구성 요소와 데이터 흐름</figcaption>
+              </div>
+              <figcaption>주요 구성 요소와 데이터 흐름 · <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer">구조도 원본 크기로 보기</a></figcaption>
             </figure>
-            {project.architecture.summary.length > 0 && <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>}
           </div>
-        </section>}
-      </section>)}
+          {project.architecture.summary.length > 0 && <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>}
+        </section>
+      </section>
+
+      <section class="project-story-section project-roles" aria-labelledby="project-role-title">
+        <h2 id="project-role-title">담당 역할</h2>
+        <div class="role-area-list">
+          {detail.roleAreas.map(area => <section class="role-area">
+            <h3>{area.title}</h3>
+            <ul>{area.items.map(item => <li><MarkdownContent content={item.text} /></li>)}</ul>
+          </section>)}
+        </div>
+      </section>
+
+      <section class="project-story-section project-troubleshooting" aria-labelledby="project-troubleshooting-title">
+        <h2 id="project-troubleshooting-title">트러블슈팅</h2>
+        {detail.troubleshooting.map((issue, index) => <article class="troubleshooting-case" aria-labelledby={projectTitleId(index)}>
+          <h3 id={projectTitleId(index)}>{issue.title}</h3>
+          <dl class="troubleshooting-steps">
+            <div><dt>문제</dt><dd><MarkdownContent content={issue.symptom} /></dd></div>
+            <div><dt>원인</dt><dd><MarkdownContent content={issue.cause} /></dd></div>
+            <div><dt>해결</dt><dd><MarkdownContent content={issue.solution} /></dd></div>
+            <div><dt>확인</dt><dd><MarkdownContent content={issue.verification} /></dd></div>
+          </dl>
+          {issue.comparison && <div class="comparison-wrap">
+            <table class="project-comparison">
+              <caption>{issue.comparison.caption}</caption>
+              <thead><tr><th scope="col">조건</th>{issue.comparison.columns.map(column => <th scope="col">{column}</th>)}</tr></thead>
+              <tbody>{issue.comparison.rows.map(row => <tr><th scope="row">{row.label}</th>{row.values.map(value => <td>{value}</td>)}</tr>)}</tbody>
+            </table>
+          </div>}
+          {issue.code && <MarkdownContent content={codeMarkdown(issue.code)} collapsibleCode />}
+        </article>)}
+      </section>
+
+      <section class="project-story-section project-results" aria-labelledby="project-results-title">
+        <h2 id="project-results-title">결과</h2>
+        <ul class="project-result-list">{project.outcomes.map(outcome => <li>{outcome.text}</li>)}</ul>
+      </section>
     </div>
   </div>
 

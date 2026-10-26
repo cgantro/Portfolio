@@ -6,11 +6,11 @@ import { execFileSync } from 'node:child_process';
 
 const root = resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const screenshotRoot = resolve(root, 'artifacts/design-review/screenshots');
-const routeNames = 'home|projects|dronesim|robotpal|mausoleum|autowingcar|documents|resume-general';
+const routeNames = 'home|projects|dronesim|robotpal|mausoleum|autowingcar';
 const files = (await readdir(screenshotRoot))
   .filter(file => new RegExp(`^(desktop|tablet|mobile)-(${routeNames})\\.png$`).test(file))
   .sort();
-if (files.length !== 24) throw new Error(`Expected 24 viewport screenshots, found ${files.length}. Run pnpm test:visual first.`);
+if (files.length !== 18) throw new Error(`Expected 18 viewport screenshots, found ${files.length}. Run pnpm test:visual first.`);
 
 const branch = execFileSync('git', ['branch', '--show-current'], { cwd: root, encoding: 'utf8' }).trim();
 const commit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: root, encoding: 'utf8' }).trim();
@@ -25,13 +25,14 @@ catch { /* The live check is optional and runs only when network access is avail
 const report = [
   '# Browser design review evidence', '',
   `- Branch: \`${branch}\``, `- Source commit: \`${commit}\``,
-  '- Capture result: Playwright visual suite passed for 8 routes at 375px, 768px, and 1440px (24 screenshots).',
+  '- Capture result: Playwright visual suite passed for the home page, project list, and four project details at 375px, 768px, and 1440px (18 screenshots).',
   '- Automated checks: no horizontal overflow; each route has a visible main heading and descriptive image alternatives.',
-  '- Accessibility: the axe-core WCAG 2.1 AA checks passed on all 8 routes.',
+  '- Accessibility: the axe-core WCAG 2.1 AA checks passed on all 6 routes.',
   '- Scope: browser screenshots are retained for human review; this report does not claim pixel-diff regression coverage.',
   '', '## Findings', '',
   '- No automated route, keyboard, axe, or horizontal-overflow failures were observed in the exercised states.',
-  '- Manual screenshot review covered DroneSim detail at all three widths, home at 375px, and the project list at 1440px. The new image and both code blocks remain within the reading column.',
+  '- Manual screenshot review covered all four project details at 375px and 1440px, plus DroneSim and AutoWingCar at 768px. The feature, role, issue, comparison, and code areas remain within the viewport.',
+  '- DroneSim currently shows the project’s colored test environment rather than an orthophoto. Mausoleum’s available image is its title screen, and AutoWingCar uses a photo of the physical vehicle; captions identify each image accurately.',
   '- DroneSim opens only after the explicit launch action. The live browser check confirms the deployed canvas renders; `crossOriginIsolated` was false, so SharedArrayBuffer thread isolation remains unverified. Details are in `live-dronesim.json`.',
   '', '## Live simulator evidence', '',
   liveResult

@@ -42,8 +42,8 @@ test('reported benchmark values retain conditions and their original limits', ()
   );
   assert.match(camera.conditions.join(' '), /1232×832/);
   assert.match(camera.conditions.join(' '), /5회/);
-  assert.match(robotpal.narrativeMarkdown, /목표 60 FPS에 도달하지 못했습니다/);
-  assert.match(robotpal.narrativeMarkdown, /2026년 10월 8일/);
+  assert.match(robotpal.narrativeMarkdown, /66\.70→96\.01 FPS/);
+  assert.match(robotpal.narrativeMarkdown, /1232×832 해상도에서.*영상 수신과 압축 해제는 측정에서 제외했습니다/);
   for (const id of ['dronesim', 'mausoleum', 'autowingcar']) {
     assert.deepEqual(
       getProject(id)!.narrativeMarkdown.match(/^## .+$/gm),

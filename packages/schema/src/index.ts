@@ -45,6 +45,41 @@ export const MetricSchema = z.object({
   evidenceIds: z.array(NonEmpty).min(1),
   status: EvidenceStatusSchema,
 }).strict();
+const ProjectFeatureSchema = z.object({
+  title: NonEmpty, description: NonEmpty, evidenceIds: z.array(NonEmpty).min(1),
+}).strict();
+const ProjectRoleAreaSchema = z.object({
+  title: NonEmpty,
+  items: z.array(z.object({ text: NonEmpty, evidenceIds: z.array(NonEmpty).min(1) }).strict()).min(1),
+}).strict();
+const ProjectCodeSchema = z.object({
+  path: NonEmpty, language: z.enum(['cpp', 'java']), title: NonEmpty,
+  source: NonEmpty, url: z.string().url(),
+}).strict();
+const ProjectComparisonSchema = z.object({
+  caption: NonEmpty,
+  columns: z.array(NonEmpty).min(1),
+  rows: z.array(z.object({ label: NonEmpty, values: z.array(NonEmpty) }).strict()).min(1),
+  evidenceIds: z.array(NonEmpty).min(1),
+}).strict().superRefine((comparison, ctx) => {
+  comparison.rows.forEach((row, index) => {
+    if (row.values.length !== comparison.columns.length) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['rows', index, 'values'], message: 'Comparison row must match its columns' });
+    }
+  });
+});
+const ProjectTroubleshootingSchema = z.object({
+  title: NonEmpty, symptom: NonEmpty, cause: NonEmpty, solution: NonEmpty, verification: NonEmpty,
+  evidenceIds: z.array(NonEmpty).min(1), metricIds: z.array(NonEmpty),
+  comparison: ProjectComparisonSchema.optional(), code: ProjectCodeSchema.optional(),
+}).strict();
+export const ProjectDetailSchema = z.object({
+  layout: z.enum(['robotpal', 'dronesim', 'mausoleum', 'autowingcar']),
+  overview: NonEmpty,
+  features: z.array(ProjectFeatureSchema).min(3).max(5),
+  roleAreas: z.array(ProjectRoleAreaSchema).min(1),
+  troubleshooting: z.array(ProjectTroubleshootingSchema).min(1).max(2),
+}).strict();
 export const AssetSchema = z.object({ src: PublicSource, alt: NonEmpty }).strict();
 export const LinkSchema = z.object({
   label: NonEmpty, url: LinkTarget, kind: z.enum(['github', 'demo', 'resume', 'contact', 'website']),
@@ -64,6 +99,7 @@ const ProjectFields = {
   status: z.enum(['complete', 'ongoing']), team: NonEmpty, role: z.array(NonEmpty).min(1),
   stack: z.array(NonEmpty).min(1), cover: AssetSchema,
   architecture: AssetSchema.extend({ summary: z.array(NonEmpty) }).strict(),
+  detail: ProjectDetailSchema,
   links: z.object({ github: z.string().url().nullable(), demo: z.string().url().nullable() }).strict(),
   contributions: z.array(ClaimSchema).min(1), outcomes: z.array(ClaimSchema), metrics: z.array(MetricSchema),
   evidence: z.array(EvidenceSchema).min(1), limitations: z.array(NonEmpty).min(1),
@@ -86,6 +122,19 @@ function validateProject(project: z.infer<typeof ProjectFactSchema>, ctx: z.Refi
       });
     });
   }
+  const detailClaims = [
+    ...project.detail.features.map((feature) => feature.evidenceIds),
+    ...project.detail.roleAreas.flatMap((area) => area.items.map((item) => item.evidenceIds)),
+    ...project.detail.troubleshooting.flatMap((item) => [item.evidenceIds, ...(item.comparison ? [item.comparison.evidenceIds] : [])]),
+  ];
+  detailClaims.flat().forEach((id) => {
+    if (!ids.has(id)) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['detail'], message: `Unknown detail evidence: ${id}` });
+  });
+  project.detail.troubleshooting.forEach((item, index) => item.metricIds.forEach((id) => {
+    if (!project.metrics.some((metric) => metric.id === id)) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['detail', 'troubleshooting', index, 'metricIds'], message: `Unknown metric: ${id}` });
+    }
+  }));
   if (project.endDate && project.endDate < project.startDate) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endDate'], message: 'End date precedes start date' });
   if (project.status === 'complete' && !project.endDate) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endDate'], message: 'Completed projects need an end date' });
   if (project.status === 'ongoing' && project.endDate) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['endDate'], message: 'Ongoing projects must use a null end date' });

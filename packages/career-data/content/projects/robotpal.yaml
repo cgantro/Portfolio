@@ -28,6 +28,71 @@ architecture:
   summary:
   - FBO 영상은 GPU에서 읽은 뒤 JPEG 작업 대기열과 TCP·WebSocket 전송 경로로 전달합니다.
   - Python 인식 결과는 공통 제어 인터페이스를 거쳐 가상 또는 실물 로봇에 적용합니다.
+detail:
+  layout: robotpal
+  overview: 가상 JETANK과 로봇 팔을 조작하고, 실물 JETANK과 영상 인식 모듈을 연결해 주행·인식·제어 흐름을 시험하는 시뮬레이터입니다. 4인 팀이 2025년 11월부터 12월까지 개발했습니다.
+  features:
+  - title: 가상 JETANK·로봇 팔 조작
+    description: 가상 이동 로봇을 주행시키고 로봇 팔과 집게를 조작합니다.
+    evidenceIds: [robotpal-public]
+  - title: 영상 인식 기반 제어
+    description: 가상 카메라 영상을 Python 인식 모듈로 보내고, 돌려받은 명령을 이동체·로봇 팔 제어에 연결합니다.
+    evidenceIds: [robotpal-public]
+  - title: 카메라 영상 전송
+    description: OpenGL 카메라 프레임을 JPEG로 압축해 TCP 또는 WebAssembly의 WebSocket 경로로 전달합니다.
+    evidenceIds: [robotpal-public]
+  - title: 실물 JETANK 연동
+    description: 실물 장비의 상태와 조작을 확인하고, 가상·실물 제어 대상을 전환해 시험합니다.
+    evidenceIds: [robotpal-public]
+  roleAreas:
+  - title: 실물 제어와 가상 주행
+    items:
+    - text: Qt 제어 화면에서 실물 JETANK 상태를 확인하고 조작 입력을 보냈습니다.
+      evidenceIds: [robotpal-public]
+    - text: 입력값 0.3에서 측정한 실물 주행값(직진 약 2.4cm/s, 회전 약 24°/s)을 가상 이동 계수에 반영했습니다.
+      evidenceIds: [robotpal-public]
+  - title: Python 인식 모듈 연결
+    items:
+    - text: TCP JSON 제어 명령을 IRobotController 기반 가상·실물 제어 경로에 연결했습니다. 카메라 영상은 별도 TCP·WebSocket 스트리밍 경로로 전송했습니다.
+      evidenceIds: [robotpal-public]
+  - title: 영상 스트리밍 성능 분석
+    items:
+    - text: Tracy 계측과 PBO 비교로 JPEG 압축이 메인 스레드 처리 시간을 많이 차지하는 것을 확인했습니다.
+      evidenceIds: [robotpal-benchmark]
+    - text: JPEG 압축 워커 4개와 별도 TCP 송신 작업자를 구성했습니다.
+      evidenceIds: [robotpal-benchmark]
+  troubleshooting:
+  - title: 카메라 스트리밍이 시뮬레이션 갱신을 늦춤
+    symptom: 스트리밍을 켜자 시뮬레이션 갱신률이 102.38 FPS에서 66.70 FPS로 떨어졌습니다.
+    cause: PBO를 적용해도 갱신률은 65.60 FPS였습니다. Tracy에서 동기 Readback p50은 1.144ms, 메인 스레드 JPEG 압축 p50은 16.406ms로 측정돼 JPEG 압축이 메인 스레드 처리 시간을 더 많이 차지하는 것을 확인했습니다.
+    solution: 메인 스레드에서는 프레임을 인코딩 큐에 넣고 바로 돌아오도록 바꿨습니다. JPEG 압축 워커 4개가 최대 6프레임 큐를 처리하며, 가득 차면 오래된 프레임을 버립니다. 압축이 끝난 프레임은 별도 TCP 송신 큐(최대 2프레임)로 넘기고, 프레임 번호를 확인해 늦게 끝난 과거 프레임을 보내지 않습니다.
+    verification: 큐 삽입 p50은 0.017ms, 워커의 JPEG 압축 p50은 27.075ms였습니다. 개별 압축 시간은 늘었지만 스트리밍 중 전체 갱신률과 카메라 송신률은 개선됐습니다.
+    evidenceIds: [robotpal-benchmark, robotpal-public]
+    metricIds: [simulation-streaming-fps, camera-send-fps, streaming-penalty]
+    comparison:
+      caption: 동기 Readback·JPEG, PBO·JPEG, PBO·JPEG 워커 4개 구성을 비교했습니다.
+      columns: [시뮬레이션 갱신률, 카메라 송신률, 갱신률 저하]
+      rows:
+      - label: 동기 Readback·JPEG
+        values: [66.70 FPS, 26.95 FPS, 34.84%]
+      - label: PBO·JPEG
+        values: [65.60 FPS, 25.49 FPS, 36.02%]
+      - label: PBO·JPEG 워커 4개
+        values: [96.01 FPS, 40.05 FPS, 6.74%]
+      evidenceIds: [robotpal-benchmark]
+    code:
+      path: RobotPal/src/Util/StreamingWorker.cpp
+      language: cpp
+      title: JPEG 인코딩 대기열에 프레임 추가
+      source: |-
+        {
+            std::lock_guard<std::mutex> lk(m_encodeQueueMutex);
+            if (m_encodeQueue.size() >= EncodeQueueCapacity)
+                m_encodeQueue.pop();
+            m_encodeQueue.push(std::move(job));
+        }
+        m_encodeQueueCv.notify_one();
+      url: https://github.com/cgantro/RobotPal/blob/main/RobotPal/src/Util/StreamingWorker.cpp
 links:
   github: https://github.com/cgantro/RobotPal
   demo: null
@@ -53,13 +118,18 @@ contributions:
   - robotpal-public
   status: reported
 outcomes:
-- id: robotpal-bottleneck
-  text: PBO만 적용해도 성능은 나아지지 않았습니다. Tracy로 JPEG 압축이 메인 스레드를 막는 병목임을 확인해 압축·송신을 워커 스레드 4개로 옮겼습니다.
+- id: robotpal-target
+  text: 스트리밍 중 시뮬레이션 갱신률은 66.70→96.01 FPS(43.9%), 카메라 송신률은 26.95→40.05 FPS(48.6%)로 개선됐고, 갱신률 저하율은 34.84→6.74%로 줄었습니다.
   evidenceIds:
   - robotpal-benchmark
   status: reported
-- id: robotpal-target
-  text: 1232×832 내장 GPU 환경에서 송신을 끈 상태와 켠 상태를 각각 5회 측정한 중앙값입니다(수신·압축 해제 제외). 스트리밍 중 시뮬레이션은 66.70→96.01 FPS, 카메라 송신은 26.95→40.05 FPS로 높아졌습니다. 카메라 송신은 목표인 60 FPS에 못 미쳤습니다.
+- id: robotpal-integration
+  text: 실물 JETANK 주행·회전값을 가상 이동 계수에 반영하고, Python 인식 명령을 이동체와 로봇 팔 조작에 연결했습니다.
+  evidenceIds:
+  - robotpal-public
+  status: reported
+- id: robotpal-benchmark-conditions
+  text: 1232×832 해상도에서 스트리밍을 끄고 켠 상태를 각각 5회 측정한 중앙값입니다. 영상 수신과 압축 해제는 측정에서 제외했습니다.
   evidenceIds:
   - robotpal-benchmark
   status: reported
