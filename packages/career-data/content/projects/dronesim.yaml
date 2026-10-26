@@ -10,9 +10,9 @@ endDate: null
 status: ongoing
 team: 개인 프로젝트
 role:
-- 고정 시간 간격의 비행 상태 갱신과 드론·카메라 ECS, 네이티브 AirSim 물리 연결 구현
-- 게임패드, UDP 지상통제, JSON 시나리오 입력을 공통 시뮬레이션 명령으로 처리
-- 다중 드론 시나리오와 충돌 계산 개선, 성능 측정 구현
+- 고정 주기로 기체·카메라 상태를 갱신하고, 네이티브 빌드에 AirSim 강체 물리를 연결했습니다.
+- 게임패드·UDP 지상통제·JSON 시나리오 입력을 공통 시뮬레이션 명령으로 처리했습니다.
+- 여러 대가 참여하는 임무 시나리오를 만들고, 충돌 계산을 개선한 뒤 성능을 측정했습니다.
 stack:
 - Flecs ECS
 - AirSim 강체 물리
@@ -20,13 +20,14 @@ stack:
 - JSON 시나리오
 cover:
   src: /assets/DroneSim-preview.jpg
-  alt: DroneSim 시연 화면. 실행 창에는 AeroSimLab 이름이 표시되며 산악 지형, 비행 상태와 드론 카메라 화면을 보여 줍니다.
+  alt: DroneSim 실행 화면. 창 제목에는 AeroSimLab이 표시됩니다.
 architecture:
   src: /assets/dronesim-system-architecture.svg
   alt: 게임패드, UDP 지상통제와 JSON 시나리오가 고정 Tick 중심부에 입력되고, 네이티브 AirSim 강체 모델 또는 WebAssembly 운동학 모델을 거쳐 장면과 EO 카메라로 이어지는 구조
   summary:
   - 화면 조작·게임패드·UDP·JSON 입력은 공통 비행 명령을 거쳐 SimulationCore의 고정 Tick에 들어갑니다.
   - Flecs가 상태를 갱신하고, 선택한 물리 모델의 결과를 화면·EO 카메라 또는 시나리오 판정에 전달합니다.
+  - UDP 수신부가 패킷 형식과 명령 종류를 확인해 비행·카메라·상태 조회로 나눕니다. 변경 명령은 다음 Tick에 반영하고, 그 Tick에는 게임패드·기록 재생 입력을 함께 처리하지 않습니다.
 links:
   github: https://github.com/cgantro/DroneSim
   demo: https://cgantro.github.io/DroneSim/

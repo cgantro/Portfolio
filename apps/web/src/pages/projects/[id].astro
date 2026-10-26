@@ -13,6 +13,28 @@ const { project } = Astro.props;
 const related = projects.filter(item => item.id !== project.id);
 const isDroneSim = project.id === 'dronesim';
 const isRobotPal = project.id === 'robotpal';
+const droneSimSections = isDroneSim
+  ? project.narrativeMarkdown
+      .split(/(?=^## )/m)
+      .filter(section => section.startsWith('## '))
+      .map(section => {
+        const newline = section.indexOf('\n');
+        return { heading: section.slice(3, newline).trim(), content: section.slice(newline + 1).trim() };
+      })
+  : [];
+const droneSimSectionIds: Record<string, string> = {
+  '고정 Tick과 비행 계산 개요': 'dronesim-fixed-tick',
+  '통신 단절과 임무 재할당': 'dronesim-reallocation',
+  '충돌 후보 정렬 재사용': 'dronesim-sort-reuse',
+  'PX4 기록 재생과 접촉 오차': 'dronesim-px4-replay',
+  '한계': 'dronesim-limitations',
+  '코드': 'dronesim-code',
+};
+const droneSimDisclosures: Record<string, string> = {
+  '세부 조건 · 임무 재할당': '임무 재할당 측정 조건',
+  '세부 조건 · 충돌 계산': '충돌 계산 측정 조건',
+  'PX4 재생 세부 수치': '세부 오차 수치 보기',
+};
 const robotPalSections = isRobotPal
   ? project.narrativeMarkdown
       .split(/(?=^## )/m)
@@ -31,6 +53,26 @@ const robotPalSections = isRobotPal
     <a class="back-link" href={localUrl('projects/')}>← 전체 프로젝트</a>
     <h1>{project.title}</h1>
     <p class="project-subtitle">{project.subtitle}</p>
+    {isDroneSim && <>
+      <div class="dronesim-kpis" aria-label="DroneSim 주요 결과">
+        <article class="dronesim-kpi">
+          <h2>임무 완료율</h2>
+          <p><strong>100%</strong></p>
+          <small>4~256대 · 전체 기체의 25% 상태 보고 단절</small>
+        </article>
+        <article class="dronesim-kpi">
+          <h2>충돌 계산 물리 단계 p95 감소</h2>
+          <p><strong>2.0~13.5%</strong></p>
+          <small>분리·밀집 배치와 기체 수 5개 조건</small>
+        </article>
+        <article class="dronesim-kpi">
+          <h2>접촉 판정 수정 후 반복 실행</h2>
+          <p><strong>2.6×10⁻⁶</strong></p>
+          <small>12회 실행 간 상태 차이 이내</small>
+        </article>
+      </div>
+      <p class="dronesim-measure-condition">임무 시험은 기체 수별 3회, 충돌 측정은 5개 조건, 접촉 수정은 새 프로세스에서 12회 반복했습니다.</p>
+    </>}
     {isRobotPal && <>
       <div class="robotpal-kpis" aria-label="핵심 측정 결과">
         <article class="robotpal-kpi">
@@ -63,6 +105,7 @@ const robotPalSections = isRobotPal
 
   <figure class="container project-cover-wide">
     <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="900" fetchpriority="high" />
+    {isDroneSim && <figcaption class="dronesim-cover-caption">실행 화면 (창 제목: AeroSimLab)</figcaption>}
   </figure>
 
   <div class="container project-content">
@@ -81,12 +124,22 @@ const robotPalSections = isRobotPal
     </section>}
 
     <section class="project-role" aria-labelledby="project-role-title">
-      <h2 id="project-role-title">{isRobotPal ? '역할' : '담당한 구현'}</h2>
+      <h2 id="project-role-title">{isRobotPal || isDroneSim ? '역할' : '담당한 구현'}</h2>
       {isRobotPal && <p class="robotpal-role-team">4인 팀</p>}
-      <ul>{project.role.map(text => <li>{text}</li>)}</ul>
+      {isDroneSim
+        ? <ul>{project.role.map((text, index) => {
+            const targets = [
+              { href: '#dronesim-fixed-tick', label: '고정 Tick과 비행 계산' },
+              { href: '#dronesim-flow', label: '지상통제 입력 흐름' },
+              { href: '#dronesim-sort-reuse', label: '충돌 후보 정렬' },
+            ];
+            const target = targets[index];
+            return <li>{text}{target && <> <a class="dronesim-role-anchor" href={target.href}>{target.label} ↓</a></>}</li>;
+          })}</ul>
+        : <ul>{project.role.map(text => <li>{text}</li>)}</ul>}
     </section>
 
-    <section class:list={["detail-section", { "dronesim-architecture": isDroneSim }]} aria-labelledby="architecture-title">
+    <section id={isDroneSim ? 'dronesim-flow' : undefined} class:list={["detail-section", { "dronesim-architecture": isDroneSim }]} aria-labelledby="architecture-title">
       <h2 id="architecture-title">{isDroneSim ? '시뮬레이션 흐름' : '시스템 구조'}</h2>
       <div class="architecture-grid">
         <figure class="architecture-figure">
@@ -109,7 +162,20 @@ const robotPalSections = isRobotPal
     </section>
 
     <div class:list={["project-narrative", { "dronesim-narrative": isDroneSim, "robotpal-case-study": isRobotPal }]}>
-      {isRobotPal
+      {isDroneSim
+        ? droneSimSections.map(section => {
+            const disclosureTitle = droneSimDisclosures[section.heading];
+            if (disclosureTitle) return <details class="dronesim-disclosure">
+              <summary>{disclosureTitle}</summary>
+              <MarkdownContent content={section.content} />
+            </details>;
+            const sectionId = droneSimSectionIds[section.heading];
+            return <section class="dronesim-story-section" id={sectionId} aria-labelledby={`${sectionId}-title`}>
+              <h2 id={`${sectionId}-title`}>{section.heading}</h2>
+              <MarkdownContent content={section.content} collapsibleCode={section.heading === '코드'} />
+            </section>;
+          })
+        : isRobotPal
         ? robotPalSections.map(section => <section class="robotpal-story-section" aria-labelledby={`robotpal-${section.heading}`}>
             <h2 id={`robotpal-${section.heading}`}>{section.heading}</h2>
             {section.heading === '결과' && <p class="robotpal-result-note">개선율은 모두 동기 Readback·인코딩 구성 대비입니다.</p>}
