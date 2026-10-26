@@ -27,7 +27,9 @@ jobs:
           enable-cache: true
 
       - name: Install Korean PDF font
-        run: sudo apt-get update && sudo apt-get install --yes fonts-noto-cjk
+        run: |
+          sudo apt-get update -o Acquire::ForceIPv4=true -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30
+          sudo apt-get install --yes -o Acquire::ForceIPv4=true -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 fonts-noto-cjk
 
       - name: Verify DroneSim portfolio preview
         run: test -s asset/DroneSim-preview.jpg
