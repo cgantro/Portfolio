@@ -12,14 +12,47 @@ export function getStaticPaths() {
 const { project } = Astro.props;
 const related = projects.filter(item => item.id !== project.id);
 const isDroneSim = project.id === 'dronesim';
+const isRobotPal = project.id === 'robotpal';
+const robotPalSections = isRobotPal
+  ? project.narrativeMarkdown
+      .split(/(?=^## )/m)
+      .filter(section => section.startsWith('## '))
+      .map(section => {
+        const newline = section.indexOf('\n');
+        return {
+          heading: section.slice(3, newline).trim(),
+          content: section.slice(newline + 1).replace('\n<인라인 차트 자리>\n', '\n').trim(),
+        };
+      })
+  : [];
 ---
 <SiteLayout title={project.title} description={project.subtitle} active="projects">
   <header class="container project-heading">
     <a class="back-link" href={localUrl('projects/')}>← 전체 프로젝트</a>
     <h1>{project.title}</h1>
     <p class="project-subtitle">{project.subtitle}</p>
+    {isRobotPal && <>
+      <div class="robotpal-kpis" aria-label="핵심 측정 결과">
+        <article class="robotpal-kpi">
+          <h2>시뮬레이션 갱신률</h2>
+          <p><strong>66.70 → 96.01</strong><span>FPS</span></p>
+          <small>동기 방식 대비 +43.9%</small>
+        </article>
+        <article class="robotpal-kpi">
+          <h2>카메라 프레임 송신률</h2>
+          <p><strong>26.95 → 40.05</strong><span>FPS</span></p>
+          <small>동기 방식 대비 +48.6%</small>
+        </article>
+        <article class="robotpal-kpi">
+          <h2>메인 스레드 대기열 삽입</h2>
+          <p><strong>0.017</strong><span>ms p50</span></p>
+          <small>워커 4개 구성</small>
+        </article>
+      </div>
+      <p class="robotpal-measure-condition">1232×832 · 내장 GPU · 각 구성 5회 측정 중앙값 · 영상 수신·압축 해제 제외</p>
+    </>}
     <p class="project-meta-brief">
-      {project.team}<span aria-hidden="true"> · </span>{project.period}
+      {!isRobotPal && <>{project.team}<span aria-hidden="true"> · </span></>}{project.period}
     </p>
     <div class="project-top-links">
       {project.links.github && <a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>}
@@ -33,12 +66,13 @@ const isDroneSim = project.id === 'dronesim';
   </figure>
 
   <div class="container project-content">
-    <section class="project-overview" aria-label="프로젝트 소개">
+    {!isRobotPal && <section class="project-overview" aria-label="프로젝트 소개">
       {project.summary.map(text => <p>{text}</p>)}
-    </section>
+    </section>}
 
     <section class="project-role" aria-labelledby="project-role-title">
-      <h2 id="project-role-title">담당한 구현</h2>
+      <h2 id="project-role-title">{isRobotPal ? '내 역할' : '담당한 구현'}</h2>
+      {isRobotPal && <p class="robotpal-role-team">팀 TODO명 중, 다음 구현을 맡았습니다.</p>}
       <ul>{project.role.map(text => <li>{text}</li>)}</ul>
     </section>
 
@@ -64,8 +98,25 @@ const isDroneSim = project.id === 'dronesim';
       </div>
     </section>
 
-    <div class:list={["project-narrative", { "dronesim-narrative": isDroneSim }]}>
-      <MarkdownContent content={implementationNarrative(project.narrativeMarkdown, { headingOffset: 0 })} />
+    <div class:list={["project-narrative", { "dronesim-narrative": isDroneSim, "robotpal-case-study": isRobotPal }]}>
+      {isRobotPal
+        ? robotPalSections.map(section => <section class="robotpal-story-section" aria-labelledby={`robotpal-${section.heading}`}>
+            <h2 id={`robotpal-${section.heading}`}>{section.heading}</h2>
+            {section.heading === '결과' && <p class="robotpal-result-note">개선율은 모두 동기 Readback·인코딩 구성 대비입니다.</p>}
+            <MarkdownContent content={section.content} collapsibleCode={section.heading === '코드'} />
+            {section.heading === '원인 분석' && <figure class="robotpal-bottleneck-figure" aria-label="GPU 동기 Readback p50 1.144밀리초, 메인 스레드 JPEG 인코딩 p50 16.406밀리초">
+              <figcaption>구간별 소요 시간 <span>p50</span></figcaption>
+              <div class="robotpal-bottleneck-row">
+                <div><strong>GPU 동기 Readback</strong><span>1.144 ms</span></div>
+                <div class="robotpal-bar-track"><span class="robotpal-bar robotpal-bar--readback"></span></div>
+              </div>
+              <div class="robotpal-bottleneck-row">
+                <div><strong>메인 스레드 JPEG 인코딩</strong><span>16.406 ms</span></div>
+                <div class="robotpal-bar-track"><span class="robotpal-bar robotpal-bar--jpeg"></span></div>
+              </div>
+            </figure>}
+          </section>)
+        : <MarkdownContent content={implementationNarrative(project.narrativeMarkdown, { headingOffset: 0 })} />}
     </div>
   </div>
 

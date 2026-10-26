@@ -21,7 +21,7 @@ function codeMetadata() {
   };
 }
 
-export default function MarkdownContent({ content }: { content: string }) {
+export default function MarkdownContent({ content, collapsibleCode = false }: { content: string; collapsibleCode?: boolean }) {
   return <div className="prose"><ReactMarkdown remarkPlugins={[codeMetadata, remarkGfm]} components={{
     a: ({ children, href }) => <a href={href} target={href?.startsWith('http') ? '_blank' : undefined} rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}>{children}</a>,
     code: ({ children, className, node, ...props }) => {
@@ -39,6 +39,10 @@ export default function MarkdownContent({ content }: { content: string }) {
       const language = classNames?.find((name) => name.startsWith('language-'))?.slice('language-'.length);
       const title = (codeProperties?.['data-title'] ?? codeProperties?.dataTitle) as string | undefined;
       if (!language) return <pre {...props} tabIndex={0}>{children}</pre>;
+      if (collapsibleCode) return <details className="code-disclosure">
+        <summary><span>{language}</span>{title && <span className="code-sample__title">{title}</span>}</summary>
+        <pre {...props} tabIndex={0}>{children}</pre>
+      </details>;
       return <figure className="code-sample">
         <figcaption><span>{language}</span>{title && <span className="code-sample__title">{title}</span>}</figcaption>
         <pre {...props} tabIndex={0}>{children}</pre>
