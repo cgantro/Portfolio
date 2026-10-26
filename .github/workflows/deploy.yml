@@ -20,17 +20,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install uv for RenderCV resume PDFs
-        uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
-        with:
-          version: 0.13.1
-          enable-cache: true
-
-      - name: Install Korean PDF font
-        run: |
-          sudo apt-get update -o Acquire::ForceIPv4=true -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30
-          sudo apt-get install --yes -o Acquire::ForceIPv4=true -o Acquire::Retries=2 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30 fonts-noto-cjk
-
       - name: Verify DroneSim portfolio preview
         run: test -s asset/DroneSim-preview.jpg
 
@@ -48,8 +37,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build Portfolio and Web
-        run: pnpm run build
+      - name: Validate content and build website
+        run: |
+          pnpm run validate:content
+          pnpm run audit:content
+          pnpm run validate:resume
+          pnpm run build:web
 
       - name: Prepare GitHub Pages files
         run: |
