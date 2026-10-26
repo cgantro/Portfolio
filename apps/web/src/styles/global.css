@@ -166,6 +166,10 @@ h3 { font-size: 25px; }
 .contribution-list li + li { margin-top: 7px; }
 .project-narrative { max-width: var(--reading-width); }
 .robotpal-case-study { max-width: 780px; }
+.robotpal-features { max-width: var(--reading-width); margin-bottom: 34px; }
+.robotpal-features h2 { margin-bottom: 12px; font-size: 22px; }
+.robotpal-features ul { margin: 0; padding-left: 1.2em; font-size: 14px; line-height: 1.8; }
+.robotpal-features li + li { margin-top: 4px; }
 .robotpal-story-section { margin-top: 42px; scroll-margin-top: 98px; }
 .robotpal-story-section:first-child { margin-top: 0; }
 .robotpal-story-section > h2 { margin-bottom: 13px; font-size: 27px; }
@@ -343,6 +347,7 @@ h3 { font-size: 25px; }
   .project-content { padding-top: 32px; }
   .robotpal-story-section { margin-top: 34px; }
   .robotpal-story-section > h2 { font-size: 24px; }
+  .robotpal-features { margin-bottom: 28px; }
   .robotpal-bottleneck-figure { padding: 13px; }
   .robotpal-bottleneck-row > div:first-child { font-size: 11px; }
   .robotpal-case-study .prose table { font-size: 11px; }

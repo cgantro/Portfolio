@@ -70,9 +70,19 @@ const robotPalSections = isRobotPal
       {project.summary.map(text => <p>{text}</p>)}
     </section>}
 
+    {isRobotPal && <section class="robotpal-features" aria-labelledby="robotpal-features-title">
+      <h2 id="robotpal-features-title">주요 기능</h2>
+      <ul>
+        <li>가상 JETANK을 운전하고 로봇 팔과 집게를 조작합니다.</li>
+        <li>가상 카메라 영상을 Python 영상 인식 모듈로 보냅니다.</li>
+        <li>인식 명령으로 가상 이동체와 로봇 팔을 움직입니다.</li>
+        <li>Qt 관제 화면에서 실물 JETANK 상태를 확인하고 조작합니다.</li>
+      </ul>
+    </section>}
+
     <section class="project-role" aria-labelledby="project-role-title">
-      <h2 id="project-role-title">{isRobotPal ? '내 역할' : '담당한 구현'}</h2>
-      {isRobotPal && <p class="robotpal-role-team">팀 4명 중, 다음 구현을 맡았습니다.</p>}
+      <h2 id="project-role-title">{isRobotPal ? '역할' : '담당한 구현'}</h2>
+      {isRobotPal && <p class="robotpal-role-team">4인 팀</p>}
       <ul>{project.role.map(text => <li>{text}</li>)}</ul>
     </section>
 
