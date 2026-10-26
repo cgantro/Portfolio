@@ -127,21 +127,6 @@ h3 { font-size: 25px; }
 .project-heading .back-link { margin-bottom: 26px; }
 .project-heading h1 { font-size: clamp(42px, 5vw, 58px); }
 .project-subtitle { max-width: 780px; margin-top: 9px; color: var(--color-muted); font-size: 18px; line-height: 1.65; }
-.robotpal-kpis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; max-width: 920px; margin-top: 28px; }
-.robotpal-kpi { min-width: 0; padding: 15px 17px 13px; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface, #fff); }
-.robotpal-kpi h2 { margin: 0 0 5px; color: var(--color-muted); font-size: 12px; font-weight: 550; }
-.robotpal-kpi p { display: flex; align-items: baseline; gap: 7px; margin: 0; color: var(--color-accent); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.robotpal-kpi p strong { font-size: clamp(18px,2vw,23px); font-weight: 650; white-space: nowrap; }
-.robotpal-kpi p span { color: var(--color-muted); font: 12px var(--font-body); white-space: nowrap; }
-.robotpal-kpi small { display: block; margin-top: 4px; color: var(--color-muted); font-size: 11px; }
-.robotpal-measure-condition { margin-top: 9px; color: var(--color-muted); font-size: 12px; }
-.dronesim-kpis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; max-width: 980px; margin-top: 25px; }
-.dronesim-kpi { min-width: 0; padding: 14px 16px 12px; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface, #fff); }
-.dronesim-kpi h2 { margin: 0 0 5px; color: var(--color-muted); font-size: 12px; font-weight: 550; }
-.dronesim-kpi p { margin: 0; color: var(--color-accent); font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
-.dronesim-kpi p strong { font-size: clamp(21px,2.3vw,27px); font-weight: 650; white-space: nowrap; }
-.dronesim-kpi small { display: block; margin-top: 4px; color: var(--color-muted); font-size: 11px; line-height: 1.5; }
-.dronesim-measure-condition { max-width: 980px; margin-top: 9px; color: var(--color-muted); font-size: 12px; line-height: 1.65; }
 .project-facts { display: flex; flex-wrap: wrap; gap: 12px 36px; margin: 23px 0 0; padding-top: 16px; border-top: 1px solid var(--color-line); }
 .project-facts div { display: flex; align-items: baseline; gap: 9px; }
 .project-facts dt { color: var(--color-muted); font-size: 12px; }
@@ -153,80 +138,33 @@ h3 { font-size: 25px; }
 .project-cover-wide { background: white; }
 .project-cover-wide img { width: 100%; max-height: 640px; object-fit: contain; }
 .project-content { padding-top: 46px; }
-.project-overview { max-width: var(--reading-width); margin-bottom: 30px; font-size: 18px; line-height: 1.8; }
-.project-overview p + p { margin-top: 12px; }
-.project-role { max-width: var(--reading-width); margin-bottom: 56px; }
-.project-role h2 { margin-bottom: 12px; font-size: 22px; }
-.project-role ul { margin: 0; padding-left: 1.2em; color: var(--color-muted); font-size: 14px; line-height: 1.75; }
-.project-role li + li { margin-top: 5px; }
-.detail-section { margin-bottom: 58px; scroll-margin-top: 98px; }
-.detail-section > h2 { margin-bottom: 18px; font-size: 30px; }
+.project-story-section { max-width: 780px; margin-top: 42px; scroll-margin-top: 98px; }
+.project-story-section:first-child { margin-top: 0; }
+.project-story-section > h2 { margin-bottom: 14px; font-size: 27px; }
+.project-story-section > .prose { line-height: 1.8; }
+.project-architecture { margin-top: 28px; }
+.project-architecture > h3 { margin-bottom: 14px; font-size: 20px; }
 .architecture-grid { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(250px,1fr); align-items: start; gap: 36px; }
 .architecture-figure img { width: 100%; background: white; }
 .architecture-figure figcaption { margin-top: 8px; color: var(--color-muted); font-size: 12px; }
 .architecture-notes { margin: 0; padding-left: 1.1em; font-size: 14px; line-height: 1.8; }
 .architecture-notes li + li { margin-top: 9px; }
-.dronesim-flow-mobile { display: none; }
-.dronesim-cover-caption { margin-top: 8px; color: var(--color-muted); font-size: 12px; }
-.dronesim-role-anchor { margin-left: 6px; color: var(--color-accent); font-size: 12px; white-space: nowrap; }
+.project-cover-wide figcaption { margin-top: 8px; color: var(--color-muted); font-size: 12px; }
 .contribution-list { max-width: var(--reading-width); margin-top: 22px; }
 .contribution-list h3 { margin-bottom: 10px; font-size: 19px; }
 .contribution-list ul { margin: 0; }
 .contribution-list li + li { margin-top: 7px; }
-.project-narrative { max-width: var(--reading-width); }
-.robotpal-case-study { max-width: 780px; }
-.robotpal-features { max-width: var(--reading-width); margin-bottom: 34px; }
-.robotpal-features h2 { margin-bottom: 12px; font-size: 22px; }
-.robotpal-features ul { margin: 0; padding-left: 1.2em; font-size: 14px; line-height: 1.8; }
-.robotpal-features li + li { margin-top: 4px; }
-.robotpal-story-section { margin-top: 42px; scroll-margin-top: 98px; }
-.robotpal-story-section:first-child { margin-top: 0; }
-.robotpal-story-section > h2 { margin-bottom: 13px; font-size: 27px; }
-.robotpal-role-team { margin: 0 0 8px; font-size: 14px; }
-.robotpal-result-note { margin: -3px 0 10px; color: var(--color-muted); font-size: 12px; }
-.robotpal-bottleneck-figure { margin: 19px 0 0; padding: 16px 18px; border: 1px solid var(--color-line); border-radius: 8px; background: var(--color-surface, #fff); }
-.robotpal-bottleneck-figure figcaption { margin-bottom: 12px; font-size: 13px; font-weight: 650; }
-.robotpal-bottleneck-figure figcaption span { margin-left: 5px; color: var(--color-muted); font-size: 11px; font-weight: 400; }
-.robotpal-bottleneck-row + .robotpal-bottleneck-row { margin-top: 13px; }
-.robotpal-bottleneck-row > div:first-child { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 5px; font-size: 12px; }
-.robotpal-bottleneck-row strong { font-weight: 550; }
-.robotpal-bottleneck-row > div:first-child span { color: var(--color-muted); font-family: var(--font-mono); white-space: nowrap; }
-.robotpal-bar-track { height: 9px; overflow: hidden; border-radius: 5px; background: var(--color-line); }
-.robotpal-bar { display: block; height: 100%; border-radius: inherit; background: var(--color-accent); }
-.robotpal-bar--readback { width: 7%; min-width: 7px; }
-.robotpal-bar--jpeg { width: 100%; }
-.robotpal-case-study .prose table { display: table; width: 100%; font-size: 13px; }
-.robotpal-case-study .prose td, .robotpal-case-study .prose th { white-space: normal; }
-.robotpal-case-study .prose .code-disclosure { margin: 17px 0; overflow: hidden; border: 1px solid #25334A; border-radius: 8px; background: #111827; }
-.robotpal-case-study .code-disclosure summary { display: flex; align-items: center; gap: 12px; min-height: 38px; padding: 8px 16px; color: #93C5FD; cursor: pointer; font: 11px/1.4 var(--font-mono); list-style: none; text-transform: uppercase; letter-spacing: .06em; }
-.robotpal-case-study .code-disclosure summary::-webkit-details-marker { display: none; }
-.robotpal-case-study .code-disclosure summary::after { content: '＋'; margin-left: auto; color: #CBD5E1; }
-.robotpal-case-study .code-disclosure[open] summary::after { content: '−'; }
-.robotpal-case-study .code-disclosure summary:focus-visible { outline: 2px solid #60A5FA; outline-offset: -3px; }
-.robotpal-case-study .code-disclosure summary > span:first-child { flex: 0 0 auto; }
-.robotpal-case-study .code-disclosure .code-sample__title { min-width: 0; overflow: hidden; color: #CBD5E1; text-overflow: ellipsis; text-transform: none; letter-spacing: 0; white-space: nowrap; }
-.robotpal-case-study .code-disclosure pre { border-top: 1px solid #334155; }
-.dronesim-architecture { margin-bottom: 44px; }
-.dronesim-narrative { max-width: var(--reading-width); }
-.dronesim-story-section { margin-top: 42px; scroll-margin-top: 98px; }
-.dronesim-story-section:first-child { margin-top: 0; }
-.dronesim-story-section > h2 { margin-bottom: 14px; font-size: 27px; }
-.dronesim-disclosure { margin: 15px 0 0; border-block: 1px solid var(--color-line); }
-.dronesim-disclosure + .dronesim-story-section { margin-top: 42px; }
-.dronesim-disclosure summary { padding: 12px 2px; color: var(--color-accent); cursor: pointer; font-size: 13px; font-weight: 600; list-style: none; }
-.dronesim-disclosure summary::-webkit-details-marker { display: none; }
-.dronesim-disclosure summary::after { content: '＋'; float: right; color: var(--color-muted); }
-.dronesim-disclosure[open] summary::after { content: '−'; }
-.dronesim-disclosure summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-.dronesim-disclosure > .prose { padding: 0 0 15px; }
-.dronesim-narrative .prose table { margin-block: 16px 7px; }
-.dronesim-narrative .code-disclosure { margin: 17px 0; overflow: hidden; border: 1px solid #25334A; border-radius: 8px; background: #111827; }
-.dronesim-narrative .code-disclosure summary { display: flex; align-items: center; gap: 12px; min-height: 38px; padding: 8px 16px; color: #93C5FD; cursor: pointer; font: 11px/1.4 var(--font-mono); list-style: none; text-transform: uppercase; letter-spacing: .06em; }
-.dronesim-narrative .code-disclosure summary::-webkit-details-marker { display: none; }
-.dronesim-narrative .code-disclosure summary::after { content: '＋'; margin-left: auto; color: #CBD5E1; }
-.dronesim-narrative .code-disclosure[open] summary::after { content: '−'; }
-.dronesim-narrative .code-disclosure summary:focus-visible { outline: 2px solid #60A5FA; outline-offset: -3px; }
-.dronesim-narrative .code-disclosure pre { border-top: 1px solid #334155; }
+.project-narrative { max-width: 780px; }
+.code-disclosure { margin: 17px 0; overflow: hidden; border: 1px solid #25334A; border-radius: 8px; background: #111827; }
+.code-disclosure summary { display: flex; align-items: center; gap: 12px; min-height: 38px; padding: 8px 16px; color: #93C5FD; cursor: pointer; font: 11px/1.4 var(--font-mono); list-style: none; text-transform: uppercase; letter-spacing: .06em; }
+.code-disclosure summary::-webkit-details-marker { display: none; }
+.code-disclosure summary::after { content: '＋'; margin-left: auto; color: #CBD5E1; }
+.code-disclosure[open] summary::after { content: '−'; }
+.code-disclosure summary:focus-visible { outline: 2px solid #60A5FA; outline-offset: -3px; }
+.code-disclosure summary > span:first-child { flex: 0 0 auto; }
+.code-disclosure .code-sample__title { min-width: 0; overflow: hidden; color: #CBD5E1; text-overflow: ellipsis; text-transform: none; letter-spacing: 0; white-space: nowrap; }
+.code-disclosure pre { border-top: 1px solid #334155; }
+.project-narrative .prose table { margin-block: 16px 7px; table-layout: fixed; }
 .prose { font-size: 15px; line-height: 1.85; overflow-wrap: anywhere; }
 .prose h1 { margin-block: 31px 14px; font-size: 25px; }
 .prose h2 { margin-block: 35px 14px; font-size: 25px; }
@@ -284,7 +222,7 @@ h3 { font-size: 25px; }
   .skill-item { grid-template-columns: 1fr; gap: 1px; }
   .skill-projects { grid-column: 1; }
   .architecture-grid { grid-template-columns: minmax(0,1.2fr) minmax(220px,.8fr); gap: 24px; }
-  .dronesim-architecture .architecture-grid { grid-template-columns: 1fr; }
+  .project-architecture .architecture-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 700px) {
   html { scroll-padding-top: 78px; }
@@ -356,18 +294,6 @@ h3 { font-size: 25px; }
   .project-heading .back-link { margin-bottom: 19px; }
   .project-heading h1 { font-size: 39px; }
   .project-subtitle { font-size: 15px; }
-  .robotpal-kpis { grid-template-columns: 1fr; gap: 9px; margin-top: 21px; }
-  .robotpal-kpi { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 2px 10px; padding: 10px 12px; }
-  .robotpal-kpi h2 { grid-column: 1; grid-row: 1; margin: 0; }
-  .robotpal-kpi p { grid-column: 2; grid-row: 1 / span 2; }
-  .robotpal-kpi p strong { font-size: 18px; }
-  .robotpal-kpi small { grid-column: 1; grid-row: 2; margin-top: 0; }
-  .robotpal-measure-condition { font-size: 11px; line-height: 1.55; }
-  .dronesim-kpis { grid-template-columns: 1fr; gap: 9px; margin-top: 20px; }
-  .dronesim-kpi { padding: 10px 12px; }
-  .dronesim-kpi h2 { margin-bottom: 2px; }
-  .dronesim-kpi p strong { font-size: 21px; }
-  .dronesim-measure-condition { font-size: 11px; }
   .project-facts { gap: 10px 18px; margin-top: 17px; }
   .project-facts div { gap: 6px; }
   .project-facts dt { font-size: 11px; }
@@ -375,42 +301,19 @@ h3 { font-size: 25px; }
   .technology-line-detail { font-size: 12px; }
   .project-cover-wide img { max-height: none; }
   .project-content { padding-top: 32px; }
-  .robotpal-story-section { margin-top: 34px; }
-  .robotpal-story-section > h2 { font-size: 24px; }
-  .robotpal-features { margin-bottom: 28px; }
-  .robotpal-bottleneck-figure { padding: 13px; }
-  .robotpal-bottleneck-row > div:first-child { font-size: 11px; }
-  .robotpal-case-study .prose table { font-size: 11px; }
-  .robotpal-case-study .prose td, .robotpal-case-study .prose th { padding: 8px 6px; }
-  .project-overview { margin-bottom: 24px; font-size: 16px; line-height: 1.75; }
-  .project-role { margin-bottom: 40px; }
-  .project-role h2 { font-size: 20px; }
-  .project-role ul { font-size: 13px; }
-  .detail-section { margin-bottom: 42px; }
-  .detail-section > h2 { font-size: 26px; }
+  .project-story-section { margin-top: 34px; }
+  .project-story-section > h2 { font-size: 24px; }
+  .project-architecture { margin-top: 22px; }
+  .project-architecture > h3 { font-size: 18px; }
   .architecture-grid { grid-template-columns: 1fr; gap: 17px; }
-  .dronesim-architecture .architecture-figure { display: none; }
-  .dronesim-flow-mobile { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
-  .dronesim-flow-mobile li { position: relative; display: grid; gap: 3px; min-height: 60px; margin-left: 8px; padding: 0 0 15px 22px; border-left: 1px solid var(--color-line); }
-  .dronesim-flow-mobile li::before { position: absolute; top: 4px; left: -5px; width: 9px; height: 9px; border-radius: 50%; background: var(--color-accent); content: ''; }
-  .dronesim-flow-mobile li:last-child { min-height: auto; padding-bottom: 0; border-left-color: transparent; }
-  .dronesim-flow-mobile strong { font-size: 14px; font-weight: 650; }
-  .dronesim-flow-mobile span { color: var(--color-muted); font-size: 13px; line-height: 1.6; }
-  .dronesim-architecture .architecture-notes { display: none; }
   .architecture-notes { font-size: 13px; }
   .contribution-list h3 { font-size: 18px; }
   .prose { font-size: 14px; line-height: 1.8; }
   .prose h1, .prose h2 { font-size: 23px; }
-  .dronesim-architecture { margin-bottom: 34px; }
-  .dronesim-story-section { margin-top: 34px; }
-  .dronesim-story-section > h2 { font-size: 24px; }
-  .dronesim-disclosure + .dronesim-story-section { margin-top: 34px; }
-  .dronesim-disclosure summary { padding-block: 11px; }
   .prose h3 { font-size: 19px; }
   .prose pre { padding: 13px 14px; font-size: 12px; }
-  .dronesim-narrative .prose table { display: table; width: 100%; table-layout: fixed; font-size: 11px; }
-  .dronesim-narrative .prose th, .dronesim-narrative .prose td { padding: 6px 4px; white-space: normal; overflow-wrap: anywhere; }
-  .dronesim-narrative .prose th:first-child, .dronesim-narrative .prose td:first-child { width: 28%; }
+  .project-narrative .prose table { display: table; width: 100%; font-size: 11px; }
+  .project-narrative .prose th, .project-narrative .prose td { padding: 6px 4px; white-space: normal; overflow-wrap: anywhere; }
   .metric-list, .related-grid { grid-template-columns: 1fr; }
   .metric-comparison strong, .metric-value { font-size: 23px; }
   .project-demo-section { align-items: flex-start; }

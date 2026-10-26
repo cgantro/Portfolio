@@ -35,11 +35,21 @@ test('reported benchmark values retain conditions and their original limits', ()
   assert.equal(camera.value, 40.05);
   assert.equal(camera.baseline, 26.95);
   assert.equal(camera.status, 'reported');
+  assert.equal(robotpal.team, '4인');
+  assert.deepEqual(
+    robotpal.narrativeMarkdown.match(/^## .+$/gm),
+    ['## 프로젝트 개요', '## 주요 기능', '## 역할', '## 트러블슈팅', '## 결과'],
+  );
   assert.match(camera.conditions.join(' '), /1232×832/);
   assert.match(camera.conditions.join(' '), /5회/);
-  assert.match(robotpal.limitations.join(' '), /60 FPS에 미달/);
-  assert.match(robotpal.limitations.join(' '), /팀원 수.*서로 다르게 기록/);
-  assert.match(robotpal.limitations.join(' '), /인원 수를 생략/);
+  assert.match(robotpal.narrativeMarkdown, /목표 60 FPS에 도달하지 못했습니다/);
+  assert.match(robotpal.narrativeMarkdown, /2026년 10월 8일/);
+  for (const id of ['dronesim', 'mausoleum', 'autowingcar']) {
+    assert.deepEqual(
+      getProject(id)!.narrativeMarkdown.match(/^## .+$/gm),
+      ['## 프로젝트 개요', '## 주요 기능', '## 역할', '## 트러블슈팅', '## 결과'],
+    );
+  }
   const autowingcar = getProject('autowingcar')!;
   assert.equal(autowingcar.metrics.length, 0);
   assert.ok(autowingcar.limitations.some((text) => text.includes('집계 기준')));

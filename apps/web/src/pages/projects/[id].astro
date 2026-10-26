@@ -3,7 +3,6 @@ import { projects } from '@portfolio/career-data';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import MarkdownContent from '../../components/MarkdownContent';
 import { assetUrl, localUrl, projectUrl } from '../../lib/urls.mjs';
-import { implementationNarrative } from '../../lib/narrative.mjs';
 
 interface Props { project: (typeof projects)[number]; }
 export function getStaticPaths() {
@@ -12,90 +11,20 @@ export function getStaticPaths() {
 const { project } = Astro.props;
 const related = projects.filter(item => item.id !== project.id);
 const isDroneSim = project.id === 'dronesim';
-const isRobotPal = project.id === 'robotpal';
-const droneSimSections = isDroneSim
-  ? project.narrativeMarkdown
-      .split(/(?=^## )/m)
-      .filter(section => section.startsWith('## '))
-      .map(section => {
-        const newline = section.indexOf('\n');
-        return { heading: section.slice(3, newline).trim(), content: section.slice(newline + 1).trim() };
-      })
-  : [];
-const droneSimSectionIds: Record<string, string> = {
-  '고정 Tick과 비행 계산 개요': 'dronesim-fixed-tick',
-  '통신 단절과 임무 재할당': 'dronesim-reallocation',
-  '충돌 후보 정렬 재사용': 'dronesim-sort-reuse',
-  'PX4 기록 재생과 접촉 오차': 'dronesim-px4-replay',
-  '한계': 'dronesim-limitations',
-  '코드': 'dronesim-code',
-};
-const droneSimDisclosures: Record<string, string> = {
-  '세부 조건 · 임무 재할당': '임무 재할당 측정 조건',
-  '세부 조건 · 충돌 계산': '충돌 계산 측정 조건',
-  'PX4 재생 세부 수치': '세부 오차 수치 보기',
-};
-const robotPalSections = isRobotPal
-  ? project.narrativeMarkdown
-      .split(/(?=^## )/m)
-      .filter(section => section.startsWith('## '))
-      .map(section => {
-        const newline = section.indexOf('\n');
-        return {
-          heading: section.slice(3, newline).trim(),
-          content: section.slice(newline + 1).replace('\n<인라인 차트 자리>\n', '\n').trim(),
-        };
-      })
-  : [];
+const sections = project.narrativeMarkdown
+  .split(/(?=^## )/m)
+  .filter(section => section.startsWith('## '))
+  .map(section => {
+    const newline = section.indexOf('\n');
+    return { heading: section.slice(3, newline).trim(), content: section.slice(newline + 1).trim() };
+  });
 ---
 <SiteLayout title={project.title} description={project.subtitle} active="projects">
   <header class="container project-heading">
     <a class="back-link" href={localUrl('projects/')}>← 전체 프로젝트</a>
     <h1>{project.title}</h1>
     <p class="project-subtitle">{project.subtitle}</p>
-    {isDroneSim && <>
-      <div class="dronesim-kpis" aria-label="DroneSim 주요 결과">
-        <article class="dronesim-kpi">
-          <h2>임무 완료율</h2>
-          <p><strong>100%</strong></p>
-          <small>4~256대 · 전체 기체의 25% 상태 보고 단절</small>
-        </article>
-        <article class="dronesim-kpi">
-          <h2>충돌 계산 물리 단계 p95 감소</h2>
-          <p><strong>2.0~13.5%</strong></p>
-          <small>분리·밀집 배치와 기체 수 5개 조건</small>
-        </article>
-        <article class="dronesim-kpi">
-          <h2>접촉 판정 수정 후 반복 실행</h2>
-          <p><strong>2.6×10⁻⁶</strong></p>
-          <small>12회 실행 간 상태 차이 이내</small>
-        </article>
-      </div>
-      <p class="dronesim-measure-condition">임무 시험은 기체 수별 3회, 충돌 측정은 5개 조건, 접촉 수정은 새 프로세스에서 12회 반복했습니다.</p>
-    </>}
-    {isRobotPal && <>
-      <div class="robotpal-kpis" aria-label="핵심 측정 결과">
-        <article class="robotpal-kpi">
-          <h2>시뮬레이션 갱신률</h2>
-          <p><strong>66.70 → 96.01</strong><span>FPS</span></p>
-          <small>동기 방식 대비 +43.9%</small>
-        </article>
-        <article class="robotpal-kpi">
-          <h2>카메라 프레임 송신률</h2>
-          <p><strong>26.95 → 40.05</strong><span>FPS</span></p>
-          <small>동기 방식 대비 +48.6%</small>
-        </article>
-        <article class="robotpal-kpi">
-          <h2>메인 스레드 대기열 삽입</h2>
-          <p><strong>0.017</strong><span>ms p50</span></p>
-          <small>워커 4개 구성</small>
-        </article>
-      </div>
-      <p class="robotpal-measure-condition">1232×832 · 내장 GPU · 각 구성 5회 측정 중앙값 · 영상 수신·압축 해제 제외</p>
-    </>}
-    <p class="project-meta-brief">
-      {!isRobotPal && <>{project.team}<span aria-hidden="true"> · </span></>}{project.period}
-    </p>
+    <p class="project-meta-brief">{project.team}<span aria-hidden="true"> · </span>{project.period}</p>
     <div class="project-top-links">
       {project.links.github && <a href={project.links.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a>}
       {project.links.demo && <a href={project.links.demo} target="_blank" rel="noopener noreferrer">웹 데모 실행 ↗</a>}
@@ -105,94 +34,27 @@ const robotPalSections = isRobotPal
 
   <figure class="container project-cover-wide">
     <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="900" fetchpriority="high" />
-    {isDroneSim && <figcaption class="dronesim-cover-caption">실행 화면 (창 제목: AeroSimLab)</figcaption>}
+    {isDroneSim && <figcaption>웹 지상통제 화면 · OSM 외벽 시험 위치</figcaption>}
   </figure>
 
   <div class="container project-content">
-    {!isRobotPal && <section class="project-overview" aria-label="프로젝트 소개">
-      {project.summary.map(text => <p>{text}</p>)}
-    </section>}
-
-    {isRobotPal && <section class="robotpal-features" aria-labelledby="robotpal-features-title">
-      <h2 id="robotpal-features-title">주요 기능</h2>
-      <ul>
-        <li>가상 JETANK을 운전하고 로봇 팔과 집게를 조작합니다.</li>
-        <li>가상 카메라 영상을 Python 영상 인식 모듈로 보냅니다.</li>
-        <li>인식 명령으로 가상 이동체와 로봇 팔을 움직입니다.</li>
-        <li>Qt 관제 화면에서 실물 JETANK 상태를 확인하고 조작합니다.</li>
-      </ul>
-    </section>}
-
-    <section class="project-role" aria-labelledby="project-role-title">
-      <h2 id="project-role-title">{isRobotPal || isDroneSim ? '역할' : '담당한 구현'}</h2>
-      {isRobotPal && <p class="robotpal-role-team">4인 팀</p>}
-      {isDroneSim
-        ? <ul>{project.role.map((text, index) => {
-            const targets = [
-              { href: '#dronesim-fixed-tick', label: '고정 Tick과 비행 계산' },
-              { href: '#dronesim-flow', label: '지상통제 입력 흐름' },
-              { href: '#dronesim-sort-reuse', label: '충돌 후보 정렬' },
-            ];
-            const target = targets[index];
-            return <li>{text}{target && <> <a class="dronesim-role-anchor" href={target.href}>{target.label} ↓</a></>}</li>;
-          })}</ul>
-        : <ul>{project.role.map(text => <li>{text}</li>)}</ul>}
-    </section>
-
-    <section id={isDroneSim ? 'dronesim-flow' : undefined} class:list={["detail-section", { "dronesim-architecture": isDroneSim }]} aria-labelledby="architecture-title">
-      <h2 id="architecture-title">{isDroneSim ? '시뮬레이션 흐름' : '시스템 구조'}</h2>
-      <div class="architecture-grid">
-        <figure class="architecture-figure">
-          <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={project.title + ' 구조도 원본 크기로 보기'}>
-            <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
-          </a>
-          <figcaption>주요 구성 요소와 데이터 흐름</figcaption>
-        </figure>
-        {isDroneSim && (
-          <ol class="dronesim-flow-mobile" aria-label="DroneSim 처리 흐름">
-            <li><strong>입력</strong><span>화면 조작 · 게임패드 · UDP · JSON 시나리오</span></li>
-            <li><strong>공통 비행 명령</strong><span>입력 형식을 SimulationCore 명령으로 변환</span></li>
-            <li><strong>고정 Tick</strong><span>Flecs가 1/60초 간격으로 드론·카메라 상태 갱신</span></li>
-            <li><strong>물리 계산</strong><span>네이티브 AirSim 강체 모델 · WebAssembly 운동학 모델</span></li>
-            <li><strong>상태와 결과</strong><span>OpenGL 장면 · EO 영상 · 시나리오 판정</span></li>
-          </ol>
-        )}
-        {project.architecture.summary.length > 0 && <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>}
-      </div>
-    </section>
-
-    <div class:list={["project-narrative", { "dronesim-narrative": isDroneSim, "robotpal-case-study": isRobotPal }]}>
-      {isDroneSim
-        ? droneSimSections.map(section => {
-            const disclosureTitle = droneSimDisclosures[section.heading];
-            if (disclosureTitle) return <details class="dronesim-disclosure">
-              <summary>{disclosureTitle}</summary>
-              <MarkdownContent content={section.content} />
-            </details>;
-            const sectionId = droneSimSectionIds[section.heading];
-            return <section class="dronesim-story-section" id={sectionId} aria-labelledby={`${sectionId}-title`}>
-              <h2 id={`${sectionId}-title`}>{section.heading}</h2>
-              <MarkdownContent content={section.content} collapsibleCode={section.heading === '코드'} />
-            </section>;
-          })
-        : isRobotPal
-        ? robotPalSections.map(section => <section class="robotpal-story-section" aria-labelledby={`robotpal-${section.heading}`}>
-            <h2 id={`robotpal-${section.heading}`}>{section.heading}</h2>
-            {section.heading === '결과' && <p class="robotpal-result-note">개선율은 모두 동기 Readback·인코딩 구성 대비입니다.</p>}
-            <MarkdownContent content={section.content} collapsibleCode={section.heading === '코드'} />
-            {section.heading === '원인 분석' && <figure class="robotpal-bottleneck-figure" aria-label="GPU 동기 Readback p50 1.144밀리초, 메인 스레드 JPEG 인코딩 p50 16.406밀리초">
-              <figcaption>구간별 소요 시간 <span>p50</span></figcaption>
-              <div class="robotpal-bottleneck-row">
-                <div><strong>GPU 동기 Readback</strong><span>1.144 ms</span></div>
-                <div class="robotpal-bar-track"><span class="robotpal-bar robotpal-bar--readback"></span></div>
-              </div>
-              <div class="robotpal-bottleneck-row">
-                <div><strong>메인 스레드 JPEG 인코딩</strong><span>16.406 ms</span></div>
-                <div class="robotpal-bar-track"><span class="robotpal-bar robotpal-bar--jpeg"></span></div>
-              </div>
-            </figure>}
-          </section>)
-        : <MarkdownContent content={implementationNarrative(project.narrativeMarkdown, { headingOffset: 0 })} />}
+    <div class="project-narrative">
+      {sections.map((section, index) => <section class="project-story-section" aria-labelledby={`project-section-${index}`}>
+        <h2 id={`project-section-${index}`}>{section.heading}</h2>
+        <MarkdownContent content={section.content} collapsibleCode />
+        {section.heading === '주요 기능' && <section class="detail-section project-architecture" aria-labelledby="architecture-title">
+          <h3 id="architecture-title">시스템 구조</h3>
+          <div class="architecture-grid">
+            <figure class="architecture-figure">
+              <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer" aria-label={project.title + ' 구조도 원본 크기로 보기'}>
+                <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
+              </a>
+              <figcaption>주요 구성 요소와 데이터 흐름</figcaption>
+            </figure>
+            {project.architecture.summary.length > 0 && <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>}
+          </div>
+        </section>}
+      </section>)}
     </div>
   </div>
 

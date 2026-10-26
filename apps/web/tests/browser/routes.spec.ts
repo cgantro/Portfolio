@@ -22,7 +22,7 @@ test('all static routes render and internal navigation keeps deployment base', a
 });
 
 test('DroneSim project assets preserve their deployed paths', async ({ request }) => {
-  for (const asset of ['DroneSim-preview.jpg', 'dronesim-system-architecture.svg']) {
+  for (const asset of ['DroneSim-current-view.png', 'dronesim-system-architecture.svg']) {
     const response = await request.get(`${base}${asset}`);
     expect(response.status()).toBe(200);
   }
@@ -44,21 +44,37 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.archive-project')).toHaveCount(4);
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
-  await expect(page.locator('.dronesim-narrative')).toContainText('약 1.041m');
-  await expect(page.locator('.dronesim-narrative h2')).toHaveCount(6);
-  await expect(page.locator('.dronesim-narrative h2').nth(0)).toHaveText('고정 Tick과 비행 계산 개요');
-  await expect(page.locator('.dronesim-narrative h2').nth(1)).toHaveText('통신 단절과 임무 재할당');
-  await expect(page.locator('.dronesim-narrative h2').nth(2)).toHaveText('충돌 후보 정렬 재사용');
-  await expect(page.locator('.dronesim-narrative h2').nth(3)).toHaveText('PX4 기록 재생과 접촉 오차');
-  await expect(page.locator('.dronesim-narrative h2').nth(4)).toHaveText('한계');
-  await expect(page.locator('.dronesim-narrative h2').nth(5)).toHaveText('코드');
-  await expect(page.locator('.dronesim-disclosure')).toHaveCount(3);
-  await expect(page.locator('.dronesim-narrative details[open]')).toHaveCount(0);
-  await expect(page.locator('.dronesim-narrative')).toContainText('188.0');
-  await expect(page.locator('.dronesim-narrative')).toContainText('184.2µs');
+  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과']);
+  await expect(page.locator('.project-narrative')).toContainText('지정 시나리오 완료율은 모두 100%');
+  await expect(page.locator('.project-narrative')).toContainText('188.0');
+  await expect(page.locator('.project-narrative')).toContainText('184.2µs');
+  await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
+  await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
+  await expect(page.locator('.project-heading')).not.toContainText('2.6×10⁻⁶');
+  await expect(page.locator('.project-narrative')).toContainText('2.6×10⁻⁶ 이내');
   await expect(page.locator('[data-evidence-ids]')).toHaveCount(0);
   await expect(page.locator('.project-top-links a[target="_blank"]').filter({ hasText: '웹 데모 실행' })).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
   await context.close();
+});
+
+test('RobotPal follows the project introduction, features, role, troubleshooting, and results structure', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto(`http://127.0.0.1:4321${base}projects/robotpal/`);
+  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과']);
+  await expect(page.locator('.project-meta-brief')).toContainText('4인');
+  await expect(page.locator('.project-narrative')).toContainText('66.70 FPS');
+  await expect(page.locator('.project-narrative')).toContainText('96.01 FPS');
+  await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
+  await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
+  await context.close();
+});
+
+test('all projects use the same five-part narrative structure', async ({ page }) => {
+  for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
+    await page.goto(`${base}projects/${id}/`);
+    await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과']);
+  }
 });
 
 test('project index presents all four cases without client-side controls', async ({ page }) => {

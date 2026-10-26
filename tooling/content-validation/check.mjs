@@ -23,16 +23,20 @@ for (const record of publicRecords) {
 }
 const projectFiles = (await readdir(resolve(contentRoot, 'projects'))).filter(name => name.endsWith('.md'));
 const projectTopics = {
-  robotpal: /^(#{1,3})\s+.*(?:스트리밍 병목|성능 개선)/m,
-  dronesim: /^(#{1,3})\s+.*충돌 후보/m,
-  mausoleum: /^(#{1,3})\s+.*(?:음성 처리|작업 분배)/m,
-  autowingcar: /^(#{1,3})\s+.*(?:상태.*문제|상태와 관제)/m,
+  robotpal: /^###\s+.*JPEG 압축/m,
+  dronesim: /^###\s+.*(?:상태 보고|충돌 후보)/m,
+  mausoleum: /^###\s+.*음성/m,
+  autowingcar: /^###\s+.*(?:상태 변경|DB 반영)/m,
 };
+const projectSections = ['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과'];
 for (const filename of projectFiles) {
   const projectId = filename.replace(/\.md$/, '');
   const text = await readFile(resolve(contentRoot, 'projects', filename), 'utf8');
   if (!careerData.projects.some(project => project.id === projectId)) errors.push(`${filename}: no matching canonical YAML project`);
-  if (!/^#{1,3}\s+.*개요/m.test(text)) errors.push(`${filename}: missing an overview heading`);
+  const headings = [...text.matchAll(/^##\s+(.+)$/gm)].map(match => match[1].trim());
+  if (projectSections.some((heading, index) => headings[index] !== heading) || headings.length !== projectSections.length) {
+    errors.push(`${filename}: expected the five portfolio sections in order`);
+  }
   if (!projectTopics[projectId]?.test(text)) errors.push(`${filename}: missing its project-specific technical section`);
   if (text.length < 500) errors.push(`${filename}: narrative is unexpectedly short (${text.length} characters)`);
   if (/\b(?:TODO|TBD|FIXME|lorem ipsum)\b/i.test(text)) errors.push(`${filename}: contains a draft placeholder`);
