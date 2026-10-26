@@ -10,7 +10,7 @@ endDate: 2025-12
 status: complete
 team: 4인
 role:
-- Tracy로 JPEG 인코딩이 메인 스레드를 오래 점유하는 것을 확인해 인코딩과 송신을 워커 스레드 4개로 옮겼습니다.
+- Tracy로 JPEG 인코딩이 메인 스레드를 오래 점유하는 것을 확인하고 JPEG 압축을 워커 스레드 4개로 분리했습니다.
 - 실물 JETANK을 연결하고 실제 주행값에 맞춰 가상 이동 속도를 보정했습니다.
 - Python 영상 인식 명령을 이동체·로봇 팔·집게 조작에 연결했습니다.
 stack:
@@ -26,14 +26,14 @@ architecture:
   src: /assets/robotpal-system-architecture.svg
   alt: 가상 카메라 영상을 압축해 인공지능 모듈로 보내고, 인공지능 명령으로 이동 로봇과 로봇 팔을 제어하는 구조
   summary:
-  - 카메라 프레임은 GPU에서 읽어 JPEG로 인코딩한 뒤 Python 영상 인식 모듈로 전송합니다.
-  - 인식 명령은 공통 제어 인터페이스를 거쳐 가상 또는 실물 로봇에 전달합니다.
+  - FBO 영상은 GPU에서 읽은 뒤 JPEG 작업 대기열과 TCP·WebSocket 전송 경로로 전달합니다.
+  - Python 인식 결과는 공통 제어 인터페이스를 거쳐 가상 또는 실물 로봇에 적용합니다.
 links:
   github: https://github.com/cgantro/RobotPal
   demo: null
 contributions:
 - id: robotpal-contribution-1
-  text: Tracy로 메인 스레드를 막는 JPEG 압축 병목을 확인하고 압축·송신을 워커 스레드 4개로 분리
+  text: Tracy로 메인 스레드를 막는 JPEG 압축 병목을 확인하고 압축을 워커 스레드 4개로 분리
   evidenceIds:
   - robotpal-benchmark
   status: reported

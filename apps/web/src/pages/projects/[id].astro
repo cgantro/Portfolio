@@ -18,6 +18,11 @@ const sections = project.narrativeMarkdown
     const newline = section.indexOf('\n');
     return { heading: section.slice(3, newline).trim(), content: section.slice(newline + 1).trim() };
   });
+const expectedSectionHeadings = ['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과'];
+if (sections.length !== expectedSectionHeadings.length
+  || sections.some((section, index) => section.heading !== expectedSectionHeadings[index])) {
+  throw new Error(`${project.id}: 프로젝트 상세 내용은 공통 다섯 항목 순서로 작성해야 합니다.`);
+}
 ---
 <SiteLayout title={project.title} description={project.subtitle} active="projects">
   <header class="container project-heading">

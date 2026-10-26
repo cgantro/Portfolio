@@ -28,8 +28,9 @@ architecture:
   src: /assets/autowing-system-architecture.svg
   alt: 차량과 인공지능 서비스가 장비 메시지와 웹 요청으로 Java 서버에 연결되고 관제 화면은 실시간 연결로 갱신되는 구성도
   summary:
-  - 차량은 MQTT로 상태·명령 응답을 보내고, 서버는 상태 전이를 확인해 관제용 데이터를 갱신합니다.
-  - 변경된 차량·항공편·비상 정보는 WebSocket·STOMP로 화면에 보내고 운행 기록은 DB에 저장합니다.
+  - 차량의 MQTT 상태·명령 응답은 서버에서 분리해 처리하고, 관제 화면은 WebSocket·STOMP로 갱신합니다.
+  - 차량의 최신 상태와 주행 이력은 각각 Redis와 PostgreSQL에 저장합니다.
+  - 운행 명령은 DB 커밋 뒤 MQTT로 발행하고, A*·Yen 탐색 결과를 경로 안내에 사용합니다.
 links:
   github: https://github.com/cgantro/Autowing_car
   demo: null

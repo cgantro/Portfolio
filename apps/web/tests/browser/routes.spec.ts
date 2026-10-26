@@ -44,10 +44,12 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.archive-project')).toHaveCount(4);
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
-  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과']);
+  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);
   await expect(page.locator('.project-narrative')).toContainText('완료율 100%');
   await expect(page.locator('.project-narrative')).toContainText('188.0');
   await expect(page.locator('.project-narrative')).toContainText('184.2µs');
+  await expect(page.locator('.project-narrative')).toContainText('H.264/RTP');
+  await expect(page.locator('.project-narrative')).toContainText('SHA-256');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
   await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
   await expect(page.locator('.project-heading')).not.toContainText('2.6×10⁻⁶');
@@ -61,10 +63,11 @@ test('RobotPal follows the project introduction, features, role, troubleshooting
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(`http://127.0.0.1:4321${base}projects/robotpal/`);
-  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과']);
+  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);
   await expect(page.locator('.project-meta-brief')).toContainText('4인');
   await expect(page.locator('.project-narrative')).toContainText('66.70 FPS');
   await expect(page.locator('.project-narrative')).toContainText('96.01 FPS');
+  await expect(page.locator('.project-narrative')).toContainText('별도의 TCP 송신 대기열로 넘기며');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
   await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
   await context.close();
@@ -73,7 +76,7 @@ test('RobotPal follows the project introduction, features, role, troubleshooting
 test('all projects use the same five-part narrative structure', async ({ page }) => {
   for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
-    await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과']);
+    await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);
     const features = page.locator('.project-story-section').nth(1).locator('ul').first().locator('li');
     expect(await features.count(), `${id} has 3–5 user-facing features`).toBeGreaterThanOrEqual(3);
     expect(await features.count(), `${id} has 3–5 user-facing features`).toBeLessThanOrEqual(5);

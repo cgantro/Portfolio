@@ -28,7 +28,7 @@ const projectTopics = {
   mausoleum: /^###\s+.*음성/m,
   autowingcar: /^###\s+.*(?:상태 변경|DB 반영)/m,
 };
-const projectSections = ['프로젝트 개요', '주요 기능', '역할', '트러블슈팅', '결과'];
+const projectSections = ['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과'];
 for (const filename of projectFiles) {
   const projectId = filename.replace(/\.md$/, '');
   const text = await readFile(resolve(contentRoot, 'projects', filename), 'utf8');

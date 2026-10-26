@@ -38,7 +38,7 @@ test('reported benchmark values retain conditions and their original limits', ()
   assert.equal(robotpal.team, '4인');
   assert.deepEqual(
     robotpal.narrativeMarkdown.match(/^## .+$/gm),
-    ['## 프로젝트 개요', '## 주요 기능', '## 역할', '## 트러블슈팅', '## 결과'],
+    ['## 프로젝트 개요', '## 주요 기능', '## 담당 역할', '## 트러블슈팅', '## 결과'],
   );
   assert.match(camera.conditions.join(' '), /1232×832/);
   assert.match(camera.conditions.join(' '), /5회/);
@@ -47,7 +47,7 @@ test('reported benchmark values retain conditions and their original limits', ()
   for (const id of ['dronesim', 'mausoleum', 'autowingcar']) {
     assert.deepEqual(
       getProject(id)!.narrativeMarkdown.match(/^## .+$/gm),
-      ['## 프로젝트 개요', '## 주요 기능', '## 역할', '## 트러블슈팅', '## 결과'],
+      ['## 프로젝트 개요', '## 주요 기능', '## 담당 역할', '## 트러블슈팅', '## 결과'],
     );
   }
   const autowingcar = getProject('autowingcar')!;

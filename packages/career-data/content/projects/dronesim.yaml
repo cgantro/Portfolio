@@ -3,21 +3,21 @@ title: DroneSim
 subtitle: 시설물 외벽 영상 수집 임무를 모의하는 드론 시뮬레이터
 category: 드론 시뮬레이션
 summary:
-- 사람이 고른 OSM 건물 외벽 시험 위치로 비행해 EO 영상을 수집하고, 위치·시각·자세 기록과 함께 저장하는 흐름을 시험합니다. 영상은 사람이 확인하며, 시설물 파손 판정은 하지 않습니다.
+- 탄천교 주변 지형에서 드론 비행과 지상통제, 외벽 EO 영상 수집·저장을 시험합니다. 영상과 위치·시각·자세 기록을 함께 남깁니다.
 period: 2026.08 – 진행 중
 startDate: 2026-08
 endDate: null
 status: ongoing
 team: 개인 프로젝트
 role:
-- 외벽 시험 위치로 비행해 EO 영상과 촬영 기록을 남기는 시뮬레이션 임무를 구현했습니다.
-- 게임패드·UDP 지상통제·JSON 시나리오 입력을 공통 비행 명령으로 연결했습니다.
-- 네이티브 AirSim 강체 물리와 웹 운동학 모델을 구분하고, 헤드리스 임무·충돌 시험을 구성했습니다.
+- Flecs ECS를 이용해 화면 갱신과 분리된 60Hz 고정 주기 시뮬레이션 코어를 구성하고, 네이티브 AirSim 강체 물리와 웹 운동학 모델을 구분했습니다.
+- 게임패드·UDP 지상통제·JSON 시나리오 입력을 공통 비행 명령으로 연결하고, 헤드리스 임무·충돌 시험을 구성했습니다.
+- EO 영상 촬영·기록과 네이티브 H.264/RTP 송수신, 녹화 파일 전달을 지상통제 프로그램에 연결했습니다.
 stack:
 - Flecs ECS
 - AirSim 강체 물리
 - UDP 지상통제
-- JSON 시나리오
+- GStreamer·H.264/RTP
 cover:
   src: /assets/DroneSim-current-view.png
   alt: OSM 건물 외벽 시험 위치를 선택해 EO 영상 수집 임무를 진행하는 DroneSim 웹 지상통제 화면
@@ -25,9 +25,9 @@ architecture:
   src: /assets/dronesim-system-architecture.svg
   alt: 게임패드·UDP·JSON 입력이 공통 비행 명령과 고정 주기 시뮬레이션을 거쳐 외벽 EO 촬영 임무로 이어지고, 네이티브와 웹 모델이 나뉘는 구조
   summary:
-  - 게임패드·UDP·JSON 입력을 공통 비행 명령으로 바꿔 고정 주기 시뮬레이션에 전달합니다.
-  - 네이티브 실행은 AirSim 강체 물리, 웹 데모는 운동학 모델을 사용합니다. 웹의 지형과 건물은 화면 표현용입니다.
-  - 선택한 외벽 시험 위치에서 영상을 수집하고 임무 기록을 저장합니다. 네이티브 영상은 MP4·JSONL, 웹 영상은 WebM이며 웹 WebRTC 수신은 같은 페이지 안에서 시험했습니다.
+  - 게임패드·UDP·JSON 입력은 공통 비행 명령을 거쳐 고정 주기 시뮬레이션에 들어갑니다.
+  - 시뮬레이션은 네이티브의 AirSim 강체 물리 또는 웹의 운동학 모델로 드론 상태를 계산합니다.
+  - EO 프레임은 실시간 H.264/RTP 영상 경로와 녹화 파일·촬영 기록 경로로 나뉘어 지상통제 프로그램에 전달됩니다. 웹 저장 자료는 별도로 내려받습니다.
 links:
   github: https://github.com/cgantro/DroneSim
   demo: https://cgantro.github.io/DroneSim/
