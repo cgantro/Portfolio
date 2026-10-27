@@ -74,7 +74,7 @@ test('RobotPal follows the project introduction, features, role, troubleshooting
 });
 
 test('all projects use the same five-part narrative structure', async ({ page }) => {
-  const expectedFeatureCounts = { robotpal: 5, dronesim: 5, mausoleum: 4, autowingcar: 4 };
+  const expectedFeatureCounts = { robotpal: 4, dronesim: 5, mausoleum: 4, autowingcar: 4 };
   for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
     await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);

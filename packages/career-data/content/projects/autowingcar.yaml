@@ -39,50 +39,46 @@ detail:
     description: 차량의 위치·속도·배터리·운행 상태를 관제 화면에서 확인합니다.
     evidenceIds: [autowingcar-public]
   - title: 운행 명령과 응답 확인
-    description: 차량에 명령을 보내고 장비의 수신 응답과 실제 운행 상태를 각각 확인합니다.
+    description: 차량에 명령을 보내고 수신 응답과 실제 운행 상태를 확인합니다.
     evidenceIds: [autowingcar-public]
   - title: 관제 알림·상태 저장
     description: 차량·항공편·비상 상태 변화를 관제 화면에 알리고, 차량별 최신 상태와 위치·속도·배터리 등의 주행 이력을 저장합니다.
     evidenceIds: [autowingcar-public]
   - title: 주행 경로 탐색
-    description: 통제·점유 구간과 예상 이동 시간을 반영해 경로를 찾고, Yen 알고리즘으로 대체 경로를 최대 3개 제시한 뒤 RDP로 좌표를 줄입니다.
+    description: 통제 구간과 예상 이동 시간을 반영해 경로를 찾고, 대체 경로를 최대 3개 제시합니다.
     evidenceIds: [autowingcar-public]
   roleAreas:
   - title: 차량 통신·실시간 관제
     items:
-    - text: MQTT 상태 메시지에서 위치·속도·배터리·운행 상태를 읽고 장비 응답 처리
+    - text: 차량 상태와 명령 수신 응답을 받아 관제 시스템에 전달
       evidenceIds: [autowingcar-public]
-    - text: WebSocket·STOMP 상태·알림 전송 및 Redis 차량별 최신 상태 조회·갱신
+    - text: 관제 화면에 차량 상태와 알림을 실시간 전달하고 최신 상태 관리
       evidenceIds: [autowingcar-public]
-    - text: 미션 명령의 장비 ACK와 실제 차량 운행 상태를 구분해 관리
+    - text: 명령 수신 응답과 실제 차량 운행 상태를 구분해 관리
       evidenceIds: [autowingcar-public]
   - title: 상태 정합성·명령 처리 순서
     items:
-    - text: 자동 상태 전이 뒤 MQTT 보고에 포함된 오래된 상태가 최신 DB 상태를 덮지 않도록 현재 상태를 우선 반영
+    - text: 자동 상태 전이 뒤 늦게 도착한 이전 상태가 최신 상태를 덮지 않도록 처리
       evidenceIds: [autowingcar-public]
-    - text: 차량 운행 명령은 데이터베이스 트랜잭션 커밋 뒤 MQTT로 발행
+    - text: 차량 운행 명령은 상태 저장을 마친 뒤 전달
       evidenceIds: [autowingcar-public, autowingcar-command-order]
   - title: 경로 탐색
     items:
-    - text: 노드·간선 지도 그래프에 이동 시간 비용을 적용한 A* 탐색 구현
+    - text: 이동 시간을 반영해 차량 주행 경로 탐색
       evidenceIds: [autowingcar-public]
-    - text: Yen 알고리즘으로 대체 경로 최대 3개 탐색, RDP로 경로 좌표 단순화
+    - text: 최대 세 개의 대체 경로를 찾아 지도에 표시
       evidenceIds: [autowingcar-public]
   - title: 데이터 처리·시험 구성
     items:
-    - text: PostgreSQL 운행 이력 저장과 Redis 최신 상태 관리를 분리
+    - text: 최신 차량 상태와 주행 이력을 나눠 저장
       evidenceIds: [autowingcar-public]
-    - text: 지도·미션·항공편 조회 API의 부하·스트레스 시험을 k6 HTTP 시나리오로 구성
-      evidenceIds: [autowingcar-k6]
-    - text: 별도 Python 하네스에 모의 차량 500대 × 10Hz 입력을 구성해 RDP 좌표 단순화와 비동기 버퍼 처리 검사
-      evidenceIds: [autowingcar-load]
   - title: Redis 운행 로그 처리 · 후속 개선
     items:
-    - text: 프로젝트 종료 후 Redis Streams 적재와 별도 소비자의 JDBC 일괄 저장으로 운행 로그 저장 경로 변경
+    - text: 프로젝트 종료 후 Redis Streams를 이용한 운행 기록 저장·재처리 기능 추가
       evidenceIds: [autowingcar-streams]
-    - text: pending 레코드 우선 재처리, DB 커밋 뒤 ACK, Stream ID와 DB 복합 키를 이용한 중복 INSERT 방지 구현
+    - text: 데이터베이스 저장을 확인한 뒤 처리 완료 표시, 같은 기록의 중복 저장 방지
       evidenceIds: [autowingcar-streams]
-    - text: 차량 상태 트랜잭션의 afterCommit 콜백에서 운행 로그를 Stream에 적재하도록 순서 조정
+    - text: 차량 상태 저장이 끝난 뒤 운행 기록을 전달하도록 순서 조정
       evidenceIds: [autowingcar-streams]
     diagram:
       src: /assets/autowing-streams-flow.svg
@@ -173,10 +169,6 @@ outcomes:
 - id: autowingcar-outcome-4
   text: DB 저장 뒤 ACK, DB 오류 시 pending 보존, 재처리 식별자 유지에 대한 단위 테스트 구성
   evidenceIds: [autowingcar-streams-tests]
-  status: reported
-- id: autowingcar-outcome-5
-  text: 모의 차량 500대 × 10Hz 입력의 Python 로컬 하네스와 조회 API의 k6 HTTP 시험을 각각 구성
-  evidenceIds: [autowingcar-load, autowingcar-k6]
   status: reported
 metrics: []
 evidence:

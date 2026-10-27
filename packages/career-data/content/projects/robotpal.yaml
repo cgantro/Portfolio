@@ -10,7 +10,7 @@ endDate: 2025-12
 status: complete
 team: 4인
 role:
-- Tracy로 JPEG 인코딩이 메인 스레드를 오래 점유하는 것을 확인하고 JPEG 압축을 워커 스레드 4개로 분리했습니다.
+- 카메라 JPEG 압축을 별도 작업자로 옮겨 시뮬레이션 갱신과 영상 전송을 분리했습니다.
 - 실물 JETANK의 주행값을 측정해 가상 이동 속도를 보정하고, 제어 화면에서 장비 상태 조회와 조작 입력 전달을 연결했습니다.
 - 외부 JSON 명령에서 이동체 모터·로봇팔 서보 값을 읽어 가상 이동체·로봇팔·집게 조작에 반영했습니다.
 stack:
@@ -19,7 +19,6 @@ stack:
 - TCP/WebSocket
 - Emscripten
 - JPEG
-- Tracy
 cover:
   src: /assets/로봇팔 시연.webp
   alt: RobotPal 프로젝트 화면
@@ -37,7 +36,7 @@ detail:
     description: JETANK 주행, 로봇팔 관절 이동, 집게 제어
     evidenceIds: [robotpal-public]
   - title: 가상 카메라
-    description: 가상 카메라 영상을 외부 영상 인식 모듈로 보내고, 외부 JSON 명령에 담긴 모터·서보 값을 가상 이동체·로봇팔·집게 조작에 반영
+    description: 가상 카메라 영상을 외부 인식 모듈에 전달하고, 외부 명령으로 이동체·로봇팔·집게를 조작
     evidenceIds: [robotpal-public]
   - title: 실물 JETANK 연동
     description: 제어 화면에 실물 장비 상태를 표시하고 조작 입력을 전달
@@ -45,15 +44,10 @@ detail:
   - title: 데스크톱·웹 실행
     description: 네이티브 TCP 및 WebAssembly WebSocket 통신 지원
     evidenceIds: [robotpal-public]
-  - title: 실측 기반 주행 보정
-    description: 실물 JETANK의 주행을 측정해 가상 AGV 이동 계수 조정
-    evidenceIds: [robotpal-public]
   roleAreas:
   - title: 실측 기반 주행 보정
     items:
-    - text: 입력값 0.3에서 실물 JETANK 직진 약 2.4cm/s·회전 약 24°/s 측정
-      evidenceIds: [robotpal-public]
-    - text: 좌우 모터 입력의 평균·차이를 선속도·각속도로 변환하고 실측값으로 가상 AGV 이동 계수 보정
+    - text: 실물 JETANK의 주행값을 기준으로 가상 이동체의 직진·회전 속도 보정
       evidenceIds: [robotpal-public]
   - title: 제어 통신
     items:
@@ -63,19 +57,9 @@ detail:
       evidenceIds: [robotpal-public]
   - title: 카메라 스트리밍
     items:
-    - text: OpenGL Framebuffer의 GPU Readback, JPEG 압축, 네트워크 전송 연결
+    - text: 가상 화면을 캡처해 JPEG로 압축하고 외부 프로그램에 영상 전송
       evidenceIds: [robotpal-public]
-    - text: 데스크톱 TCP·웹 WebSocket 전송 경로 분리
-      evidenceIds: [robotpal-public]
-  - title: 멀티스레드 영상 처리
-    items:
-    - text: Tracy로 Readback·JPEG 인코딩·송신 구간 계측, PBO·Fence 기반 비동기 픽셀 읽기 적용
-      evidenceIds: [robotpal-benchmark]
-    - text: JPEG 워커 4개와 인코딩 대기열 6프레임·TCP 송신 대기열 2프레임 구성
-      evidenceIds: [robotpal-benchmark, robotpal-public]
-    - text: 대기열 포화 시 오래된 프레임 폐기, 프레임 번호 검사로 늦게 끝난 과거 프레임의 역순 송신 방지
-      evidenceIds: [robotpal-public]
-    - text: 워커별 JPEG 인코더와 픽셀·압축 버퍼를 분리하고 반복 작업에서 버퍼 재사용
+    - text: 데스크톱과 웹 실행 환경에 맞춰 영상 전송 연결
       evidenceIds: [robotpal-public]
   troubleshooting:
   - title: 카메라 스트리밍 중 시뮬레이션 성능 저하
@@ -130,7 +114,7 @@ links:
   demo: null
 contributions:
 - id: robotpal-contribution-1
-  text: Tracy로 메인 스레드를 막는 JPEG 압축 병목을 확인하고 압축을 워커 스레드 4개로 분리
+  text: 메인 스레드를 오래 점유하던 JPEG 압축을 별도 작업자로 분리해 카메라 스트리밍 처리 개선
   evidenceIds:
   - robotpal-benchmark
   status: reported
