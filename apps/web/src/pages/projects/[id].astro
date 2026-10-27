@@ -14,7 +14,7 @@ const detail = project.detail;
 const architectureNotes = project.id === 'robotpal' ? project.architecture.summary : project.architecture.summary.slice(1);
 const projectTitleId = (index: number) => `troubleshooting-${project.id}-${index}`;
 const codeMarkdown = (code: (typeof detail.troubleshooting)[number]['code']) => code
-  ? `\`\`\`${code.language} title="${code.title}"\n${code.source}\n\`\`\`\n\n**파일**: \`${code.path}\` · [원본 코드 보기](${code.url})`
+  ? `\`\`\`${code.language} title="${code.title}"\n${code.source}\n\`\`\``
   : '';
 const robotpalFpsRows = project.id === 'robotpal'
   ? detail.troubleshooting.find(issue => issue.comparison)?.comparison?.rows ?? []
@@ -38,12 +38,6 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
       <section class="project-story-section project-overview" aria-labelledby="project-overview-title">
         <h2 id="project-overview-title">프로젝트 개요</h2>
         <div class="project-overview-copy"><p>{detail.overview}</p></div>
-        <figure class="project-cover-wide">
-          <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="900" fetchpriority="high" />
-          {project.id === 'dronesim' && <figcaption>웹 지상통제 화면 · OSM 건물 정보를 바탕으로 정한 외벽 시험 위치</figcaption>}
-          {project.id === 'mausoleum' && <figcaption>영묘 게임 타이틀 화면</figcaption>}
-          {project.id === 'autowingcar' && <figcaption>오토잉카 실물 차량</figcaption>}
-        </figure>
         <p class="project-meta-brief"><span>기간</span>{project.period}<span aria-hidden="true"> · </span><span>팀</span>{project.team}</p>
         <p class="technology-line-detail"><strong>주요 기술</strong><span>{project.stack.join(' · ')}</span></p>
         <nav class="project-top-links" aria-label="프로젝트 링크">
@@ -55,13 +49,19 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
       <section class="project-story-section project-roles" aria-labelledby="project-role-title">
         <h2 id="project-role-title">담당 역할</h2>
         <ul class="project-role-list">{project.role.map(item => <li><MarkdownContent content={item} /></li>)}</ul>
+        <figure class="project-cover-wide">
+          <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width={project.id === 'dronesim' ? 772 : 1440} height={project.id === 'dronesim' ? 482 : 900} fetchpriority="high" />
+          {project.id === 'dronesim' && <figcaption>헬리오시티 111동 촬영 임무 중 드론 카메라 화면</figcaption>}
+          {project.id === 'mausoleum' && <figcaption>영묘 게임 타이틀 화면</figcaption>}
+          {project.id === 'autowingcar' && <figcaption>오토잉카 실물 차량</figcaption>}
+        </figure>
         {detail.roleAreas.some(area => area.diagram) && <div class="role-area-list role-area-diagrams">
           {detail.roleAreas.filter(area => area.diagram).map(area => <section class="role-area">
             {area.diagram && <figure class="role-area-diagram troubleshooting-diagram">
               <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + area.title + ' 도표. 가로로 이동할 수 있습니다.'}>
                 <img src={assetUrl(area.diagram.src)} alt={area.diagram.alt} width={area.diagram.width} height={area.diagram.height} loading="lazy" />
               </div>
-              <figcaption>{area.diagram.caption} · <a href={assetUrl(area.diagram.src)} target="_blank" rel="noopener noreferrer">큰 그림 보기</a></figcaption>
+              <figcaption>{area.diagram.caption}</figcaption>
             </figure>}
           </section>)}
         </div>}
@@ -104,7 +104,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 문제 해결 흐름도. 가로로 이동할 수 있습니다.'}>
               <img src={assetUrl(issue.diagram.src)} alt={issue.diagram.alt} width={issue.diagram.width} height={issue.diagram.height} loading="lazy" />
             </div>
-            <figcaption>{issue.diagram.caption} · <a href={assetUrl(issue.diagram.src)} target="_blank" rel="noopener noreferrer">큰 그림 보기</a></figcaption>
+            <figcaption>{issue.diagram.caption}</figcaption>
           </figure>}
           {project.id === 'robotpal' && robotpalFpsRows.length > 0 && <figure class="robotpal-fps-chart" aria-labelledby="robotpal-fps-chart-title">
             <h4 id="robotpal-fps-chart-title">구성별 시뮬레이션 갱신률</h4>
@@ -121,7 +121,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             <figcaption>스트리밍 중 갱신률. 정확한 측정 조건은 아래 비교표에 표시했습니다.</figcaption>
           </figure>}
           {project.id === 'dronesim' && index === 0 && dronesimP95Rows.length > 0 && <figure class="dronesim-p95-chart" aria-labelledby="dronesim-p95-chart-title">
-            <h4 id="dronesim-p95-chart-title">배치별 충돌 처리 시간</h4>
+            <h4 id="dronesim-p95-chart-title">배치별 물리 단계 처리 시간</h4>
             <div class="p95-chart-legend" aria-label="범례">
               <span><i class="p95-before" aria-hidden="true"></i>변경 전</span>
               <span><i class="p95-after" aria-hidden="true"></i>변경 후</span>

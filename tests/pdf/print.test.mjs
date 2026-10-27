@@ -21,9 +21,9 @@ test('print document presents Korean project narratives without internal audit m
     assert.ok(html.includes(project.title));
     assert.ok(html.includes(project.summary[0]));
   }
-  assert.match(html, /접촉 판정이 반복마다 달라짐/);
-  assert.match(html, /워커 4개/);
-  assert.match(html, /마이크 입력 버퍼/);
+  assert.match(html, /바닥 접촉 판정이 달라짐/);
+  assert.match(html, /작업 스레드 4개/);
+  assert.match(html, /게임 창 복귀 뒤 오래된 마이크 입력이 섞임/);
   assert.match(html, /오래된 MQTT 상태가 최신 값을 덮음/);
   assert.match(html, /데이터베이스 반영 전에 차량 명령이 발행될 수 있음/);
   assert.match(html, /Redis Streams/);

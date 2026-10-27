@@ -6,7 +6,7 @@ import { localUrl } from '../../lib/urls.mjs';
 const order = ['dronesim', 'robotpal', 'mausoleum', 'autowingcar'];
 const orderedProjects = order.flatMap(id => projects.filter(project => project.id === id));
 ---
-<SiteLayout title="프로젝트" description="C++ 시뮬레이션과 실시간 통신 프로젝트 구현 사례" active="projects">
+<SiteLayout title="프로젝트" description="시뮬레이션과 실시간 통신 프로젝트 구현 사례" active="projects">
   <header class="container archive-heading">
     <a class="back-link" href={localUrl()}>← 포트폴리오 홈</a>
     <h1>프로젝트</h1>

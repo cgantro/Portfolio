@@ -32,22 +32,22 @@ architecture:
   - UDP 서버는 패킷·세션을 확인해 방별 참가자에게 중계하고, 클라이언트는 거리·플레이어 상태에 따라 청취 여부를 결정합니다.
 detail:
   layout: mausoleum
-  overview: 여러 플레이어가 아이템을 수집하고 석상을 함께 조작해 탈출하는 UE5 협동 게임입니다. 단일 전용 서버에서 여러 게임 방을 운영하며, 로비 전체 음성과 게임 내 거리·상태별 음성 대화를 지원합니다.
+  overview: 여러 명이 아이템을 모으고 석상을 함께 조작해 탈출하는 협동 게임입니다. 로비와 게임 안에서 방·거리·플레이어 상태에 맞춰 음성을 주고받습니다.
   features:
   - title: 게임 로비
     description: 방 생성·입장·퇴장, 참가자 관리와 채팅
     evidenceIds: [mausoleum-public]
   - title: 방별 멀티플레이
     description: 하나의 전용 서버에서 여러 방의 게임을 동시에 진행하고, 방마다 게임 단계와 이벤트를 따로 관리
-    implementation: 로비가 방과 참가자를 관리하고 UE5 전용 서버는 RoomCode로 게임 공간·페이즈·이벤트를 구분합니다. 한 방이 끝날 때 해당 방의 상태만 정리합니다.
+    implementation: 로비는 방과 참가자를 관리합니다. 게임 서버는 방마다 진행 상황을 나누고, 한 방이 끝나면 그 방의 정보만 정리합니다.
     evidenceIds: [mausoleum-public]
   - title: 로비 음성 채팅
     description: 로비 참가자끼리 음성으로 대화하고, 게임 안에서는 가까운 플레이어의 음성을 들음
-    implementation: 마이크 PCM을 Opus로 압축해 UDP로 보내면 음성 서버가 세션과 방을 확인해 같은 방 참가자에게 전달합니다. 클라이언트는 화자별로 풀어 재생합니다.
+    implementation: 마이크 음성을 압축해 서버로 보내면, 서버가 같은 방 참가자에게 전달합니다. 게임은 받은 음성을 풀어 재생합니다.
     evidenceIds: [mausoleum-public]
   - title: 공간 음향
     description: 화자의 위치와 거리, 생존·사망·관전 상태에 따라 들을 수 있는 음성을 구분
-    implementation: 수신 음성의 화자 위치와 플레이어 상태를 확인해 청취 대상을 정하고, 방향·거리에 맞춰 HRTF로 재생합니다.
+    implementation: 화자의 위치·거리와 플레이어 상태에 따라 들을 음성을 고르고, 방향과 거리를 반영해 재생합니다.
     evidenceIds: [mausoleum-public]
   roleAreas:
   - title: 로비·게임 서버
@@ -72,23 +72,23 @@ detail:
       evidenceIds: [mausoleum-public]
   troubleshooting:
   - title: 단일 전용 서버의 방별 게임 상태 분리
-    symptom: 하나의 UE 월드에서 여러 게임 방을 운영하므로, 한 방의 페이즈 진행·보상·종료 처리를 다른 방과 분리해야 했습니다.
-    cause: 플레이 공간에 오프셋을 주는 것만으로는 상태 조회와 이벤트 대상이 나뉘지 않아, 게임 진행과 레벨 수명을 관리할 공통 방 식별자가 필요했습니다.
-    solution: "`RoomCode`를 공통 기준으로 삼아 `RoomRuntimeSubsystem`에서 방별 레벨 수명을, 페이즈 서브시스템에서 진행 상태와 보상 수량을 관리했습니다. 방을 중단할 때 해당 방의 상태와 레벨만 정리하도록 처리했습니다."
-    verification: 상태 객체 단위 자동화 테스트에 방 A·B의 보상 수량과 페이즈 진행 분리, 한 방 중단 후 다른 방 유지, 중복 중단·재생성 검사를 작성했습니다.
+    symptom: 한 서버에서 여러 방을 운영할 때, 한 방의 진행 상황과 보상이 다른 방에 섞이지 않게 해야 했습니다.
+    cause: 방마다 공간을 나누는 것만으로는 진행 상황과 이벤트가 분리되지 않았습니다.
+    solution: 방 번호를 기준으로 진행 상황·보상을 따로 관리하고, 방이 끝나면 해당 방 정보만 정리했습니다.
+    verification: 자동화 시험으로 방별 진행·보상 분리와 한 방을 끝낸 뒤 다른 방이 계속되는지 확인하는 항목을 마련했습니다.
     evidenceIds: [mausoleum-public, mausoleum-room-tests]
     metricIds: []
   - title: 게임 창 복귀 뒤 오래된 마이크 입력이 섞임
-    symptom: 게임 창을 백그라운드로 두었다가 돌아오면 마이크 입력 버퍼에 쌓인 PCM이 뒤늦게 인코딩·전송되어 과거 음성이 새 대화에 섞였습니다.
-    cause: 포커스가 바뀌는 동안 VoiceCapture의 PCM 버퍼와 Opus 인코더 상태를 비우지 않아, 복귀 뒤 오래된 데이터까지 새 입력처럼 처리했습니다.
-    solution: '`ProcessCapture()`에서 포커스가 없으면 캡처 버퍼를 비우고 인코더를 다시 초기화합니다. 포커스 복귀 뒤에도 8KB를 넘는 입력은 버리고, 한 번의 처리에서 읽는 양은 4KB로 제한합니다.'
+    symptom: 게임 창으로 돌아온 뒤, 창을 비운 동안 마이크에 들어온 오래된 음성이 새 대화에 섞였습니다.
+    cause: 창이 비활성화된 동안 쌓인 음성 자료를 버리지 않고 다시 처리했습니다.
+    solution: 창이 비활성화되면 쌓인 음성 자료를 비우고 음성 압축 상태를 초기화하도록 바꿨습니다.
     verification: 게임 창을 백그라운드에 둔 뒤 다시 열고, 이후 새로 말한 음성부터 전달되는지 수동으로 확인했습니다.
     evidenceIds: [mausoleum-public]
     metricIds: []
     code:
       path: A302/Source/A302Client/Voice/Capture/VoiceCaptureProcessor.cpp
       language: cpp
-      title: 포커스가 없는 동안 PCM 버퍼와 Opus 상태 비우기
+      title: 창을 비운 동안 들어온 음성 자료 정리
       url: https://github.com/cgantro/Mausoleum/blob/main/A302/Source/A302Client/Voice/Capture/VoiceCaptureProcessor.cpp
       source: |
         if (!FApp::HasFocus())

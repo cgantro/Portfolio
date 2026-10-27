@@ -10,7 +10,7 @@ const supportingProjects = [projectById.mausoleum, projectById.autowingcar];
 const education = timeline.filter(item => item.type === 'edu');
 const certifications = timeline.filter(item => item.type === 'cert');
 const featured = [
-  { project: dronesim, side: 'copy-first', summary: '탄천교 주변 지형에서 외벽 촬영 지점을 지정하고, EO 영상과 비행 기록을 함께 남기는 시뮬레이터를 개발하고 있습니다.' },
+  { project: dronesim, side: 'copy-first', summary: '탄천교 주변에서 드론을 비행하고 시설물 외벽을 촬영하는 시뮬레이터를 개발하고 있습니다.' },
   { project: robotpal, side: 'image-first', summary: '로봇 시뮬레이터에서 카메라 압축 병목을 찾아 갱신과 송신을 분리했습니다.' },
 ];
 const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming-fps', 'camera-send-fps'].includes(metric.id));
@@ -75,13 +75,13 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
           <p class="project-state">{project.period} · {project.team}</p>
           <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
           <p>{project.id === 'mausoleum'
-            ? '단일 전용 서버에서 방별 게임 상태를 나누고, UDP 음성 패킷과 작업 대기열을 처리했습니다.'
-            : 'MQTT 차량 통신과 WebSocket 관제 갱신을 구현했습니다. 프로젝트 뒤에는 Redis Streams 운행 로그 처리를 보완했습니다.'}</p>
+            ? '한 서버에서 여러 방의 게임 진행을 나누고, 같은 방 참가자끼리 음성으로 대화하는 기능을 만들었습니다.'
+            : '차량 상태를 받아 관제 화면을 갱신하고 운행 명령과 경로 탐색을 구현했습니다. 프로젝트 뒤에는 운행 기록 저장을 보완했습니다.'}</p>
           <p class="supporting-role"><strong>담당</strong> {project.role[0]}</p>
           <ul class="supporting-highlights">
             {(project.id === 'mausoleum'
-              ? ['방별 게임 페이즈·보상 분리', 'UDP 세션·송신 주소 검사', '대기열 용량·음성 만료 처리']
-              : ['MQTT 차량 상태·응답 처리', 'A*·Yen 경로 탐색', '후속 개선: Redis Streams 일괄 저장·재처리']).map(item => <li>{item}</li>)}
+              ? ['방별 진행 상황과 보상 분리', '같은 방 참가자에게 음성 전달', '창 복귀 뒤 오래된 음성이 섞이는 문제 해결']
+              : ['차량 응답과 실제 운행 상태 구분', '상태 변경 뒤 늦게 온 값을 걸러냄', '경로 탐색과 운행 기록 저장 개선']).map(item => <li>{item}</li>)}
           </ul>
           <a class="project-link" href={projectUrl(project.id)}>상세 보기 <span aria-hidden="true">↗</span></a>
         </div>

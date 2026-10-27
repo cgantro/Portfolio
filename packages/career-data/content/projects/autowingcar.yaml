@@ -33,23 +33,23 @@ architecture:
   - 후속 개선에서는 운행 로그를 Redis Streams에 적재하고 별도 소비자가 DB에 일괄 저장합니다.
 detail:
   layout: autowingcar
-  overview: 공항 견인차의 위치·운행 상태를 관제하고 차량에 미션 명령을 전달하는 시스템입니다. 차량 상태 조회, 실시간 알림, 주행 경로와 대체 경로 탐색을 지원합니다.
+  overview: 공항 견인차의 위치와 운행 상태를 확인하고, 차량에 운행 명령을 보내는 관제 시스템입니다. 주행 경로와 대체 경로도 찾습니다.
   features:
   - title: 견인차 상태 관제
     description: 차량의 위치·속도·배터리·운행 상태를 관제 화면에서 확인합니다.
-    implementation: 차량 상태 메시지를 MQTT로 받고, 최신 상태는 Redis에 두며 관제 화면은 WebSocket·STOMP 갱신을 받습니다.
+    implementation: 차량 상태를 받아 최신 값을 저장하고 관제 화면을 실시간으로 갱신합니다.
     evidenceIds: [autowingcar-public]
   - title: 운행 명령과 응답 확인
     description: 차량에 명령을 보내고 수신 응답과 실제 운행 상태를 확인합니다.
-    implementation: 장비의 명령 수신 응답과 주행 중 상태 보고를 별도로 처리합니다. 명령은 데이터베이스 반영이 끝난 뒤 MQTT로 발행합니다.
+    implementation: 명령을 받았다는 응답과 실제 차량 상태를 따로 관리합니다. 차량 명령은 데이터베이스 저장을 마친 뒤 보냅니다.
     evidenceIds: [autowingcar-public]
   - title: 관제 알림·상태 저장
     description: 차량·항공편·비상 상태 변화를 관제 화면에 알리고, 차량별 최신 상태와 위치·속도·배터리 등의 주행 이력을 저장합니다.
-    implementation: 빠르게 조회할 최신 차량 상태는 Redis에 저장하고, 주행 이력은 PostgreSQL에 기록합니다.
+    implementation: 최신 차량 상태와 주행 이력을 나눠 저장합니다.
     evidenceIds: [autowingcar-public]
   - title: 주행 경로 탐색
     description: 통제 구간과 예상 이동 시간을 반영해 경로를 찾고, 대체 경로를 최대 3개 제시합니다.
-    implementation: 이동 시간 비용으로 A* 경로를 찾고 Yen 탐색으로 대체 경로를 구해 관제 지도에 전달합니다.
+    implementation: 예상 이동 시간을 반영해 기본 경로와 대체 경로를 찾아 관제 지도에 표시합니다.
     evidenceIds: [autowingcar-public]
   roleAreas:
   - title: 차량 통신·실시간 관제
@@ -92,10 +92,10 @@ detail:
       height: 360
   troubleshooting:
   - title: 자동 상태 변경 뒤 오래된 MQTT 상태가 최신 값을 덮음
-    symptom: 차량이 게이트에 도착해 서버가 DOCKING으로 바꾼 뒤, MQTT로 늦게 도착한 MOVING_TO_GATE 상태가 저장될 수 있었습니다.
-    cause: 같은 메시지 처리 안에서 자동 동작이 차량 상태를 바꾼 뒤, 원래 메시지의 상태값을 다시 저장했습니다.
-    solution: 자동 동작 전 상태를 기록하고, 처리 중 상태가 달라졌다면 차량 객체의 현재 상태를 MQTT 메시지 값보다 우선해 저장합니다. 게이트 이동 중과 도킹 전환 구간의 오래된 상태도 별도로 걸러냅니다.
-    verification: processCarMonitoring()에서 전환 전후 상태를 비교해 최신 객체 상태를 저장하는 분기를 확인했습니다. 저장소에는 관련 상태 전이와 DOCKING 유지 동작을 확인하는 테스트가 있습니다.
+    symptom: 차량이 게이트에 도착한 뒤에도 늦게 도착한 이전 운행 상태가 저장될 수 있었습니다.
+    cause: 서버가 차량 상태를 바꾼 뒤, 이전 메시지에 담긴 상태를 다시 저장했습니다.
+    solution: 처리 중 상태가 바뀌면 차량의 새 상태를 저장하고, 전환 중 도착한 오래된 상태는 반영하지 않도록 했습니다.
+    verification: 상태 전환 뒤 새 상태가 유지되는지 확인하는 시험을 마련했습니다.
     evidenceIds: [autowingcar-public]
     metricIds: []
     code:
@@ -112,10 +112,10 @@ detail:
         assignedCar.updateStatus(x, y, heading, velocity, battery, status);
       url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
   - title: 데이터베이스 반영 전에 차량 명령이 발행될 수 있음
-    symptom: 서버가 명령 처리를 마친 뒤 데이터베이스 트랜잭션이 롤백되면 차량만 명령을 받은 상태가 될 수 있었습니다.
-    cause: 데이터베이스 상태 변경과 MQTT 발행은 별도 작업인데, 명령을 커밋 이후로 미루지 않았습니다.
-    solution: 운행 명령 발행을 TxUtil.executeAfterCommit()에 등록해 데이터베이스 커밋이 끝난 뒤 MQTT로 보내도록 바꿨습니다.
-    verification: 서비스 테스트에서 명령 처리 후 예상한 MQTT 주행 명령과 내용을 확인합니다. 커밋·롤백을 함께 검증하는 별도 통합 시험은 공개 자료에 없습니다.
+    symptom: 데이터베이스 저장이 취소돼도 차량은 운행 명령을 받을 수 있었습니다.
+    cause: 저장이 끝나기 전에 별도로 차량에 명령을 보냈습니다.
+    solution: 데이터베이스 저장이 끝난 뒤에 차량에 명령을 보내도록 순서를 바꿨습니다.
+    verification: 서비스 시험에서 발행하는 명령과 내용을 확인했습니다.
     evidenceIds: [autowingcar-command-order]
     metricIds: []
     code:

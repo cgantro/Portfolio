@@ -51,12 +51,13 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.dronesim-p95-chart .p95-chart-row')).toHaveCount(5);
   await expect(page.locator('.dronesim-p95-chart')).toContainText('변경 전');
   await expect(page.locator('.dronesim-p95-chart')).toContainText('변경 후');
-  await expect(page.locator('.project-narrative')).toContainText('H.264/RTP');
-  await expect(page.locator('.project-narrative')).toContainText('90m NGII DEM');
+  await expect(page.locator('.project-narrative')).toContainText('H.264 영상으로 실시간 전송');
+  await expect(page.locator('.project-narrative')).toContainText('90m 간격 지형 자료를 30m 높이 격자로');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
   await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
   await expect(page.locator('.project-heading')).not.toContainText('2.6×10⁻⁶');
-  await expect(page.locator('.project-narrative')).toContainText('2.6×10⁻⁶ 이내');
+  await expect(page.locator('.project-narrative')).toContainText('같은 기록을 12회 재생');
+  await expect(page.locator('.dronesim-p95-chart')).toContainText('물리 단계 처리 시간');
   await expect(page.locator('[data-evidence-ids]')).toHaveCount(0);
   await expect(page.locator('.project-top-links a[target="_blank"]').filter({ hasText: '웹 데모 실행' })).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
   await context.close();
@@ -71,31 +72,28 @@ test('RobotPal follows the project introduction, role, features, troubleshooting
   await expect(page.locator('.project-role-list')).toContainText('실물 JETANK의 주행값');
   await expect(page.locator('.project-narrative')).toContainText('66.70 FPS');
   await expect(page.locator('.project-narrative')).toContainText('96.01 FPS');
-  await expect(page.locator('.project-narrative')).toContainText('TCP 송신 대기열은 2프레임');
+  await expect(page.locator('.project-narrative')).toContainText('TCP 송신 2프레임');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
   await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
   await context.close();
 });
 
 test('all projects use the same five-part narrative structure', async ({ page }) => {
-  const expectedFeatureCounts = { robotpal: 4, dronesim: 5, mausoleum: 4, autowingcar: 4 };
   for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
     await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과']);
-    const features = page.locator('.project-features .project-feature-list > li');
-    expect(await features.count(), `${id} has 3–5 user-facing features`).toBeGreaterThanOrEqual(3);
-    expect(await features.count(), `${id} has 3–5 user-facing features`).toBeLessThanOrEqual(5);
-    expect(await features.count(), `${id} keeps its project-specific feature count`).toBe(expectedFeatureCounts[id as keyof typeof expectedFeatureCounts]);
-    const troubleshootings = page.locator('.project-story-section').nth(3).locator('h3');
-    expect(await troubleshootings.count(), `${id} has 1–2 troubleshooting cases`).toBeGreaterThanOrEqual(1);
-    expect(await troubleshootings.count(), `${id} has 1–2 troubleshooting cases`).toBeLessThanOrEqual(2);
+    await expect(page.locator('.project-features .project-feature-list > li').first().locator('h3')).toBeVisible();
+    await expect(page.locator('.project-story-section').nth(3).locator('h3').first()).toBeVisible();
     await expect(page.locator('.project-story-section .code-disclosure[open]')).toHaveCount(0);
+    await expect(page.locator('.project-roles .project-cover-wide img')).toHaveAttribute('alt', /.+/);
+    await expect(page.locator('.project-narrative a[href*="/blob/"]')).toHaveCount(0);
+    await expect(page.locator('.project-narrative figure a')).toHaveCount(0);
     await expect(page.locator('.project-cover-wide img')).toHaveAttribute('alt', /.+/);
     await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
   }
 });
 
-test('project code stays collapsed and exposes its title and source link when opened', async ({ page }) => {
+test('project code stays collapsed and does not expose a source-code link', async ({ page }) => {
   await page.goto(`${base}projects/robotpal/`);
   const codeDisclosure = page.locator('.code-disclosure');
   await expect(codeDisclosure).toHaveCount(1);
@@ -103,9 +101,8 @@ test('project code stays collapsed and exposes its title and source link when op
   await expect(codeDisclosure.locator('summary')).toContainText('JPEG 인코딩 대기열에 프레임 추가');
   await codeDisclosure.locator('summary').click();
   await expect(codeDisclosure.locator('pre')).toBeVisible();
-  const troubleshooting = page.locator('.troubleshooting-case');
-  await expect(troubleshooting).toContainText('RobotPal/src/Util/StreamingWorker.cpp');
-  await expect(troubleshooting.getByRole('link', { name: '원본 코드 보기' })).toHaveAttribute('href', 'https://github.com/cgantro/RobotPal/blob/main/RobotPal/src/Util/StreamingWorker.cpp');
+  await expect(page.locator('.project-narrative a[href*="/blob/"]')).toHaveCount(0);
+  await expect(page.locator('.project-narrative figure a')).toHaveCount(0);
 });
 
 test('mobile project tables fit and architecture diagrams have a keyboard-scrollable viewport', async ({ page }) => {

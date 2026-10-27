@@ -12,7 +12,7 @@ team: 4인
 role:
 - 카메라 JPEG 압축을 별도 작업자로 옮겨 시뮬레이션 갱신과 영상 전송을 분리했습니다.
 - 실물 JETANK의 주행값을 측정해 가상 이동 속도를 보정하고, 제어 화면에서 장비 상태 조회와 조작 입력 전달을 연결했습니다.
-- 외부 JSON 명령에서 이동체 모터·로봇팔 서보 값을 읽어 가상 이동체·로봇팔·집게 조작에 반영했습니다.
+- 외부 JSON 패킷에서 이동체 모터와 로봇팔 서보 값을 읽어 가상 로봇을 조작했습니다.
 stack:
 - C++17
 - OpenGL
@@ -30,19 +30,19 @@ architecture:
   - 외부 JSON 명령에 담긴 모터·서보 값을 받아 가상 로봇의 이동과 로봇팔 조작에 반영합니다.
 detail:
   layout: robotpal
-  overview: JETANK 이동체와 로봇팔을 가상 환경에서 조작하고, 외부 영상 인식 모듈과 영상·명령을 주고받는 시뮬레이터입니다. 외부 JSON 명령의 모터·서보 값을 가상 로봇에 반영하며, 실물 JETANK은 제어 화면에서 상태를 확인하고 조작 입력을 전달하도록 연결했습니다.
+  overview: JETANK 이동 로봇과 로봇팔을 가상 환경에서 조작하는 시뮬레이터입니다. 가상 카메라 영상을 인식 프로그램에 보내고, 실물 장비는 제어 화면에서 상태를 확인하고 조작 입력을 전달합니다.
   features:
   - title: 가상 로봇 조작
     description: JETANK 주행, 로봇팔 관절 이동, 집게 제어
-    implementation: 외부 JSON 패킷에서 이동체 모터와 로봇팔 서보 값을 읽어 가상 이동체·팔·집게 상태에 반영합니다.
+    implementation: 외부 명령에 담긴 모터·서보 값으로 가상 로봇과 집게를 움직입니다.
     evidenceIds: [robotpal-public]
   - title: 가상 카메라
     description: 가상 카메라 영상을 외부 인식 모듈에 전달하고, 외부 명령으로 이동체·로봇팔·집게를 조작
-    implementation: 시뮬레이터 화면에서 가상 카메라 영상을 캡처해 JPEG로 압축하고 TCP 또는 WebSocket으로 보냅니다. 외부 인식 모듈의 JSON 명령은 별도 입력 경로로 가상 로봇에 적용합니다.
+    implementation: 가상 카메라 영상을 JPEG로 압축해 TCP 또는 WebSocket으로 보냅니다. 인식 프로그램의 명령은 가상 로봇에 반영합니다.
     evidenceIds: [robotpal-public]
   - title: 실물 JETANK 연동
     description: 제어 화면에 실물 장비 상태를 표시하고 조작 입력을 전달
-    implementation: 실물 장비의 상태를 제어 화면에 표시하고 화면의 입력을 장비 쪽으로 전달합니다. 이 화면 연동을 가상 로봇의 JSON 명령 처리와 구분했습니다.
+    implementation: 제어 화면에 실물 장비 상태를 표시하고, 화면의 조작 입력을 장비 쪽으로 전달합니다.
     evidenceIds: [robotpal-public]
   - title: 데스크톱·웹 실행
     description: 네이티브 TCP 및 WebAssembly WebSocket 통신 지원
@@ -66,10 +66,10 @@ detail:
       evidenceIds: [robotpal-public]
   troubleshooting:
   - title: 카메라 스트리밍 중 시뮬레이션 성능 저하
-    symptom: 스트리밍을 켜면 시뮬레이션 갱신률이 102.38→66.70 FPS로 떨어져 GPU Readback 대기를 주요 병목으로 예상했습니다.
-    cause: PBO·Fence 적용 후에도 갱신률은 65.60 FPS였습니다. Tracy 측정에서 Readback p50은 1.144ms, JPEG 인코딩 p50은 16.406ms로 JPEG 압축의 메인 스레드 점유가 더 컸습니다.
-    solution: JPEG 인코딩을 워커 4개로 옮기고 메인 스레드는 작업을 대기열에 넣은 뒤 다음 프레임을 진행하도록 바꿨습니다. 인코딩 대기열은 6프레임, TCP 송신 대기열은 2프레임으로 제한하고 가득 차면 오래된 프레임을 버립니다. 병렬 압축이 끝난 순서가 바뀌어도 프레임 번호를 비교해 과거 프레임을 거부합니다.
-    verification: 메인 스레드 작업 삽입 p50은 0.017ms로, JPEG 인코딩 완료를 기다리는 구간을 분리했습니다. 워커의 개별 JPEG 압축 p50은 27.075ms였지만 동기·PBO 단독·PBO+워커 비교에서 전체 갱신률과 송신률은 개선됐습니다.
+    symptom: 카메라 영상을 보내면 시뮬레이션 갱신률이 102.38 FPS에서 66.70 FPS로 떨어졌습니다. 처음에는 GPU에서 화면을 읽어오는 과정이 원인이라고 봤습니다.
+    cause: GPU 픽셀 읽기를 비동기로 바꿔도 갱신률은 65.60 FPS였습니다. 측정 결과 JPEG 압축은 p50 16.406ms, 화면 읽기는 1.144ms였고 메인 스레드는 압축을 더 오래 기다렸습니다.
+    solution: JPEG 압축을 작업 스레드 4개로 옮겼습니다. 대기열은 인코딩 6프레임, TCP 송신 2프레임으로 제한하고 밀리면 오래된 영상을 버렸습니다. 압축이 늦게 끝난 과거 영상은 프레임 번호를 확인해 보내지 않았습니다.
+    verification: 다섯 번 측정한 결과 스트리밍 중 시뮬레이션 갱신률과 카메라 송신률이 모두 개선됐습니다. 측정 조건과 전후 수치는 표에 표시했습니다.
     evidenceIds: [robotpal-benchmark, robotpal-public]
     metricIds: [simulation-streaming-fps, camera-send-fps, streaming-penalty]
     diagram:
@@ -82,11 +82,11 @@ detail:
       caption: 1232×832, 스트리밍 OFF·ON 구성별 5회 중앙값, 수신·디코딩 제외.
       columns: [시뮬레이션 갱신률, 카메라 송신률, 갱신률 저하]
       rows:
-      - label: 동기 Readback·JPEG
+      - label: 화면 읽기·압축 동기 처리
         values: [66.70 FPS, 26.95 FPS, 34.84%]
-      - label: PBO·JPEG
+      - label: 픽셀 읽기 비동기화·JPEG 압축
         values: [65.60 FPS, 25.49 FPS, 36.02%]
-      - label: PBO·JPEG 워커 4개
+      - label: 픽셀 읽기 비동기화·압축 작업자 4개
         values: [96.01 FPS, 40.05 FPS, 6.74%]
       evidenceIds: [robotpal-benchmark]
     code:

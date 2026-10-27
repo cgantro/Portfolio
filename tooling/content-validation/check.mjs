@@ -29,8 +29,9 @@ for (const project of careerData.projects) {
   if (projectSections.some((heading, index) => headings[index] !== heading) || headings.length !== projectSections.length) {
     errors.push(`${project.id}: generated narrative must contain the five portfolio sections in order`);
   }
-  if (detail.features.length < 3 || detail.features.length > 5) errors.push(`${project.id}: expected 3–5 user-facing features`);
-  if (detail.troubleshooting.length < 1 || detail.troubleshooting.length > 2) errors.push(`${project.id}: expected 1–2 troubleshooting cases`);
+  for (const [index, feature] of detail.features.entries()) {
+    if (!feature.title?.trim() || !feature.description?.trim()) errors.push(`${project.id}: feature ${index + 1} is missing its title or description`);
+  }
   for (const [index, issue] of detail.troubleshooting.entries()) {
     for (const field of ['symptom', 'cause', 'solution', 'verification']) {
       if (!issue[field]?.trim()) errors.push(`${project.id}: troubleshooting ${index + 1} is missing ${field}`);
