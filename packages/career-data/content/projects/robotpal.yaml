@@ -34,12 +34,15 @@ detail:
   features:
   - title: 가상 로봇 조작
     description: JETANK 주행, 로봇팔 관절 이동, 집게 제어
+    implementation: 외부 JSON 패킷에서 이동체 모터와 로봇팔 서보 값을 읽어 가상 이동체·팔·집게 상태에 반영합니다.
     evidenceIds: [robotpal-public]
   - title: 가상 카메라
     description: 가상 카메라 영상을 외부 인식 모듈에 전달하고, 외부 명령으로 이동체·로봇팔·집게를 조작
+    implementation: 시뮬레이터 화면에서 가상 카메라 영상을 캡처해 JPEG로 압축하고 TCP 또는 WebSocket으로 보냅니다. 외부 인식 모듈의 JSON 명령은 별도 입력 경로로 가상 로봇에 적용합니다.
     evidenceIds: [robotpal-public]
   - title: 실물 JETANK 연동
     description: 제어 화면에 실물 장비 상태를 표시하고 조작 입력을 전달
+    implementation: 실물 장비의 상태를 제어 화면에 표시하고 화면의 입력을 장비 쪽으로 전달합니다. 이 화면 연동을 가상 로봇의 JSON 명령 처리와 구분했습니다.
     evidenceIds: [robotpal-public]
   - title: 데스크톱·웹 실행
     description: 네이티브 TCP 및 WebAssembly WebSocket 통신 지원

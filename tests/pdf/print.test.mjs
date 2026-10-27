@@ -27,7 +27,11 @@ test('print document presents Korean project narratives without internal audit m
   assert.match(html, /오래된 MQTT 상태가 최신 값을 덮음/);
   assert.match(html, /데이터베이스 반영 전에 차량 명령이 발행될 수 있음/);
   assert.match(html, /Redis Streams/);
-  assert.match(html, /프로젝트 개요[\s\S]*주요 기능[\s\S]*담당 역할[\s\S]*트러블슈팅[\s\S]*결과/);
+  assert.match(html, /<table><thead>/);
+  assert.doesNotMatch(html, /\| 항목 \|/);
+  assert.match(html, /<h1>결과<\/h1>/);
+  assert.match(html, /네이티브 H\.264\/RTP/);
+  assert.match(html, /프로젝트 개요[\s\S]*담당 역할[\s\S]*주요 기능[\s\S]*트러블슈팅[\s\S]*결과/);
   assert.match(html, /<strong>문제<\/strong>/);
   assert.doesNotMatch(html, /\*\*문제\*\*/);
   assert.doesNotMatch(html, /오래된 음성 대기열|게이트 도착 메시지 처리 중 서버가|커밋 전에 운행 명령이 먼저 발행/);

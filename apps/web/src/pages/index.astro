@@ -10,8 +10,8 @@ const supportingProjects = [projectById.mausoleum, projectById.autowingcar];
 const education = timeline.filter(item => item.type === 'edu');
 const certifications = timeline.filter(item => item.type === 'cert');
 const featured = [
-  { project: robotpal, side: 'image-first', summary: '로봇 시뮬레이터에서 카메라 압축 병목을 찾아 갱신과 송신을 분리했습니다.' },
   { project: dronesim, side: 'copy-first', summary: '탄천교 주변 지형에서 외벽 촬영 지점을 지정하고, EO 영상과 비행 기록을 함께 남기는 시뮬레이터를 개발하고 있습니다.' },
+  { project: robotpal, side: 'image-first', summary: '로봇 시뮬레이터에서 카메라 압축 병목을 찾아 갱신과 송신을 분리했습니다.' },
 ];
 const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming-fps', 'camera-send-fps'].includes(metric.id));
 ---
@@ -20,6 +20,7 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
 <section class="intro-section" aria-labelledby="home-title">
   <div class="container intro-copy">
     <h1 id="home-title">시뮬레이션·실시간 통신 개발자 홍윤표입니다.</h1>
+    <p class="intro-summary">시설물 촬영 지점과 비행 조건을 바꿔 반복 시험할 수 있는 드론 시뮬레이터를 개발하고 있습니다.</p>
     <div class="intro-actions">
       <a class="button" href="#projects">프로젝트 보기 <span aria-hidden="true">↓</span></a>
       <a class="button button-outline" href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
@@ -41,10 +42,11 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
             <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1200" height="800" loading="lazy" />
           </a>
           <div class="featured-copy">
-            <p class="project-state">{project.status === 'ongoing' ? '진행 중인 개인 프로젝트' : project.period}</p>
+            <p class="project-state">{project.status === 'ongoing' ? `진행 중 · ${project.team}` : `${project.period} · ${project.team}`}</p>
             <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
             <p class="featured-summary">{summary}</p>
-            <p class="featured-problem">{project.id === 'robotpal' ? '문제 · JPEG 압축이 시뮬레이션 갱신을 막음' : '주요 기능 · 외벽 촬영 임무와 EO 기록'}</p>
+            <p class="featured-role"><strong>담당</strong> {project.role[0]}</p>
+            {project.id === 'robotpal' && <p class="featured-problem">문제 · JPEG 압축이 시뮬레이션 갱신을 막음</p>}
             {metrics.length > 0 && (
               <dl class="featured-metrics">
                 {metrics.map(metric => (
@@ -70,11 +72,12 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
           <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="960" height="640" loading="lazy" />
         </a>
         <div>
-          <p class="project-state">{project.period}</p>
+          <p class="project-state">{project.period} · {project.team}</p>
           <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
           <p>{project.id === 'mausoleum'
             ? '단일 전용 서버에서 방별 게임 상태를 나누고, UDP 음성 패킷과 작업 대기열을 처리했습니다.'
             : 'MQTT 차량 통신과 WebSocket 관제 갱신을 구현했습니다. 프로젝트 뒤에는 Redis Streams 운행 로그 처리를 보완했습니다.'}</p>
+          <p class="supporting-role"><strong>담당</strong> {project.role[0]}</p>
           <ul class="supporting-highlights">
             {(project.id === 'mausoleum'
               ? ['방별 게임 페이즈·보상 분리', 'UDP 세션·송신 주소 검사', '대기열 용량·음성 만료 처리']

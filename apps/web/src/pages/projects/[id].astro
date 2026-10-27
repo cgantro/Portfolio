@@ -11,6 +11,7 @@ export function getStaticPaths() {
 const { project } = Astro.props;
 const related = projects.filter(item => item.id !== project.id);
 const detail = project.detail;
+const architectureNotes = project.id === 'robotpal' ? project.architecture.summary : project.architecture.summary.slice(1);
 const projectTitleId = (index: number) => `troubleshooting-${project.id}-${index}`;
 const codeMarkdown = (code: (typeof detail.troubleshooting)[number]['code']) => code
   ? `\`\`\`${code.language} title="${code.title}"\n${code.source}\n\`\`\`\n\n**파일**: \`${code.path}\` · [원본 코드 보기](${code.url})`
@@ -20,6 +21,10 @@ const robotpalFpsRows = project.id === 'robotpal'
   : [];
 const robotpalFpsValue = (value: string) => Number.parseFloat(value.replace('FPS', '').trim());
 const robotpalFpsMax = Math.max(...robotpalFpsRows.map(row => robotpalFpsValue(row.values[0])), 1);
+const dronesimP95Rows = project.id === 'dronesim'
+  ? detail.troubleshooting.find(issue => issue.comparison)?.comparison?.rows ?? []
+  : [];
+const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(row.values[0])), 1);
 ---
 <SiteLayout title={project.title} description={project.subtitle} active="projects">
   <header class="container project-heading">
@@ -47,12 +52,28 @@ const robotpalFpsMax = Math.max(...robotpalFpsRows.map(row => robotpalFpsValue(r
         </nav>
       </section>
 
+      <section class="project-story-section project-roles" aria-labelledby="project-role-title">
+        <h2 id="project-role-title">담당 역할</h2>
+        <ul class="project-role-list">{project.role.map(item => <li><MarkdownContent content={item} /></li>)}</ul>
+        {detail.roleAreas.some(area => area.diagram) && <div class="role-area-list role-area-diagrams">
+          {detail.roleAreas.filter(area => area.diagram).map(area => <section class="role-area">
+            {area.diagram && <figure class="role-area-diagram troubleshooting-diagram">
+              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + area.title + ' 도표. 가로로 이동할 수 있습니다.'}>
+                <img src={assetUrl(area.diagram.src)} alt={area.diagram.alt} width={area.diagram.width} height={area.diagram.height} loading="lazy" />
+              </div>
+              <figcaption>{area.diagram.caption} · <a href={assetUrl(area.diagram.src)} target="_blank" rel="noopener noreferrer">큰 그림 보기</a></figcaption>
+            </figure>}
+          </section>)}
+        </div>}
+      </section>
+
       <section class="project-story-section project-features" aria-labelledby="project-features-title">
         <h2 id="project-features-title">주요 기능</h2>
         <ul class="project-feature-list">
           {detail.features.map(feature => <li>
             <h3>{feature.title}</h3>
             <p>{feature.description}</p>
+            {feature.implementation && <p class="feature-implementation">{feature.implementation}</p>}
           </li>)}
         </ul>
         <section class="detail-section project-architecture" aria-labelledby="architecture-title">
@@ -62,27 +83,11 @@ const robotpalFpsMax = Math.max(...robotpalFpsRows.map(row => robotpalFpsValue(r
               <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 구성 흐름도. 가로로 이동할 수 있습니다.'}>
                 <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
               </div>
-              {project.id !== 'robotpal' && <figcaption>주요 구성 요소와 데이터 흐름 · <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer">구조도 원본 크기로 보기</a></figcaption>}
+              {project.id !== 'robotpal' && <figcaption>{project.architecture.summary[0]}</figcaption>}
             </figure>
           </div>
-          {project.architecture.summary.length > 0 && <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>}
+          {architectureNotes.length > 0 && <ul class="architecture-notes">{architectureNotes.map(text => <li>{text}</li>)}</ul>}
         </section>
-      </section>
-
-      <section class="project-story-section project-roles" aria-labelledby="project-role-title">
-        <h2 id="project-role-title">담당 역할</h2>
-        <div class="role-area-list">
-          {detail.roleAreas.map(area => <section class="role-area">
-            <h3>{area.title}</h3>
-            <ul>{area.items.map(item => <li><MarkdownContent content={item.text} /></li>)}</ul>
-            {area.diagram && <figure class="role-area-diagram troubleshooting-diagram">
-              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + area.title + ' 도표. 가로로 이동할 수 있습니다.'}>
-                <img src={assetUrl(area.diagram.src)} alt={area.diagram.alt} width={area.diagram.width} height={area.diagram.height} loading="lazy" />
-              </div>
-              <figcaption>{area.diagram.caption} · <a href={assetUrl(area.diagram.src)} target="_blank" rel="noopener noreferrer">큰 그림 보기</a></figcaption>
-            </figure>}
-          </section>)}
-        </div>
       </section>
 
       <section class="project-story-section project-troubleshooting" aria-labelledby="project-troubleshooting-title">
@@ -114,6 +119,27 @@ const robotpalFpsMax = Math.max(...robotpalFpsRows.map(row => robotpalFpsValue(r
               })}
             </div>
             <figcaption>스트리밍 중 갱신률. 정확한 측정 조건은 아래 비교표에 표시했습니다.</figcaption>
+          </figure>}
+          {project.id === 'dronesim' && index === 0 && dronesimP95Rows.length > 0 && <figure class="dronesim-p95-chart" aria-labelledby="dronesim-p95-chart-title">
+            <h4 id="dronesim-p95-chart-title">배치별 충돌 처리 시간</h4>
+            <div class="p95-chart-legend" aria-label="범례">
+              <span><i class="p95-before" aria-hidden="true"></i>변경 전</span>
+              <span><i class="p95-after" aria-hidden="true"></i>변경 후</span>
+            </div>
+            <div class="p95-chart-rows">
+              {dronesimP95Rows.map(row => {
+                const before = Number.parseFloat(row.values[0]);
+                const after = Number.parseFloat(row.values[1]);
+                return <div class="p95-chart-row">
+                  <span>{row.label}</span>
+                  <span class="p95-bar-pair" aria-hidden="true">
+                    <span class="p95-before" style={`--bar-width: ${(before / dronesimP95Max) * 100}%`}></span>
+                    <span class="p95-after" style={`--bar-width: ${(after / dronesimP95Max) * 100}%`}></span>
+                  </span>
+                </div>;
+              })}
+            </div>
+            <figcaption>막대 길이는 물리 단계 p95(µs)를 나타냅니다. 정확한 값과 측정 조건은 아래 표에 있습니다.</figcaption>
           </figure>}
           {issue.comparison && <div class="comparison-wrap">
             <table class="project-comparison">

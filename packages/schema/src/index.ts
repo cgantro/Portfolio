@@ -46,7 +46,7 @@ export const MetricSchema = z.object({
   status: EvidenceStatusSchema,
 }).strict();
 const ProjectFeatureSchema = z.object({
-  title: NonEmpty, description: NonEmpty, evidenceIds: z.array(NonEmpty).min(1),
+  title: NonEmpty, description: NonEmpty, implementation: NonEmpty.optional(), evidenceIds: z.array(NonEmpty).min(1),
 }).strict();
 const ProjectDiagramSchema = z.object({ src: PublicSource, alt: NonEmpty, caption: NonEmpty, width: z.number().int().positive(), height: z.number().int().positive() }).strict();
 const ProjectRoleAreaSchema = z.object({

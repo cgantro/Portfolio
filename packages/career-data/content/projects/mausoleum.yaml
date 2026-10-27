@@ -39,12 +39,15 @@ detail:
     evidenceIds: [mausoleum-public]
   - title: 방별 멀티플레이
     description: 하나의 전용 서버에서 여러 방의 게임을 동시에 진행하고, 방마다 게임 단계와 이벤트를 따로 관리
+    implementation: 로비가 방과 참가자를 관리하고 UE5 전용 서버는 RoomCode로 게임 공간·페이즈·이벤트를 구분합니다. 한 방이 끝날 때 해당 방의 상태만 정리합니다.
     evidenceIds: [mausoleum-public]
   - title: 로비 음성 채팅
     description: 로비 참가자끼리 음성으로 대화하고, 게임 안에서는 가까운 플레이어의 음성을 들음
+    implementation: 마이크 PCM을 Opus로 압축해 UDP로 보내면 음성 서버가 세션과 방을 확인해 같은 방 참가자에게 전달합니다. 클라이언트는 화자별로 풀어 재생합니다.
     evidenceIds: [mausoleum-public]
   - title: 공간 음향
     description: 화자의 위치와 거리, 생존·사망·관전 상태에 따라 들을 수 있는 음성을 구분
+    implementation: 수신 음성의 화자 위치와 플레이어 상태를 확인해 청취 대상을 정하고, 방향·거리에 맞춰 HRTF로 재생합니다.
     evidenceIds: [mausoleum-public]
   roleAreas:
   - title: 로비·게임 서버

@@ -37,15 +37,19 @@ detail:
   features:
   - title: 견인차 상태 관제
     description: 차량의 위치·속도·배터리·운행 상태를 관제 화면에서 확인합니다.
+    implementation: 차량 상태 메시지를 MQTT로 받고, 최신 상태는 Redis에 두며 관제 화면은 WebSocket·STOMP 갱신을 받습니다.
     evidenceIds: [autowingcar-public]
   - title: 운행 명령과 응답 확인
     description: 차량에 명령을 보내고 수신 응답과 실제 운행 상태를 확인합니다.
+    implementation: 장비의 명령 수신 응답과 주행 중 상태 보고를 별도로 처리합니다. 명령은 데이터베이스 반영이 끝난 뒤 MQTT로 발행합니다.
     evidenceIds: [autowingcar-public]
   - title: 관제 알림·상태 저장
     description: 차량·항공편·비상 상태 변화를 관제 화면에 알리고, 차량별 최신 상태와 위치·속도·배터리 등의 주행 이력을 저장합니다.
+    implementation: 빠르게 조회할 최신 차량 상태는 Redis에 저장하고, 주행 이력은 PostgreSQL에 기록합니다.
     evidenceIds: [autowingcar-public]
   - title: 주행 경로 탐색
     description: 통제 구간과 예상 이동 시간을 반영해 경로를 찾고, 대체 경로를 최대 3개 제시합니다.
+    implementation: 이동 시간 비용으로 A* 경로를 찾고 Yen 탐색으로 대체 경로를 구해 관제 지도에 전달합니다.
     evidenceIds: [autowingcar-public]
   roleAreas:
   - title: 차량 통신·실시간 관제

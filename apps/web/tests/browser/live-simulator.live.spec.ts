@@ -8,9 +8,9 @@ test('live DroneSim web demo renders after the explicit new-tab launch', async (
   const externalFailures: string[] = [];
   page.on('pageerror', error => pageErrors.push(error.message));
   await page.goto('/Portfolio/projects/dronesim/');
-  await page.locator('.project-demo-section').scrollIntoViewIfNeeded();
+  await page.locator('.project-top-links').scrollIntoViewIfNeeded();
   const popupPromise = page.waitForEvent('popup');
-  await page.getByRole('link', { name: '새 탭에서 실행' }).click();
+  await page.getByRole('link', { name: '웹 데모 실행' }).click();
   const simulator = await popupPromise;
   simulator.on('requestfailed', request => {
     if (request.url().includes('cgantro.github.io/DroneSim')) externalFailures.push(`${request.url()}: ${request.failure()?.errorText}`);

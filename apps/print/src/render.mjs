@@ -17,6 +17,7 @@ function renderMarkdown(markdown) {
   const blocks = [];
   let paragraph = [];
   let items = [];
+  let tableRows = [];
   let code = null;
   const inline = text => text.split(/(`[^`]+`)/g).map(part => part.startsWith('`') && part.endsWith('`')
     ? `<code>${e(part.slice(1, -1))}</code>`
@@ -29,12 +30,20 @@ function renderMarkdown(markdown) {
     if (items.length) blocks.push(`<ul>${items.map(item => `<li>${inline(item)}</li>`).join('')}</ul>`);
     items = [];
   };
+  const flushTable = () => {
+    if (tableRows.length > 1) {
+      const [headers, ...rows] = tableRows;
+      blocks.push(`<table><thead><tr>${headers.map(cell => `<th>${inline(cell)}</th>`).join('')}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${inline(cell)}</td>`).join('')}</tr>`).join('')}</tbody></table>`);
+    }
+    tableRows = [];
+  };
 
   for (const line of markdown.split(/\r?\n/)) {
     const fence = line.match(/^```(\w*)(?:\s+title="([^"]+)")?\s*$/);
     if (fence) {
       flushParagraph();
       flushItems();
+      flushTable();
       if (code === null) code = { language: fence[1], title: fence[2], lines: [] };
       else {
         const caption = code.title ? `<figcaption>${code.language ? `${e(code.language)} · ` : ''}${e(code.title)}</figcaption>` : '';
@@ -47,6 +56,15 @@ function renderMarkdown(markdown) {
       code.lines.push(line);
       continue;
     }
+    if (/^\s*\|.*\|\s*$/.test(line)) {
+      flushParagraph();
+      flushItems();
+      if (!/^\s*\|\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?\s*$/.test(line)) {
+        tableRows.push(line.trim().replace(/^\||\|$/g, '').split('|').map(cell => cell.trim()));
+      }
+      continue;
+    }
+    flushTable();
     const title = line.match(/^(#{2,5})\s+(.+)$/);
     if (title) {
       flushParagraph();
@@ -66,6 +84,7 @@ function renderMarkdown(markdown) {
   }
   flushParagraph();
   flushItems();
+  flushTable();
   return `<div class="prose">${blocks.join('')}</div>`;
 }
 
@@ -98,7 +117,11 @@ function metricsMarkup(project) {
       : visibleConditions(metric.conditions.filter(condition => !shared.includes(condition)));
     return `<article><strong>${e(metric.label)}: ${e(value)}</strong>${conditions.length ? `<p>${e(conditions.join(' · '))}</p>` : ''}</article>`;
   }).join('');
-  return `<section class="page result-page"><div class="eyebrow">${e(project.title)} · 측정 결과</div><h1>측정 결과</h1><p class="subtitle">${e(project.subtitle)}</p>${sharedMarkup}<div class="metrics">${cards}</div><div class="project-links">${projectLinks(project)}</div></section>`;
+  const otherResults = project.outcomes
+    .map(outcome => outcome.text)
+    .filter(text => !/(?:\b\d+(?:\.\d+)?\s*(?:%|FPS|µs|ms|회|대|Tick)|p95)/i.test(text));
+  const otherResultsMarkup = otherResults.length ? `<ul class="result-outcomes">${otherResults.map(text => `<li>${e(text)}</li>`).join('')}</ul>` : '';
+  return `<section class="page result-page"><div class="eyebrow">${e(project.title)} · 결과</div><h1>결과</h1><p class="subtitle">${e(project.subtitle)}</p>${sharedMarkup}<div class="metrics">${cards}</div>${otherResultsMarkup}<div class="project-links">${projectLinks(project)}</div></section>`;
 }
 
 export function renderPortfolio({ data, edition, projects }, stylesheet) {
@@ -110,7 +133,7 @@ export function renderPortfolio({ data, edition, projects }, stylesheet) {
       <div class="stack">${project.stack.map(item => `<span>${e(item)}</span>`).join('')}</div>
       ${paragraphs(project.summary)}
       ${project.printImage ? `<figure><img src="${e(project.printImage)}" alt="${e(project.architecture.alt)}"><figcaption>${e(project.architecture.alt)}</figcaption></figure>` : ''}
-      <h2>기술 사례</h2>${renderMarkdown(implementationNarrative(project.narrativeMarkdown))}
+      <h2>기술 사례</h2>${renderMarkdown(implementationNarrative(project.narrativeMarkdown, { includeResults: projectMetrics(project).length === 0 }))}
       ${projectMetrics(project).length ? '' : `<div class="project-links">${projectLinks(project)}</div>`}
     </section>${metricsMarkup(project)}`;
   }).join('');

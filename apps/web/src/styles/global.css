@@ -50,6 +50,8 @@ h3 { font-size: 25px; }
 .project-state { color: var(--color-muted); font-size: 13px; }
 .featured-copy h3 { margin-top: 5px; font-size: clamp(29px, 3vw, 36px); }
 .featured-summary { margin-top: 11px; font-size: 16px; line-height: 1.75; }
+.featured-role { margin-top: 12px; font-size: 14px; line-height: 1.65; }
+.featured-role strong, .supporting-role strong, .archive-role strong { color: var(--color-ink); }
 .featured-problem { margin-top: 16px; color: var(--color-muted); font-size: 14px; }
 .featured-metrics { display: grid; gap: 12px; margin: 20px 0 0; }
 .featured-metrics > div { display: flex; align-items: baseline; justify-content: space-between; gap: 18px; }
@@ -69,6 +71,7 @@ h3 { font-size: 25px; }
 .supporting-image img { width: 100%; aspect-ratio: 1.3; object-fit: contain; }
 .supporting-project h3 { margin-top: 5px; font-size: 23px; }
 .supporting-project > div > p:not(.project-state) { margin-top: 9px; font-size: 14px; line-height: 1.7; }
+.supporting-project > div > p.supporting-role { color: var(--color-ink); }
 .supporting-highlights { margin: 12px 0 0; color: var(--color-muted); font-size: 13px; line-height: 1.7; }
 .supporting-highlights li + li { margin-top: 3px; }
 .supporting-project .project-link { margin-top: 13px; font-size: 13px; }
@@ -119,6 +122,7 @@ h3 { font-size: 25px; }
 .archive-project-image img { width: 100%; aspect-ratio: 1.5; object-fit: contain; }
 .archive-project-copy h2, .archive-project-copy h3 { margin-top: 5px; font-size: 30px; }
 .archive-subtitle { margin-top: 7px; font-size: 16px; font-weight: 590; }
+.archive-role { margin-top: 10px; }
 .archive-project-copy > p:not(.project-state):not(.archive-subtitle) { margin-top: 10px; color: var(--color-muted); font-size: 14px; }
 .archive-project-copy ul { margin-block: 12px 0; color: var(--color-muted); font-size: 13px; }
 .archive-project-copy li + li { margin-top: 4px; }
@@ -147,10 +151,14 @@ h3 { font-size: 25px; }
 .project-overview-copy, .troubleshooting-steps dd { max-width: 780px; }
 .project-overview-copy p { margin: 0; line-height: 1.8; }
 .project-overview-copy p + p { margin-top: 13px; }
+.project-role-list { max-width: 780px; margin: 18px 0 0; padding-left: 1.2em; line-height: 1.8; }
+.project-role-list li + li { margin-top: 8px; }
+.role-area-diagrams:empty { display: none; }
 .project-feature-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 36px; margin: 22px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--color-line); }
 .project-feature-list li { padding: 19px 0 20px; border-bottom: 1px solid var(--color-line); }
 .project-feature-list h3, .role-area h3 { margin: 0 0 6px; font-size: 17px; }
 .project-feature-list p { max-width: 450px; margin: 0; color: var(--color-muted); font-size: 15px; line-height: 1.75; }
+.project-feature-list p.feature-implementation { margin-top: 8px; color: var(--color-ink); font-size: 14px; }
 .project-architecture { max-width: 1180px; margin-top: 44px; }
 .project-architecture > h3 { margin-bottom: 14px; font-size: 20px; }
 .architecture-grid { display: grid; grid-template-columns: minmax(0,1fr); align-items: start; gap: 18px; }
@@ -198,6 +206,18 @@ h3 { font-size: 25px; }
 .robotpal-fps-chart__track > span { display: block; width: var(--bar-width); height: 100%; border-radius: inherit; background: var(--color-accent); }
 .robotpal-fps-chart__row strong { font-variant-numeric: tabular-nums; text-align: right; }
 .robotpal-fps-chart figcaption { margin-top: 12px; color: var(--color-muted); font-size: 12px; line-height: 1.65; }
+.dronesim-p95-chart { max-width: 850px; margin: 22px 0; padding: 18px 0; border-block: 1px solid var(--color-line); }
+.dronesim-p95-chart h4 { margin-bottom: 12px; font-size: 16px; }
+.p95-chart-legend { display: flex; gap: 18px; margin-bottom: 12px; color: var(--color-muted); font-size: 12px; }
+.p95-chart-legend span { display: inline-flex; align-items: center; gap: 7px; }
+.p95-chart-legend i { width: 14px; height: 8px; border-radius: 2px; }
+.p95-before { background: #94a3b8; }
+.p95-after { background: var(--color-accent); }
+.p95-chart-rows { display: grid; gap: 8px; }
+.p95-chart-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); align-items: center; gap: 12px; font-size: 13px; }
+.p95-bar-pair { display: grid; gap: 3px; }
+.p95-bar-pair > span { display: block; height: 7px; width: var(--bar-width); border-radius: 2px; }
+.dronesim-p95-chart figcaption { margin-top: 10px; color: var(--color-muted); font-size: 12px; }
 .project-top-links { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 12px; }
 .project-top-links a { display: inline-flex; min-height: 36px; align-items: center; color: var(--color-accent); text-underline-offset: 3px; }
 .project-top-links a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
@@ -251,8 +271,6 @@ h3 { font-size: 25px; }
 .metric-value { margin-top: 6px; font: 650 26px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; }
 .metric-value > span { margin-left: 6px; color: var(--color-muted); font: 13px var(--font-body); }
 .metric-conditions { margin: 9px 0 0; padding-left: 1.1em; color: var(--color-muted); font-size: 12px; line-height: 1.65; }
-.project-demo-section { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; padding-block: 18px; border-block: 1px solid var(--color-line); }
-.project-demo-section p { max-width: 690px; color: var(--color-muted); font-size: 14px; }
 .related-section { padding-block: 30px 70px; border-top: 1px solid var(--color-line); }
 .related-section h2 { margin-bottom: 18px; }
 .related-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; }
@@ -378,7 +396,6 @@ h3 { font-size: 25px; }
   .project-feature-list p, .role-area ul, .troubleshooting-steps dd { font-size: 14px; }
   .metric-list, .related-grid { grid-template-columns: 1fr; }
   .metric-comparison strong, .metric-value { font-size: 23px; }
-  .project-demo-section { align-items: flex-start; }
   .related-section { padding-block: 25px 45px; }
   .related-grid { gap: 14px; }
 }

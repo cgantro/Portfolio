@@ -41,11 +41,11 @@ export function loadCareerData(contentDirectory = defaultContentDirectory): Care
 
 /** Build print-ready Markdown from the same structured project source used by the web page. */
 function renderProjectNarrative(project: ProjectFacts): string {
-  const featureLines = project.detail.features.map((item) => `- **${item.title}:** ${item.description}`);
-  const roleLines = project.detail.roleAreas.flatMap((area) => [
-    `### ${area.title}`,
-    ...area.items.map((item) => `- ${item.text}`),
+  const featureLines = project.detail.features.flatMap((item) => [
+    `- **${item.title}:** ${item.description}`,
+    ...(item.implementation ? [`  ${item.implementation}`] : []),
   ]);
+  const roleLines = project.role.map((item) => `- ${item}`);
   const troubleshooting = project.detail.troubleshooting.flatMap((item) => {
     const blocks = [
       `### ${item.title}`,
@@ -69,8 +69,8 @@ function renderProjectNarrative(project: ProjectFacts): string {
   return [
     `# ${project.title}`,
     '## 프로젝트 개요', project.detail.overview,
-    '## 주요 기능', ...featureLines,
     '## 담당 역할', ...roleLines,
+    '## 주요 기능', ...featureLines,
     '## 트러블슈팅', ...troubleshooting,
     '## 결과', ...project.outcomes.map((outcome) => `- ${outcome.text}`),
   ].join('\n\n');

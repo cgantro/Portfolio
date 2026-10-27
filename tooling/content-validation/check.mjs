@@ -22,7 +22,7 @@ for (const record of publicRecords) {
   }
 }
 
-const projectSections = ['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과'];
+const projectSections = ['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과'];
 for (const project of careerData.projects) {
   const { detail, narrativeMarkdown } = project;
   const headings = [...narrativeMarkdown.matchAll(/^##\s+(.+)$/gm)].map(match => match[1].trim());

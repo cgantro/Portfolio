@@ -34,22 +34,27 @@ architecture:
   - EO 프레임은 실시간 H.264/RTP 영상 경로와 녹화 파일·촬영 기록 경로로 나뉘어 지상통제 프로그램에 전달됩니다. 웹 저장 자료는 별도로 내려받습니다.
 detail:
   layout: dronesim
-  overview: 드론 비행과 시설물 외벽 EO 영상 수집, 지상통제를 가상환경에서 시험하는 시뮬레이터입니다. 사람이 정한 촬영 지점을 방문해 영상과 비행 정보를 저장하며, 다중 드론 임무와 통신 장애 시나리오를 지원합니다.
+  overview: 드론을 시설물 외벽의 시험 위치로 보내 EO 영상을 기록·전달하는 시뮬레이터입니다. 탄천교 주변 3D 환경에서 지상통제와 다중 기체 임무를 시험합니다.
   features:
   - title: 드론 비행
     description: 이륙·정지 비행·이동·착륙을 조종하고, 현재 기체 상태를 확인
+    implementation: 게임패드·UDP 지상통제·JSON 시나리오 입력을 공통 명령으로 바꿔 60Hz 시뮬레이션 Tick에서 적용합니다. 네이티브는 AirSim 강체 물리, 웹 데모는 운동학 모델로 위치와 속도를 갱신합니다.
     evidenceIds: [dronesim-source]
   - title: 3D 환경
     description: 탄천교 주변 지형과 건물·도로·교량 위에서 드론 비행과 시설물 접근을 시험
+    implementation: 90m NGII DEM을 30m 간격으로 보간하고, 정사영상과 OSM 건물·도로·교량을 배치했습니다. 건물 높이는 자료가 있을 때만 근사하며, 높이 정보가 없는 건물은 비행 금지 구역으로 취급합니다.
     evidenceIds: [dronesim-source]
   - title: EO 외벽 촬영 임무
     description: 외벽 촬영 위치를 정해 자동 비행·촬영하고 위치·시각·자세를 기록합니다. 임무를 멈추거나 다시 시작하고 중단할 수 있습니다.
+    implementation: 웹에서는 촬영 위치별 WebM 영상·PNG 정지 화면과 위치·시각·자세가 담긴 JSON을 저장합니다. 네이티브에서는 H.264 영상과 JSONL 비행 기록을 남겨 웹의 저장 경로와 구분했습니다.
     evidenceIds: [dronesim-source]
   - title: 다중 드론 운용
-    description: 기체별 임무와 상태를 관리하고, 통신이 끊긴 기체의 미완료 임무를 다른 기체에 재할당
+    description: 네이티브 지상통제에서 최대 8대의 편대 비행을 시작하고, 헤드리스 시나리오에서는 상태 보고 단절 뒤 미완료 임무 재할당을 시험
+    implementation: 네이티브 편대 시연은 선두 기체만 영상 기록을 지원합니다. 4~256대 재할당 결과는 별도의 합성 상태 보고 단절을 넣은 헤드리스 시험이며 실제 UDP 장애 시험과 구분합니다.
     evidenceIds: [dronesim-reallocation]
   - title: 시나리오 기록·재생
     description: 조종 명령을 기록·재생하고 통신과 카메라 장애 상황을 넣어 시험
+    implementation: JSON 시나리오가 공통 시뮬레이션 코어에 명령과 장애 입력을 전달합니다. 화면을 띄우지 않고도 임무 진행과 처리 시간을 반복 확인할 수 있습니다.
     evidenceIds: [dronesim-source]
   roleAreas:
   - title: 시뮬레이션 코어
@@ -255,7 +260,7 @@ evidence:
   source: https://github.com/cgantro/DroneSim
   kind: repository
   status: reported
-  locator: README.md, modules/simulation_core/src/SimulationCore.cpp, modules/simulation_core/src/ScenarioRunner.cpp, benchmarks/results
+  locator: README.md, apps/simulator/AeroSimLabAppMission.cpp, apps/simulator/AeroSimLabAppEoCapture.cpp, apps/simulator/EoVideoRecorder.cpp, modules/simulation_core/src/SimulationCore.cpp, modules/simulation_core/src/ScenarioRunner.cpp, benchmarks/results
   note: 공개 코드와 기록에서 구현 및 수치를 대조했습니다. 이 포트폴리오에서 별도 빌드나 실기체 검증을 수행했다는 뜻은 아닙니다.
 - id: dronesim-sort-reuse
   label: 충돌 정렬 재사용 전후 코드와 반복 측정

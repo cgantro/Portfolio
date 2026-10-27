@@ -44,10 +44,13 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.archive-project')).toHaveCount(4);
   await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
   await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
-  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);
+  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과']);
   await expect(page.locator('.project-narrative')).toContainText('완료율 100%');
   await expect(page.locator('.project-narrative')).toContainText('188.0');
   await expect(page.locator('.project-narrative')).toContainText('184.2µs');
+  await expect(page.locator('.dronesim-p95-chart .p95-chart-row')).toHaveCount(5);
+  await expect(page.locator('.dronesim-p95-chart')).toContainText('변경 전');
+  await expect(page.locator('.dronesim-p95-chart')).toContainText('변경 후');
   await expect(page.locator('.project-narrative')).toContainText('H.264/RTP');
   await expect(page.locator('.project-narrative')).toContainText('90m NGII DEM');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
@@ -59,12 +62,13 @@ test('project content and links are readable without client JavaScript', async (
   await context.close();
 });
 
-test('RobotPal follows the project introduction, features, role, troubleshooting, and results structure', async ({ browser }) => {
+test('RobotPal follows the project introduction, role, features, troubleshooting, and results structure', async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(`http://127.0.0.1:4321${base}projects/robotpal/`);
-  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);
+  await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과']);
   await expect(page.locator('.project-meta-brief')).toContainText('4인');
+  await expect(page.locator('.project-role-list')).toContainText('실물 JETANK의 주행값');
   await expect(page.locator('.project-narrative')).toContainText('66.70 FPS');
   await expect(page.locator('.project-narrative')).toContainText('96.01 FPS');
   await expect(page.locator('.project-narrative')).toContainText('TCP 송신 대기열은 2프레임');
@@ -77,8 +81,8 @@ test('all projects use the same five-part narrative structure', async ({ page })
   const expectedFeatureCounts = { robotpal: 4, dronesim: 5, mausoleum: 4, autowingcar: 4 };
   for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
-    await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '주요 기능', '담당 역할', '트러블슈팅', '결과']);
-    const features = page.locator('.project-story-section').nth(1).locator('ul').first().locator('li');
+    await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과']);
+    const features = page.locator('.project-features .project-feature-list > li');
     expect(await features.count(), `${id} has 3–5 user-facing features`).toBeGreaterThanOrEqual(3);
     expect(await features.count(), `${id} has 3–5 user-facing features`).toBeLessThanOrEqual(5);
     expect(await features.count(), `${id} keeps its project-specific feature count`).toBe(expectedFeatureCounts[id as keyof typeof expectedFeatureCounts]);
@@ -121,6 +125,10 @@ test('mobile project tables fit and architecture diagrams have a keyboard-scroll
 test('project index presents all four cases without client-side controls', async ({ page }) => {
   await page.goto(`${base}projects/`);
   await expect(page.locator('.archive-project')).toHaveCount(4);
+  await expect(page.locator('.archive-project').first()).toContainText('DroneSim');
+  await expect(page.locator('.archive-project').first()).toContainText('진행 중 · 개인 프로젝트');
+  await expect(page.locator('.archive-project').first()).toContainText('담당');
+  await expect(page.locator('.archive-project').first().locator('ul')).toHaveCount(0);
   await expect(page.locator('astro-island')).toHaveCount(0);
   await expect(page.locator('.archive-project').nth(3)).toContainText('오토잉카');
 });
@@ -164,6 +172,8 @@ test('homepage introduces the developer before the featured project cases', asyn
   await expect(page.locator('main h1')).not.toContainText('C++');
   await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();
+  await expect(page.locator('.featured-project').first()).toContainText('DroneSim');
+  await expect(page.locator('.featured-project').first()).toContainText('담당');
   const launch = page.getByRole('link', { name: '웹 데모 실행' });
   await expect(launch).toHaveAttribute('target', '_blank');
   await expect(page.locator('.featured-project')).toHaveCount(2);

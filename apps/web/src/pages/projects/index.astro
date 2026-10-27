@@ -3,7 +3,7 @@ import { projects } from '@portfolio/career-data';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { localUrl } from '../../lib/urls.mjs';
-const order = ['robotpal', 'dronesim', 'mausoleum', 'autowingcar'];
+const order = ['dronesim', 'robotpal', 'mausoleum', 'autowingcar'];
 const orderedProjects = order.flatMap(id => projects.filter(project => project.id === id));
 ---
 <SiteLayout title="프로젝트" description="C++ 시뮬레이션과 실시간 통신 프로젝트 구현 사례" active="projects">
