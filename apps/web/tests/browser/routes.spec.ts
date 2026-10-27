@@ -22,7 +22,7 @@ test('all static routes render and internal navigation keeps deployment base', a
 });
 
 test('DroneSim project assets preserve their deployed paths', async ({ request }) => {
-  for (const asset of ['DroneSim-current-view.png', 'dronesim-system-architecture.svg']) {
+  for (const asset of ['DroneSim-native-scene.png', 'dronesim-system-architecture.svg']) {
     const response = await request.get(`${base}${asset}`);
     expect(response.status()).toBe(200);
   }

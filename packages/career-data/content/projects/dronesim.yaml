@@ -23,8 +23,8 @@ stack:
 - GStreamer
 - CMake
 cover:
-  src: /assets/DroneSim-current-view.png
-  alt: 외벽 촬영 임무 중 드론 카메라에 잡힌 아파트 외벽과 주변 지형
+  src: /assets/DroneSim-native-scene.png
+  alt: 탄천교 인근 아파트 단지를 나타낸 DroneSim 3D 비행 장면
 architecture:
   src: /assets/dronesim-system-architecture.svg
   alt: 게임패드와 지상통제 명령이 일정한 주기로 드론 비행 계산에 반영되고, 촬영 영상과 비행 기록이 관제 화면으로 전달되는 구조

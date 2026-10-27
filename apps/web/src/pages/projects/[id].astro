@@ -50,8 +50,8 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
         <h2 id="project-role-title">담당 역할</h2>
         <ul class="project-role-list">{project.role.map(item => <li><MarkdownContent content={item} /></li>)}</ul>
         <figure class="project-cover-wide">
-          <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width={project.id === 'dronesim' ? 772 : 1440} height={project.id === 'dronesim' ? 482 : 900} fetchpriority="high" />
-          {project.id === 'dronesim' && <figcaption>헬리오시티 111동 촬영 임무 중 드론 카메라 화면</figcaption>}
+          <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width={project.id === 'dronesim' ? 882 : 1440} height={project.id === 'dronesim' ? 680 : 900} fetchpriority="high" />
+          {project.id === 'dronesim' && <figcaption>헬리오시티 아파트 단지를 재현한 시뮬레이터 장면</figcaption>}
           {project.id === 'mausoleum' && <figcaption>영묘 게임 타이틀 화면</figcaption>}
           {project.id === 'autowingcar' && <figcaption>오토잉카 실물 차량</figcaption>}
         </figure>
