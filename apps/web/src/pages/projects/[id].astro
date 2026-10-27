@@ -62,7 +62,7 @@ const robotpalFpsMax = Math.max(...robotpalFpsRows.map(row => robotpalFpsValue(r
               <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 구성 흐름도. 가로로 이동할 수 있습니다.'}>
                 <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
               </div>
-              <figcaption>주요 구성 요소와 데이터 흐름 · <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer">구조도 원본 크기로 보기</a></figcaption>
+              {project.id !== 'robotpal' && <figcaption>주요 구성 요소와 데이터 흐름 · <a href={assetUrl(project.architecture.src)} target="_blank" rel="noopener noreferrer">구조도 원본 크기로 보기</a></figcaption>}
             </figure>
           </div>
           {project.architecture.summary.length > 0 && <ul class="architecture-notes">{project.architecture.summary.map(text => <li>{text}</li>)}</ul>}

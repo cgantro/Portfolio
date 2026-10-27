@@ -11,8 +11,8 @@ status: complete
 team: 4인
 role:
 - Tracy로 JPEG 인코딩이 메인 스레드를 오래 점유하는 것을 확인하고 JPEG 압축을 워커 스레드 4개로 분리했습니다.
-- 실물 JETANK을 연결하고 실제 주행값에 맞춰 가상 이동 속도를 보정했습니다.
-- Python 영상 인식 명령을 이동체·로봇 팔·집게 조작에 연결했습니다.
+- 실물 JETANK의 주행값을 측정해 가상 이동 속도를 보정하고, 제어 화면에서 장비 상태 조회와 조작 입력 전달을 연결했습니다.
+- 외부 JSON 명령에서 이동체 모터·로봇팔 서보 값을 읽어 가상 이동체·로봇팔·집게 조작에 반영했습니다.
 stack:
 - C++17
 - OpenGL
@@ -25,22 +25,22 @@ cover:
   alt: RobotPal 프로젝트 화면
 architecture:
   src: /assets/robotpal-system-architecture.svg
-  alt: 가상 카메라 영상을 압축해 인공지능 모듈로 보내고, 인공지능 명령으로 이동 로봇과 로봇 팔을 제어하는 구조
+  alt: 가상 카메라 영상과 제어 명령이 시뮬레이터와 외부 인식 모듈 사이를 오가는 구조
   summary:
   - FBO 영상은 GPU에서 읽은 뒤 JPEG 작업 대기열과 TCP·WebSocket 전송 경로로 전달합니다.
-  - Python 인식 결과는 공통 제어 인터페이스를 거쳐 가상 또는 실물 로봇에 적용합니다.
+  - 외부 JSON 명령에 담긴 모터·서보 값을 받아 가상 로봇의 이동과 로봇팔 조작에 반영합니다.
 detail:
   layout: robotpal
-  overview: 실물 JETANK의 주행과 로봇팔 조작을 가상환경에서 시험하는 시뮬레이터입니다. 가상 카메라를 Python 영상 인식 모듈에 연결해 인식 결과로 가상·실물 장비를 제어합니다.
+  overview: JETANK 이동체와 로봇팔을 가상 환경에서 조작하고, 외부 영상 인식 모듈과 영상·명령을 주고받는 시뮬레이터입니다. 외부 JSON 명령의 모터·서보 값을 가상 로봇에 반영하며, 실물 JETANK은 제어 화면에서 상태를 확인하고 조작 입력을 전달하도록 연결했습니다.
   features:
   - title: 가상 로봇 조작
     description: JETANK 주행, 로봇팔 관절 이동, 집게 제어
     evidenceIds: [robotpal-public]
   - title: 가상 카메라
-    description: OpenGL 카메라 영상을 Python 영상 인식 모듈로 보내고, 인식 결과를 이동체·로봇팔·집게 제어에 반영
+    description: 가상 카메라 영상을 외부 영상 인식 모듈로 보내고, 외부 JSON 명령에 담긴 모터·서보 값을 가상 이동체·로봇팔·집게 조작에 반영
     evidenceIds: [robotpal-public]
   - title: 실물 JETANK 연동
-    description: Qt 관제 화면에서 실물 장비를 확인·조작하고 공통 제어 인터페이스로 가상 로봇과 전환
+    description: 제어 화면에 실물 장비 상태를 표시하고 조작 입력을 전달
     evidenceIds: [robotpal-public]
   - title: 데스크톱·웹 실행
     description: 네이티브 TCP 및 WebAssembly WebSocket 통신 지원
@@ -57,11 +57,9 @@ detail:
       evidenceIds: [robotpal-public]
   - title: 제어 통신
     items:
-    - text: TCP JSON 명령 수신·처리와 Python 인식 명령의 이동체·로봇팔·집게 제어 연동
+    - text: 외부 JSON 명령에서 이동체 모터·로봇팔 서보 값을 받아 가상 로봇 상태에 반영
       evidenceIds: [robotpal-public]
-    - text: '`IRobotController`를 기준으로 가상 ECS 제어와 실물 장비 제어 구현 분리'
-      evidenceIds: [robotpal-public]
-    - text: Qt 제어 화면의 실물 JETANK 상태 확인 및 조작 입력 연동
+    - text: 제어 화면에서 실물 JETANK 상태 조회와 조작 입력 전달 연결
       evidenceIds: [robotpal-public]
   - title: 카메라 스트리밍
     items:

@@ -29,7 +29,7 @@ AI 학습·추론에 사용할 가상 카메라 영상을 외부로 전달하는
 초기에는 GPU Readback을 주요 병목으로 예상해 Non-blocking PBO + Fence를 적용했지만 PBO-only는 전체 성능을 개선하지 못했다. Tracy 재계측에서 JPEG가 더 큰 Main Thread 병목임을 확인한 뒤 JPEG 작업을 4 Worker로 분리해 Simulation critical path에서 제거했다. 집게 잡기/놓기 로직은 ECS 시스템으로 통합했다.
 
 **내 역할 및 세부 구현 방식**
-- **제어 시스템 다형성 설계 (`IRobotController`)**: 상위 제어 논리와 실제/가상 제어 구현을 분리.
+- **가상 로봇 명령 처리**: 외부 JSON 패킷에서 이동체 모터·로봇팔 서보 값을 읽어 가상 로봇 상태에 반영. 실물 JETANK은 제어 화면에서 상태를 확인하고 조작 입력을 전달하는 연동 범위로 구분.
 - **논블로킹 네트워크 엔진 (`TcpNetworkTransport`)**: 메인 렌더 루프와 송수신 처리를 분리.
 - **카메라 스트리밍 성능 검증**: Sync / PBO / PBO+4Worker 구조를 비교하고 Tracy로 Readback·JPEG·Main-thread enqueue를 계측.
 - **가설 수정과 구조 개선**: PBO-only가 개선되지 않자 GPU Readback 중심 가설을 폐기하고 JPEG Main Thread 병목을 기준으로 4 Worker 구조를 적용.
