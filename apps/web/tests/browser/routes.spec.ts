@@ -205,13 +205,17 @@ test('homepage introduces the developer before the featured project cases', asyn
 test('AutoWing Car shows telemetry formats and orders its features as a vehicle workflow', async ({ page }) => {
   await page.goto(`${base}projects/autowingcar/`);
   const featureTitles = await page.locator('.project-feature-list h3').allTextContents();
-  expect(featureTitles.slice(0, 4)).toEqual(['견인차 상태 관제', '주행 경로 계산', '운행 명령·응답 확인', '운행 이력 저장']);
+  expect(featureTitles.slice(0, 3)).toEqual(['견인차 상태 관제', '주행 경로 계산', '운행 명령·응답 확인']);
+  expect(featureTitles).not.toContain('운행 이력 저장');
   expect(featureTitles).not.toContain('프로젝트 종료 후 개선');
   await expect(page.getByText('MQTT 수신 형식 · autowing_car/v1/monitoring')).toBeVisible();
   await expect(page.getByText('WebSocket·STOMP 전송 형식 · /topic/towingcar/TC01')).toBeVisible();
   await expect(page.locator('.project-content[data-project-layout="autowingcar"] .feature-process').first()).toHaveCSS('display', 'block');
-  await expect(page.locator('.project-content[data-project-layout="autowingcar"] .feature-diagram img')).toHaveCount(2);
-  await expect(page.getByRole('img', { name: /Redis Streams에 모아 PostgreSQL에 저장/ })).toBeVisible();
+  await expect(page.locator('.project-content[data-project-layout="autowingcar"] .feature-diagram img')).toHaveCount(1);
+  await expect(page.getByRole('heading', { name: 'Redis 없이 상태와 이력을 DB에 바로 저장할 때 생기는 부하' })).toBeVisible();
+  await expect(page.getByRole('img', { name: /Redis 없이 차량 최신 상태와 운행 이력을 PostgreSQL에 바로 쓰는 흐름/ })).toBeVisible();
+  await expect(page.getByText(/보고량만큼 PostgreSQL 쓰기 요청이 생깁니다/)).toBeVisible();
+  await expect(page.getByText(/DOCKING/)).toHaveCount(0);
   const architecture = page.locator('.project-content[data-project-layout="autowingcar"] .architecture-figure img');
   await expect(architecture).toHaveAttribute('alt', /토잉카/);
   await expect(architecture).toHaveAttribute('width', '1560');
@@ -219,7 +223,7 @@ test('AutoWing Car shows telemetry formats and orders its features as a vehicle 
   const flowRatios = await page.locator('.project-content[data-project-layout="autowingcar"] .feature-diagram img, .project-content[data-project-layout="autowingcar"] .troubleshooting-diagram img').evaluateAll(images => images.map(image => Number(image.getAttribute('width')) / Number(image.getAttribute('height'))));
   expect(flowRatios.every(ratio => ratio > 1)).toBe(true);
   await expect(page.getByText('Redis에는 최신 차량 상태를 저장하고, PostgreSQL에는 운행 이력을 기록합니다.')).toHaveCount(0);
-  await expect(page.getByRole('heading', { name: '운행 이력 저장' })).toBeVisible();
+  await expect(page.locator('.project-troubleshooting')).toContainText('저장 성공 뒤 완료 처리');
 });
 
 test('DroneSim stays absent until explicit launch and opens in a separate tab', async ({ page }) => {

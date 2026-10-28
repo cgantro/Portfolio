@@ -3,7 +3,7 @@ title: 오토잉카 (AutoWing Car)
 subtitle: 공항 견인차 상태 관제와 운행 경로
 category: 공항 견인차 관제·실시간 통신·운행 상태 관리
 summary:
-  - MQTT 차량 상태와 명령 응답을 관제 화면에 연결하고, 늦게 도착한 상태가 서버의 최신 운행 상태를 덮지 않도록 처리했습니다.
+  - MQTT로 차량 상태를 받고 관제 화면에 전달하며, 최신 상태와 누적 운행 이력을 나눠 저장했습니다.
 period: 2026.01 – 2026.02
 startDate: '2026-01-16'
 endDate: '2026-02-09'
@@ -133,16 +133,6 @@ detail:
       width: 1380
       height: 500
     evidenceIds: [autowingcar-public]
-  - title: 운행 이력 저장
-    description: 차량 위치와 운행 상태 변화를 이력으로 남깁니다.
-    implementation: Redis Streams에 모아 PostgreSQL에 묶음 저장합니다. 실패하면 완료 처리하지 않고 다시 시도합니다.
-    diagram:
-      src: /assets/autowing-streams-flow.svg
-      alt: 차량 상태 기록을 Redis Streams에 모아 PostgreSQL에 저장하고, 실패한 기록을 다시 처리하는 좌우 흐름
-      caption: 저장에 실패한 기록은 남겨 다시 처리합니다.
-      width: 1280
-      height: 470
-    evidenceIds: [autowingcar-streams]
   roleAreas:
   - title: 차량 통신·실시간 관제
     items:
@@ -152,10 +142,8 @@ detail:
       evidenceIds: [autowingcar-public]
     - text: 명령 수신 응답과 실제 차량 운행 상태를 구분해 관리
       evidenceIds: [autowingcar-public]
-  - title: 상태 정합성·명령 처리 순서
+  - title: 운행 명령 처리 순서
     items:
-    - text: DOCKING 상태에 MOVING_TO_GATE 보고가 들어와도 DOCKING을 유지
-      evidenceIds: [autowingcar-public]
     - text: 차량 운행 명령은 상태 저장을 마친 뒤 전달
       evidenceIds: [autowingcar-public, autowingcar-command-order]
   - title: 경로 탐색
@@ -177,29 +165,19 @@ detail:
     - text: 차량 상태 저장이 끝난 뒤 운행 기록을 전달하도록 순서 조정
       evidenceIds: [autowingcar-streams]
   troubleshooting:
-  - title: 도킹한 차량이 다시 이동 중으로 표시됨
-    symptom: 서버 상태가 `DOCKING`일 때 MQTT 보고의 `MOVING_TO_GATE`가 반영되면 운행 상태가 이동 중으로 되돌아갈 수 있었습니다.
-    cause: MQTT 상태 보고에는 시각 정보가 없어 메시지 순서를 비교할 수 없습니다.
-    solution: 서버 상태가 `DOCKING`이고 수신 상태가 `MOVING_TO_GATE`인 조합에서는 수신값을 반영하지 않고 `DOCKING`을 유지합니다.
-    verification: 시각을 비교하지 않고, 현재 상태와 수신 상태의 조합만 확인합니다.
-    evidenceIds: [autowingcar-public]
+  - title: Redis 없이 상태와 이력을 DB에 바로 저장할 때 생기는 부하
+    symptom: MQTT 보고마다 차량 상태를 갱신하고 이력을 저장하면, 보고량만큼 PostgreSQL 쓰기 요청이 생깁니다.
+    cause: 차량 수가 늘면 DB 커넥션과 UPDATE·INSERT도 늘어납니다. 관제 목록이나 이력 조회까지 겹치면 읽기·쓰기가 DB 자원을 나눠 써 응답이 늦어질 수 있습니다.
+    solution: 최신 차량 상태는 Redis에 두고, 운행 이력은 Redis Streams에 모아 PostgreSQL에 묶음 저장합니다.
+    verification: 저장 성공 뒤 완료 처리, 실패한 기록 재처리, 재전송 때 같은 기록 ID 유지를 단위 시험으로 확인했습니다.
+    evidenceIds: [autowingcar-public, autowingcar-streams, autowingcar-streams-tests, autowingcar-streams-order]
     metricIds: []
     diagram:
-      src: /assets/autowing-state-order.svg
-      alt: 서버의 DOCKING 상태와 MQTT의 MOVING_TO_GATE 보고를 비교해 DOCKING을 유지하는 좌우 흐름
-      caption: DOCKING과 MOVING_TO_GATE 조합에서는 서버 상태를 유지합니다.
-      width: 1180
-      height: 460
-    code:
-      path: Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
-      language: java
-      title: DOCKING 상태에서 이전 단계 보고 제외
-      source: |-
-        if (assignedCar.getCarStatus() == CarStatus.DOCKING
-            && status == CarStatus.MOVING_TO_GATE) {
-            status = CarStatus.DOCKING;
-        }
-      url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
+      src: /assets/autowing-streams-flow.svg
+      alt: Redis 없이 차량 최신 상태와 운행 이력을 PostgreSQL에 바로 쓰는 흐름과, Redis 최신 상태·Streams 이력으로 나눠 처리하는 흐름 비교
+      caption: 차량 상태 보고마다 DB에 쓰는 방식과 Redis로 상태·이력을 분리한 방식
+      width: 1560
+      height: 620
   - title: 데이터베이스 반영 전에 차량 명령이 발행될 수 있음
     symptom: 데이터베이스 저장이 취소돼도 차량은 운행 명령을 받을 수 있었습니다.
     cause: MQTT 발행이 데이터베이스 커밋을 기다리지 않았습니다.
