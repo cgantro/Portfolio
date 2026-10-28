@@ -10,8 +10,8 @@ const supportingProjects = [projectById.mausoleum, projectById.autowingcar];
 const education = timeline.filter(item => item.type === 'edu');
 const certifications = timeline.filter(item => item.type === 'cert');
 const featured = [
-  { project: dronesim, side: 'copy-first', summary: '탄천교 주변에서 드론을 비행하고 시설물 외벽을 촬영하는 시뮬레이터를 개발하고 있습니다.' },
-  { project: robotpal, side: 'image-first', summary: '로봇 시뮬레이터에서 카메라 압축 병목을 찾아 갱신과 송신을 분리했습니다.' },
+  { project: dronesim, side: 'copy-first', summary: '탄천교 주변 가상 환경에서 드론 비행과 외벽 촬영 임무를 시험합니다.' },
+  { project: robotpal, side: 'image-first', summary: '가상 이동 로봇과 로봇팔을 조작하고 카메라 영상을 외부 인식 프로그램에 전달합니다.' },
 ];
 const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming-fps', 'camera-send-fps'].includes(metric.id));
 ---
@@ -19,8 +19,8 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
 <SiteLayout>
 <section class="intro-section" aria-labelledby="home-title">
   <div class="container intro-copy">
-    <h1 id="home-title">시뮬레이션·실시간 통신 개발자 홍윤표입니다.</h1>
-    <p class="intro-summary">시설물 촬영 지점과 비행 조건을 바꿔 반복 시험할 수 있는 드론 시뮬레이터를 개발하고 있습니다.</p>
+    <h1 id="home-title">시뮬레이션과 실시간 통신 소프트웨어를 개발합니다.</h1>
+    <p class="intro-summary">드론 시뮬레이터의 비행·촬영 시험 환경과 로봇 시뮬레이터의 카메라 영상 처리 기능을 만들었습니다.</p>
     <div class="intro-actions">
       <a class="button" href="#projects">프로젝트 보기 <span aria-hidden="true">↓</span></a>
       <a class="button button-outline" href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
@@ -46,7 +46,6 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
             <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
             <p class="featured-summary">{summary}</p>
             <p class="featured-role"><strong>담당</strong> {project.role[0]}</p>
-            {project.id === 'robotpal' && <p class="featured-problem">문제 · JPEG 압축이 시뮬레이션 갱신을 막음</p>}
             {metrics.length > 0 && (
               <dl class="featured-metrics">
                 {metrics.map(metric => (
@@ -75,13 +74,13 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
           <p class="project-state">{project.period} · {project.team}</p>
           <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
           <p>{project.id === 'mausoleum'
-            ? '한 서버에서 여러 방의 게임 진행을 나누고, 같은 방 참가자끼리 음성으로 대화하는 기능을 만들었습니다.'
-            : '차량 상태를 받아 관제 화면을 갱신하고 운행 명령과 경로 탐색을 구현했습니다. 프로젝트 뒤에는 운행 기록 저장을 보완했습니다.'}</p>
+            ? '전용 서버 한 대에서 여러 방의 진행 상태를 나누고, UDP 음성 서버로 방별 대화를 중계했습니다.'
+            : 'MQTT 차량 상태와 명령 응답을 관제 화면에 연결하고 운행 경로를 찾았습니다.'}</p>
           <p class="supporting-role"><strong>담당</strong> {project.role[0]}</p>
           <ul class="supporting-highlights">
             {(project.id === 'mausoleum'
-              ? ['방별 진행 상황과 보상 분리', '같은 방 참가자에게 음성 전달', '창 복귀 뒤 오래된 음성이 섞이는 문제 해결']
-              : ['차량 응답과 실제 운행 상태 구분', '상태 변경 뒤 늦게 온 값을 걸러냄', '경로 탐색과 운행 기록 저장 개선']).map(item => <li>{item}</li>)}
+              ? ['방별 게임 진행 상태 분리', 'UDP 음성 패킷을 방별 작업자로 전달', '창 복귀 뒤 이전 마이크 입력 폐기']
+              : ['ACK와 실제 운행 상태 구분', '늦게 온 상태가 자동 전이를 덮지 않도록 처리', '데이터베이스 커밋 뒤 명령 발행']).map(item => <li>{item}</li>)}
           </ul>
           <a class="project-link" href={projectUrl(project.id)}>상세 보기 <span aria-hidden="true">↗</span></a>
         </div>

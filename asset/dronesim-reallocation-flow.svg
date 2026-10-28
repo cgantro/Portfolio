@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 340" role="img" aria-labelledby="title desc">
+  <title id="title">상태 보고 단절 뒤 임무 재배정</title>
+  <desc id="desc">시나리오에 설정한 상태 보고 단절이 제한 시간을 넘으면 드론 상태를 미확정으로 바꾸고, 미완료 임무를 대기 상태로 돌린 뒤 다른 드론에 배정합니다.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748B"/></marker><style>
+    .bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#2563EB;stroke-width:2}.line{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}.t{font:600 16px Pretendard,'Noto Sans KR',sans-serif;fill:#111827}.s{font:13px Pretendard,'Noto Sans KR',sans-serif;fill:#64748B}
+  </style></defs>
+  <rect class="bg" width="1120" height="340" rx="12"/>
+  <rect class="box" x="24" y="120" width="178" height="90" rx="8"/><text class="t" x="113" y="157" text-anchor="middle">시나리오 입력</text><text class="s" x="113" y="182" text-anchor="middle">기체·임무·단절 조건</text>
+  <rect class="box" x="236" y="120" width="178" height="90" rx="8"/><text class="t" x="325" y="157" text-anchor="middle">하트비트 중단</text><text class="s" x="325" y="182" text-anchor="middle">설정 시간 경과</text>
+  <rect class="focus" x="448" y="120" width="178" height="90" rx="8"/><text class="t" x="537" y="157" text-anchor="middle">상태 미확정</text><text class="s" x="537" y="182" text-anchor="middle">마지막 보고 이후 판정</text>
+  <rect class="box" x="660" y="62" width="196" height="82" rx="8"/><text class="t" x="758" y="96" text-anchor="middle">미완료 임무 반환</text><text class="s" x="758" y="120" text-anchor="middle">대기 상태로 변경</text>
+  <rect class="box" x="660" y="202" width="196" height="82" rx="8"/><text class="t" x="758" y="236" text-anchor="middle">다른 기체에 배정</text><text class="s" x="758" y="260" text-anchor="middle">사용 가능한 기체 선택</text>
+  <rect class="box" x="902" y="120" width="194" height="90" rx="8"/><text class="t" x="999" y="157" text-anchor="middle">임무 결과 기록</text><text class="s" x="999" y="182" text-anchor="middle">완료·오류 집계</text>
+  <path class="line" d="M202 165H236M414 165H448M626 165H642V103H660M642 165V243H660M856 103H878V165H902M856 243H878V165"/>
+</svg>

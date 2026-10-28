@@ -52,7 +52,7 @@ test('project content and links are readable without client JavaScript', async (
   await expect(page.locator('.dronesim-p95-chart')).toContainText('변경 전');
   await expect(page.locator('.dronesim-p95-chart')).toContainText('변경 후');
   await expect(page.locator('.project-narrative')).toContainText('H.264 영상으로 실시간 전송');
-  await expect(page.locator('.project-narrative')).toContainText('90m 간격 지형 자료를 30m 높이 격자로');
+  await expect(page.locator('.project-narrative')).toContainText('90m DEM의 높이값을 수치지도 표고점·등고선 자료로 보정해 5m 간격 지형 격자');
   await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
   await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
   await expect(page.locator('.project-heading')).not.toContainText('2.6×10⁻⁶');
@@ -78,14 +78,14 @@ test('RobotPal follows the project introduction, role, features, troubleshooting
   await context.close();
 });
 
-test('all projects use the same five-part narrative structure', async ({ page }) => {
+test('all projects share the five narrative sections and show the cover beside the role section', async ({ page }) => {
   for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
     await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과']);
     await expect(page.locator('.project-features .project-feature-list > li').first().locator('h3')).toBeVisible();
     await expect(page.locator('.project-story-section').nth(3).locator('h3').first()).toBeVisible();
     await expect(page.locator('.project-story-section .code-disclosure[open]')).toHaveCount(0);
-    await expect(page.locator('.project-roles .project-cover-wide img')).toHaveAttribute('alt', /.+/);
+    await expect(page.locator('.project-roles + .project-cover-wide img')).toHaveAttribute('alt', /.+/);
     await expect(page.locator('.project-narrative a[href*="/blob/"]')).toHaveCount(0);
     await expect(page.locator('.project-narrative figure a')).toHaveCount(0);
     await expect(page.locator('.project-cover-wide img')).toHaveAttribute('alt', /.+/);
@@ -165,7 +165,7 @@ test('homepage introduces the developer before the featured project cases', asyn
   let demoRequests = 0;
   page.on('request', request => { if (request.url().startsWith('https://cgantro.github.io/DroneSim/')) demoRequests += 1; });
   await page.goto(base);
-  await expect(page.getByRole('heading', { name: '시뮬레이션·실시간 통신 개발자 홍윤표입니다.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '시뮬레이션과 실시간 통신 소프트웨어를 개발합니다.' })).toBeVisible();
   await expect(page.locator('main h1')).not.toContainText('C++');
   await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();

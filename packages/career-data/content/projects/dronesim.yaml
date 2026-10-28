@@ -1,9 +1,9 @@
 id: dronesim
 title: DroneSim
-subtitle: 드론 비행·시설물 촬영 시뮬레이터
-category: 드론 시뮬레이션
+subtitle: 드론 비행·EO 영상 수집·지상통제 시험 시뮬레이터
+category: 드론 시뮬레이션·임무 시험
 summary:
-- 탄천교 주변에서 드론을 비행하고 외벽을 촬영합니다. 영상과 촬영 위치·시각·기체 자세를 기록합니다.
+  - 탄천교 주변 가상 환경에서 드론 비행과 시설물 촬영 임무를 시험합니다. 촬영 영상과 비행 기록을 저장하고 지상통제 프로그램에 전달합니다.
 period: 2026.08 – 진행 중
 startDate: 2026-08
 endDate: null
@@ -24,7 +24,7 @@ stack:
 - CMake
 cover:
   src: /assets/DroneSim-native-scene.png
-  alt: 탄천교 인근 아파트 단지를 나타낸 DroneSim 3D 비행 장면
+  alt: DroneSim 3D 장면에서 아파트형 건물 사이를 비행하는 작은 드론
 architecture:
   src: /assets/dronesim-system-architecture.svg
   alt: 게임패드와 지상통제 명령이 일정한 주기로 드론 비행 계산에 반영되고, 촬영 영상과 비행 기록이 관제 화면으로 전달되는 구조
@@ -34,27 +34,64 @@ architecture:
   - Windows 실행은 H.264 영상으로 실시간 전송합니다. 촬영 영상은 파일로 저장하고 위치·시각·기체 자세를 비행 기록에 남깁니다.
 detail:
   layout: dronesim
-  overview: 탄천교 주변을 비행하며 시설물 외벽을 촬영하는 드론 시뮬레이터입니다. 지상통제와 여러 대의 드론 운용도 시험할 수 있습니다.
+  overview: 탄천교 주변 가상 환경에서 드론 비행과 시설물 외벽 촬영 임무를 시험합니다. 지상통제 명령, 비행 상태 갱신, EO 영상 수집과 촬영 기록을 한 시뮬레이터에서 다룹니다. Windows 실행과 웹 데모는 서로 다른 비행 모델을 사용합니다.
+  verificationScope:
+  - 충돌 형상은 상자로 단순화했습니다.
+  - PX4 기록 재생은 실제 기체의 비행 정확도 검증이 아닙니다.
   features:
   - title: 드론 비행
     description: 이륙·정지 비행·이동·착륙을 조종하고, 현재 기체 상태를 확인
-    implementation: 드론 상태를 초당 60회 갱신합니다. Windows 실행은 AirSim 물리 모델을 쓰고, 웹 데모는 간략한 비행 모델을 씁니다.
+    implementation: 화면 프레임 시간을 누적해 1/60초 단위 모의 Tick을 실행합니다. Windows 실행은 AirSim 강체 물리 모델을 사용하고 웹 데모는 운동학 모델을 사용합니다.
+    processSteps:
+    - 게임패드·지상통제·기록 명령 입력
+    - 고정 주기 Tick에서 비행 명령과 기체 상태 갱신
+    - 실행 환경에 맞는 물리 모델로 위치·자세 계산
+    - 갱신한 상태를 화면과 지상통제에 표시
+    diagram:
+      src: /assets/dronesim-flight-flow.svg
+      alt: 게임패드와 지상통제 명령을 고정 주기 모의 Tick에 적용하고 계산한 기체 상태를 화면과 지상통제에 전달하는 흐름
+      caption: 화면 갱신 시간과 모의 시간을 분리해 명령을 일정한 1/60초 간격으로 처리합니다.
+      width: 1120
+      height: 300
     evidenceIds: [dronesim-source]
   - title: 3D 환경
     description: 탄천교 주변 지형과 건물·도로·교량 위에서 드론 비행과 시설물 접근을 시험
-    implementation: 90m 간격 지형 자료를 30m 높이 격자로 바꾸고, 항공사진에 건물·도로·교량을 배치했습니다. 높이를 알 수 없는 건물은 비행 금지 구역으로 둡니다.
+    implementation: 90m DEM의 높이값을 수치지도 표고점·등고선 자료로 보정해 5m 간격 지형 격자를 구성했습니다. 주변 정사영상과 OSM 건물·도로·교량 자료를 배치했습니다. 5m는 보정 자료를 보간한 격자 간격입니다.
     evidenceIds: [dronesim-source]
   - title: 외벽 촬영 임무
     description: 외벽 촬영 위치를 정해 자동 비행·촬영하고 위치·시각·자세를 기록합니다. 임무를 멈추거나 다시 시작하고 중단할 수 있습니다.
-    implementation: 촬영 영상에 위치·시각·기체 자세를 함께 기록합니다.
+    implementation: 지상통제에서 촬영 위치를 고르면 임무가 이륙·접근·카메라 정렬·촬영·착륙 순서로 진행됩니다. 카메라 영상은 프레임과 기체 자세, 모의 시각, 촬영 판정 정보를 함께 녹화 자료에 기록합니다. Windows 실행에서는 녹화 파일과 비행 기록을 저장하고, 완성된 촬영 자료를 지상통제 프로그램으로 전달합니다.
+    processSteps:
+    - 지상통제에서 외벽 촬영 위치 선택
+    - 비행 경로를 따라 이동하고 카메라 화면 확인
+    - 영상 프레임과 모의 시각·기체 자세 기록
+    - 촬영 자료를 저장하고 지상통제 프로그램으로 전달
+    diagram:
+      src: /assets/dronesim-eo-flow.svg
+      alt: 촬영 위치 선택부터 드론 접근, EO 영상과 기체 상태 기록, 자료 저장 및 전달까지의 흐름
+      caption: 영상 프레임과 같은 시점의 기체 상태·촬영 판정을 함께 기록합니다.
+      width: 1120
+      height: 300
     evidenceIds: [dronesim-source]
   - title: 다중 드론 운용
     description: 지상통제 화면에서 최대 8대의 편대 비행을 조종하고, 상태 보고가 끊긴 드론의 일을 다른 드론에 넘깁니다.
-    implementation: 화면 없이 실행한 시험에서 4·16·64·256대 조건을 각각 확인했습니다. 시험 입력으로 전체 드론의 25%가 상태를 보내지 않게 했고, 남은 드론에 일을 다시 나눠 모든 임무를 마쳤습니다.
+    implementation: 화면 없는 시나리오 실행에서 일부 기체의 상태 보고가 끊기는 입력을 적용하고, 보고 상태가 미확정인 기체의 미완료 임무를 대기 상태로 돌려 다른 기체에 배정합니다. 4·16·64·256대 조건마다 전체 기체의 25%를 보고 중단 상태로 설정해 3회씩 실행했습니다. 이 시험은 시나리오 입력으로 만든 상태 보고 단절이며 실제 무선 통신 장애 시험은 아닙니다.
+    processSteps:
+    - 시나리오에 기체·임무·통신 단절 조건 입력
+    - 하트비트 제한 시간 뒤 기체 상태를 미확정으로 변경
+    - 해당 기체의 미완료 임무를 대기 상태로 반환
+    - 다른 기체에 임무를 배정하고 완료 여부 기록
+    diagram:
+      src: /assets/dronesim-reallocation-flow.svg
+      alt: 상태 보고가 끊긴 기체를 미확정 상태로 바꾸고 미완료 임무를 대기열에 돌려 다른 기체에 배정하는 흐름
+      caption: 시나리오 입력으로 통신 단절을 재현하고 임무 반환·재배정 결과를 기록합니다.
+      width: 1120
+      height: 340
+    verification: 4·16·64·256대 조건별 3회 실행에서 지정 임무 완료율은 100%였습니다.
     evidenceIds: [dronesim-reallocation]
   - title: 시나리오 기록·재생
     description: 조종 명령을 기록·재생하고 통신과 카메라 장애 상황을 넣어 시험
-    implementation: 저장한 조종 입력과 장애 상황을 다시 실행해 같은 비행 시험을 반복합니다.
+    implementation: 시나리오 파일의 명령·장애 이벤트를 Tick에 맞춰 적용하고, 실행 결과에는 비행 상태와 임무 진행 기록을 남깁니다. 화면 없는 실행에서도 SimulationCore의 같은 고정 주기 코어를 호출합니다.
     evidenceIds: [dronesim-source]
   roleAreas:
   - title: 시뮬레이션 코어
@@ -109,10 +146,10 @@ detail:
       evidenceIds: [dronesim-source]
   troubleshooting:
   - title: 충돌 후보를 찾기 전마다 전체 목록을 다시 정렬함
-    symptom: 드론이 움직일 때마다 충돌할 수 있는 물체 목록을 전부 다시 정렬했습니다.
-    cause: 위치가 바뀌어도 정렬 순서는 그대로인 경우가 많았습니다.
-    solution: 목록 순서를 확인해, 실제 순서가 바뀐 경우에만 다시 정렬하도록 바꿨습니다.
-    verification: 드론 수와 배치가 다른 5가지 조건에서 물리 계산 시간의 p95가 2.0~13.5% 줄었습니다.
+    symptom: 물리 단계마다 충돌 후보를 찾기 위해 강체의 X 좌표 목록을 다시 정렬했습니다.
+    cause: 강체 좌표를 갱신한 뒤에도 정렬 순서가 유지되는 경우가 있었지만, 기존에는 이를 확인하지 않고 매번 전체 정렬을 수행했습니다.
+    solution: 현재 X 좌표를 반영한 목록이 이미 정렬되어 있는지 먼저 확인하고, 순서가 바뀐 경우에만 다시 정렬하도록 변경했습니다.
+    verification: Windows Release에서 준비 120 Tick 뒤 30,000 Tick을 조건별 3회 실행했습니다. 다섯 배치·기체 수 조건에서 물리 단계 p95의 반복별 중앙값이 2.0~13.5% 감소했습니다.
     evidenceIds: [dronesim-sort-reuse]
     metricIds: [separated-128-physics-p95, separated-256-physics-p95, separated-512-physics-p95, compact-128-physics-p95, compact-256-physics-p95]
     comparison:

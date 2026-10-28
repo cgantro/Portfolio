@@ -49,12 +49,32 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
       <section class="project-story-section project-roles" aria-labelledby="project-role-title">
         <h2 id="project-role-title">담당 역할</h2>
         <ul class="project-role-list">{project.role.map(item => <li><MarkdownContent content={item} /></li>)}</ul>
-        <figure class="project-cover-wide">
-          <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width={project.id === 'dronesim' ? 882 : 1440} height={project.id === 'dronesim' ? 680 : 900} fetchpriority="high" />
-          {project.id === 'dronesim' && <figcaption>헬리오시티 아파트 단지를 재현한 시뮬레이터 장면</figcaption>}
-          {project.id === 'mausoleum' && <figcaption>영묘 게임 타이틀 화면</figcaption>}
-          {project.id === 'autowingcar' && <figcaption>오토잉카 실물 차량</figcaption>}
-        </figure>
+      </section>
+
+      <figure class="project-cover-wide project-cover-standalone">
+        <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width={project.id === 'dronesim' ? 882 : 1440} height={project.id === 'dronesim' ? 680 : 900} fetchpriority="high" />
+        {project.id === 'dronesim' && <figcaption>DroneSim에서 아파트형 건물 사이를 비행하는 장면</figcaption>}
+        {project.id === 'mausoleum' && <figcaption>영묘 프로젝트 타이틀 아트</figcaption>}
+        {project.id === 'autowingcar' && <figcaption>프로젝트에서 사용한 견인차 실물 사진</figcaption>}
+      </figure>
+
+      <section class="project-story-section project-features" aria-labelledby="project-features-title">
+        <h2 id="project-features-title">주요 기능</h2>
+        <ul class="project-feature-list">
+          {detail.features.map(feature => <li>
+            <h3>{feature.title}</h3>
+            <p>{feature.description}</p>
+            {feature.implementation && <p class="feature-implementation">{feature.implementation}</p>}
+            {feature.processSteps && <ol class="feature-process">{feature.processSteps.map(step => <li>{step}</li>)}</ol>}
+            {feature.diagram && <figure class="feature-diagram troubleshooting-diagram">
+              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + feature.title + ' 처리 흐름. 가로로 이동할 수 있습니다.'}>
+                <img src={assetUrl(feature.diagram.src)} alt={feature.diagram.alt} width={feature.diagram.width} height={feature.diagram.height} loading="lazy" />
+              </div>
+              <figcaption>{feature.diagram.caption}</figcaption>
+            </figure>}
+            {feature.verification && <p class="feature-verification">{feature.verification}</p>}
+          </li>)}
+        </ul>
         {detail.roleAreas.some(area => area.diagram) && <div class="role-area-list role-area-diagrams">
           {detail.roleAreas.filter(area => area.diagram).map(area => <section class="role-area">
             {area.diagram && <figure class="role-area-diagram troubleshooting-diagram">
@@ -65,17 +85,6 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             </figure>}
           </section>)}
         </div>}
-      </section>
-
-      <section class="project-story-section project-features" aria-labelledby="project-features-title">
-        <h2 id="project-features-title">주요 기능</h2>
-        <ul class="project-feature-list">
-          {detail.features.map(feature => <li>
-            <h3>{feature.title}</h3>
-            <p>{feature.description}</p>
-            {feature.implementation && <p class="feature-implementation">{feature.implementation}</p>}
-          </li>)}
-        </ul>
         <section class="detail-section project-architecture" aria-labelledby="architecture-title">
           <h3 id="architecture-title">구성 흐름</h3>
           <div class="architecture-grid">
@@ -155,6 +164,10 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
       <section class="project-story-section project-results" aria-labelledby="project-results-title">
         <h2 id="project-results-title">결과</h2>
         <ul class="project-result-list">{project.outcomes.map(outcome => <li>{outcome.text}</li>)}</ul>
+        {detail.verificationScope && detail.verificationScope.length > 0 && <div class="project-limitations">
+          <h3>검증 범위</h3>
+          <ul>{detail.verificationScope.map(item => <li>{item}</li>)}</ul>
+        </div>}
       </section>
     </div>
   </div>

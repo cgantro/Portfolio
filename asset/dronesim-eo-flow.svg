@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 300" role="img" aria-labelledby="title desc">
+  <title id="title">DroneSim EO 촬영과 기록 흐름</title>
+  <desc id="desc">지상통제에서 촬영 지점을 선택하면 드론이 이동하고 카메라 프레임을 읽습니다. 촬영 판정과 기체 자세 및 모의 시각을 영상 기록에 함께 저장하고 네이티브 실행에서는 관제 프로그램으로 전달합니다.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748B"/></marker><style>
+    .bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#2563EB;stroke-width:2}.line{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}.t{font:600 16px Pretendard,'Noto Sans KR',sans-serif;fill:#111827}.s{font:13px Pretendard,'Noto Sans KR',sans-serif;fill:#64748B}
+  </style></defs>
+  <rect class="bg" width="1120" height="300" rx="12"/>
+  <rect class="box" x="24" y="103" width="190" height="90" rx="8"/><text class="t" x="119" y="141" text-anchor="middle">촬영 지점 선택</text><text class="s" x="119" y="166" text-anchor="middle">지상통제</text>
+  <rect class="box" x="250" y="103" width="190" height="90" rx="8"/><text class="t" x="345" y="141" text-anchor="middle">드론 접근·정렬</text><text class="s" x="345" y="166" text-anchor="middle">임무 상태 갱신</text>
+  <rect class="focus" x="476" y="103" width="190" height="90" rx="8"/><text class="t" x="571" y="141" text-anchor="middle">EO 프레임 읽기</text><text class="s" x="571" y="166" text-anchor="middle">카메라 화면·시각</text>
+  <rect class="box" x="702" y="62" width="190" height="76" rx="8"/><text class="t" x="797" y="94" text-anchor="middle">촬영 판정</text><text class="s" x="797" y="117" text-anchor="middle">목표 화면 포함 여부</text>
+  <rect class="box" x="702" y="160" width="190" height="76" rx="8"/><text class="t" x="797" y="192" text-anchor="middle">영상·상태 기록</text><text class="s" x="797" y="215" text-anchor="middle">자세·모의 시각 포함</text>
+  <rect class="box" x="928" y="103" width="168" height="90" rx="8"/><text class="t" x="1012" y="141" text-anchor="middle">저장·전달</text><text class="s" x="1012" y="166" text-anchor="middle">영상 자료·비행 기록</text>
+  <path class="line" d="M214 148H250M440 148H476M666 148H684V100H702M684 148V198H702M892 100H910V148H928M892 198H910V148"/>
+</svg>

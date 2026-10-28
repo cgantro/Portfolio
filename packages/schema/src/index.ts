@@ -46,7 +46,16 @@ export const MetricSchema = z.object({
   status: EvidenceStatusSchema,
 }).strict();
 const ProjectFeatureSchema = z.object({
-  title: NonEmpty, description: NonEmpty, implementation: NonEmpty.optional(), evidenceIds: z.array(NonEmpty).min(1),
+  title: NonEmpty,
+  description: NonEmpty,
+  implementation: NonEmpty.optional(),
+  processSteps: z.array(NonEmpty).min(2).optional(),
+  diagram: z.object({
+    src: PublicSource, alt: NonEmpty, caption: NonEmpty,
+    width: z.number().int().positive(), height: z.number().int().positive(),
+  }).strict().optional(),
+  verification: NonEmpty.optional(),
+  evidenceIds: z.array(NonEmpty).min(1),
 }).strict();
 const ProjectDiagramSchema = z.object({ src: PublicSource, alt: NonEmpty, caption: NonEmpty, width: z.number().int().positive(), height: z.number().int().positive() }).strict();
 const ProjectRoleAreaSchema = z.object({
@@ -78,9 +87,10 @@ const ProjectTroubleshootingSchema = z.object({
 export const ProjectDetailSchema = z.object({
   layout: z.enum(['robotpal', 'dronesim', 'mausoleum', 'autowingcar']),
   overview: NonEmpty,
-  features: z.array(ProjectFeatureSchema).min(3).max(5),
+  verificationScope: z.array(NonEmpty).max(2).optional(),
+  features: z.array(ProjectFeatureSchema).min(1),
   roleAreas: z.array(ProjectRoleAreaSchema).min(1),
-  troubleshooting: z.array(ProjectTroubleshootingSchema).min(1).max(2),
+  troubleshooting: z.array(ProjectTroubleshootingSchema),
 }).strict();
 export const AssetSchema = z.object({ src: PublicSource, alt: NonEmpty }).strict();
 export const LinkSchema = z.object({

@@ -154,11 +154,23 @@ h3 { font-size: 25px; }
 .project-role-list { max-width: 780px; margin: 18px 0 0; padding-left: 1.2em; line-height: 1.8; }
 .project-role-list li + li { margin-top: 8px; }
 .role-area-diagrams:empty { display: none; }
-.project-feature-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 36px; margin: 22px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--color-line); }
+.project-feature-list { display: grid; grid-template-columns: minmax(0,1fr); gap: 0; margin: 22px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--color-line); }
+.project-feature-list > li { min-width: 0; }
 .project-feature-list li { padding: 19px 0 20px; border-bottom: 1px solid var(--color-line); }
-.project-feature-list h3, .role-area h3 { margin: 0 0 6px; font-size: 17px; }
-.project-feature-list p { max-width: 450px; margin: 0; color: var(--color-muted); font-size: 15px; line-height: 1.75; }
-.project-feature-list p.feature-implementation { margin-top: 8px; color: var(--color-ink); font-size: 14px; }
+.project-feature-list h3, .role-area h3 { margin: 0 0 8px; font-size: 20px; }
+.project-feature-list p { max-width: 780px; margin: 0; color: var(--color-muted); font-size: 16px; line-height: 1.75; }
+.project-feature-list p.feature-implementation { margin-top: 12px; color: var(--color-ink); }
+.project-feature-list p.feature-verification { margin-top: 12px; padding-left: 14px; border-left: 2px solid var(--color-accent); color: var(--color-muted); font-size: 14px; }
+.feature-process { display: flex; flex-wrap: wrap; gap: 8px 32px; max-width: 960px; margin: 14px 0 0; padding-left: 20px; list-style: disc; }
+.feature-process li { flex: 1 1 160px; min-width: 0; padding: 4px 0; border: 0; color: var(--color-muted); font-size: 14px; line-height: 1.6; }
+.feature-diagram { width: 100%; min-width: 0; max-width: 980px; margin: 18px 0 0; }
+.feature-diagram .architecture-scroll { width: 100%; }
+.feature-diagram img { display: block; width: 100%; height: auto; }
+.feature-diagram figcaption { margin-top: 8px; color: var(--color-muted); font-size: 13px; line-height: 1.6; }
+.project-cover-standalone { margin: 24px 0 0; }
+.project-limitations { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--color-line); }
+.project-limitations h3 { margin: 0 0 8px; font-size: 16px; }
+.project-limitations ul { margin: 0; padding-left: 20px; color: var(--color-muted); font-size: 14px; line-height: 1.7; }
 .project-architecture { max-width: 1180px; margin-top: 44px; }
 .project-architecture > h3 { margin-bottom: 14px; font-size: 20px; }
 .architecture-grid { display: grid; grid-template-columns: minmax(0,1fr); align-items: start; gap: 18px; }
@@ -294,6 +306,7 @@ h3 { font-size: 25px; }
   .project-feature-list, .role-area-list { grid-template-columns: 1fr; }
   .project-feature-list { gap: 0; }
   .role-area-list { gap: 18px; }
+  .troubleshooting-diagram::after, .architecture-figure::after { content: '도표는 좌우로 밀어 전체를 확인할 수 있습니다.'; display: block; margin-top: 6px; color: var(--color-muted); font-size: 12px; }
 }
 @media (max-width: 700px) {
   html { scroll-padding-top: 78px; }
@@ -393,7 +406,8 @@ h3 { font-size: 25px; }
   .robotpal-fps-chart__row strong { grid-column: 2; grid-row: 2; }
   .robotpal-fps-chart__track { grid-column: 1; grid-row: 2; }
   .troubleshooting-steps > div { grid-template-columns: 42px minmax(0,1fr); gap: 9px; }
-  .project-feature-list p, .role-area ul, .troubleshooting-steps dd { font-size: 14px; }
+  .project-feature-list p, .role-area ul, .troubleshooting-steps dd { font-size: 15px; }
+  .feature-process { display: block; }
   .metric-list, .related-grid { grid-template-columns: 1fr; }
   .metric-comparison strong, .metric-value { font-size: 23px; }
   .related-section { padding-block: 25px 45px; }

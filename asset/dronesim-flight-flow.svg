@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 300" role="img" aria-labelledby="title desc">
+  <title id="title">DroneSim 비행 명령과 고정 주기 계산</title>
+  <desc id="desc">게임패드와 지상통제 명령이 고정 주기 모의 Tick에 적용되고, 실행 환경에 따른 비행 계산 뒤 기체 상태가 화면과 지상통제에 전달됩니다.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748B"/></marker><style>
+    .bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#2563EB;stroke-width:2}.line{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}.t{font:600 17px Pretendard,'Noto Sans KR',sans-serif;fill:#111827}.s{font:14px Pretendard,'Noto Sans KR',sans-serif;fill:#64748B}
+  </style></defs>
+  <rect class="bg" width="1120" height="300" rx="12"/>
+  <rect class="box" x="28" y="68" width="200" height="70" rx="8"/><text class="t" x="128" y="98" text-anchor="middle">게임패드</text><text class="s" x="128" y="121" text-anchor="middle">수동 조종</text>
+  <rect class="box" x="28" y="162" width="200" height="70" rx="8"/><text class="t" x="128" y="192" text-anchor="middle">지상통제 명령</text><text class="s" x="128" y="215" text-anchor="middle">UDP · 기록 재생</text>
+  <rect class="focus" x="300" y="104" width="210" height="94" rx="8"/><text class="t" x="405" y="142" text-anchor="middle">고정 주기 Tick</text><text class="s" x="405" y="169" text-anchor="middle">1/60초마다 상태 갱신</text>
+  <rect class="box" x="580" y="68" width="220" height="70" rx="8"/><text class="t" x="690" y="98" text-anchor="middle">Windows</text><text class="s" x="690" y="121" text-anchor="middle">AirSim 강체 물리</text>
+  <rect class="box" x="580" y="162" width="220" height="70" rx="8"/><text class="t" x="690" y="192" text-anchor="middle">웹 데모</text><text class="s" x="690" y="215" text-anchor="middle">운동학 모델</text>
+  <rect class="box" x="870" y="104" width="220" height="94" rx="8"/><text class="t" x="980" y="142" text-anchor="middle">기체 상태 출력</text><text class="s" x="980" y="169" text-anchor="middle">화면 · 지상통제</text>
+  <path class="line" d="M228 103H300M228 197H265V151H300M510 151H548V103H580M548 151V197H580M800 103H836V151H870M800 197H836V151"/>
+</svg>

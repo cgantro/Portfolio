@@ -1,7 +1,7 @@
 id: autowingcar
 title: 오토잉카 (AutoWing Car)
 subtitle: 공항 견인차 상태 관제와 운행 경로
-category: Java 기반 공항 차량 관제 서버
+category: 공항 견인차 관제·실시간 통신·운행 상태 관리
 summary:
   - 공항 견인차에 운행 명령을 보내고 상태를 관제하는 6인 팀 프로젝트에서 차량 메시지, 웹 갱신과 경로 탐색을 구현했습니다.
 period: 2026.01 – 2026.02
@@ -23,7 +23,7 @@ stack:
 - PostgreSQL
 cover:
   src: /assets/오토잉카_실물.png
-  alt: 오토잉카 (AutoWing Car) 프로젝트 화면
+  alt: 견인 장비와 공항 여객기 모형을 연결한 오토잉카 실물 차량 사진
 architecture:
   src: /assets/autowing-system-architecture.svg
   alt: 차량과 인공지능 서비스가 장비 메시지와 웹 요청으로 Java 서버에 연결되고 관제 화면은 실시간 연결로 갱신되는 구성도
@@ -33,24 +33,57 @@ architecture:
   - 후속 개선에서는 운행 로그를 Redis Streams에 적재하고 별도 소비자가 DB에 일괄 저장합니다.
 detail:
   layout: autowingcar
-  overview: 공항 견인차의 위치와 운행 상태를 확인하고, 차량에 운행 명령을 보내는 관제 시스템입니다. 주행 경로와 대체 경로도 찾습니다.
+  overview: 여섯 명이 함께 개발한 공항 견인차 관제 시스템입니다. MQTT 차량 상태와 명령 응답을 관제 화면에 연결하고, 차량 운행 상태와 경로를 관리합니다.
+  verificationScope:
+  - Redis Streams 후속 개선의 처리량·지연 비교 수치는 측정하지 않았습니다.
   features:
   - title: 견인차 상태 관제
     description: 차량의 위치·속도·배터리·운행 상태를 관제 화면에서 확인합니다.
-    implementation: 차량 상태를 받아 최신 값을 저장하고 관제 화면을 실시간으로 갱신합니다.
+    implementation: MQTT로 차량 상태를 받은 뒤 최신 값은 Redis에 저장하고 WebSocket·STOMP로 관제 화면에 전달합니다. 주행 이력 저장은 현재 상태 조회와 분리해 처리합니다.
+    processSteps:
+    - MQTT에서 차량 위치·속도·배터리·상태 수신
+    - 최신 상태를 Redis에 갱신
+    - WebSocket·STOMP로 관제 화면 갱신
     evidenceIds: [autowingcar-public]
   - title: 운행 명령과 응답 확인
     description: 차량에 명령을 보내고 수신 응답과 실제 운행 상태를 확인합니다.
-    implementation: 명령을 받았다는 응답과 실제 차량 상태를 따로 관리합니다. 차량 명령은 데이터베이스 저장을 마친 뒤 보냅니다.
+    implementation: MQTT ACK는 명령 수신 여부로, 차량 상태 보고는 실제 운행 상태로 따로 처리합니다. 서버는 명령 정보를 데이터베이스에 반영하고 트랜잭션이 커밋된 뒤 차량에 MQTT 명령을 발행합니다.
+    processSteps:
+    - 관제 요청을 검증하고 데이터베이스 변경
+    - 트랜잭션 커밋 뒤 MQTT 운행 명령 발행
+    - ACK를 명령 수신 응답으로 처리
+    - 이후 차량 상태 보고를 운행 상태로 반영
+    diagram:
+      src: /assets/autowing-command-flow.svg
+      alt: 관제 요청이 데이터베이스에 반영된 뒤 MQTT 명령으로 전달되고 ACK와 차량 상태 보고가 각각 처리되는 흐름
+      caption: ACK는 명령을 받았다는 응답이며, 실제 운행 상태는 별도 상태 보고로 갱신합니다.
+      width: 1120
+      height: 340
     evidenceIds: [autowingcar-public]
   - title: 관제 알림·상태 저장
     description: 차량·항공편·비상 상태 변화를 관제 화면에 알리고, 차량별 최신 상태와 위치·속도·배터리 등의 주행 이력을 저장합니다.
-    implementation: 최신 차량 상태와 주행 이력을 나눠 저장합니다.
+    implementation: Redis에는 조회에 쓰는 최신 상태를 두고, PostgreSQL에는 위치·속도·배터리 등 주행 이력을 기록합니다. Redis Streams를 이용한 일괄 저장과 재처리는 프로젝트 종료 후 추가한 개선입니다.
     evidenceIds: [autowingcar-public]
   - title: 주행 경로 탐색
     description: 통제 구간과 예상 이동 시간을 반영해 경로를 찾고, 대체 경로를 최대 3개 제시합니다.
     implementation: 예상 이동 시간을 반영해 기본 경로와 대체 경로를 찾아 관제 지도에 표시합니다.
     evidenceIds: [autowingcar-public]
+  - title: 운행 기록 후속 개선
+    description: 프로젝트 종료 후 운행 기록 저장과 실패 기록 재처리를 보완했습니다.
+    implementation: 상태 변경 뒤 운행 기록을 Redis Streams에 넣고, 별도 소비자가 여러 기록을 묶어 데이터베이스에 저장합니다. 저장이 끝난 항목만 처리 완료로 표시하고 실패한 항목은 다시 읽어 처리합니다.
+    processSteps:
+    - 커밋 뒤 운행 기록을 Stream에 추가
+    - 소비자가 여러 기록을 읽어 데이터베이스에 저장
+    - 저장 뒤 처리 완료 표시
+    - 실패한 기록을 다시 읽어 처리
+    diagram:
+      src: /assets/autowing-streams-flow.svg
+      alt: 커밋 뒤 Redis Streams에 운행 기록을 넣고 소비자가 데이터베이스에 저장한 다음 처리 완료로 표시하는 흐름
+      caption: 원 프로젝트 기간 뒤 추가한 기록 저장 개선입니다.
+      width: 1200
+      height: 360
+    verification: 저장 완료 뒤 ACK, 데이터베이스 오류 시 pending 유지와 재전달 식별자 보존을 단위 테스트로 확인했습니다.
+    evidenceIds: [autowingcar-streams, autowingcar-streams-tests]
   roleAreas:
   - title: 차량 통신·실시간 관제
     items:
@@ -84,12 +117,6 @@ detail:
       evidenceIds: [autowingcar-streams]
     - text: 차량 상태 저장이 끝난 뒤 운행 기록을 전달하도록 순서 조정
       evidenceIds: [autowingcar-streams]
-    diagram:
-      src: /assets/autowing-streams-flow.svg
-      alt: 커밋 뒤 Redis Streams에 운행 기록을 넣고, 소비자가 데이터베이스에 저장한 다음 확인하는 흐름
-      caption: Redis Streams를 이용한 운행 로그 후속 개선입니다. 데이터베이스 저장이 끝난 뒤 Stream 항목을 확인 처리합니다.
-      width: 1200
-      height: 360
   troubleshooting:
   - title: 자동 상태 변경 뒤 오래된 MQTT 상태가 최신 값을 덮음
     symptom: 차량이 게이트에 도착한 뒤에도 늦게 도착한 이전 운행 상태가 저장될 수 있었습니다.
@@ -115,9 +142,15 @@ detail:
     symptom: 데이터베이스 저장이 취소돼도 차량은 운행 명령을 받을 수 있었습니다.
     cause: 저장이 끝나기 전에 별도로 차량에 명령을 보냈습니다.
     solution: 데이터베이스 저장이 끝난 뒤에 차량에 명령을 보내도록 순서를 바꿨습니다.
-    verification: 서비스 시험에서 발행하는 명령과 내용을 확인했습니다.
+    verification: 서비스 테스트에서 커밋 뒤 발행되는 MQTT 명령과 전달 내용을 확인했습니다. 외부 MQTT 전달까지 원자성을 보장하는 구조는 아닙니다.
     evidenceIds: [autowingcar-command-order]
     metricIds: []
+    diagram:
+      src: /assets/autowing-after-commit.svg
+      alt: 데이터베이스 변경을 커밋한 뒤에 MQTT 운행 명령을 발행하는 순서
+      caption: 커밋 뒤 명령을 발행하도록 순서를 정했으며, 데이터베이스와 MQTT를 하나의 원자적 트랜잭션으로 묶지는 않습니다.
+      width: 1120
+      height: 240
     code:
       path: Backend/autowing_car/src/main/java/com/project/service/MissionService.java
       language: java

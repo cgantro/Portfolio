@@ -1,6 +1,6 @@
 id: mausoleum
 title: 영묘 (Mausoleum)
-subtitle: UE5 협동 멀티플레이 게임의 서버·실시간 음성 통신
+subtitle: 협동 게임의 방별 진행 관리와 실시간 음성 통신
 category: 실시간 음성 통신과 온라인 게임 서버
 summary:
   - 협동 게임 중 룸·거리 정책에 따라 음성을 전달하고 재생하는 기능을 클라이언트와 서버에 구현했습니다.
@@ -22,7 +22,7 @@ stack:
 - HRTF
 cover:
   src: /assets/영묘.png
-  alt: 영묘 협동 게임 타이틀 화면
+  alt: 어두운 석상과 불빛 아래 영문 Mausoleum 제목이 표시된 프로젝트 타이틀 아트
 architecture:
   src: /assets/mausoleum-system-architecture.svg
   alt: 언리얼 엔진 5 게임 클라이언트가 방을 관리하는 로비, 게임 진행 서버, 음성 전달 서버에 각각 연결되는 구성도
@@ -32,22 +32,41 @@ architecture:
   - UDP 서버는 패킷·세션을 확인해 방별 참가자에게 중계하고, 클라이언트는 거리·플레이어 상태에 따라 청취 여부를 결정합니다.
 detail:
   layout: mausoleum
-  overview: 여러 명이 아이템을 모으고 석상을 함께 조작해 탈출하는 협동 게임입니다. 로비와 게임 안에서 방·거리·플레이어 상태에 맞춰 음성을 주고받습니다.
+  overview: 여섯 명이 함께 개발한 UE5 협동 게임입니다. 전용 서버 한 대에서 여러 방의 진행 상태를 나누고, 별도 UDP 음성 서버와 게임 클라이언트를 연결해 방별 음성 대화를 구현했습니다.
+  verificationScope:
+  - 음성 작업 분배 효과를 비교한 재현 가능한 성능 측정은 없습니다.
   features:
   - title: 게임 로비
     description: 방 생성·입장·퇴장, 참가자 관리와 채팅
+    implementation: WebSocket 로비가 방과 참가자 정보를 관리합니다. 방장이 게임을 시작하면 로비 서버가 전용 서버에 시작 요청을 전달하고, 준비 완료 응답을 받은 뒤 방의 게임 시작을 알립니다.
+    processSteps:
+    - WebSocket으로 방 생성·입장 요청
+    - 로비 서버에서 방·참가자 정보 갱신
+    - 게임 시작 요청을 전용 서버에 전달
+    - 준비 완료 응답 뒤 참가자에게 시작 알림
     evidenceIds: [mausoleum-public]
   - title: 방별 멀티플레이
     description: 하나의 전용 서버에서 여러 방의 게임을 동시에 진행하고, 방마다 게임 단계와 이벤트를 따로 관리
-    implementation: 로비는 방과 참가자를 관리합니다. 게임 서버는 방마다 진행 상황을 나누고, 한 방이 끝나면 그 방의 정보만 정리합니다.
+    implementation: 게임 서버는 방 식별자를 기준으로 플레이어·진행 단계·이벤트 대상을 구분합니다. 방의 플레이어가 모두 나가면 해당 방의 진행 타이머와 자원만 정리합니다.
     evidenceIds: [mausoleum-public]
   - title: 로비 음성 채팅
     description: 로비 참가자끼리 음성으로 대화하고, 게임 안에서는 가까운 플레이어의 음성을 들음
-    implementation: 마이크 음성을 압축해 서버로 보내면, 서버가 같은 방 참가자에게 전달합니다. 게임은 받은 음성을 풀어 재생합니다.
+    implementation: 클라이언트가 마이크 음성을 Opus로 압축해 UDP로 보내면 음성 서버가 패킷 형식과 방 코드를 확인합니다. 방 코드를 기준으로 작업자를 나눠 처리하고, 같은 방의 다른 참가자에게 패킷을 중계합니다.
+    processSteps:
+    - 마이크 음성을 압축해 UDP 패킷 전송
+    - 서버가 패킷 종류·크기·방 코드 확인
+    - 방 코드에 따라 음성 처리 작업자에 전달
+    - 같은 방의 다른 참가자에게 중계해 재생
+    diagram:
+      src: /assets/mausoleum-voice-flow.svg
+      alt: 마이크 음성의 Opus 인코딩, UDP 서버의 패킷 확인과 방별 작업 분배, 같은 방 참가자에게 중계하는 흐름
+      caption: 음성 서버는 방 코드로 작업을 나누고, 발신자를 제외한 같은 방 참가자에게 패킷을 전달합니다.
+      width: 1120
+      height: 300
     evidenceIds: [mausoleum-public]
   - title: 공간 음향
     description: 화자의 위치와 거리, 생존·사망·관전 상태에 따라 들을 수 있는 음성을 구분
-    implementation: 화자의 위치·거리와 플레이어 상태에 따라 들을 음성을 고르고, 방향과 거리를 반영해 재생합니다.
+    implementation: 게임 클라이언트가 화자 위치·거리와 플레이어 생존·사망·관전 상태에 따라 재생 대상을 정하고, 방향과 거리를 반영해 음성을 재생합니다.
     evidenceIds: [mausoleum-public]
   roleAreas:
   - title: 로비·게임 서버
@@ -73,9 +92,9 @@ detail:
   troubleshooting:
   - title: 단일 전용 서버의 방별 게임 상태 분리
     symptom: 한 서버에서 여러 방을 운영할 때, 한 방의 진행 상황과 보상이 다른 방에 섞이지 않게 해야 했습니다.
-    cause: 방마다 공간을 나누는 것만으로는 진행 상황과 이벤트가 분리되지 않았습니다.
-    solution: 방 번호를 기준으로 진행 상황·보상을 따로 관리하고, 방이 끝나면 해당 방 정보만 정리했습니다.
-    verification: 자동화 시험으로 방별 진행·보상 분리와 한 방을 끝낸 뒤 다른 방이 계속되는지 확인하는 항목을 마련했습니다.
+    cause: 게임 진행 단계와 이벤트 처리 대상이 방 식별자 없이 공유되면, 한 방의 상태 변경이 다른 방에도 적용될 수 있었습니다.
+    solution: 방 식별자를 기준으로 진행 단계와 이벤트 대상을 관리하고, 마지막 참가자가 나간 방의 관련 상태만 정리했습니다.
+    verification: 방별 진행·보상 분리와 한 방 종료 후 다른 방의 진행이 유지되는지 확인하는 자동화 테스트를 구성했습니다.
     evidenceIds: [mausoleum-public, mausoleum-room-tests]
     metricIds: []
   - title: 게임 창 복귀 뒤 오래된 마이크 입력이 섞임
