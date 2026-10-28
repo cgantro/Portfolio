@@ -199,6 +199,8 @@ h3 { font-size: 25px; }
 .architecture-scroll { max-width: 100%; overflow: auto; }
 .architecture-scroll:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
 .architecture-figure img { width: 100%; background: white; }
+.project-content[data-project-layout="autowingcar"] .architecture-figure img,
+.project-content[data-project-layout="autowingcar"] .troubleshooting-diagram .architecture-scroll img { width: 100%; max-width: 100%; height: auto; }
 .architecture-figure figcaption { margin-top: 8px; color: var(--color-muted); font-size: 12px; }
 .architecture-figure figcaption a { display: inline; color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
 .architecture-notes { margin: 0; padding-left: 1.1em; font-size: 14px; line-height: 1.8; }
@@ -327,7 +329,6 @@ h3 { font-size: 25px; }
   .project-feature-list, .role-area-list { grid-template-columns: 1fr; }
   .project-feature-list { gap: 0; }
   .role-area-list { gap: 18px; }
-  .troubleshooting-diagram::after, .architecture-figure::after { content: '도표는 좌우로 밀어 전체를 확인할 수 있습니다.'; display: block; margin-top: 6px; color: var(--color-muted); font-size: 12px; }
 }
 @media (max-width: 700px) {
   html { scroll-padding-top: 78px; }

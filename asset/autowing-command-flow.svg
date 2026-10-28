@@ -1,15 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 340" role="img" aria-labelledby="title desc">
-  <title id="title">견인차 명령과 응답 처리</title>
-  <desc id="desc">관제 명령은 서버 상태 변경을 커밋한 뒤 MQTT로 차량에 전달합니다. 차량의 ACK는 명령 수신 확인에 쓰고, 이후 MQTT 상태 보고로 실제 운행 상태를 갱신합니다.</desc>
-  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748B"/></marker><style>
-    .bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#2563EB;stroke-width:2}.line{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}.back{fill:none;stroke:#2563EB;stroke-width:2.5;stroke-dasharray:7 6;marker-end:url(#arrowBlue)}.t{font:600 16px Pretendard,'Noto Sans KR',sans-serif;fill:#111827}.s{font:13px Pretendard,'Noto Sans KR',sans-serif;fill:#64748B}
-  </style><marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2563EB"/></marker></defs>
-  <rect class="bg" width="1120" height="340" rx="12"/>
-  <rect class="box" x="30" y="120" width="200" height="90" rx="8"/><text class="t" x="130" y="158" text-anchor="middle">관제 명령</text><text class="s" x="130" y="183" text-anchor="middle">운행 요청</text>
-  <rect class="focus" x="300" y="120" width="200" height="90" rx="8"/><text class="t" x="400" y="158" text-anchor="middle">서버·DB 반영</text><text class="s" x="400" y="183" text-anchor="middle">커밋 뒤 발행</text>
-  <rect class="box" x="570" y="120" width="200" height="90" rx="8"/><text class="t" x="670" y="158" text-anchor="middle">MQTT 차량 명령</text><text class="s" x="670" y="183" text-anchor="middle">커밋 후 전달</text>
-  <rect class="box" x="840" y="66" width="240" height="78" rx="8"/><text class="t" x="960" y="99" text-anchor="middle">ACK</text><text class="s" x="960" y="122" text-anchor="middle">명령 수신 응답</text>
-  <rect class="box" x="840" y="200" width="240" height="78" rx="8"/><text class="t" x="960" y="233" text-anchor="middle">차량 상태 보고</text><text class="s" x="960" y="256" text-anchor="middle">실제 운행 상태 갱신</text>
-  <path class="line" d="M230 165H300M500 165H570M770 165H805V105H840M805 165V239H840"/>
-  <path class="back" d="M840 105H808V165H770M840 239H808V165H770"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="1010" viewBox="0 0 760 1010" role="img" aria-labelledby="title desc">
+  <title id="title">운행 명령과 차량 응답 흐름</title>
+  <desc id="desc">관제 요청을 데이터베이스에 저장하고 커밋한 뒤 MQTT 운행 명령을 보냅니다. 차량 ACK는 명령 수신을 알리고, 별도의 상태 보고가 실제 운행 상태를 갱신합니다.</desc>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748B"/></marker>
+    <style>.bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#60A5FA;stroke-width:2}.head{font:700 20px Pretendard,'Noto Sans KR',sans-serif;fill:#111827;text-anchor:middle}.sub{font:16px Pretendard,'Noto Sans KR',sans-serif;fill:#475569;text-anchor:middle}.arrow{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}</style>
+  </defs><rect class="bg" width="760" height="1010" rx="16"/>
+  <rect class="box" x="180" y="25" width="400" height="82" rx="14"/><text class="head" x="380" y="75">관제 요청</text>
+  <path class="arrow" d="M380 109V140"/>
+  <rect class="box" x="180" y="150" width="400" height="82" rx="14"/><text class="head" x="380" y="188">데이터베이스에 명령 저장</text><text class="sub" x="380" y="216">트랜잭션 커밋</text>
+  <path class="arrow" d="M380 234V265"/>
+  <rect class="focus" x="180" y="275" width="400" height="82" rx="14"/><text class="head" x="380" y="325">MQTT 운행 명령</text>
+  <path class="arrow" d="M380 359V390"/>
+  <rect class="box" x="180" y="400" width="400" height="82" rx="14"/><text class="head" x="380" y="450">차량 장치</text>
+  <path class="arrow" d="M380 484V515H195V545"/><path class="arrow" d="M380 515H565V545"/>
+  <rect class="box" x="55" y="555" width="280" height="88" rx="14"/><text class="head" x="195" y="592">MQTT ACK</text><text class="sub" x="195" y="620">명령 수신 확인</text>
+  <rect class="focus" x="425" y="555" width="280" height="88" rx="14"/><text class="head" x="565" y="592">차량 상태 보고</text><text class="sub" x="565" y="620">실제 운행 상태</text>
+  <path class="arrow" d="M565 645V680"/>
+  <rect class="box" x="425" y="690" width="280" height="82" rx="14"/><text class="head" x="565" y="740">서버 상태 갱신</text>
+  <path class="arrow" d="M565 774V809"/>
+  <rect class="box" x="425" y="819" width="280" height="82" rx="14"/><text class="head" x="565" y="869">WebSocket · STOMP</text>
+  <path class="arrow" d="M565 903V938"/>
+  <rect class="box" x="425" y="948" width="280" height="45" rx="14"/><text class="head" x="565" y="978">관제 화면</text>
 </svg>

@@ -210,6 +210,9 @@ test('AutoWing Car shows telemetry formats and orders its features as a vehicle 
   await expect(page.getByText('MQTT 수신 형식 · autowing_car/v1/monitoring')).toBeVisible();
   await expect(page.getByText('WebSocket·STOMP 전송 형식 · /topic/towingcar/TC01')).toBeVisible();
   await expect(page.locator('.project-content[data-project-layout="autowingcar"] .feature-process').first()).toHaveCSS('display', 'block');
+  await expect(page.locator('.project-content[data-project-layout="autowingcar"] .feature-diagram img')).toHaveCount(2);
+  await expect(page.getByRole('img', { name: /Redis Streams 기록, PostgreSQL 묶음 저장/ })).toBeVisible();
+  await expect(page.getByText('Redis에는 최신 차량 상태를 저장하고, PostgreSQL에는 운행 이력을 기록합니다.')).toHaveCount(0);
   await expect(page.getByRole('heading', { name: '운행 이력 저장' })).toBeVisible();
 });
 

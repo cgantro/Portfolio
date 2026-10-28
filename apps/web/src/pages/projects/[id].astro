@@ -11,7 +11,9 @@ export function getStaticPaths() {
 const { project } = Astro.props;
 const related = projects.filter(item => item.id !== project.id);
 const detail = project.detail;
-const architectureNotes = project.id === 'robotpal' || project.id === 'autowingcar'
+const architectureNotes = project.id === 'autowingcar'
+  ? []
+  : project.id === 'robotpal'
   ? project.architecture.summary
   : project.architecture.summary.slice(1);
 const projectTitleId = (index: number) => `troubleshooting-${project.id}-${index}`;
@@ -70,7 +72,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             {feature.codeSnippets?.map(snippet => <MarkdownContent content={codeMarkdown(snippet)} collapsibleCode />)}
             {feature.processSteps && <ol class="feature-process">{feature.processSteps.map(step => <li>{step}</li>)}</ol>}
             {feature.diagram && <figure class="feature-diagram troubleshooting-diagram">
-              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + feature.title + ' 처리 흐름. 가로로 이동할 수 있습니다.'}>
+              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + feature.title + ' 처리 흐름도'}>
                 <img src={assetUrl(feature.diagram.src)} alt={feature.diagram.alt} width={feature.diagram.width} height={feature.diagram.height} loading="lazy" />
               </div>
               <figcaption>{feature.diagram.caption}</figcaption>
@@ -78,7 +80,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             {feature.packetDiagram && <details class="packet-diagram-disclosure">
               <summary>{feature.packetDiagram.summary}</summary>
               <figure class="feature-diagram troubleshooting-diagram">
-                <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + feature.title + ' 패킷 그림. 가로로 이동할 수 있습니다.'}>
+                <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + feature.title + ' 패킷 그림'}>
                   <img src={assetUrl(feature.packetDiagram.src)} alt={feature.packetDiagram.alt} width={feature.packetDiagram.width} height={feature.packetDiagram.height} loading="lazy" />
                 </div>
                 <figcaption>{feature.packetDiagram.caption}</figcaption>
@@ -93,7 +95,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
           {detail.postProjectImprovement.implementation && <p class="feature-implementation">{detail.postProjectImprovement.implementation}</p>}
           {detail.postProjectImprovement.processSteps && <ol class="feature-process">{detail.postProjectImprovement.processSteps.map(step => <li>{step}</li>)}</ol>}
           {detail.postProjectImprovement.diagram && <figure class="feature-diagram troubleshooting-diagram">
-            <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 운행 기록 저장 흐름도. 가로로 이동할 수 있습니다.'}>
+            <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 운행 기록 저장 흐름도'}>
               <img src={assetUrl(detail.postProjectImprovement.diagram.src)} alt={detail.postProjectImprovement.diagram.alt} width={detail.postProjectImprovement.diagram.width} height={detail.postProjectImprovement.diagram.height} loading="lazy" />
             </div>
             <figcaption>{detail.postProjectImprovement.diagram.caption}</figcaption>
@@ -103,7 +105,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
         {detail.roleAreas.some(area => area.diagram) && <div class="role-area-list role-area-diagrams">
           {detail.roleAreas.filter(area => area.diagram).map(area => <section class="role-area">
             {area.diagram && <figure class="role-area-diagram troubleshooting-diagram">
-              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + area.title + ' 도표. 가로로 이동할 수 있습니다.'}>
+              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + area.title + ' 도표'}>
                 <img src={assetUrl(area.diagram.src)} alt={area.diagram.alt} width={area.diagram.width} height={area.diagram.height} loading="lazy" />
               </div>
               <figcaption>{area.diagram.caption}</figcaption>
@@ -114,10 +116,10 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
           <h3 id="architecture-title">구성 흐름</h3>
           <div class="architecture-grid">
             <figure class="architecture-figure">
-              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 구성 흐름도. 가로로 이동할 수 있습니다.'}>
-                <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width="1400" height="900" loading="lazy" />
+              <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 구성 흐름도'}>
+                <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width={project.id === 'autowingcar' ? 1000 : 1400} height={project.id === 'autowingcar' ? 1050 : 900} loading="lazy" />
               </div>
-              {project.id !== 'robotpal' && <figcaption>{project.architecture.summary[0]}</figcaption>}
+              {project.id !== 'robotpal' && project.id !== 'autowingcar' && <figcaption>{project.architecture.summary[0]}</figcaption>}
             </figure>
           </div>
           {architectureNotes.length > 0 && <ul class="architecture-notes">{architectureNotes.map(text => <li>{text}</li>)}</ul>}
@@ -135,7 +137,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             <div><dt>확인</dt><dd><MarkdownContent content={issue.verification} /></dd></div>
           </dl>
           {issue.diagram && <figure class="troubleshooting-diagram">
-            <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + issue.title + ' 흐름도. 가로로 이동할 수 있습니다.'}>
+            <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + issue.title + ' 흐름도'}>
               <img src={assetUrl(issue.diagram.src)} alt={issue.diagram.alt} width={issue.diagram.width} height={issue.diagram.height} loading="lazy" />
             </div>
             <figcaption>{issue.diagram.caption}</figcaption>
