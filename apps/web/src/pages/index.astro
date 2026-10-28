@@ -10,8 +10,8 @@ const supportingProjects = [projectById.mausoleum, projectById.autowingcar];
 const education = timeline.filter(item => item.type === 'edu');
 const certifications = timeline.filter(item => item.type === 'cert');
 const featured = [
-  { project: dronesim, side: 'copy-first', summary: '탄천교 주변 가상 환경에서 드론 비행과 외벽 촬영 임무를 시험합니다.' },
-  { project: robotpal, side: 'image-first', summary: '가상 이동 로봇과 로봇팔을 조작하고 카메라 영상을 외부 인식 프로그램에 전달합니다.' },
+  { project: dronesim, side: 'copy-first', summary: '탄천교 주변 가상 환경에서 드론 비행과 외벽 촬영 임무를 실행하고, 지상통제 명령과 촬영 기록을 함께 시험합니다.' },
+  { project: robotpal, side: 'image-first', summary: '이동 로봇과 로봇팔을 가상 환경에서 조작하고, 카메라 영상을 외부 인식 프로그램에 전달하는 시뮬레이터입니다.' },
 ];
 const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming-fps', 'camera-send-fps'].includes(metric.id));
 ---
@@ -20,7 +20,7 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
 <section class="intro-section" aria-labelledby="home-title">
   <div class="container intro-copy">
     <h1 id="home-title">시뮬레이션과 실시간 통신 소프트웨어를 개발합니다.</h1>
-    <p class="intro-summary">드론 시뮬레이터의 비행·촬영 시험 환경과 로봇 시뮬레이터의 카메라 영상 처리 기능을 만들었습니다.</p>
+    <p class="intro-summary">드론 비행과 영상 수집 임무를 반복 시험하는 시뮬레이터를 개발하고 있습니다. 로봇 시뮬레이터에서는 영상 압축 병목을 측정하고 처리 구조를 개선했습니다.</p>
     <div class="intro-actions">
       <a class="button" href="#projects">프로젝트 보기 <span aria-hidden="true">↓</span></a>
       <a class="button button-outline" href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
@@ -74,13 +74,13 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
           <p class="project-state">{project.period} · {project.team}</p>
           <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
           <p>{project.id === 'mausoleum'
-            ? '전용 서버 한 대에서 여러 방의 진행 상태를 나누고, UDP 음성 서버로 방별 대화를 중계했습니다.'
-            : 'MQTT 차량 상태와 명령 응답을 관제 화면에 연결하고 운행 경로를 찾았습니다.'}</p>
+            ? '하나의 전용 서버에서 여러 게임 방의 진행 상태를 분리하고, UDP 음성 서버를 통해 방별 실시간 음성 통신을 구현했습니다.'
+            : 'MQTT 차량 상태와 명령 응답을 처리하고, WebSocket으로 관제 화면을 갱신했습니다. 늦게 도착한 상태 메시지가 최신 운행 상태를 덮어쓰지 않도록 처리했습니다.'}</p>
           <p class="supporting-role"><strong>담당</strong> {project.role[0]}</p>
           <ul class="supporting-highlights">
             {(project.id === 'mausoleum'
-              ? ['방별 게임 진행 상태 분리', 'UDP 음성 패킷을 방별 작업자로 전달', '창 복귀 뒤 이전 마이크 입력 폐기']
-              : ['ACK와 실제 운행 상태 구분', '늦게 온 상태가 자동 전이를 덮지 않도록 처리', '데이터베이스 커밋 뒤 명령 발행']).map(item => <li>{item}</li>)}
+              ? ['방별 게임 진행·이벤트·보상 상태 분리', '세션과 방 정보를 확인한 뒤 음성 패킷 중계', '게임 창 복귀 시 오래된 마이크 입력 폐기']
+              : ['명령 수신 ACK와 실제 차량 상태 구분', '상태 전이 뒤 도착한 이전 메시지 폐기', '데이터베이스 커밋 이후 명령 발행']).map(item => <li>{item}</li>)}
           </ul>
           <a class="project-link" href={projectUrl(project.id)}>상세 보기 <span aria-hidden="true">↗</span></a>
         </div>

@@ -167,6 +167,12 @@ h3 { font-size: 25px; }
 .feature-diagram .architecture-scroll { width: 100%; }
 .feature-diagram img { display: block; width: 100%; height: auto; }
 .feature-diagram figcaption { margin-top: 8px; color: var(--color-muted); font-size: 13px; line-height: 1.6; }
+.project-post-improvement { max-width: 980px; margin-top: 24px; padding: 20px 0 8px; border-top: 1px solid var(--color-line); }
+.project-post-improvement > h3 { margin: 0 0 14px; font-size: 18px; }
+.project-post-improvement > h4 { margin: 0 0 8px; font-size: 17px; }
+.project-post-improvement > p { max-width: 780px; margin: 0; font-size: 16px; line-height: 1.75; }
+.project-post-improvement > p.feature-implementation { margin-top: 10px; }
+.project-post-improvement .feature-process { margin-bottom: 8px; }
 .project-cover-standalone { margin: 24px 0 0; }
 .project-limitations { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--color-line); }
 .project-limitations h3 { margin: 0 0 8px; font-size: 16px; }

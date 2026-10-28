@@ -89,6 +89,7 @@ export const ProjectDetailSchema = z.object({
   overview: NonEmpty,
   verificationScope: z.array(NonEmpty).max(2).optional(),
   features: z.array(ProjectFeatureSchema).min(1),
+  postProjectImprovement: ProjectFeatureSchema.optional(),
   roleAreas: z.array(ProjectRoleAreaSchema).min(1),
   troubleshooting: z.array(ProjectTroubleshootingSchema),
 }).strict();

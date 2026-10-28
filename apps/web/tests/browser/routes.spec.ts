@@ -166,6 +166,7 @@ test('homepage introduces the developer before the featured project cases', asyn
   page.on('request', request => { if (request.url().startsWith('https://cgantro.github.io/DroneSim/')) demoRequests += 1; });
   await page.goto(base);
   await expect(page.getByRole('heading', { name: '시뮬레이션과 실시간 통신 소프트웨어를 개발합니다.' })).toBeVisible();
+  await expect(page.locator('.intro-summary')).toContainText('드론 비행과 영상 수집 임무를 반복 시험하는 시뮬레이터');
   await expect(page.locator('main h1')).not.toContainText('C++');
   await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();
@@ -176,6 +177,14 @@ test('homepage introduces the developer before the featured project cases', asyn
   await expect(page.locator('.featured-project')).toHaveCount(2);
   await expect(page.locator('.supporting-project')).toHaveCount(2);
   expect(demoRequests).toBe(0);
+});
+
+test('AutoWing Car labels Redis Streams work as a post-project improvement', async ({ page }) => {
+  await page.goto(`${base}projects/autowingcar/`);
+  const featureTitles = await page.locator('.project-feature-list h3').allTextContents();
+  expect(featureTitles).not.toContain('운행 기록 후속 개선');
+  await expect(page.getByRole('heading', { name: '프로젝트 종료 후 개선' })).toBeVisible();
+  await expect(page.locator('.project-post-improvement')).toContainText('Redis Streams');
 });
 
 test('DroneSim stays absent until explicit launch and opens in a separate tab', async ({ page }) => {

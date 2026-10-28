@@ -3,7 +3,7 @@ title: 오토잉카 (AutoWing Car)
 subtitle: 공항 견인차 상태 관제와 운행 경로
 category: 공항 견인차 관제·실시간 통신·운행 상태 관리
 summary:
-  - 공항 견인차에 운행 명령을 보내고 상태를 관제하는 6인 팀 프로젝트에서 차량 메시지, 웹 갱신과 경로 탐색을 구현했습니다.
+  - MQTT 차량 상태와 명령 응답을 처리하고, WebSocket으로 관제 화면을 갱신했습니다. 늦게 도착한 상태 메시지가 최신 운행 상태를 덮어쓰지 않도록 처리했습니다.
 period: 2026.01 – 2026.02
 startDate: '2026-01-16'
 endDate: '2026-02-09'
@@ -33,7 +33,7 @@ architecture:
   - 후속 개선에서는 운행 로그를 Redis Streams에 적재하고 별도 소비자가 DB에 일괄 저장합니다.
 detail:
   layout: autowingcar
-  overview: 여섯 명이 함께 개발한 공항 견인차 관제 시스템입니다. MQTT 차량 상태와 명령 응답을 관제 화면에 연결하고, 차량 운행 상태와 경로를 관리합니다.
+  overview: 공항 견인차의 위치와 운행 상태를 관제하고 차량에 운행 명령을 전달하는 시스템입니다. MQTT로 받은 차량 정보를 WebSocket 관제 화면에 연결하고, 운행 경로 탐색과 상태 저장 기능을 구현했습니다.
   verificationScope:
   - Redis Streams 후속 개선의 처리량·지연 비교 수치는 측정하지 않았습니다.
   features:
@@ -62,24 +62,25 @@ detail:
     evidenceIds: [autowingcar-public]
   - title: 관제 알림·상태 저장
     description: 차량·항공편·비상 상태 변화를 관제 화면에 알리고, 차량별 최신 상태와 위치·속도·배터리 등의 주행 이력을 저장합니다.
-    implementation: Redis에는 조회에 쓰는 최신 상태를 두고, PostgreSQL에는 위치·속도·배터리 등 주행 이력을 기록합니다. Redis Streams를 이용한 일괄 저장과 재처리는 프로젝트 종료 후 추가한 개선입니다.
+    implementation: Redis에는 조회에 쓰는 최신 상태를 두고, PostgreSQL에는 위치·속도·배터리 등 주행 이력을 기록합니다.
     evidenceIds: [autowingcar-public]
   - title: 주행 경로 탐색
     description: 통제 구간과 예상 이동 시간을 반영해 경로를 찾고, 대체 경로를 최대 3개 제시합니다.
-    implementation: 예상 이동 시간을 반영해 기본 경로와 대체 경로를 찾아 관제 지도에 표시합니다.
+    implementation: 이동 시간 비용으로 A* 경로를 찾고 Yen 알고리즘으로 대체 경로를 최대 세 개 계산합니다. 경로를 관제 지도에 전달하기 전 RDP 방식으로 지점을 줄입니다.
     evidenceIds: [autowingcar-public]
-  - title: 운행 기록 후속 개선
-    description: 프로젝트 종료 후 운행 기록 저장과 실패 기록 재처리를 보완했습니다.
-    implementation: 상태 변경 뒤 운행 기록을 Redis Streams에 넣고, 별도 소비자가 여러 기록을 묶어 데이터베이스에 저장합니다. 저장이 끝난 항목만 처리 완료로 표시하고 실패한 항목은 다시 읽어 처리합니다.
+  postProjectImprovement:
+    title: Redis Streams 운행 기록 저장
+    description: 프로젝트 종료 후 운행 기록을 별도 소비자가 일괄 저장하고 실패한 기록을 다시 처리하도록 보완했습니다.
+    implementation: 상태 변경 뒤 운행 기록을 Redis Streams에 넣습니다. 별도 소비자가 여러 기록을 묶어 데이터베이스에 저장하고, 저장이 끝난 항목만 완료 처리합니다. 실패한 기록은 pending 상태로 남겨 다시 처리합니다.
     processSteps:
-    - 커밋 뒤 운행 기록을 Stream에 추가
+    - 커밋 뒤 운행 기록을 Redis Streams에 추가
     - 소비자가 여러 기록을 읽어 데이터베이스에 저장
-    - 저장 뒤 처리 완료 표시
-    - 실패한 기록을 다시 읽어 처리
+    - 저장 완료 뒤 처리 완료 표시
+    - 실패 기록을 pending 항목으로 다시 처리
     diagram:
       src: /assets/autowing-streams-flow.svg
       alt: 커밋 뒤 Redis Streams에 운행 기록을 넣고 소비자가 데이터베이스에 저장한 다음 처리 완료로 표시하는 흐름
-      caption: 원 프로젝트 기간 뒤 추가한 기록 저장 개선입니다.
+      caption: 프로젝트 종료 후 별도로 추가한 기록 저장 개선입니다.
       width: 1200
       height: 360
     verification: 저장 완료 뒤 ACK, 데이터베이스 오류 시 pending 유지와 재전달 식별자 보존을 단위 테스트로 확인했습니다.
