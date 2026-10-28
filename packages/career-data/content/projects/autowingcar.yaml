@@ -26,94 +26,118 @@ cover:
   alt: 견인 장비와 공항 여객기 모형을 연결한 오토잉카 실물 차량 사진
 architecture:
   src: /assets/autowing-system-architecture.svg
-  alt: React, Nginx, Spring Boot, PostgreSQL, Redis, MQTT, WebSocket과 STOMP의 기술 구성
+  alt: React 관제 화면과 Nginx, Spring Boot 서버, PostgreSQL·Redis 저장소, MQTT 차량 통신, WebSocket·STOMP 연결 구조
   summary:
-  - MQTT 차량 상태와 명령 확인 응답을 처리하고, WebSocket·STOMP로 관제 화면을 갱신합니다.
-  - 차량의 최신 상태와 주행 이력은 각각 Redis와 PostgreSQL에 저장합니다.
-  - 프로젝트가 끝난 뒤 운행 기록 저장을 보완해, 별도 저장 프로그램이 기록을 묶어 저장하고 실패한 항목을 다시 처리하도록 했습니다.
+  - Redis에는 최신 차량 상태를 저장하고, PostgreSQL에는 운행 이력을 기록합니다.
 detail:
   layout: autowingcar
-  overview: 공항 견인차의 위치와 운행 상태를 관제하고 차량에 운행 명령을 전달하는 시스템입니다. MQTT로 받은 차량 정보를 WebSocket 관제 화면에 연결하고, 운행 경로 탐색과 상태 저장 기능을 구현했습니다.
+  overview: 공항 견인차의 위치와 운행 상태를 확인하고, 이동 경로를 정해 차량에 명령하는 관제 시스템입니다.
   features:
   - title: 견인차 상태 관제
-    description: 차량의 위치·속도·배터리·운행 상태를 관제 화면에서 확인합니다.
-    implementation: MQTT로 차량 상태를 받은 뒤 최신 값은 Redis에 저장하고 WebSocket·STOMP로 관제 화면에 전달합니다. 주행 이력 저장은 현재 상태 조회와 분리해 처리합니다.
+    description: 차량이 보낸 위치·속도·방향·배터리·운행 상태를 관제 화면에 표시합니다.
+    implementation: 차량은 MQTT로 상태를 보내고, 서버는 최신 상태를 Redis에 갱신한 뒤 차량별 WebSocket·STOMP 채널로 관제 화면에 전달합니다.
     processSteps:
-    - MQTT에서 차량 위치·속도·배터리·상태 수신
-    - 최신 상태를 Redis에 갱신
-    - WebSocket·STOMP로 관제 화면 갱신
+    - 차량이 autowing_car/v1/monitoring 토픽으로 상태 보고
+    - 서버가 차량 코드를 확인하고 Redis의 최신 상태 갱신
+    - /topic/towingcar/{차량 코드} 채널로 관제 화면에 전송
+    codeSnippets:
+    - language: json
+      title: MQTT 수신 형식 · autowing_car/v1/monitoring
+      source: |-
+        {
+          "carId": "TC01",
+          "x": 1000.0,
+          "y": 750.0,
+          "yaw": 90.0,
+          "v": 10,
+          "mode": "MOVING_TO_GATE",
+          "battery": 90
+        }
+    - language: json
+      title: WebSocket·STOMP 전송 형식 · /topic/towingcar/TC01
+      source: |-
+        {
+          "code": "TC01",
+          "posX": 1000.0,
+          "posY": 750.0,
+          "heading": 90.0,
+          "velocity": 10.0,
+          "battery": 90,
+          "status": "MOVING_TO_GATE"
+        }
     evidenceIds: [autowingcar-public]
-  - title: 운행 명령과 응답 확인
-    description: 차량에 운행 명령을 보내고, 명령 확인 응답과 실제 차량 상태를 따로 확인합니다.
-    implementation: 명령을 데이터베이스에 저장하고 커밋한 뒤 MQTT로 발행합니다. MQTT 응답은 명령 수신 확인으로, 차량 상태 보고는 실제 운행 상태로 반영합니다.
-    processSteps:
-    - 관제 요청을 검증하고 데이터베이스 변경
-    - 트랜잭션 커밋 뒤 MQTT 운행 명령 발행
-    - 차량의 확인 응답은 명령 수신 여부로 처리
-    - 이후 차량 상태 보고를 운행 상태로 반영
-    diagram:
-      src: /assets/autowing-command-flow.svg
-      alt: 관제 요청을 데이터베이스에 저장한 뒤 MQTT 명령을 보내고, 차량의 명령 확인과 실제 상태 보고를 따로 받는 흐름
-      caption: 명령 확인 응답과 실제 운행 상태 보고를 구분합니다.
-      width: 1120
-      height: 340
-    evidenceIds: [autowingcar-public]
-  - title: 관제 알림·상태 저장
-    description: 차량·항공편·비상 상태 변화를 관제 화면에 알리고, 차량별 최신 상태와 위치·속도·배터리 등의 주행 이력을 저장합니다.
-    implementation: Redis에는 조회에 쓰는 최신 상태를 두고, PostgreSQL에는 위치·속도·배터리 등 주행 이력을 기록합니다.
-    evidenceIds: [autowingcar-public]
-  - title: 주행 경로 탐색
-    description: 현재 위치에서 목적지까지 이동 시간이 짧은 기본 경로와 대체 경로를 최대 두 개 더 찾습니다.
-    implementation: A*로 이동 시간이 짧은 기본 경로를 찾고, Yen 탐색으로 그 길의 갈림점마다 다른 구간을 붙여 대체 경로를 최대 두 개 더 구합니다. 이미 찾은 길은 빼고, 후보 중 이동 시간이 짧은 길부터 보여줍니다.
+  - title: 주행 경로 계산
+    description: 현재 위치에서 목적지까지 이동 시간이 짧은 경로와 대체 경로를 계산합니다.
+    implementation: 지도에서 교차로는 노드, 도로 구간은 간선으로 다룹니다. A*는 지금까지 든 이동 시간 `g`와 남은 직선거리를 지도 최대 속도로 나눈 예상 시간 `h`를 더한 `f = g + h`가 낮은 교차로를 먼저 탐색합니다. 통제 중인 길은 건너뛰며, 간선별 이동 시간이 없으면 거리/10을 비용으로 씁니다. Yen 탐색은 최단 경로의 각 갈림점에서 이미 사용한 도로를 제외하고 우회 구간을 찾은 뒤, 원래 경로 앞부분에 붙여 비용이 짧은 대체 경로를 최대 두 개 더 고릅니다.
     codeSnippets:
     - language: java
-      title: 이동 시간이 짧아지는 경로로 갱신
+      title: A* 기본 경로 탐색 · 누적 비용과 예상 비용으로 다음 교차로 선택
       source: |-
-        // 출발점부터 현재 노드까지의 비용에 이번 간선 비용을 더합니다.
-        double newG = gScore.getOrDefault(currentNode.getId(), Double.MAX_VALUE)
-            + edgeCost(edge);
-        // 이 경로가 이웃 노드까지 기존에 찾은 경로보다 짧을 때만 갱신합니다.
-        if (newG < gScore.getOrDefault(neighbor.getId(), Double.MAX_VALUE)) {
-            // 이웃 노드에 어떤 간선으로 왔는지 저장해 나중에 경로를 되짚습니다.
-            cameFrom.put(neighbor.getId(), edge);
-            // 출발점부터 이웃 노드까지의 새 최저 비용을 기록합니다.
-            gScore.put(neighbor.getId(), newG);
-            // 지금까지 비용과 목적지까지의 예상 비용을 합쳐 다음 탐색 순서를 정합니다.
-            openSet.add(new PathNode(neighbor, newG, newG + heuristic(neighbor, end)));
+        // f가 가장 낮은 노드를 먼저 꺼내는 우선순위 큐가 A* 탐색 순서를 정합니다.
+        PriorityQueue<PathNode> openSet = new PriorityQueue<>(
+            Comparator.comparingDouble(PathNode::getF));
+        Map<Long, Double> gScore = new HashMap<>(); // 출발점부터의 실제 비용
+        Map<Long, Edge> cameFrom = new HashMap<>(); // 경로를 되짚을 때 쓸 이전 간선
+        Set<Long> closedSet = new HashSet<>();
+
+        gScore.put(start.getId(), 0.0);
+        openSet.add(new PathNode(start, 0.0, heuristic(start, end)));
+
+        while (!openSet.isEmpty()) {
+            PathNode current = openSet.poll(); // f = g + h가 가장 낮은 노드
+            Node currentNode = current.node;
+            if (currentNode.getId().equals(end.getId())) {
+                return reconstructEdgeList(cameFrom, currentNode);
+            }
+            if (closedSet.contains(currentNode.getId())) continue;
+            closedSet.add(currentNode.getId());
+
+            for (Edge edge : graphCache.getEdges(currentNode)) {
+                if (excludedEdges.contains(edge.getId())) continue;
+                Node neighbor = edge.getDstNode();
+                if (closedSet.contains(neighbor.getId())) continue;
+                if (edge.getStatus() == MapStatus.BLOCKED
+                    || neighbor.getStatus() == MapStatus.BLOCKED) continue;
+
+                double newG = gScore.getOrDefault(currentNode.getId(), Double.MAX_VALUE)
+                    + edgeCost(edge);
+                if (newG < gScore.getOrDefault(neighbor.getId(), Double.MAX_VALUE)) {
+                    cameFrom.put(neighbor.getId(), edge);
+                    gScore.put(neighbor.getId(), newG);
+                    openSet.add(new PathNode(neighbor, newG,
+                        newG + heuristic(neighbor, end))); // f = g + h
+                }
+            }
         }
+        return Collections.emptyList();
     - language: java
-      title: 다른 구간을 잇는 대체 경로 후보
+      title: Yen 대체 경로 · 갈림점 이후 다른 길을 후보에 추가
       source: |-
-        // 기존 경로와 겹치는 간선을 빼고 갈림점부터 목적지까지 다른 길을 찾습니다.
+        // 이미 찾은 경로와 같은 구간을 피한 뒤, 갈림점부터 목적지까지 다시 탐색합니다.
         List<Edge> spurPath = findSinglePath(spurNode, end, excluded);
         if (!spurPath.isEmpty()) {
-            // 기존 경로에서 갈림점까지의 구간에 새로 찾은 구간을 이어 붙입니다.
+            // 기본 경로에서 갈림점까지의 구간(rootPath)에 새 구간을 이어 붙입니다.
             List<Edge> totalPath = new ArrayList<>(rootPath);
             totalPath.addAll(spurPath);
-            // 이미 결과나 후보에 들어 있는 길은 다시 넣지 않습니다.
+            // 이미 결과나 후보에 있는 경로는 중복으로 추가하지 않습니다.
             if (!containsPath(candidates, resultPaths, totalPath)) {
-                // 후보 중 이동 비용이 가장 낮은 길이 먼저 선택됩니다.
                 candidates.add(totalPath);
             }
         }
     evidenceIds: [autowingcar-public]
-  postProjectImprovement:
-    title: Redis Streams 운행 기록 저장
-    description: 운행 기록을 모아 한꺼번에 저장하고, 저장에 실패한 기록은 다시 처리합니다.
-    implementation: 차량 상태 저장이 끝나면 운행 기록을 Redis Streams에 넣습니다. 별도 저장 프로그램이 기록을 묶어 데이터베이스에 저장하고, 저장에 성공한 뒤 완료 표시를 합니다. 실패한 기록은 남겨 두었다가 다시 처리합니다.
+  - title: 운행 명령·응답 확인
+    description: 관제 화면에서 경로를 골라 차량에 운행 명령을 보내고, 수신 응답과 실제 운행 상태를 확인합니다.
+    implementation: MQTT ACK는 명령을 받았다는 응답으로, 차량 상태 보고는 현재 운행 상태로 따로 처리합니다.
     processSteps:
-    - 차량 상태 저장을 마친 뒤 운행 기록을 보관
-    - 별도 저장 프로그램이 기록을 묶어 데이터베이스에 저장
-    - 저장 성공을 확인한 뒤 처리 완료 표시
-    - 저장 실패 기록은 남겨 두고 다시 처리
-    diagram:
-      src: /assets/autowing-streams-flow.svg
-      alt: 차량 상태를 저장하고 운행 기록을 모은 뒤 데이터베이스에 저장합니다. 저장에 실패하면 다시 시도합니다.
-      caption: 운행 기록을 모아 저장하고, 실패한 기록은 다시 시도합니다.
-      width: 1200
-      height: 390
-    verification: 단위 시험에서 저장 성공 뒤 완료 표시, 데이터베이스 오류 뒤 재시도, 같은 기록의 식별값 유지를 확인했습니다.
-    evidenceIds: [autowingcar-streams, autowingcar-streams-tests]
+    - 관제에서 차량과 운행 경로를 선택
+    - 서버가 차량에 MQTT 명령 전송
+    - 차량 ACK로 명령 수신 확인
+    - 다음 상태 보고로 실제 운행 확인
+    evidenceIds: [autowingcar-public]
+  - title: 운행 이력 저장
+    description: 차량 위치와 운행 상태 변화를 이력으로 남깁니다.
+    implementation: 운행 이력은 Redis Streams에 모아 PostgreSQL에 묶음 저장합니다. 데이터베이스 저장에 실패하면 완료 처리하지 않아 다음 처리 때 다시 저장합니다.
+    evidenceIds: [autowingcar-streams]
   roleAreas:
   - title: 차량 통신·실시간 관제
     items:
@@ -152,7 +176,7 @@ detail:
     symptom: 차량이 게이트에 도착한 뒤에도 늦게 도착한 이전 운행 상태가 저장될 수 있었습니다.
     cause: 서버가 차량 상태를 바꾼 뒤, 이전 메시지에 담긴 상태를 다시 저장했습니다.
     solution: 처리 중 상태가 바뀌면 차량의 새 상태를 저장하고, 전환 중 도착한 오래된 상태는 반영하지 않도록 했습니다.
-    verification: 상태 전환 뒤 새 상태가 유지되는지 확인하는 시험을 마련했습니다.
+    verification: 게이트 도착 자동 전이 뒤 늦은 상태 보고가 이전 값으로 되돌리지 않는지 단위 시험으로 확인했습니다.
     evidenceIds: [autowingcar-public]
     metricIds: []
     diagram:
@@ -166,11 +190,15 @@ detail:
       language: java
       title: 자동 상태 전환 뒤 오래된 메시지 값을 덮어쓰지 않음
       source: |-
+        // 자동 동작 전의 서버 상태를 기억합니다.
         CarStatus preAutoActionStatus = assignedCar.getCarStatus();
+        // 차량 보고 위치를 바탕으로 게이트 도착 등 자동 전이를 처리합니다.
         checkAndTriggerAutoActions(assignedCar, x, y, status);
+        // 자동 전이가 발생했다면, 보고에 담긴 이전 상태 대신 서버의 새 상태를 씁니다.
         if (assignedCar.getCarStatus() != preAutoActionStatus) {
             status = assignedCar.getCarStatus();
         }
+        // 이후 상태 조정과 저장에도 앞에서 선택한 상태를 전달합니다.
         status = stateCoordinator.resolveCarStatus(assignedCar, status);
         assignedCar.updateStatus(x, y, heading, velocity, battery, status);
       url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
@@ -228,20 +256,8 @@ contributions:
   status: reported
 outcomes:
 - id: autowingcar-outcome-1
-  text: MQTT 상태 보고의 오래된 값이 서버 자동 전이 상태를 덮지 않도록 처리
-  evidenceIds: [autowingcar-public]
-  status: reported
-- id: autowingcar-outcome-2
-  text: 차량 주행 명령을 데이터베이스 커밋 뒤 MQTT로 발행하도록 순서 조정
-  evidenceIds: [autowingcar-command-order]
-  status: reported
-- id: autowingcar-outcome-3
-  text: Redis Streams에 운행 기록을 모아 저장하고 실패한 기록을 재처리
-  evidenceIds: [autowingcar-streams]
-  status: reported
-- id: autowingcar-outcome-4
-  text: 데이터베이스 저장 성공 뒤 완료 처리, 오류 뒤 재처리, 기록 식별값 유지에 대한 단위 시험 구성
-  evidenceIds: [autowingcar-streams-tests]
+  text: 차량 위치 확인부터 경로 선택, 명령 전달과 운행 이력 저장까지 관제 흐름으로 연결
+  evidenceIds: [autowingcar-public, autowingcar-streams]
   status: reported
 metrics: []
 evidence:

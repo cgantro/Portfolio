@@ -11,9 +11,11 @@ export function getStaticPaths() {
 const { project } = Astro.props;
 const related = projects.filter(item => item.id !== project.id);
 const detail = project.detail;
-const architectureNotes = project.id === 'robotpal' ? project.architecture.summary : project.architecture.summary.slice(1);
+const architectureNotes = project.id === 'robotpal' || project.id === 'autowingcar'
+  ? project.architecture.summary
+  : project.architecture.summary.slice(1);
 const projectTitleId = (index: number) => `troubleshooting-${project.id}-${index}`;
-const codeMarkdown = (code: { language: 'cpp' | 'java'; title: string; source: string } | undefined) => code
+const codeMarkdown = (code: { language: 'cpp' | 'java' | 'json'; title: string; source: string } | undefined) => code
   ? `\`\`\`${code.language} title="${code.title}"\n${code.source}\n\`\`\``
   : '';
 const robotpalFpsRows = project.id === 'robotpal'

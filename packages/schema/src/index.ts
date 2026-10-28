@@ -50,7 +50,7 @@ const ProjectFeatureSchema = z.object({
   description: NonEmpty,
   implementation: NonEmpty.optional(),
   codeSnippets: z.array(z.object({
-    language: z.enum(['cpp', 'java']), title: NonEmpty, source: NonEmpty,
+    language: z.enum(['cpp', 'java', 'json']), title: NonEmpty, source: NonEmpty,
   }).strict()).min(1).optional(),
   processSteps: z.array(NonEmpty).min(2).optional(),
   diagram: z.object({

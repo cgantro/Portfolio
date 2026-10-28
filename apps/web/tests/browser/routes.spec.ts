@@ -202,12 +202,15 @@ test('homepage introduces the developer before the featured project cases', asyn
   expect(demoRequests).toBe(0);
 });
 
-test('AutoWing Car presents Redis Streams as a storage feature', async ({ page }) => {
+test('AutoWing Car shows telemetry formats and orders its features as a vehicle workflow', async ({ page }) => {
   await page.goto(`${base}projects/autowingcar/`);
   const featureTitles = await page.locator('.project-feature-list h3').allTextContents();
+  expect(featureTitles.slice(0, 4)).toEqual(['견인차 상태 관제', '주행 경로 계산', '운행 명령·응답 확인', '운행 이력 저장']);
   expect(featureTitles).not.toContain('프로젝트 종료 후 개선');
-  await expect(page.getByRole('heading', { name: 'Redis Streams 운행 기록 저장' })).toBeVisible();
-  await expect(page.locator('.project-post-improvement')).toContainText('Redis Streams');
+  await expect(page.getByText('MQTT 수신 형식 · autowing_car/v1/monitoring')).toBeVisible();
+  await expect(page.getByText('WebSocket·STOMP 전송 형식 · /topic/towingcar/TC01')).toBeVisible();
+  await expect(page.locator('.project-content[data-project-layout="autowingcar"] .feature-process').first()).toHaveCSS('display', 'block');
+  await expect(page.getByRole('heading', { name: '운행 이력 저장' })).toBeVisible();
 });
 
 test('DroneSim stays absent until explicit launch and opens in a separate tab', async ({ page }) => {

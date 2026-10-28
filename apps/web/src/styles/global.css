@@ -171,6 +171,8 @@ h3 { font-size: 25px; }
 .project-feature-list p.feature-verification { margin-top: 12px; padding-left: 14px; border-left: 2px solid var(--color-accent); color: var(--color-muted); font-size: 14px; }
 .feature-process { display: flex; flex-wrap: wrap; gap: 8px 32px; max-width: 960px; margin: 14px 0 0; padding-left: 20px; list-style: disc; }
 .feature-process li { flex: 1 1 160px; min-width: 0; padding: 4px 0; border: 0; color: var(--color-muted); font-size: 14px; line-height: 1.6; }
+.project-content[data-project-layout="autowingcar"] .feature-process { display: block; max-width: 780px; margin-top: 12px; }
+.project-content[data-project-layout="autowingcar"] .feature-process li { padding: 3px 0; }
 .feature-diagram { width: 100%; min-width: 0; max-width: 980px; margin: 18px 0 0; }
 .feature-diagram .architecture-scroll { width: 100%; }
 .feature-diagram img { display: block; width: 100%; height: auto; }
