@@ -45,7 +45,7 @@ detail:
     evidenceIds: [autowingcar-public]
   - title: 운행 명령과 응답 확인
     description: 차량에 운행 명령을 보내고, 명령 확인 응답과 실제 차량 상태를 따로 확인합니다.
-    implementation: 명령을 데이터베이스에 저장하기 전에 MQTT로 발행하면, 저장이 취소돼도 차량은 명령을 받을 수 있습니다. 서버 기록에는 없는 명령이 차량에 전달되는 상황을 막기 위해 명령을 먼저 저장하고 커밋 뒤 발행합니다. MQTT 응답은 명령 수신 확인이며, 실제 운행 상태는 뒤이어 오는 차량 상태 보고로 갱신합니다.
+    implementation: 명령을 데이터베이스에 저장하고 커밋한 뒤 MQTT로 발행합니다. MQTT 응답은 명령 수신 확인으로, 차량 상태 보고는 실제 운행 상태로 반영합니다.
     processSteps:
     - 관제 요청을 검증하고 데이터베이스 변경
     - 트랜잭션 커밋 뒤 MQTT 운행 명령 발행
@@ -161,17 +161,17 @@ detail:
       url: https://github.com/cgantro/Autowing_car/blob/main/Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
   - title: 데이터베이스 반영 전에 차량 명령이 발행될 수 있음
     symptom: 데이터베이스 저장이 취소돼도 차량은 운행 명령을 받을 수 있었습니다.
-    cause: 저장이 끝나기 전에 별도로 차량에 명령을 보냈습니다.
-    solution: 데이터베이스 저장이 끝난 뒤에 차량에 명령을 보내도록 순서를 바꿨습니다.
+    cause: MQTT 발행이 데이터베이스 커밋을 기다리지 않았습니다.
+    solution: 데이터베이스 커밋이 끝난 뒤 명령을 발행하도록 순서를 바꿨습니다.
     verification: 서비스 테스트에서 커밋 뒤 발행되는 MQTT 명령과 전달 내용을 확인했습니다. 외부 MQTT 전달까지 원자성을 보장하는 구조는 아닙니다.
     evidenceIds: [autowingcar-command-order]
     metricIds: []
     diagram:
       src: /assets/autowing-after-commit.svg
-      alt: 데이터베이스 변경을 커밋한 뒤에 MQTT 운행 명령을 발행하는 순서
-      caption: 커밋 뒤 명령을 발행하도록 순서를 정했으며, 데이터베이스와 MQTT를 하나의 원자적 트랜잭션으로 묶지는 않습니다.
+      alt: 데이터베이스 커밋 전에 명령을 발행하면 저장 실패 뒤 차량만 명령을 받으며, 커밋 뒤 발행하면 저장 실패 시 명령을 보내지 않는 비교
+      caption: 잘못된 순서와 수정한 순서를 비교합니다.
       width: 1120
-      height: 240
+      height: 470
     code:
       path: Backend/autowing_car/src/main/java/com/project/service/MissionService.java
       language: java
