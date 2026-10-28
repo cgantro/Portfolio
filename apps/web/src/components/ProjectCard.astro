@@ -9,7 +9,7 @@ const { project, headingLevel = 'h3' } = Astro.props;
     <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="960" height="640" loading="lazy" />
   </a>
   <div class="archive-project-copy">
-    <p class="project-state">{project.status === 'ongoing' ? `진행 중 · ${project.team}` : `${project.period} · ${project.team}`}</p>
+    <p class="project-state">{project.period} · {project.team}</p>
     {headingLevel === 'h2' ? <h2><a href={projectUrl(project.id)}>{project.title}</a></h2> : <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>}
     <p class="archive-subtitle">{project.subtitle}</p>
     <p>{project.summary[0]}</p>

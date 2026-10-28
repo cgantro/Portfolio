@@ -6,12 +6,12 @@ import { localUrl, projectUrl, assetUrl } from '../lib/urls.mjs';
 const projectById = Object.fromEntries(projects.map(project => [project.id, project]));
 const robotpal = projectById.robotpal;
 const dronesim = projectById.dronesim;
-const supportingProjects = [projectById.mausoleum, projectById.autowingcar];
+const supportingProjects = [projectById.autowingcar, projectById.mausoleum];
 const education = timeline.filter(item => item.type === 'edu');
 const certifications = timeline.filter(item => item.type === 'cert');
 const featured = [
-  { project: dronesim, side: 'copy-first', summary: '탄천교 주변 가상 환경에서 드론 비행과 외벽 촬영 임무를 실행하고, 지상통제 명령과 촬영 기록을 함께 시험합니다.' },
-  { project: robotpal, side: 'image-first', summary: '이동 로봇과 로봇팔을 가상 환경에서 조작하고, 카메라 영상을 외부 인식 프로그램에 전달하는 시뮬레이터입니다.' },
+  { project: robotpal, side: 'image-first', summary: '카메라 JPEG 압축이 시뮬레이션 갱신을 늦추는 원인을 측정하고, 압축 작업과 프레임 전송을 분리했습니다.' },
+  { project: dronesim, side: 'copy-first', summary: '지상통제 명령을 일정한 주기의 비행 계산에 연결하고, 촬영 영상과 비행 기록을 관제 프로그램에 전달합니다.' },
 ];
 const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming-fps', 'camera-send-fps'].includes(metric.id));
 ---
@@ -19,8 +19,8 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
 <SiteLayout>
 <section class="intro-section" aria-labelledby="home-title">
   <div class="container intro-copy">
-    <h1 id="home-title">시뮬레이션과 실시간 통신 소프트웨어를 개발합니다.</h1>
-    <p class="intro-summary">드론 비행과 영상 수집 임무를 반복 시험하는 시뮬레이터를 개발하고 있습니다. 로봇 시뮬레이터에서는 영상 압축 병목을 측정하고 처리 구조를 개선했습니다.</p>
+    <h1 id="home-title">실시간 통신 소프트웨어 개발자 홍윤표입니다.</h1>
+    <p class="intro-summary">실시간 데이터가 늦거나 순서가 바뀌어 시스템 동작이 어긋나는 문제를 해결해 왔습니다. 문제를 풀다 보니 데이터마다 다른 전달 기준을 설계하는 통신 소프트웨어에 관심이 생겼습니다.</p>
     <div class="intro-actions">
       <a class="button" href="#projects">프로젝트 보기 <span aria-hidden="true">↓</span></a>
       <a class="button button-outline" href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
@@ -42,7 +42,7 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
             <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1200" height="800" loading="lazy" />
           </a>
           <div class="featured-copy">
-            <p class="project-state">{project.status === 'ongoing' ? `진행 중 · ${project.team}` : `${project.period} · ${project.team}`}</p>
+            <p class="project-state">{project.period} · {project.team}</p>
             <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
             <p class="featured-summary">{summary}</p>
             <p class="featured-role"><strong>담당</strong> {project.role[0]}</p>
@@ -73,9 +73,7 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
         <div>
           <p class="project-state">{project.period} · {project.team}</p>
           <h3><a href={projectUrl(project.id)}>{project.title}</a></h3>
-          <p>{project.id === 'mausoleum'
-            ? '하나의 전용 서버에서 여러 게임 방의 진행 상태를 분리하고, UDP 음성 서버를 통해 방별 실시간 음성 통신을 구현했습니다.'
-            : 'MQTT 차량 상태와 명령 응답을 처리하고, WebSocket으로 관제 화면을 갱신했습니다. 늦게 도착한 상태 메시지가 최신 운행 상태를 덮어쓰지 않도록 처리했습니다.'}</p>
+          <p>{project.summary[0]}</p>
           <p class="supporting-role"><strong>담당</strong> {project.role[0]}</p>
           <ul class="supporting-highlights">
             {(project.id === 'mausoleum'
@@ -87,6 +85,25 @@ const robotpalMetrics = robotpal.metrics.filter(metric => ['simulation-streaming
       </article>
     ))}
   </div>
+</section>
+
+<section class="container roadmap-section" id="roadmap" aria-labelledby="roadmap-title">
+  <div class="section-heading"><h2 id="roadmap-title">앞으로 풀고 싶은 문제</h2></div>
+  <p class="roadmap-intro">제어 명령과 상태 정보에는 순서와 정확성이, 영상과 음성에는 낮은 지연과 최신성이 중요합니다. 연결 상태가 나빠져도 각 데이터가 필요한 기준에 맞게 전달되는 통신 구조를 만들고 싶습니다.</p>
+  <ol class="roadmap-list">
+    <li>
+      <h3>전송부터 반영까지 측정</h3>
+      <p>명령을 보낸 뒤 시스템에 반영되기까지의 지연, 대기열에 머문 시간, 유실과 역순 도착을 한 흐름에서 확인할 시험 환경을 만들겠습니다.</p>
+    </li>
+    <li>
+      <h3>데이터마다 전달 기준 설계</h3>
+      <p>명령은 순서·중복·응답을 관리하고, 상태는 오래된 값을 걸러내며, 영상과 음성은 만료된 자료를 버려 최신성을 지키는 방식을 다루겠습니다.</p>
+    </li>
+    <li>
+      <h3>불안정한 연결과 다수 장비에서 검증</h3>
+      <p>지연·유실·연결 끊김과 재연결을 재현하고, 여러 장비가 함께 통신할 때 복구와 처리 부하가 어떻게 달라지는지 확인하겠습니다.</p>
+    </li>
+  </ol>
 </section>
 
 <section class="skills-section" id="skills" aria-labelledby="skills-title">

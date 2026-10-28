@@ -122,12 +122,16 @@ test('mobile project tables fit and architecture diagrams have a keyboard-scroll
 test('project index presents all four cases without client-side controls', async ({ page }) => {
   await page.goto(`${base}projects/`);
   await expect(page.locator('.archive-project')).toHaveCount(4);
-  await expect(page.locator('.archive-project').first()).toContainText('DroneSim');
-  await expect(page.locator('.archive-project').first()).toContainText('진행 중 · 개인 프로젝트');
+  await expect(page.locator('.archive-intro')).toContainText('전문 분야로 삼고 싶어졌습니다');
+  await expect(page.locator('.archive-project').first()).toContainText('RobotPal');
+  await expect(page.locator('.archive-project').first()).toContainText('2025.11');
   await expect(page.locator('.archive-project').first()).toContainText('담당');
   await expect(page.locator('.archive-project').first().locator('ul')).toHaveCount(0);
   await expect(page.locator('astro-island')).toHaveCount(0);
-  await expect(page.locator('.archive-project').nth(3)).toContainText('오토잉카');
+  await expect(page.locator('.archive-project').nth(1)).toContainText('오토잉카');
+  await expect(page.locator('.archive-project').nth(2)).toContainText('영묘');
+  await expect(page.locator('.archive-project').nth(3)).toContainText('DroneSim');
+  await expect(page.locator('.archive-project').nth(3)).toContainText('2026.08');
 });
 
 test('keyboard skip link and navigation are reachable', async ({ page }) => {
@@ -158,19 +162,22 @@ test('mobile menu opens by keyboard and supporting projects stay visible', async
   await expect(page.locator('.mobile-nav')).toHaveAttribute('open', '');
   await expect(page.locator('.mobile-nav nav a', { hasText: '프로젝트' })).toBeVisible();
   await expect(page.locator('.supporting-project')).toHaveCount(2);
-  await expect(page.locator('.supporting-project').nth(1)).toContainText('MQTT');
+  await expect(page.locator('.supporting-project').first()).toContainText('MQTT');
 });
 
 test('homepage introduces the developer before the featured project cases', async ({ page }) => {
   let demoRequests = 0;
   page.on('request', request => { if (request.url().startsWith('https://cgantro.github.io/DroneSim/')) demoRequests += 1; });
   await page.goto(base);
-  await expect(page.getByRole('heading', { name: '시뮬레이션과 실시간 통신 소프트웨어를 개발합니다.' })).toBeVisible();
-  await expect(page.locator('.intro-summary')).toContainText('드론 비행과 영상 수집 임무를 반복 시험하는 시뮬레이터');
+  await expect(page.getByRole('heading', { name: '실시간 통신 소프트웨어 개발자 홍윤표입니다.' })).toBeVisible();
+  await expect(page.locator('.intro-summary')).toContainText('데이터마다 다른 전달 기준');
   await expect(page.locator('main h1')).not.toContainText('C++');
+  await expect(page.getByRole('heading', { name: '앞으로 풀고 싶은 문제' })).toBeVisible();
+  await expect(page.locator('.roadmap-list li')).toHaveCount(3);
+  await expect(page.locator('.roadmap-list')).toContainText('유실과 역순 도착');
   await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();
-  await expect(page.locator('.featured-project').first()).toContainText('DroneSim');
+  await expect(page.locator('.featured-project').first()).toContainText('RobotPal');
   await expect(page.locator('.featured-project').first()).toContainText('담당');
   const launch = page.getByRole('link', { name: '웹 데모 실행' });
   await expect(launch).toHaveAttribute('target', '_blank');

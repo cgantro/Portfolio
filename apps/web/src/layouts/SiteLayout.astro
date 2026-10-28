@@ -3,7 +3,7 @@ import { profile } from '@portfolio/career-data';
 import { localUrl } from '../lib/urls.mjs';
 import '../styles/global.css';
 interface Props { title?: string; description?: string; active?: string; }
-const { title, description = profile.tagline, active = '' } = Astro.props;
+const { title, description = '실시간 통신에서 지연·순서·최신성 문제를 해결한 프로젝트와 앞으로 다루고 싶은 문제를 소개합니다.', active = '' } = Astro.props;
 const pageTitle = title ? `${title} — ${profile.name}` : `${profile.name} — 개발 포트폴리오`;
 const navigation = [
   { id: 'projects', label: '프로젝트', href: localUrl('projects/') },
@@ -28,7 +28,7 @@ const navigation = [
     <a class="skip-link" href="#main">본문으로 바로가기</a>
     <header class="site-header">
       <div class="container header-inner">
-        <a class="wordmark" href={localUrl()} aria-label={`${profile.name} 포트폴리오 홈`}><span>{profile.name}<small>시뮬레이션·통신 개발자</small></span></a>
+        <a class="wordmark" href={localUrl()} aria-label={`${profile.name} 포트폴리오 홈`}><span>{profile.name}<small>실시간 통신 SW 개발자</small></span></a>
         <nav class="desktop-nav" aria-label="주 메뉴">
           {navigation.map(item => <a href={item.href} aria-current={active === item.id ? 'page' : undefined}>{item.label}</a>)}
           <a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
@@ -44,7 +44,7 @@ const navigation = [
     </header>
     <main id="main"><slot /></main>
     <footer class="site-footer container">
-      <div><strong>{profile.name}</strong><p>{profile.role}</p></div>
+      <div><strong>{profile.name}</strong><p>실시간 통신 SW 개발자</p></div>
       <div class="footer-links"><a href={`mailto:${profile.email}`}>이메일 ↗</a><a href={profile.github} target="_blank" rel="noopener noreferrer">GitHub ↗</a></div>
       <small>© {new Date().getFullYear()} {profile.nameEn}</small>
     </footer>
