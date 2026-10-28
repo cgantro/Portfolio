@@ -72,6 +72,15 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
               </div>
               <figcaption>{feature.diagram.caption}</figcaption>
             </figure>}
+            {feature.packetDiagram && <details class="packet-diagram-disclosure">
+              <summary>{feature.packetDiagram.summary}</summary>
+              <figure class="feature-diagram troubleshooting-diagram">
+                <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + feature.title + ' 패킷 그림. 가로로 이동할 수 있습니다.'}>
+                  <img src={assetUrl(feature.packetDiagram.src)} alt={feature.packetDiagram.alt} width={feature.packetDiagram.width} height={feature.packetDiagram.height} loading="lazy" />
+                </div>
+                <figcaption>{feature.packetDiagram.caption}</figcaption>
+              </figure>
+            </details>}
             {feature.verification && <p class="feature-verification">{feature.verification}</p>}
           </li>)}
         </ul>

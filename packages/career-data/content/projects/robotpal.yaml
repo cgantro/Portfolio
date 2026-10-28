@@ -1,9 +1,9 @@
 id: robotpal
 title: RobotPal
-subtitle: JETANK 이동 로봇·로봇팔 제어 시뮬레이터
-category: 로봇 시뮬레이션과 실시간 영상 전송
+subtitle: 가상 이동 로봇과 로봇팔을 조작하고 카메라 영상을 외부 프로그램에 전송하는 시뮬레이터
+category: 가상 로봇 제어와 영상 통신
 summary:
-- 카메라 JPEG 압축이 시뮬레이션 갱신을 늦추는 문제를 측정하고, 압축 작업과 프레임 전송을 분리했습니다.
+- 외부 제어 명령을 가상 로봇의 주행·관절 동작으로 바꾸고, 카메라 영상은 별도 작업자와 전송 경로로 전달했습니다.
 period: 2025.11 – 2025.12
 startDate: 2025-11
 endDate: 2025-12
@@ -11,8 +11,8 @@ status: complete
 team: 4인
 role:
 - 메인 스레드를 점유하던 JPEG 압축을 별도 작업 스레드로 분리하고, 프레임 대기열과 전송 순서를 관리했습니다.
-- 실물 JETANK의 주행값을 측정해 가상 이동 속도를 보정하고, 제어 화면에서 장비 상태 조회와 조작 입력 전달을 연결했습니다.
-- 외부 JSON 패킷에서 이동체 모터와 로봇팔 서보 값을 읽어 가상 로봇을 조작했습니다.
+- 외부 제어 패킷의 JSON 명령을 해석해 가상 이동체와 로봇팔 상태에 반영했습니다.
+- TCP와 WebSocket의 송수신을 공통 전송 인터페이스로 분리했습니다.
 stack:
 - C++17
 - OpenGL
@@ -24,28 +24,35 @@ cover:
   alt: 가상 이동 로봇과 로봇팔이 주행로 위에 있고 왼쪽 위에 카메라 영상 창이 열린 RobotPal 화면
 architecture:
   src: /assets/robotpal-system-architecture.svg
-  alt: 가상 카메라 영상과 제어 명령이 시뮬레이터와 외부 인식 모듈 사이를 오가는 구조
+  alt: 외부 제어 패킷은 실행 환경에 맞는 전송 구현과 수신 큐를 거쳐 가상 로봇을 제어하고, 카메라 영상은 JPEG 작업자와 같은 전송 인터페이스를 거쳐 외부 프로그램으로 전달되는 구조
   summary:
-  - FBO 영상은 GPU에서 읽은 뒤 JPEG 작업 대기열과 TCP·WebSocket 전송 경로로 전달합니다.
-  - 외부 JSON 명령에 담긴 모터·서보 값을 받아 가상 로봇의 이동과 로봇팔 조작에 반영합니다.
+  - 제어 명령은 TCP 또는 WebSocket으로 받고, 공통 수신 큐에서 꺼내 JSON의 명령 종류에 따라 주행·서보 값으로 나눕니다.
+  - 카메라 프레임은 제한된 JPEG 작업자 큐를 거쳐 같은 전송 인터페이스로 외부 프로그램에 보냅니다.
 detail:
   layout: robotpal
-  overview: JETANK 이동 로봇과 로봇팔을 가상 환경에서 조작하고, 가상 카메라 영상을 외부 인식 프로그램에 전달하는 시뮬레이터입니다. 실물 JETANK의 주행값을 측정해 가상 이동 속도를 보정했습니다. 외부 명령은 가상 로봇에 반영하고, 실물 장비는 제어 화면에서 상태 조회와 조작 입력을 연결합니다.
+  overview: 가상 이동 로봇과 로봇팔을 외부 프로그램의 제어 명령으로 조작하고, 가상 카메라 영상을 영상 인식 프로그램에 전달하는 시뮬레이터입니다. 주행·관절 명령 수신과 카메라 영상 송신은 공통 전송 인터페이스를 사용하며, 실행 환경에 따라 TCP 또는 WebSocket 구현이 연결됩니다.
   verificationScope:
   - 측정은 1232×832 내장 GPU 환경의 보고값이며 영상 수신·디코딩은 포함하지 않았습니다.
   - 카메라 송신률 40.05 FPS는 목표 60 FPS에 미달했습니다.
   features:
   - title: 가상 로봇 조작
-    description: 외부 제어 명령으로 이동 로봇의 주행, 로봇팔 관절 이동, 집게 조작을 실행합니다.
-    implementation: 외부 제어 패킷에서 JSON을 읽어 모터와 서보 값을 해석하고, 주행 값은 가상 이동체에, 서보 값은 해당 관절에 반영합니다. 가상 이동체의 직진·회전 속도는 실물 JETANK를 반복 주행해 측정한 값을 기준으로 보정했습니다.
+    description: 외부 프로그램의 주행·서보 명령으로 가상 이동체와 로봇팔 관절을 조작합니다.
+    implementation: 수신 콜백은 패킷을 큐에 넣고, 시뮬레이션 갱신 때 큐를 비우며 JSON의 type에 따라 drive와 servo 명령을 나눕니다. 여러 drive 명령이 한 번의 갱신 전에 쌓이면 마지막 값을 사용하고, 서보 명령은 ID별로 저장합니다. drive의 좌우 입력 평균은 직진 목표 속도, 차이는 회전 목표 속도로 바꿔 시간 간격만큼 위치와 방향에 반영하며, servo는 목표 각도와 속도를 따라 관절을 움직입니다.
     processSteps:
-    - 외부 프로그램이 제어 패킷 전송
-    - 명령 유형에 따라 이동체·서보 값 해석
-    - 가상 로봇의 주행·관절 상태 갱신
+    - 전송 경로가 받은 패킷을 수신 큐에 저장
+    - 시뮬레이션 갱신에서 JSON 명령 종류와 값을 해석
+    - 주행 입력은 이동·회전으로, 서보 입력은 ID별 관절 각도로 반영
+    packetDiagram:
+      summary: 제어 패킷 예시와 값이 움직임으로 바뀌는 과정 보기
+      src: /assets/robotpal-control-packet.svg
+      alt: 4바이트 길이 필드 뒤에 JSON 데이터가 붙는 패킷 형식, 주행 입력이 초당 2.4센티미터 또는 24도 목표 속도로 계산되는 예시, 서보 ID와 각도·속도 값의 해석
+      caption: 예시 값으로 설명한 수신 형식과 코드의 속도 환산입니다. 0.3 입력은 직진 목표 속도 2.4cm/s에 해당하며, 좌우 입력 차이가 0.6이면 회전 목표 속도는 24°/s입니다. 이는 한 프레임 이동량이 아니라 초당 목표 속도입니다.
+      width: 1200
+      height: 690
     evidenceIds: [robotpal-public]
   - title: 가상 카메라
     description: 시뮬레이터의 가상 카메라 영상을 외부 영상 인식 프로그램에 전송합니다.
-    implementation: OpenGL 카메라 화면을 GPU에서 읽어온 뒤 JPEG로 압축합니다. 압축은 최대 6프레임 대기열을 거쳐 작업 스레드 4개가 처리하고, 실행 환경에 따라 TCP 또는 WebSocket으로 전송합니다. 대기열이 가득 차면 오래된 프레임을 버리며, 프레임 번호를 검사해 늦게 끝난 과거 영상이 뒤늦게 전송되지 않도록 합니다.
+    implementation: 가상 카메라 화면을 GPU에서 읽어 JPEG로 압축합니다. 압축은 뮤텍스와 조건변수로 동기화하는 최대 6프레임 대기열과 작업자 4개가 처리하며, 대기열이 차면 가장 오래된 프레임을 버립니다. 전송 대기열도 2프레임으로 제한하고 프레임 번호를 비교해 늦게 끝난 과거 영상은 보내지 않습니다.
     processSteps:
     - 가상 카메라 화면 생성
     - 프레임 읽기와 JPEG 압축
@@ -57,24 +64,22 @@ detail:
       width: 1200
       height: 470
     evidenceIds: [robotpal-public]
-  - title: 실물 JETANK 연동
-    description: 제어 화면에서 실물 JETANK의 상태를 조회하고 조작 명령을 전달합니다.
-    implementation: 제어 화면에 실물 장비의 상태 조회와 조작 입력 전달을 연결했습니다. 이 경로는 JSON 명령으로 가상 로봇 상태를 바꾸는 기능과 분리되어 있습니다.
-    evidenceIds: [robotpal-public]
-  - title: 데스크톱·웹 실행
-    description: 데스크톱과 웹 실행 환경에서 제어·영상 통신을 지원합니다.
-    implementation: 데스크톱에서는 TCP, 웹 실행에서는 WebSocket 통신 경로를 사용합니다.
+  - title: 송수신 기능 추상화
+    description: 제어 패킷 수신과 카메라 프레임 송신을 공통 전송 인터페이스에 연결합니다.
+    implementation: 네트워크 엔진은 송수신 공통 인터페이스를 사용하고, 빌드 환경에 따라 TCP 또는 WebSocket 구현을 연결합니다. 수신 데이터는 콜백을 거쳐 엔진 큐에 들어오며, 시뮬레이션 갱신에서 꺼내 처리합니다.
+    processSteps:
+    - 데스크톱 빌드에는 TCP 전송 구현을 연결
+    - 웹 빌드에는 WebSocket 전송 구현을 연결
+    - 공통 콜백·큐·명령 처리 경로에서 송수신 데이터를 전달
     evidenceIds: [robotpal-public]
   roleAreas:
-  - title: 실측 기반 주행 보정
+  - title: 제어 명령 처리
     items:
-    - text: 실물 JETANK의 주행값을 기준으로 가상 이동체의 직진·회전 속도 보정
+    - text: 외부 제어 패킷의 JSON 종류와 모터·서보 값을 해석해 가상 로봇 상태 갱신
       evidenceIds: [robotpal-public]
-  - title: 제어 통신
+  - title: 통신 경로 추상화
     items:
-    - text: 외부 JSON 명령에서 이동체 모터·로봇팔 서보 값을 받아 가상 로봇 상태에 반영
-      evidenceIds: [robotpal-public]
-    - text: 제어 화면에서 실물 JETANK 상태 조회와 조작 입력 전달 연결
+    - text: TCP와 WebSocket 전송 구현을 공통 송수신 인터페이스 뒤에 연결
       evidenceIds: [robotpal-public]
   - title: 카메라 스트리밍
     items:
@@ -133,18 +138,8 @@ contributions:
   evidenceIds:
   - robotpal-benchmark
   status: reported
-- id: robotpal-contribution-3
-  text: Qt 화면에서 실물 JETANK 이동 로봇의 상태를 확인하고 조작 입력을 보내는 기능 구현
-  evidenceIds:
-  - robotpal-public
-  status: reported
-- id: robotpal-contribution-4
-  text: 좌우 모터 입력과 실측 주행값으로 가상 이동 로봇의 직진과 회전 속도 보정
-  evidenceIds:
-  - robotpal-public
-  status: reported
 - id: robotpal-contribution-5
-  text: Python 인공지능 명령과 카메라 프레임 전송을 이동 로봇·로봇 팔 제어에 연결
+  text: 외부 JSON 주행·서보 명령을 해석해 가상 이동체와 로봇팔 관절 상태에 반영
   evidenceIds:
   - robotpal-public
   status: reported

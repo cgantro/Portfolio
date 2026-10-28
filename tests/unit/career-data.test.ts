@@ -40,7 +40,7 @@ test('reported benchmark values retain conditions and their original limits', ()
     robotpal.narrativeMarkdown.match(/^## .+$/gm),
     ['## 프로젝트 개요', '## 담당 역할', '## 주요 기능', '## 트러블슈팅', '## 결과'],
   );
-  assert.match(robotpal.narrativeMarkdown, /외부 JSON 패킷에서 이동체 모터와 로봇팔 서보 값을 읽어/);
+  assert.match(robotpal.narrativeMarkdown, /외부 제어 패킷의 JSON 명령을 해석해 가상 이동체와 로봇팔 상태에 반영/);
   assert.match(camera.conditions.join(' '), /1232×832/);
   assert.match(camera.conditions.join(' '), /5회/);
   assert.match(robotpal.narrativeMarkdown, /66\.70→96\.01 FPS/);

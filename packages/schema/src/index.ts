@@ -54,6 +54,10 @@ const ProjectFeatureSchema = z.object({
     src: PublicSource, alt: NonEmpty, caption: NonEmpty,
     width: z.number().int().positive(), height: z.number().int().positive(),
   }).strict().optional(),
+  packetDiagram: z.object({
+    summary: NonEmpty, src: PublicSource, alt: NonEmpty, caption: NonEmpty,
+    width: z.number().int().positive(), height: z.number().int().positive(),
+  }).strict().optional(),
   verification: NonEmpty.optional(),
   evidenceIds: z.array(NonEmpty).min(1),
 }).strict();

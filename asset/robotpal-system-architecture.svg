@@ -1,58 +1,76 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="780" viewBox="0 0 1400 780" role="img" aria-labelledby="title desc">
-  <title id="title">RobotPal 가상 제어와 주변 장치 연결</title>
-  <desc id="desc">외부 JSON 명령의 모터와 서보 값을 가상 로봇에 반영하고, 가상 카메라 영상을 인식 모듈로 전달합니다. 실물 JETANK은 별도 제어 화면에서 상태 조회와 조작 입력을 연결합니다.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1480" height="760" viewBox="0 0 1480 760" role="img" aria-labelledby="title desc">
+  <title id="title">RobotPal 제어 명령과 영상의 송수신 흐름</title>
+  <desc id="desc">외부 제어 프로그램의 패킷은 데스크톱 TCP 또는 웹 WebSocket 구현을 거쳐 공통 수신 큐와 네트워크 엔진으로 전달됩니다. JSON 명령은 가상 이동체와 로봇팔 상태를 갱신합니다. 카메라 영상은 JPEG 작업자와 공통 전송 인터페이스를 거쳐 외부 영상 프로그램으로 전달됩니다.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748b"/></marker>
     <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563eb"/></marker>
-    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#16a34a"/></marker>
+    <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#15803d"/></marker>
     <style>
-      .zone{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}.node{fill:#fff;stroke:#94a3b8;stroke-width:2}.blue{fill:#eff6ff;stroke:#60a5fa;stroke-width:2}.green{fill:#f0fdf4;stroke:#4ade80;stroke-width:2}.amber{fill:#fffbeb;stroke:#fbbf24;stroke-width:2}
-      .title{font:700 30px Arial,'Noto Sans KR',sans-serif;fill:#0f172a}.zoneTitle{font:700 18px Arial,'Noto Sans KR',sans-serif;fill:#334155}.label{font:700 18px Arial,'Noto Sans KR',sans-serif;fill:#0f172a;text-anchor:middle}.small{font:600 14px Arial,'Noto Sans KR',sans-serif;fill:#475569;text-anchor:middle}.note{font:600 13px Arial,'Noto Sans KR',sans-serif;fill:#64748b;text-anchor:middle}
-      .flow{fill:none;stroke:#64748b;stroke-width:2.5;marker-end:url(#arrow)}.flowBlue{fill:none;stroke:#2563eb;stroke-width:2.5;marker-end:url(#arrowBlue)}.flowGreen{fill:none;stroke:#16a34a;stroke-width:2.5;marker-end:url(#arrowGreen)}
+      .bg{fill:#f8fafc}.zone{fill:#fff;stroke:#cbd5e1;stroke-width:2}.blue{fill:#eff6ff;stroke:#60a5fa;stroke-width:2}.green{fill:#f0fdf4;stroke:#4ade80;stroke-width:2}.amber{fill:#fffbeb;stroke:#fbbf24;stroke-width:2}.neutral{fill:#f1f5f9;stroke:#94a3b8;stroke-width:2}
+      .title{font:700 30px Pretendard,Arial,sans-serif;fill:#111827}.zoneTitle{font:700 20px Pretendard,Arial,sans-serif;fill:#334155}.label{font:700 18px Pretendard,Arial,sans-serif;fill:#111827;text-anchor:middle}.small{font:500 15px Pretendard,Arial,sans-serif;fill:#475569;text-anchor:middle}.note{font:500 14px Pretendard,Arial,sans-serif;fill:#64748b;text-anchor:middle}
+      .arrow{fill:none;stroke:#64748b;stroke-width:3;marker-end:url(#arrow)}.arrowBlue{fill:none;stroke:#2563eb;stroke-width:3;marker-end:url(#arrowBlue)}.arrowGreen{fill:none;stroke:#15803d;stroke-width:3;marker-end:url(#arrowGreen)}
     </style>
   </defs>
-  <rect width="1400" height="780" fill="#fff"/>
-  <text class="title" x="55" y="52">RobotPal 가상 제어와 주변 장치 연결</text>
+  <rect class="bg" width="1480" height="760"/>
+  <text class="title" x="44" y="52">제어 명령 수신과 카메라 영상 송신</text>
 
-  <rect class="zone" x="45" y="90" width="340" height="600" rx="22"/>
-  <text class="zoneTitle" x="75" y="128">외부 프로그램</text>
-  <rect class="amber" x="85" y="165" width="260" height="100" rx="15"/>
-  <text class="label" x="215" y="207">JSON 제어 명령</text>
-  <text class="small" x="215" y="235">이동체 모터·로봇팔 서보 값</text>
-  <rect class="green" x="85" y="430" width="260" height="100" rx="15"/>
-  <text class="label" x="215" y="472">영상 인식 모듈</text>
-  <text class="small" x="215" y="500">전달받은 카메라 영상 처리</text>
+  <rect class="zone" x="36" y="100" width="270" height="570" rx="18"/>
+  <text class="zoneTitle" x="62" y="138">외부 프로그램</text>
+  <rect class="amber" x="66" y="180" width="210" height="104" rx="14"/>
+  <text class="label" x="171" y="222">제어 명령</text>
+  <text class="small" x="171" y="251">주행·서보 JSON</text>
+  <rect class="green" x="66" y="494" width="210" height="104" rx="14"/>
+  <text class="label" x="171" y="536">영상 처리 프로그램</text>
+  <text class="small" x="171" y="565">JPEG 프레임 수신</text>
 
-  <rect class="zone" x="430" y="90" width="600" height="600" rx="22"/>
-  <text class="zoneTitle" x="460" y="128">RobotPal 가상 시뮬레이터</text>
-  <rect class="blue" x="500" y="170" width="460" height="115" rx="15"/>
-  <text class="label" x="730" y="214">가상 이동체·로봇팔 제어</text>
-  <text class="small" x="730" y="246">JSON 명령의 모터·서보 값을 가상 상태에 반영</text>
-  <rect class="node" x="500" y="360" width="210" height="100" rx="15"/>
-  <text class="label" x="605" y="402">가상 카메라</text>
-  <text class="small" x="605" y="430">시뮬레이터 화면 촬영</text>
-  <rect class="node" x="750" y="360" width="210" height="100" rx="15"/>
-  <text class="label" x="855" y="402">JPEG 압축</text>
-  <text class="small" x="855" y="430">워커 대기열로 분리 처리</text>
-  <rect class="blue" x="625" y="535" width="210" height="90" rx="15"/>
-  <text class="label" x="730" y="573">영상 전송</text>
-  <text class="small" x="730" y="600">TCP 또는 WebSocket</text>
+  <rect class="zone" x="336" y="100" width="774" height="570" rx="18"/>
+  <text class="zoneTitle" x="364" y="138">공통 전송 인터페이스</text>
+  <text class="small" x="723" y="168">같은 송수신 인터페이스에 환경별 전송 구현 연결</text>
+  <rect class="blue" x="378" y="193" width="300" height="82" rx="12"/>
+  <text class="label" x="528" y="226">TCP 전송 구현</text>
+  <text class="small" x="528" y="251">데스크톱 빌드</text>
+  <rect class="blue" x="768" y="193" width="300" height="82" rx="12"/>
+  <text class="label" x="918" y="226">WebSocket 전송 구현</text>
+  <text class="small" x="918" y="251">웹 빌드</text>
 
-  <rect class="zone" x="1075" y="90" width="280" height="600" rx="22"/>
-  <text class="zoneTitle" x="1105" y="128">실물 장비 연동</text>
-  <rect class="green" x="1110" y="220" width="210" height="105" rx="15"/>
-  <text class="label" x="1215" y="263">제어 화면</text>
-  <text class="small" x="1215" y="292">상태 조회·조작 입력</text>
-  <rect class="node" x="1110" y="405" width="210" height="105" rx="15"/>
-  <text class="label" x="1215" y="448">실물 JETANK</text>
-  <text class="small" x="1215" y="477">연결된 장비</text>
+  <rect class="neutral" x="378" y="326" width="205" height="88" rx="12"/>
+  <text class="label" x="480" y="361">수신 콜백</text>
+  <text class="small" x="480" y="388">받은 패킷 전달</text>
+  <rect class="neutral" x="620" y="326" width="205" height="88" rx="12"/>
+  <text class="label" x="722" y="361">수신 큐</text>
+  <text class="small" x="722" y="388">갱신 단계에서 꺼냄</text>
+  <rect class="amber" x="862" y="326" width="205" height="88" rx="12"/>
+  <text class="label" x="964" y="361">JSON 명령 구분</text>
+  <text class="small" x="964" y="388">drive · servo</text>
 
-  <path class="flowBlue" d="M345 215H500"/>
-  <text class="small" x="422" y="199">명령 전달</text>
-  <path class="flow" d="M710 410H750"/>
-  <path class="flow" d="M855 460V535"/>
-  <path class="flowGreen" d="M625 580H520V480H345"/>
-  <text class="small" x="458" y="565">카메라 영상</text>
-  <path class="flowGreen" d="M1215 325V405"/>
-  <text class="note" x="1290" y="370">상태·입력 연결</text>
+  <rect class="green" x="378" y="503" width="205" height="88" rx="12"/>
+  <text class="label" x="480" y="538">공통 송신 경로</text>
+  <text class="small" x="480" y="565">TCP 또는 WebSocket</text>
+  <rect class="green" x="620" y="503" width="205" height="88" rx="12"/>
+  <text class="label" x="722" y="538">JPEG 작업자 4개</text>
+  <text class="small" x="722" y="565">프레임별 압축</text>
+  <rect class="green" x="862" y="503" width="205" height="88" rx="12"/>
+  <text class="label" x="964" y="538">JPEG 작업 큐</text>
+  <text class="small" x="964" y="565">최대 6프레임 · 뮤텍스·조건변수</text>
+  <text class="note" x="722" y="632">가득 차면 오래된 프레임 폐기 · 송신 큐 최대 2프레임</text>
+
+  <rect class="zone" x="1140" y="100" width="304" height="570" rx="18"/>
+  <text class="zoneTitle" x="1168" y="138">가상 시뮬레이터</text>
+  <rect class="blue" x="1182" y="326" width="220" height="105" rx="14"/>
+  <text class="label" x="1292" y="366">가상 로봇</text>
+  <text class="small" x="1292" y="396">주행·관절 상태 갱신</text>
+  <rect class="green" x="1182" y="503" width="220" height="88" rx="14"/>
+  <text class="label" x="1292" y="538">가상 카메라</text>
+  <text class="small" x="1292" y="565">화면 프레임 생성</text>
+
+  <path class="arrowBlue" d="M276 232H378"/>
+  <path class="arrow" d="M528 275V305H480V326"/>
+  <path class="arrow" d="M918 275V305H480V326"/>
+  <path class="arrow" d="M583 370H620"/>
+  <path class="arrow" d="M825 370H862"/>
+  <path class="arrowBlue" d="M1067 370H1182"/>
+  <path class="arrowGreen" d="M1182 547H1067"/>
+  <path class="arrowGreen" d="M862 547H825"/>
+  <path class="arrowGreen" d="M620 547H583"/>
+  <path class="arrowGreen" d="M378 547H276"/>
 </svg>

@@ -175,6 +175,11 @@ h3 { font-size: 25px; }
 .feature-diagram .architecture-scroll { width: 100%; }
 .feature-diagram img { display: block; width: 100%; height: auto; }
 .feature-diagram figcaption { margin-top: 8px; color: var(--color-muted); font-size: 13px; line-height: 1.6; }
+.packet-diagram-disclosure { max-width: 980px; margin-top: 16px; }
+.packet-diagram-disclosure > summary { width: fit-content; color: var(--color-accent); cursor: pointer; font-size: 14px; font-weight: 650; text-underline-offset: 4px; }
+.packet-diagram-disclosure > summary:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: 2px; }
+.packet-diagram-disclosure[open] > summary { margin-bottom: 12px; }
+.packet-diagram-disclosure .feature-diagram { margin-top: 0; }
 .project-post-improvement { max-width: 980px; margin-top: 24px; padding: 20px 0 8px; border-top: 1px solid var(--color-line); }
 .project-post-improvement > h3 { margin: 0 0 14px; font-size: 18px; }
 .project-post-improvement > h4 { margin: 0 0 8px; font-size: 17px; }
