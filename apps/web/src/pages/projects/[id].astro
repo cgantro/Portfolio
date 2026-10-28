@@ -13,7 +13,7 @@ const related = projects.filter(item => item.id !== project.id);
 const detail = project.detail;
 const architectureNotes = project.id === 'robotpal' ? project.architecture.summary : project.architecture.summary.slice(1);
 const projectTitleId = (index: number) => `troubleshooting-${project.id}-${index}`;
-const codeMarkdown = (code: (typeof detail.troubleshooting)[number]['code']) => code
+const codeMarkdown = (code: { language: 'cpp' | 'java'; title: string; source: string } | undefined) => code
   ? `\`\`\`${code.language} title="${code.title}"\n${code.source}\n\`\`\``
   : '';
 const robotpalFpsRows = project.id === 'robotpal'
@@ -65,6 +65,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             <h3>{feature.title}</h3>
             <p>{feature.description}</p>
             {feature.implementation && <p class="feature-implementation">{feature.implementation}</p>}
+            {feature.codeSnippets?.map(snippet => <MarkdownContent content={codeMarkdown(snippet)} collapsibleCode />)}
             {feature.processSteps && <ol class="feature-process">{feature.processSteps.map(step => <li>{step}</li>)}</ol>}
             {feature.diagram && <figure class="feature-diagram troubleshooting-diagram">
               <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + feature.title + ' 처리 흐름. 가로로 이동할 수 있습니다.'}>

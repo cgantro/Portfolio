@@ -30,7 +30,7 @@ test('print document presents Korean project narratives without internal audit m
   assert.match(html, /<table><thead>/);
   assert.doesNotMatch(html, /\| 항목 \|/);
   assert.match(html, /<h1>결과<\/h1>/);
-  assert.match(html, /네이티브 H\.264\/RTP/);
+  assert.match(html, /상태 보고 중단 시나리오의 임무 완료율/);
   assert.match(html, /프로젝트 개요[\s\S]*담당 역할[\s\S]*주요 기능[\s\S]*트러블슈팅[\s\S]*결과/);
   assert.match(html, /<strong>문제<\/strong>/);
   assert.doesNotMatch(html, /\*\*문제\*\*/);
