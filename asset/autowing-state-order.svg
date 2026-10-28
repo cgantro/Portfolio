@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 340" role="img" aria-labelledby="title desc">
+  <title id="title">늦게 도착한 MQTT 상태가 서버 상태를 되돌리는 문제</title>
+  <desc id="desc">차량이 게이트에 도착해 서버 상태가 바뀐 뒤 이전 운행 상태가 늦게 도착할 수 있습니다. 상태 전이를 확인하지 않으면 이전 값이 저장되고, 바뀐 상태와 비교하면 게이트 도착 상태를 유지합니다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0 0L10 5L0 10Z" fill="#64748B"/>
+    </marker>
+    <style>
+      .bg{fill:#F8FAFC}
+      .box{fill:#fff;stroke:#CBD5E1;stroke-width:2}
+      .bad{fill:#FEF2F2;stroke:#FCA5A5;stroke-width:2}
+      .good{fill:#EFF6FF;stroke:#60A5FA;stroke-width:2}
+      .head{font:700 18px Pretendard,'Noto Sans KR',sans-serif;fill:#111827}
+      .badHead{font:700 18px Pretendard,'Noto Sans KR',sans-serif;fill:#B91C1C}
+      .goodHead{font:700 18px Pretendard,'Noto Sans KR',sans-serif;fill:#1D4ED8}
+      .label{font:600 16px Pretendard,'Noto Sans KR',sans-serif;fill:#111827;text-anchor:middle}
+      .arrow{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="1120" height="340" rx="14"/>
+
+  <text class="badHead" x="32" y="38">이전 상태를 그대로 저장하면</text>
+  <rect class="box" x="30" y="58" width="270" height="76" rx="10"/>
+  <text class="label" x="165" y="104">서버 상태: 게이트 도착</text>
+  <path class="arrow" d="M303 96H414"/>
+  <rect class="box" x="425" y="58" width="270" height="76" rx="10"/>
+  <text class="label" x="560" y="91">늦게 온 MQTT 보고</text>
+  <text class="label" x="560" y="115">이전 상태: 이동 중</text>
+  <path class="arrow" d="M698 96H809"/>
+  <rect class="bad" x="820" y="58" width="270" height="76" rx="10"/>
+  <text class="badHead" x="955" y="91" text-anchor="middle">상태가 이전 값으로</text>
+  <text class="badHead" x="955" y="116" text-anchor="middle">되돌아감</text>
+
+  <text class="goodHead" x="32" y="193">상태 전이를 확인하면</text>
+  <rect class="box" x="30" y="213" width="220" height="76" rx="10"/>
+  <text class="label" x="140" y="259">서버 상태: 게이트 도착</text>
+  <path class="arrow" d="M253 251H327"/>
+  <rect class="box" x="338" y="213" width="220" height="76" rx="10"/>
+  <text class="label" x="448" y="246">늦은 보고 도착</text>
+  <text class="label" x="448" y="270">이전 상태: 이동 중</text>
+  <path class="arrow" d="M561 251H635"/>
+  <rect class="good" x="646" y="213" width="220" height="76" rx="10"/>
+  <text class="label" x="756" y="246">서버 상태 변경 감지</text>
+  <text class="label" x="756" y="270">이전 값 대신 현재 값</text>
+  <path class="arrow" d="M869 251H943"/>
+  <rect class="good" x="954" y="213" width="136" height="76" rx="10"/>
+  <text class="goodHead" x="1022" y="246" text-anchor="middle">게이트</text>
+  <text class="goodHead" x="1022" y="270" text-anchor="middle">도착 유지</text>
+</svg>

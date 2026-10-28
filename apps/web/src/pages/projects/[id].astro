@@ -86,13 +86,12 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
           </li>)}
         </ul>
         {detail.postProjectImprovement && <section class="project-post-improvement" aria-labelledby="post-project-improvement-title">
-          <h3 id="post-project-improvement-title">프로젝트 종료 후 개선</h3>
-          <h4>{detail.postProjectImprovement.title}</h4>
+          <h3 id="post-project-improvement-title">{detail.postProjectImprovement.title}</h3>
           <p>{detail.postProjectImprovement.description}</p>
           {detail.postProjectImprovement.implementation && <p class="feature-implementation">{detail.postProjectImprovement.implementation}</p>}
           {detail.postProjectImprovement.processSteps && <ol class="feature-process">{detail.postProjectImprovement.processSteps.map(step => <li>{step}</li>)}</ol>}
           {detail.postProjectImprovement.diagram && <figure class="feature-diagram troubleshooting-diagram">
-            <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 프로젝트 종료 후 개선 흐름도. 가로로 이동할 수 있습니다.'}>
+            <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 운행 기록 저장 흐름도. 가로로 이동할 수 있습니다.'}>
               <img src={assetUrl(detail.postProjectImprovement.diagram.src)} alt={detail.postProjectImprovement.diagram.alt} width={detail.postProjectImprovement.diagram.width} height={detail.postProjectImprovement.diagram.height} loading="lazy" />
             </div>
             <figcaption>{detail.postProjectImprovement.diagram.caption}</figcaption>
@@ -134,7 +133,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             <div><dt>확인</dt><dd><MarkdownContent content={issue.verification} /></dd></div>
           </dl>
           {issue.diagram && <figure class="troubleshooting-diagram">
-            <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 문제 해결 흐름도. 가로로 이동할 수 있습니다.'}>
+            <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + issue.title + ' 흐름도. 가로로 이동할 수 있습니다.'}>
               <img src={assetUrl(issue.diagram.src)} alt={issue.diagram.alt} width={issue.diagram.width} height={issue.diagram.height} loading="lazy" />
             </div>
             <figcaption>{issue.diagram.caption}</figcaption>

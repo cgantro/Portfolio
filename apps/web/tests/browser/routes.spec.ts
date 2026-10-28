@@ -202,11 +202,11 @@ test('homepage introduces the developer before the featured project cases', asyn
   expect(demoRequests).toBe(0);
 });
 
-test('AutoWing Car labels Redis Streams work as a post-project improvement', async ({ page }) => {
+test('AutoWing Car presents Redis Streams as a storage feature', async ({ page }) => {
   await page.goto(`${base}projects/autowingcar/`);
   const featureTitles = await page.locator('.project-feature-list h3').allTextContents();
-  expect(featureTitles).not.toContain('운행 기록 후속 개선');
-  await expect(page.getByRole('heading', { name: '프로젝트 종료 후 개선' })).toBeVisible();
+  expect(featureTitles).not.toContain('프로젝트 종료 후 개선');
+  await expect(page.getByRole('heading', { name: 'Redis Streams 운행 기록 저장' })).toBeVisible();
   await expect(page.locator('.project-post-improvement')).toContainText('Redis Streams');
 });
 
