@@ -75,7 +75,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
               <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + feature.title + ' 처리 흐름도'}>
                 <img src={assetUrl(feature.diagram.src)} alt={feature.diagram.alt} width={feature.diagram.width} height={feature.diagram.height} loading="lazy" />
               </div>
-              <figcaption>{feature.diagram.caption}</figcaption>
+              {feature.diagram.caption && <figcaption>{feature.diagram.caption}</figcaption>}
             </figure>}
             {feature.packetDiagram && <details class="packet-diagram-disclosure">
               <summary>{feature.packetDiagram.summary}</summary>
@@ -117,7 +117,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
           <div class="architecture-grid">
             <figure class="architecture-figure">
               <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' 구성 흐름도'}>
-                <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width={project.id === 'autowingcar' ? 1000 : 1400} height={project.id === 'autowingcar' ? 1050 : 900} loading="lazy" />
+                <img src={assetUrl(project.architecture.src)} alt={project.architecture.alt} width={project.id === 'autowingcar' ? 1560 : 1400} height={project.id === 'autowingcar' ? 700 : 900} loading="lazy" />
               </div>
               {project.id !== 'robotpal' && project.id !== 'autowingcar' && <figcaption>{project.architecture.summary[0]}</figcaption>}
             </figure>
@@ -140,7 +140,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
             <div class="architecture-scroll" tabindex="0" role="region" aria-label={project.title + ' ' + issue.title + ' 흐름도'}>
               <img src={assetUrl(issue.diagram.src)} alt={issue.diagram.alt} width={issue.diagram.width} height={issue.diagram.height} loading="lazy" />
             </div>
-            <figcaption>{issue.diagram.caption}</figcaption>
+            {issue.diagram.caption && <figcaption>{issue.diagram.caption}</figcaption>}
           </figure>}
           {project.id === 'robotpal' && robotpalFpsRows.length > 0 && <figure class="robotpal-fps-chart" aria-labelledby="robotpal-fps-chart-title">
             <h4 id="robotpal-fps-chart-title">구성별 시뮬레이션 갱신률</h4>

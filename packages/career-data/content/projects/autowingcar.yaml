@@ -26,7 +26,7 @@ cover:
   alt: 견인 장비와 공항 여객기 모형을 연결한 오토잉카 실물 차량 사진
 architecture:
   src: /assets/autowing-system-architecture.svg
-  alt: React 관제 화면과 Nginx, Spring Boot 서버, PostgreSQL·Redis 저장소, MQTT 차량 통신, WebSocket·STOMP 연결 구조
+  alt: React 관제 화면, AWS 서버 구성, MQTT로 연결된 별도 토잉카 영역의 구조
   summary: []
 detail:
   layout: autowingcar
@@ -128,20 +128,20 @@ detail:
     implementation: MQTT ACK는 명령 수신을 알리고, 별도 차량 상태 보고가 실제 운행 상태를 갱신합니다.
     diagram:
       src: /assets/autowing-command-flow.svg
-      alt: 관제 요청을 데이터베이스에 반영하고 커밋 뒤 MQTT 명령을 보낸 다음, 차량 ACK와 실제 상태 보고를 별도로 처리하는 흐름
-      caption: ACK는 명령 수신 확인, 상태 보고는 실제 운행 상태입니다.
-      width: 760
-      height: 1010
+      alt: 관제 화면에서 명령을 저장하고 MQTT로 토잉카에 보낸 뒤, ACK와 실제 운행 상태 보고를 구분해 처리하는 좌우 흐름
+      caption: 명령은 저장 뒤 발행하고, ACK와 운행 상태는 따로 처리합니다.
+      width: 1380
+      height: 500
     evidenceIds: [autowingcar-public]
   - title: 운행 이력 저장
     description: 차량 위치와 운행 상태 변화를 이력으로 남깁니다.
     implementation: Redis Streams에 모아 PostgreSQL에 묶음 저장합니다. 실패하면 완료 처리하지 않고 다시 시도합니다.
     diagram:
       src: /assets/autowing-streams-flow.svg
-      alt: 차량 상태 보고에서 Redis Streams 기록, PostgreSQL 묶음 저장, 성공 완료 처리와 실패 재시도까지 이어지는 세로 흐름
-      caption: 운행 상태 기록 저장 흐름
-      width: 760
-      height: 790
+      alt: 차량 상태 기록을 Redis Streams에 모아 PostgreSQL에 저장하고, 실패한 기록을 다시 처리하는 좌우 흐름
+      caption: 저장에 실패한 기록은 남겨 다시 처리합니다.
+      width: 1280
+      height: 470
     evidenceIds: [autowingcar-streams]
   roleAreas:
   - title: 차량 통신·실시간 관제
@@ -186,10 +186,10 @@ detail:
     metricIds: []
     diagram:
       src: /assets/autowing-state-order.svg
-      alt: 현재 서버 상태가 DOCKING이고 MQTT 보고 상태가 MOVING_TO_GATE이면 수신값을 반영하지 않고 DOCKING을 유지하는 흐름
-      caption: DOCKING에서 MOVING_TO_GATE로 되돌아가는 상태 조합을 막습니다.
-      width: 760
-      height: 700
+      alt: 서버의 DOCKING 상태와 MQTT의 MOVING_TO_GATE 보고를 비교해 DOCKING을 유지하는 좌우 흐름
+      caption: DOCKING과 MOVING_TO_GATE 조합에서는 서버 상태를 유지합니다.
+      width: 1180
+      height: 460
     code:
       path: Backend/autowing_car/src/main/java/com/project/domain/towingcar/service/TowingCarService.java
       language: java

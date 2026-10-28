@@ -1,15 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="700" viewBox="0 0 760 700" role="img" aria-labelledby="title desc">
-  <title id="title">도킹 상태를 이동 중 상태로 되돌리지 않기</title>
-  <desc id="desc">MQTT에는 상태 시각 정보가 없습니다. 서버 상태가 DOCKING이고 수신 상태가 MOVING_TO_GATE인 조합만 적용하지 않고 DOCKING을 유지합니다.</desc>
-  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748B"/></marker>
-    <style>.bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#60A5FA;stroke-width:2}.head{font:700 20px Pretendard,'Noto Sans KR',sans-serif;fill:#111827;text-anchor:middle}.sub{font:16px Pretendard,'Noto Sans KR',sans-serif;fill:#475569;text-anchor:middle}.arrow{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}</style>
-  </defs><rect class="bg" width="760" height="700" rx="16"/>
-  <rect class="box" x="150" y="35" width="460" height="88" rx="14"/><text class="head" x="380" y="72">MQTT 상태 보고</text><text class="sub" x="380" y="101">수신 상태: MOVING_TO_GATE</text>
-  <path class="arrow" d="M380 125V165"/>
-  <rect class="box" x="150" y="175" width="460" height="88" rx="14"/><text class="head" x="380" y="212">서버의 현재 상태 확인</text><text class="sub" x="380" y="241">현재 상태: DOCKING</text>
-  <path class="arrow" d="M380 265V305"/>
-  <rect class="focus" x="150" y="315" width="460" height="105" rx="14"/><text class="head" x="380" y="355">두 상태 조합을 확인</text><text class="sub" x="380" y="388">DOCKING + MOVING_TO_GATE는 반영하지 않음</text>
-  <path class="arrow" d="M380 422V465"/>
-  <rect class="box" x="150" y="475" width="460" height="88" rx="14"/><text class="head" x="380" y="512">DOCKING 유지</text><text class="sub" x="380" y="541">현재 상태와 보고 상태의 조합만 검사</text>
-  <text class="sub" x="380" y="625">MQTT 보고 시각은 비교하지 않음</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="460" viewBox="0 0 1180 460" role="img" aria-labelledby="title desc">
+<title id="title">도킹 중 이동 상태 보고 처리</title><desc id="desc">서버 상태가 DOCKING이고 차량 보고가 MOVING_TO_GATE이면 보고 상태를 반영하지 않고 DOCKING을 유지합니다. MQTT 시각 정보는 사용하지 않습니다.</desc><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748B"/></marker><style>
+.bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#60A5FA;stroke-width:2}.ok{fill:#F0FDF4;stroke:#22C55E;stroke-width:2}.fail{fill:#FFF7ED;stroke:#FDBA74;stroke-width:2}
+.head{font:700 20px Pretendard,'Noto Sans KR',sans-serif;fill:#111827;text-anchor:middle}.sub{font:16px Pretendard,'Noto Sans KR',sans-serif;fill:#475569;text-anchor:middle}.arrow{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}.retry{fill:none;stroke:#2563EB;stroke-width:2.5;stroke-dasharray:8 6;marker-end:url(#retry)}
+</style></defs>
+<rect class="bg" width="1180" height="460" rx="16"/>
+<path class="arrow" d="M275 165H430M275 295H430M720 230H875"/>
+<rect class="box" x="30" y="115" width="245" height="100" rx="14"/><text class="head" x="152" y="155">서버 상태</text><text class="sub" x="152" y="188">DOCKING</text>
+<rect class="box" x="30" y="245" width="245" height="100" rx="14"/><text class="head" x="152" y="285">MQTT 보고</text><text class="sub" x="152" y="318">MOVING_TO_GATE</text>
+<rect class="focus" x="430" y="170" width="290" height="120" rx="14"/><text class="head" x="575" y="218">두 상태 조합 확인</text><text class="sub" x="575" y="252">DOCKING + MOVING_TO_GATE</text>
+<rect class="ok" x="875" y="170" width="275" height="120" rx="14"/><text class="head" x="1012" y="218">DOCKING 유지</text><text class="sub" x="1012" y="252">보고 상태는 반영하지 않음</text>
+<text class="sub" x="590" y="400">상태 시각이 아닌 현재 상태와 보고 상태를 비교</text>
 </svg>

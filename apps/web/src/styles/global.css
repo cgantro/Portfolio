@@ -325,6 +325,8 @@ h3 { font-size: 25px; }
   .architecture-grid { grid-template-columns: minmax(0,1.2fr) minmax(220px,.8fr); gap: 24px; }
   .architecture-figure img { width: 960px; max-width: none; }
   .troubleshooting-diagram .architecture-scroll img { width: 760px; max-width: none; }
+  .project-content[data-project-layout="autowingcar"] .architecture-figure img,
+  .project-content[data-project-layout="autowingcar"] .troubleshooting-diagram .architecture-scroll img { width: 900px; max-width: none; }
   .project-architecture .architecture-grid { grid-template-columns: 1fr; }
   .project-feature-list, .role-area-list { grid-template-columns: 1fr; }
   .project-feature-list { gap: 0; }
@@ -345,6 +347,8 @@ h3 { font-size: 25px; }
   .mobile-nav[open] summary::after { content: '⌃'; }
   .mobile-nav nav { position: absolute; top: calc(100% + 10px); right: 0; display: grid; min-width: 180px; padding: 8px 16px; border: 1px solid var(--color-line); background: white; box-shadow: 0 10px 28px rgb(15 23 42 / 10%); }
   .mobile-nav nav a { padding-block: 10px; font-size: 14px; }
+  .project-content[data-project-layout="autowingcar"] .architecture-figure img,
+  .project-content[data-project-layout="autowingcar"] .troubleshooting-diagram .architecture-scroll img { width: 760px; max-width: none; }
   .intro-section { padding-block: 54px 58px; }
   .intro-copy h1 { font-size: clamp(32px, 8.5vw, 38px); }
   .intro-summary { margin-top: 15px; font-size: 15px; }

@@ -1,19 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="760" height="790" viewBox="0 0 760 790" role="img" aria-labelledby="title desc">
-  <title id="title">운행 이력 저장 흐름</title>
-  <desc id="desc">차량 상태 저장 뒤 운행 이력을 Redis Streams에 기록합니다. 기록을 묶어 PostgreSQL에 저장하고 성공하면 완료 처리합니다. 실패하면 기록을 남겨 다시 시도합니다.</desc>
-  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748B"/></marker><marker id="retry" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#2563EB"/></marker>
-    <style>.bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#60A5FA;stroke-width:2}.ok{fill:#F0FDF4;stroke:#22C55E;stroke-width:2}.fail{fill:#FFF7ED;stroke:#FDBA74;stroke-width:2}.head{font:700 22px Pretendard,Arial,sans-serif;fill:#111827;text-anchor:middle}.sub{font:16px Pretendard,Arial,sans-serif;fill:#475569;text-anchor:middle}.arrow{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}.retry-line{fill:none;stroke:#2563EB;stroke-width:2.5;stroke-dasharray:8 6;marker-end:url(#retry)}</style>
-  </defs><rect class="bg" width="760" height="790" rx="16"/>
-  <rect class="box" x="170" y="35" width="420" height="90" rx="14"/><text class="head" x="380" y="75">차량 상태 저장</text><text class="sub" x="380" y="103">현재 위치·운행 상태 갱신</text>
-  <path class="arrow" d="M380 127V165"/>
-  <rect class="focus" x="170" y="175" width="420" height="90" rx="14"/><text class="head" x="380" y="215">Redis Streams</text><text class="sub" x="380" y="243">운행 이력 기록</text>
-  <path class="arrow" d="M380 267V305"/>
-  <rect class="box" x="170" y="315" width="420" height="90" rx="14"/><text class="head" x="380" y="355">PostgreSQL</text><text class="sub" x="380" y="383">기록을 묶어 저장</text>
-  <path class="arrow" d="M380 407V445"/>
-  <path d="M380 455L445 500L380 545L315 500Z" fill="#fff" stroke="#CBD5E1" stroke-width="2"/><text class="sub" x="380" y="505">저장 성공?</text>
-  <path class="arrow" d="M445 500H475V575"/><text class="sub" x="495" y="532">예</text>
-  <rect class="ok" x="255" y="585" width="420" height="82" rx="14"/><text class="head" x="465" y="634">완료 처리</text>
-  <path class="arrow" d="M315 500H170V575"/><text class="sub" x="250" y="532">아니요</text>
-  <rect class="fail" x="85" y="585" width="170" height="82" rx="14"/><text class="head" x="170" y="619">기록 유지</text><text class="sub" x="170" y="647">다시 시도</text>
-  <path class="retry-line" d="M85 626H35V220H160"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="title desc">
+<title id="title">운행 이력 저장과 재시도 흐름</title><desc id="desc">차량 상태를 Redis Streams에 기록하고 PostgreSQL에 묶음 저장합니다. 저장에 성공하면 완료 처리하고, 실패하면 기록을 남겨 다시 시도합니다.</desc><defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#64748B"/></marker><style>
+.bg{fill:#F8FAFC}.box{fill:#fff;stroke:#CBD5E1;stroke-width:2}.focus{fill:#EFF6FF;stroke:#60A5FA;stroke-width:2}.ok{fill:#F0FDF4;stroke:#22C55E;stroke-width:2}.fail{fill:#FFF7ED;stroke:#FDBA74;stroke-width:2}
+.head{font:700 20px Pretendard,'Noto Sans KR',sans-serif;fill:#111827;text-anchor:middle}.sub{font:16px Pretendard,'Noto Sans KR',sans-serif;fill:#475569;text-anchor:middle}.arrow{fill:none;stroke:#64748B;stroke-width:3;marker-end:url(#arrow)}.retry{fill:none;stroke:#2563EB;stroke-width:2.5;stroke-dasharray:8 6;marker-end:url(#retry)}
+</style></defs>
+<rect class="bg" width="1280" height="470" rx="16"/>
+<path class="arrow" d="M255 145H325M560 145H635M875 145H955"/>
+<path class="arrow" d="M755 200V295H690"/><path class="retry" d="M690 360H445V205"/>
+<text class="sub" x="920" y="250">저장 성공</text><text class="sub" x="785" y="270">저장 실패</text>
+<rect class="box" x="25" y="95" width="230" height="110" rx="14"/><text class="head" x="140" y="143">차량 상태 변경</text><text class="sub" x="140" y="176">위치·운행 상태</text>
+<rect class="focus" x="325" y="95" width="235" height="110" rx="14"/><text class="head" x="442" y="143">Redis Streams</text><text class="sub" x="442" y="176">운행 이력 기록</text>
+<rect class="box" x="635" y="95" width="240" height="110" rx="14"/><text class="head" x="755" y="143">PostgreSQL</text><text class="sub" x="755" y="176">기록 묶음 저장</text>
+<rect class="ok" x="955" y="95" width="285" height="110" rx="14"/><text class="head" x="1097" y="157">완료 처리</text>
+<rect class="fail" x="500" y="310" width="380" height="100" rx="14"/><text class="head" x="690" y="350">기록 유지</text><text class="sub" x="690" y="382">다음 처리 때 다시 저장</text>
 </svg>
