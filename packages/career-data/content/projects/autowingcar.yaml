@@ -65,63 +65,7 @@ detail:
         }
     evidenceIds: [autowingcar-public]
   - title: 주행 경로 계산
-    description: 현재 위치에서 목적지까지 이동 시간이 짧은 경로와 대체 경로를 계산합니다.
-    implementation: A*로 기본 경로를 찾고, Yen으로 대체 경로를 최대 두 개 더 구합니다. 남은 시간은 교차로 사이 직선거리를 기본 지도 정보의 `maxSpeed`로 나눠 추정합니다. 기본 지도 정보가 없으면 10.0을 씁니다.
-    codeSnippets:
-    - language: java
-      title: A* 기본 경로 탐색 · 누적 비용과 예상 비용으로 다음 교차로 선택
-      source: |-
-        // f가 가장 낮은 노드를 먼저 꺼내는 우선순위 큐가 A* 탐색 순서를 정합니다.
-        PriorityQueue<PathNode> openSet = new PriorityQueue<>(
-            Comparator.comparingDouble(PathNode::getF));
-        Map<Long, Double> gScore = new HashMap<>(); // 출발점부터의 실제 비용
-        Map<Long, Edge> cameFrom = new HashMap<>(); // 경로를 되짚을 때 쓸 이전 간선
-        Set<Long> closedSet = new HashSet<>();
-
-        gScore.put(start.getId(), 0.0);
-        openSet.add(new PathNode(start, 0.0, heuristic(start, end)));
-
-        while (!openSet.isEmpty()) {
-            PathNode current = openSet.poll(); // f = g + h가 가장 낮은 노드
-            Node currentNode = current.node;
-            if (currentNode.getId().equals(end.getId())) {
-                return reconstructEdgeList(cameFrom, currentNode);
-            }
-            if (closedSet.contains(currentNode.getId())) continue;
-            closedSet.add(currentNode.getId());
-
-            for (Edge edge : graphCache.getEdges(currentNode)) {
-                if (excludedEdges.contains(edge.getId())) continue;
-                Node neighbor = edge.getDstNode();
-                if (closedSet.contains(neighbor.getId())) continue;
-                if (edge.getStatus() == MapStatus.BLOCKED
-                    || neighbor.getStatus() == MapStatus.BLOCKED) continue;
-
-                double newG = gScore.getOrDefault(currentNode.getId(), Double.MAX_VALUE)
-                    + edgeCost(edge);
-                if (newG < gScore.getOrDefault(neighbor.getId(), Double.MAX_VALUE)) {
-                    cameFrom.put(neighbor.getId(), edge);
-                    gScore.put(neighbor.getId(), newG);
-                    openSet.add(new PathNode(neighbor, newG,
-                        newG + heuristic(neighbor, end))); // f = g + h
-                }
-            }
-        }
-        return Collections.emptyList();
-    - language: java
-      title: Yen 대체 경로 · 갈림점 이후 다른 길을 후보에 추가
-      source: |-
-        // 이미 찾은 경로와 같은 구간을 피한 뒤, 갈림점부터 목적지까지 다시 탐색합니다.
-        List<Edge> spurPath = findSinglePath(spurNode, end, excluded);
-        if (!spurPath.isEmpty()) {
-            // 기본 경로에서 갈림점까지의 구간(rootPath)에 새 구간을 이어 붙입니다.
-            List<Edge> totalPath = new ArrayList<>(rootPath);
-            totalPath.addAll(spurPath);
-            // 이미 결과나 후보에 있는 경로는 중복으로 추가하지 않습니다.
-            if (!containsPath(candidates, resultPaths, totalPath)) {
-                candidates.add(totalPath);
-            }
-        }
+    description: 현재 위치에서 목적지까지 기본 경로를 찾고, 다른 길을 최대 두 개 더 찾아 관제 화면에 보여줍니다.
     evidenceIds: [autowingcar-public]
   - title: 운행 명령·응답 확인
     description: 관제 화면에서 경로를 골라 차량에 운행 명령을 보내고, 수신 응답과 실제 운행 상태를 확인합니다.
@@ -150,7 +94,7 @@ detail:
     items:
     - text: 이동 시간을 반영해 차량 주행 경로 탐색
       evidenceIds: [autowingcar-public]
-    - text: A*로 기본 경로를 찾고 Yen으로 대체 경로를 구해, 합쳐 최대 세 경로를 지도에 표시
+    - text: 기본 경로와 대체 경로를 합쳐 최대 세 경로를 지도에 표시
       evidenceIds: [autowingcar-public]
   - title: 데이터 처리·시험 구성
     items:
@@ -232,7 +176,7 @@ contributions:
   status: reported
 outcomes:
 - id: autowingcar-outcome-1
-  text: A* 기본 경로와 대체 경로를 합쳐 최대 세 경로를 관제 화면에 제공
+  text: 기본 경로와 대체 경로를 합쳐 최대 세 경로를 관제 화면에 제공
   evidenceIds: [autowingcar-public]
   status: reported
 - id: autowingcar-outcome-2
