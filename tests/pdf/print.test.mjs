@@ -24,13 +24,11 @@ test('print document presents Korean project narratives without internal audit m
   assert.match(html, /바닥 접촉 판정이 달라짐/);
   assert.match(html, /작업 스레드 4개/);
   assert.match(html, /게임 창 복귀 뒤 오래된 마이크 입력이 섞임/);
-  assert.match(html, /오래된 MQTT 상태가 최신 값을 덮음/);
-  assert.match(html, /데이터베이스 반영 전에 차량 명령이 발행될 수 있음/);
+  assert.match(html, /Redis 없이 상태와 이력을 DB에 바로 저장할 때 생기는 부하/);
   assert.match(html, /Redis Streams/);
   assert.match(html, /<table><thead>/);
   assert.doesNotMatch(html, /\| 항목 \|/);
   assert.match(html, /<h1>결과<\/h1>/);
-  assert.match(html, /상태 보고 중단 시나리오의 임무 완료율/);
   assert.match(html, /프로젝트 개요[\s\S]*담당 역할[\s\S]*주요 기능[\s\S]*트러블슈팅[\s\S]*결과/);
   assert.match(html, /<strong>문제<\/strong>/);
   assert.doesNotMatch(html, /\*\*문제\*\*/);

@@ -39,7 +39,7 @@ test('project content and links are readable without client JavaScript', async (
   const page = await context.newPage();
   await page.goto(`http://127.0.0.1:4321${base}projects/`);
   await expect(page.locator('.archive-project')).toHaveCount(3);
-  await expect(page.locator('.archive-project')).not.toContainText('DroneSim');
+  expect((await page.locator('.archive-project').allTextContents()).join(' ')).not.toContain('DroneSim');
   await page.goto(`http://127.0.0.1:4321${base}projects/robotpal/`);
   await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과']);
   await expect(page.locator('.project-narrative')).toContainText('66.70 FPS');
@@ -127,7 +127,7 @@ test('project index presents the published cases without client-side controls', 
   await expect(page.locator('astro-island')).toHaveCount(0);
   await expect(page.locator('.archive-project').nth(1)).toContainText('오토잉카');
   await expect(page.locator('.archive-project').nth(2)).toContainText('영묘');
-  await expect(page.locator('.archive-project')).not.toContainText('DroneSim');
+  expect((await page.locator('.archive-project').allTextContents()).join(' ')).not.toContain('DroneSim');
 });
 
 test('keyboard skip link and navigation are reachable', async ({ page }) => {
