@@ -241,18 +241,6 @@ h3 { font-size: 25px; }
 .robotpal-fps-chart__track > span { display: block; width: var(--bar-width); height: 100%; border-radius: inherit; background: var(--color-accent); }
 .robotpal-fps-chart__row strong { font-variant-numeric: tabular-nums; text-align: right; }
 .robotpal-fps-chart figcaption { margin-top: 12px; color: var(--color-muted); font-size: 12px; line-height: 1.65; }
-.dronesim-p95-chart { max-width: 850px; margin: 22px 0; padding: 18px 0; border-block: 1px solid var(--color-line); }
-.dronesim-p95-chart h4 { margin-bottom: 12px; font-size: 16px; }
-.p95-chart-legend { display: flex; gap: 18px; margin-bottom: 12px; color: var(--color-muted); font-size: 12px; }
-.p95-chart-legend span { display: inline-flex; align-items: center; gap: 7px; }
-.p95-chart-legend i { width: 14px; height: 8px; border-radius: 2px; }
-.p95-before { background: #94a3b8; }
-.p95-after { background: var(--color-accent); }
-.p95-chart-rows { display: grid; gap: 8px; }
-.p95-chart-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); align-items: center; gap: 12px; font-size: 13px; }
-.p95-bar-pair { display: grid; gap: 3px; }
-.p95-bar-pair > span { display: block; height: 7px; width: var(--bar-width); border-radius: 2px; }
-.dronesim-p95-chart figcaption { margin-top: 10px; color: var(--color-muted); font-size: 12px; }
 .project-top-links { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-top: 12px; }
 .project-top-links a { display: inline-flex; min-height: 36px; align-items: center; color: var(--color-accent); text-underline-offset: 3px; }
 .project-top-links a:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }

@@ -3,8 +3,8 @@ import { projects } from '@portfolio/career-data';
 import SiteLayout from '../../layouts/SiteLayout.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import { localUrl } from '../../lib/urls.mjs';
-const order = ['robotpal', 'autowingcar', 'mausoleum', 'dronesim'];
-const orderedProjects = order.flatMap(id => projects.filter(project => project.id === id));
+const order = ['robotpal', 'autowingcar', 'mausoleum'];
+const orderedProjects = order.flatMap(id => projects.filter(project => project.portfolioVisible && project.id === id));
 ---
 <SiteLayout title="프로젝트" description="실시간 통신의 지연·순서·최신성 문제를 다룬 프로젝트 사례" active="projects">
   <header class="container archive-heading">

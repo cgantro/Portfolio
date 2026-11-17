@@ -6,10 +6,10 @@ import { assetUrl, localUrl, projectUrl } from '../../lib/urls.mjs';
 
 interface Props { project: (typeof projects)[number]; }
 export function getStaticPaths() {
-  return projects.map(project => ({ params: { id: project.id }, props: { project } }));
+  return projects.filter(project => project.portfolioVisible).map(project => ({ params: { id: project.id }, props: { project } }));
 }
 const { project } = Astro.props;
-const related = projects.filter(item => item.id !== project.id);
+const related = projects.filter(item => item.portfolioVisible && item.id !== project.id);
 const detail = project.detail;
 const architectureNotes = project.id === 'autowingcar'
   ? []
@@ -25,10 +25,6 @@ const robotpalFpsRows = project.id === 'robotpal'
   : [];
 const robotpalFpsValue = (value: string) => Number.parseFloat(value.replace('FPS', '').trim());
 const robotpalFpsMax = Math.max(...robotpalFpsRows.map(row => robotpalFpsValue(row.values[0])), 1);
-const dronesimP95Rows = project.id === 'dronesim'
-  ? detail.troubleshooting.find(issue => issue.comparison)?.comparison?.rows ?? []
-  : [];
-const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(row.values[0])), 1);
 ---
 <SiteLayout title={project.title} description={project.subtitle} active="projects">
   <header class="container project-heading">
@@ -56,8 +52,7 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
       </section>
 
       <figure class="project-cover-wide project-cover-standalone">
-        <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width={project.id === 'dronesim' ? 882 : 1440} height={project.id === 'dronesim' ? 680 : 900} fetchpriority="high" />
-        {project.id === 'dronesim' && <figcaption>DroneSim에서 아파트형 건물 사이를 비행하는 장면</figcaption>}
+        <img src={assetUrl(project.cover.src)} alt={project.cover.alt} width="1440" height="900" fetchpriority="high" />
         {project.id === 'mausoleum' && <figcaption>영묘 프로젝트 타이틀 아트</figcaption>}
         {project.id === 'autowingcar' && <figcaption>프로젝트에서 사용한 견인차 실물 사진</figcaption>}
       </figure>
@@ -155,27 +150,6 @@ const dronesimP95Max = Math.max(...dronesimP95Rows.map(row => Number.parseFloat(
               })}
             </div>
             <figcaption>스트리밍 중 갱신률. 정확한 측정 조건은 아래 비교표에 표시했습니다.</figcaption>
-          </figure>}
-          {project.id === 'dronesim' && index === 0 && dronesimP95Rows.length > 0 && <figure class="dronesim-p95-chart" aria-labelledby="dronesim-p95-chart-title">
-            <h4 id="dronesim-p95-chart-title">배치별 물리 단계 처리 시간</h4>
-            <div class="p95-chart-legend" aria-label="범례">
-              <span><i class="p95-before" aria-hidden="true"></i>변경 전</span>
-              <span><i class="p95-after" aria-hidden="true"></i>변경 후</span>
-            </div>
-            <div class="p95-chart-rows">
-              {dronesimP95Rows.map(row => {
-                const before = Number.parseFloat(row.values[0]);
-                const after = Number.parseFloat(row.values[1]);
-                return <div class="p95-chart-row">
-                  <span>{row.label}</span>
-                  <span class="p95-bar-pair" aria-hidden="true">
-                    <span class="p95-before" style={`--bar-width: ${(before / dronesimP95Max) * 100}%`}></span>
-                    <span class="p95-after" style={`--bar-width: ${(after / dronesimP95Max) * 100}%`}></span>
-                  </span>
-                </div>;
-              })}
-            </div>
-            <figcaption>막대 길이는 물리 단계 p95(µs)를 나타냅니다. 정확한 값과 측정 조건은 아래 표에 있습니다.</figcaption>
           </figure>}
           {issue.comparison && <div class="comparison-wrap">
             <table class="project-comparison">

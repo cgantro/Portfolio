@@ -6,7 +6,7 @@ const screenshotRoot = resolve(process.cwd(), '../../artifacts/design-review/scr
 mkdirSync(screenshotRoot, { recursive: true });
 
 const routes = [
-  ['', 'home'], ['projects/', 'projects'], ['projects/dronesim/', 'dronesim'],
+  ['', 'home'], ['projects/', 'projects'],
   ['projects/robotpal/', 'robotpal'], ['projects/mausoleum/', 'mausoleum'],
   ['projects/autowingcar/', 'autowingcar'],
 ] as const;

@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 
 const routes = [
   '', 'projects/', 'projects/robotpal/', 'projects/mausoleum/',
-  'projects/autowingcar/', 'projects/dronesim/',
+  'projects/autowingcar/',
 ];
 
 for (const route of routes) {

@@ -7,7 +7,7 @@ test('all static routes render and internal navigation keeps deployment base', a
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   const missingAssets: string[] = [];
   page.on('response', response => { if (response.status() >= 400 && response.url().startsWith('http://127.0.0.1:4321/')) missingAssets.push(response.url()); });
-  for (const route of ['', 'projects/', 'projects/robotpal/', 'projects/mausoleum/', 'projects/autowingcar/', 'projects/dronesim/']) {
+  for (const route of ['', 'projects/', 'projects/robotpal/', 'projects/mausoleum/', 'projects/autowingcar/']) {
     const response = await page.goto(`${base}${route}`);
     expect(response?.status()).toBe(200);
     await expect(page.locator('main h1')).toHaveCount(1);
@@ -21,11 +21,8 @@ test('all static routes render and internal navigation keeps deployment base', a
   expect(missingAssets).toEqual([]);
 });
 
-test('DroneSim project assets preserve their deployed paths', async ({ request }) => {
-  for (const asset of ['DroneSim-native-scene.png', 'dronesim-system-architecture.svg']) {
-    const response = await request.get(`${base}${asset}`);
-    expect(response.status()).toBe(200);
-  }
+test('DroneSim is not published as a portfolio detail page', async ({ request }) => {
+  expect((await request.get(`${base}projects/dronesim/`)).status()).toBe(404);
 });
 
 test('portfolio pages have no downloadable files or document pages', async ({ page, request }) => {
@@ -41,27 +38,11 @@ test('project content and links are readable without client JavaScript', async (
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto(`http://127.0.0.1:4321${base}projects/`);
-  await expect(page.locator('.archive-project')).toHaveCount(4);
-  await page.goto(`http://127.0.0.1:4321${base}projects/dronesim/`);
-  await expect(page.locator('.architecture-figure img')).toHaveAttribute('alt', /.+/);
+  await expect(page.locator('.archive-project')).toHaveCount(3);
+  await expect(page.locator('.archive-project')).not.toContainText('DroneSim');
+  await page.goto(`http://127.0.0.1:4321${base}projects/robotpal/`);
   await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과']);
-  await expect(page.locator('.project-narrative')).toContainText('설정한 상태 보고 중단 시나리오에서 임무 100% 완료');
-  await expect(page.locator('.project-narrative')).toContainText('188.0');
-  await expect(page.locator('.project-narrative')).toContainText('184.2µs');
-  await expect(page.locator('.dronesim-p95-chart .p95-chart-row')).toHaveCount(5);
-  await expect(page.locator('.dronesim-p95-chart')).toContainText('변경 전');
-  await expect(page.locator('.dronesim-p95-chart')).toContainText('변경 후');
-  await expect(page.locator('.project-narrative')).toContainText('네 대의 드론을 편대로 이동시키고');
-  await expect(page.locator('.project-narrative')).toContainText('가상 통신 경로');
-  await expect(page.locator('.project-narrative')).not.toContainText('H.264 영상으로 실시간 전송');
-  await expect(page.locator('.project-narrative')).not.toContainText('탄천교 주변');
-  await expect(page.locator('.project-narrative .code-disclosure')).toHaveCount(1);
-  await expect(page.locator('.project-narrative .code-disclosure[open]')).toHaveCount(0);
-  await expect(page.locator('.project-heading')).not.toContainText('2.6×10⁻⁶');
-  await expect(page.locator('.project-narrative')).toContainText('같은 기록을 12회 재생');
-  await expect(page.locator('.dronesim-p95-chart')).toContainText('물리 단계 처리 시간');
-  await expect(page.locator('[data-evidence-ids]')).toHaveCount(0);
-  await expect(page.locator('.project-top-links a[target="_blank"]').filter({ hasText: '웹 데모 실행' })).toHaveAttribute('href', 'https://cgantro.github.io/DroneSim/');
+  await expect(page.locator('.project-narrative')).toContainText('66.70 FPS');
   await context.close();
 });
 
@@ -95,7 +76,7 @@ test('RobotPal follows the project introduction, role, features, troubleshooting
 });
 
 test('all projects share the five narrative sections and show the cover beside the role section', async ({ page }) => {
-  for (const id of ['robotpal', 'dronesim', 'mausoleum', 'autowingcar']) {
+  for (const id of ['robotpal', 'mausoleum', 'autowingcar']) {
     await page.goto(`${base}projects/${id}/`);
     await expect(page.locator('.project-narrative h2')).toHaveText(['프로젝트 개요', '담당 역할', '주요 기능', '트러블슈팅', '결과']);
     await expect(page.locator('.project-features .project-feature-list > li').first().locator('h3')).toBeVisible();
@@ -123,7 +104,7 @@ test('project code stays collapsed and does not expose a source-code link', asyn
 
 test('mobile project tables fit and architecture diagrams have a keyboard-scrollable viewport', async ({ page }) => {
   await page.setViewportSize({ width: 375, height: 812 });
-  for (const id of ['robotpal', 'dronesim']) {
+  for (const id of ['robotpal']) {
     await page.goto(`${base}projects/${id}/`);
     const table = page.locator('.project-comparison').first();
     await expect(table).toBeVisible();
@@ -135,9 +116,9 @@ test('mobile project tables fit and architecture diagrams have a keyboard-scroll
   }
 });
 
-test('project index presents all four cases without client-side controls', async ({ page }) => {
+test('project index presents the published cases without client-side controls', async ({ page }) => {
   await page.goto(`${base}projects/`);
-  await expect(page.locator('.archive-project')).toHaveCount(4);
+  await expect(page.locator('.archive-project')).toHaveCount(3);
   await expect(page.locator('.archive-intro')).toContainText('전문 분야로 삼고 싶어졌습니다');
   await expect(page.locator('.archive-project').first()).toContainText('RobotPal');
   await expect(page.locator('.archive-project').first()).toContainText('2025.11');
@@ -146,8 +127,7 @@ test('project index presents all four cases without client-side controls', async
   await expect(page.locator('astro-island')).toHaveCount(0);
   await expect(page.locator('.archive-project').nth(1)).toContainText('오토잉카');
   await expect(page.locator('.archive-project').nth(2)).toContainText('영묘');
-  await expect(page.locator('.archive-project').nth(3)).toContainText('DroneSim');
-  await expect(page.locator('.archive-project').nth(3)).toContainText('2026.08');
+  await expect(page.locator('.archive-project')).not.toContainText('DroneSim');
 });
 
 test('keyboard skip link and navigation are reachable', async ({ page }) => {
@@ -192,12 +172,11 @@ test('homepage introduces the developer before the featured project cases', asyn
   await expect(page.locator('.roadmap-list li')).toHaveCount(3);
   await expect(page.locator('.roadmap-list')).toContainText('유실과 역순 도착');
   await expect(page.getByRole('heading', { name: 'RobotPal', exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'DroneSim', exact: true })).toHaveCount(0);
   await expect(page.locator('.featured-project').first()).toContainText('RobotPal');
   await expect(page.locator('.featured-project').first()).toContainText('담당');
-  const launch = page.getByRole('link', { name: '웹 데모 실행' });
-  await expect(launch).toHaveAttribute('target', '_blank');
-  await expect(page.locator('.featured-project')).toHaveCount(2);
+  await expect(page.getByRole('link', { name: '웹 데모 실행' })).toHaveCount(0);
+  await expect(page.locator('.featured-project')).toHaveCount(1);
   await expect(page.locator('.supporting-project')).toHaveCount(2);
   expect(demoRequests).toBe(0);
 });
@@ -224,22 +203,5 @@ test('AutoWing Car shows telemetry formats and orders its features as a vehicle 
   expect(flowRatios.every(ratio => ratio > 1)).toBe(true);
   await expect(page.getByText('Redis에는 최신 차량 상태를 저장하고, PostgreSQL에는 운행 이력을 기록합니다.')).toHaveCount(0);
   await expect(page.locator('.project-troubleshooting')).toContainText('저장 성공 뒤 완료 처리');
-});
-
-test('DroneSim stays absent until explicit launch and opens in a separate tab', async ({ page }) => {
-  let demoRequests = 0;
-  await page.context().route('https://cgantro.github.io/DroneSim/**', route => { demoRequests += 1; return route.fulfill({ status: 200, contentType: 'text/html', body: '<html><body>DroneSim simulator fixture</body></html>' }); });
-  await page.goto(`${base}projects/dronesim/`);
-  await expect(page.locator('iframe')).toHaveCount(0);
-  expect(demoRequests).toBe(0);
-  const launch = page.locator('.project-top-links').getByRole('link', { name: '웹 데모 실행' });
-  await expect(launch).toHaveAttribute('target', '_blank');
-  await launch.scrollIntoViewIfNeeded();
-  const popupPromise = page.waitForEvent('popup');
-  await launch.click();
-  const popup = await popupPromise;
-  await expect(popup.getByText('DroneSim simulator fixture')).toBeVisible();
-  expect(demoRequests).toBeGreaterThan(0);
-  await popup.close();
 });
 

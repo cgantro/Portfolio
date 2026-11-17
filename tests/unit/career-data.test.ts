@@ -53,7 +53,7 @@ test('reported benchmark values retain conditions and their original limits', ()
   }
   const autowingcar = getProject('autowingcar')!;
   assert.equal(autowingcar.metrics.length, 0);
-  assert.ok(autowingcar.limitations.some((text) => text.includes('처리량·지연 개선 수치')));
+  assert.ok(autowingcar.limitations.some((text) => text.includes('처리량·지연 비교 수치')));
 });
 
 test('schema rejects dangling provenance, duplicate evidence, and confidence inflation', () => {
@@ -97,10 +97,10 @@ test('loader rejects mismatch between YAML ID and its selected filename', () => 
 });
 
 test('all public asset references and local evidence sources are tracked files', () => {
-  const tracked = new Set(execFileSync('git', ['-c', 'core.quotepath=false', 'ls-files', '-z', 'asset', 'data/projects', 'portfolio'], { cwd: root, encoding: 'utf8' }).split('\0'));
+  const tracked = new Set(execFileSync('git', ['-c', 'core.quotepath=false', 'ls-files', '-z', 'asset', 'packages/career-data/content/projects/assets', 'data/projects', 'portfolio'], { cwd: root, encoding: 'utf8' }).split('\0'));
   for (const project of careerData.projects) {
     for (const asset of [project.cover, project.architecture]) {
-      const path = `asset/${asset.src.replace(/^\/assets\//, '')}`;
+      const path = asset.src.startsWith('/assets/') ? `asset/${asset.src.slice('/assets/'.length)}` : asset.src;
       assert.ok(tracked.has(path), `Asset must already be publicly tracked: ${path}`);
       assert.ok(existsSync(resolve(root, path)));
     }
